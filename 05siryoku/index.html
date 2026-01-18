@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>すーぱー しりょく てすと</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* カスタムアニメーション */
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-zoom-in {
+            animation: zoomIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeOutUp {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to { opacity: 0; transform: translate(-50%, -40px); }
+        }
+        .animate-feedback {
+            animation: fadeOutUp 0.5s ease-out forwards;
+        }
+        .touch-manipulation {
+            touch-action: manipulation;
+        }
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-[#E0F2FE] font-sans overflow-hidden w-full h-screen flex flex-col touch-manipulation">
+
+    <!-- 背景装飾 -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none" 
+         style="background-image: radial-gradient(#0EA5E9 3px, transparent 3px); background-size: 30px 30px;">
+    </div>
+
+    <!-- ====================
+         タイトル画面
+         ==================== -->
+    <div id="screen-title" class="absolute inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] p-6 w-full max-w-sm shadow-xl border-4 border-white ring-8 ring-sky-200 flex flex-col gap-6 animate-zoom-in">
+            <div class="text-center mt-2">
+                <div class="inline-block bg-sky-100 p-4 rounded-full mb-4 border-4 border-sky-200">
+                    <i data-lucide="eye" class="w-12 h-12 text-blue-500"></i>
+                </div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight leading-tight drop-shadow-sm">
+                    すーぱー<br>しりょく てすと
+                </h1>
+            </div>
+
+            <div class="bg-slate-50 rounded-3xl p-5 border-2 border-slate-100">
+                <p class="text-center text-slate-400 text-xs font-black mb-3 bg-white inline-block px-3 py-1 rounded-full mx-auto shadow-sm">あそぶ ルールを えらぼう</p>
+                <div class="flex gap-3">
+                    <button onclick="toggleConfig('useRed')" id="btn-config-red" class="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border-b-4 transition-all active:scale-95 active:border-b-0 active:translate-y-1 bg-white text-red-500 border-slate-200 shadow-sm">
+                        <div class="p-2 rounded-full mb-1 bg-slate-50">
+                            <i data-lucide="timer" class="w-6 h-6"></i>
+                        </div>
+                        <span class="font-black text-sm">あか</span>
+                        <div class="mt-1 icon-status"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    </button>
+                    
+                    <button onclick="toggleConfig('useYellow')" id="btn-config-yellow" class="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border-b-4 transition-all active:scale-95 active:border-b-0 active:translate-y-1 bg-white text-yellow-500 border-slate-200 shadow-sm">
+                        <div class="p-2 rounded-full mb-1 bg-slate-50">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                        <span class="font-black text-sm">きいろ</span>
+                        <div class="mt-1 icon-status"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    </button>
+
+                    <button onclick="toggleConfig('useBlue')" id="btn-config-blue" class="flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border-b-4 transition-all active:scale-95 active:border-b-0 active:translate-y-1 bg-white text-blue-500 border-slate-200 shadow-sm">
+                        <div class="p-2 rounded-full mb-1 bg-slate-50">
+                            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                        </div>
+                        <span class="font-black text-sm">あお</span>
+                        <div class="mt-1 icon-status"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-5 bg-green-500 hover:bg-green-400 text-white rounded-2xl font-black text-2xl shadow-[0_6px_0_rgb(21,128,61)] active:shadow-none active:translate-y-[6px] transition-all border-b-2 border-green-600 flex items-center justify-center gap-2 group">
+                <i data-lucide="power" class="w-6 h-6" stroke-width="4"></i>
+                スタート！
+            </button>
+        </div>
+    </div>
+
+    <!-- ====================
+         プレイ画面
+         ==================== -->
+    <div id="screen-game" class="hidden flex-col w-full h-full">
+        
+        <!-- Header -->
+        <div class="bg-white/90 backdrop-blur-sm px-2 py-2 flex items-center gap-2 z-30 shadow-sm border-b-4 border-slate-100 rounded-b-3xl mx-2 mt-2">
+            <button onclick="backToTitle()" class="flex flex-col items-center justify-center bg-slate-100 hover:bg-red-50 hover:text-red-400 text-slate-400 rounded-2xl w-14 h-14 border-b-4 border-slate-200 active:border-b-0 active:translate-y-[4px] transition-all shrink-0">
+                <i data-lucide="x" class="w-6 h-6" stroke-width="4"></i>
+                <span class="text-[9px] font-black leading-none mt-1">やめる</span>
+            </button>
+
+            <div class="flex flex-col items-center shrink-0">
+                <span class="text-[10px] font-black text-slate-400 leading-none mb-1">しりょく</span>
+                <span id="game-score" class="text-4xl text-blue-600 font-black tracking-tighter leading-none">0.1</span>
+            </div>
+            
+            <div id="hint-area" class="flex-1 flex justify-center items-center px-1 overflow-hidden h-10">
+                <!-- Javascript will inject content here -->
+            </div>
+
+            <div class="flex flex-col items-center shrink-0">
+                <span class="text-[10px] font-black text-slate-400 leading-none mb-1">のこり</span>
+                <span id="game-time" class="text-2xl font-black text-slate-700">30</span>
+            </div>
+        </div>
+
+        <!-- Main Canvas -->
+        <!-- 色が見やすいように少し暗めのグレー背景 -->
+        <div id="game-canvas" class="flex-1 relative w-full overflow-hidden bg-slate-200 rounded-2xl my-2 mx-2 border-4 border-white shadow-inner">
+            
+            <!-- Target Container -->
+            <div id="landolt-container" class="absolute flex items-center justify-center z-10 transition-all duration-300" style="display: none;">
+                <div class="relative flex items-center justify-center">
+                    
+                    <!-- 
+                        COLOR HACK CONTAINER
+                    -->
+                    <div id="img-wrapper" class="w-32 h-32 overflow-hidden flex items-center justify-center relative hidden">
+                        <!-- 画像本体（見えないように左へ） -->
+                        <img id="landolt-img" src="" alt="arrow" 
+                             class="w-full h-full object-contain absolute" 
+                             style="left: -100px;"> 
+                    </div>
+                    
+                    <!-- Fallback Icon -->
+                    <div id="landolt-icon" class="hidden">
+                        <i data-lucide="arrow-up" class="w-[110px] h-[110px]" stroke-width="3"></i>
+                    </div>
+
+                    <!-- Yellow Counter: 位置を右下に移動し、少し小さく調整 -->
+                    <span id="yellow-counter" class="text-3xl drop-shadow-md bg-white rounded-full w-12 h-12 flex items-center justify-center absolute -bottom-2 -right-2 text-slate-900 border-[4px] border-yellow-500 font-black z-20 animate-pulse hidden">
+                        3
+                    </span>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Control Pad -->
+        <div class="bg-white rounded-t-[3rem] border-t-4 border-slate-100 p-6 z-40 pb-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+            <div class="max-w-[300px] mx-auto grid grid-cols-3 gap-3">
+                <div></div>
+                <button onclick="handleInput('Up')" class="aspect-square bg-white hover:bg-slate-50 text-slate-300 active:bg-blue-500 active:text-white rounded-2xl flex items-center justify-center border-b-[8px] border-slate-200 active:border-b-0 active:translate-y-[8px] transition-all">
+                    <i data-lucide="arrow-up" class="w-12 h-12" stroke-width="4"></i>
+                </button>
+                <div></div>
+                
+                <button onclick="handleInput('Left')" class="aspect-square bg-white hover:bg-slate-50 text-slate-300 active:bg-blue-500 active:text-white rounded-2xl flex items-center justify-center border-b-[8px] border-slate-200 active:border-b-0 active:translate-y-[8px] transition-all">
+                    <i data-lucide="arrow-left" class="w-12 h-12" stroke-width="4"></i>
+                </button>
+                <div class="flex items-center justify-center">
+                     <div class="w-4 h-4 bg-slate-200 rounded-full"></div>
+                </div>
+                <button onclick="handleInput('Right')" class="aspect-square bg-white hover:bg-slate-50 text-slate-300 active:bg-blue-500 active:text-white rounded-2xl flex items-center justify-center border-b-[8px] border-slate-200 active:border-b-0 active:translate-y-[8px] transition-all">
+                    <i data-lucide="arrow-right" class="w-12 h-12" stroke-width="4"></i>
+                </button>
+    
+                <div></div>
+                <button onclick="handleInput('Down')" class="aspect-square bg-white hover:bg-slate-50 text-slate-300 active:bg-blue-500 active:text-white rounded-2xl flex items-center justify-center border-b-[8px] border-slate-200 active:border-b-0 active:translate-y-[8px] transition-all">
+                    <i data-lucide="arrow-down" class="w-12 h-12" stroke-width="4"></i>
+                </button>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================
+         ゲームオーバー画面
+         ==================== -->
+    <div id="screen-gameover" class="hidden absolute inset-0 z-50 flex items-center justify-center p-4 bg-sky-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl flex flex-col items-center gap-4 animate-zoom-in text-center relative overflow-hidden border-4 border-white">
+           <div class="mt-2">
+               <i data-lucide="trophy" class="w-16 h-16 text-yellow-400 mx-auto mb-2 drop-shadow-md fill-yellow-200"></i>
+               <h2 class="text-xl font-black text-slate-400">あなたの しりょくは...</h2>
+           </div>
+           <div class="py-8 px-4 bg-sky-50 rounded-3xl border-b-8 border-sky-100 w-full mb-2">
+               <span id="result-score" class="text-[6rem] font-black text-blue-500 leading-none drop-shadow-sm tracking-tighter">0.0</span>
+           </div>
+           <div class="text-slate-400 font-bold text-xs bg-slate-100 px-4 py-2 rounded-full mb-4">
+               最高きろく: <span id="result-highscore">0.0</span>
+           </div>
+           <button onclick="backToTitle()" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-2xl font-black text-xl shadow-[0_6px_0_rgb(15,23,42)] active:shadow-none active:translate-y-[6px] transition-all border-b-2 border-slate-800 flex items-center justify-center gap-2">
+               <i data-lucide="rotate-ccw" class="w-6 h-6" stroke-width="3"></i>
+               タイトルへ
+           </button>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        const GAME_DURATION = 30;
+        const RED_LIMIT_MS = 1500;
+        const DIRECTIONS = ['Up', 'Right', 'Down', 'Left'];
+
+        let state = {
+            gameState: 'title',
+            config: { useRed: true, useBlue: true, useYellow: true },
+            score: 0.1,
+            level: 1,
+            timeLeft: GAME_DURATION,
+            landolt: null,
+            highScore: parseFloat(localStorage.getItem('ultraVisionKidsHighScoreV3') || '0.0'),
+            levelAlert: null,
+            lastDirection: null
+        };
+
+        let mainTimer = null;
+        let redTimer = null;
+        let alertTimer = null;
+
+        lucide.createIcons();
+
+        // Audio
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'switch') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.05); osc.start(now); osc.stop(now + 0.05);
+            } else if (type === 'start') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(440, now); osc.frequency.linearRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.8);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.8); osc.start(now); osc.stop(now + 0.8);
+            } else if (type === 'back') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
+
+        function toggleConfig(key) {
+            playSound('switch');
+            state.config[key] = !state.config[key];
+            updateConfigUI();
+        }
+
+        function updateConfigUI() {
+            const map = {
+                useRed: { btn: 'btn-config-red', color: 'text-red-500' },
+                useYellow: { btn: 'btn-config-yellow', color: 'text-yellow-500' },
+                useBlue: { btn: 'btn-config-blue', color: 'text-blue-500' }
+            };
+            for (const key in map) {
+                const isActive = state.config[key];
+                const el = document.getElementById(map[key].btn);
+                const statusDiv = el.querySelector('.icon-status');
+                if (isActive) {
+                    el.className = `flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border-b-4 transition-all active:scale-95 active:border-b-0 active:translate-y-1 bg-white ${map[key].color} border-slate-200 shadow-sm`;
+                    el.querySelector('.rounded-full').className = 'p-2 rounded-full mb-1 bg-slate-50';
+                    statusDiv.innerHTML = '<i data-lucide="check" class="w-4 h-4" stroke-width="4"></i>';
+                } else {
+                    el.className = `flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border-b-4 transition-all active:scale-95 active:border-b-0 active:translate-y-1 bg-slate-200 text-slate-400 border-slate-300 grayscale opacity-60`;
+                    el.querySelector('.rounded-full').className = 'p-2 rounded-full mb-1 bg-slate-300';
+                    statusDiv.innerHTML = '<i data-lucide="x" class="w-4 h-4" stroke-width="4"></i>';
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function getActiveSpecialColors() {
+            const list = [];
+            if (state.config.useRed) list.push('Red');
+            if (state.config.useYellow) list.push('Yellow');
+            if (state.config.useBlue) list.push('Blue');
+            return list;
+        }
+
+        function startGame() {
+            playSound('start');
+            state.gameState = 'playing';
+            state.score = 0.1;
+            state.level = 1;
+            state.timeLeft = GAME_DURATION;
+            state.levelAlert = null;
+            state.lastDirection = null;
+            
+            document.getElementById('screen-title').classList.add('hidden');
+            document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('screen-game').classList.add('flex');
+            
+            updateScoreDisplay();
+            updateTimeDisplay();
+            spawnLandolt();
+
+            if (mainTimer) clearInterval(mainTimer);
+            mainTimer = setInterval(() => {
+                state.timeLeft -= 1;
+                updateTimeDisplay();
+                if (state.timeLeft <= 0) endGame();
+                else if (state.timeLeft < 10) document.getElementById('game-time').classList.add('text-red-500', 'animate-pulse');
+            }, 1000);
+        }
+
+        function backToTitle() {
+            playSound('back');
+            if (mainTimer) clearInterval(mainTimer);
+            if (redTimer) clearTimeout(redTimer);
+            state.gameState = 'title';
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('flex');
+            document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-title').classList.remove('hidden');
+        }
+
+        function endGame() {
+            playSound('gameover');
+            if (mainTimer) clearInterval(mainTimer);
+            if (redTimer) clearTimeout(redTimer);
+            state.gameState = 'gameover';
+            if (state.score > state.highScore) {
+                state.highScore = state.score;
+                localStorage.setItem('ultraVisionKidsHighScoreV3', state.score.toFixed(1));
+            }
+            document.getElementById('result-score').innerText = state.score.toFixed(1);
+            document.getElementById('result-highscore').innerText = state.highScore.toFixed(1);
+            document.getElementById('screen-gameover').classList.remove('hidden');
+        }
+
+        function spawnLandolt() {
+            let nextColor = 'Black';
+            let pos = { x: 50, y: 50 };
+
+            if (state.level >= 2) {
+                pos = { x: 20 + Math.random() * 60, y: 35 + Math.random() * 30 };
+            }
+
+            const activeSpecials = getActiveSpecialColors();
+            const availableColors = ['Black'];
+
+            if (state.level >= 3 && activeSpecials.length > 0) availableColors.push(activeSpecials[0]);
+            if (state.level >= 4 && activeSpecials.length > 1) availableColors.push(activeSpecials[1]);
+            if (state.level >= 5 && activeSpecials.length > 2) availableColors.push(activeSpecials[2]);
+
+            if (availableColors.length > 1) {
+                let colorChance = 0.5;
+                if (state.level >= 4) colorChance = 0.7;
+                if (state.level >= 5) colorChance = 0.85;
+                if (Math.random() < colorChance) {
+                    const specialColors = availableColors.filter(c => c !== 'Black');
+                    nextColor = specialColors[Math.floor(Math.random() * specialColors.length)];
+                }
+            }
+
+            // 方向決定：前回と違うものを
+            let direction;
+            if (!state.lastDirection) {
+                direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            } else {
+                const candidates = DIRECTIONS.filter(d => d !== state.lastDirection);
+                direction = candidates[Math.floor(Math.random() * candidates.length)];
+            }
+            state.lastDirection = direction;
+            
+            state.landolt = {
+                id: Date.now(),
+                direction: direction,
+                color: nextColor,
+                x: pos.x,
+                y: pos.y,
+                hitsRemaining: nextColor === 'Yellow' ? 3 : 1
+            };
+
+            renderLandoltUI();
+
+            if (redTimer) clearTimeout(redTimer);
+            if (nextColor === 'Red') {
+                redTimer = setTimeout(() => {
+                    if (state.landolt && state.landolt.color === 'Red') {
+                        showFeedback('おそい！', 'error', state.landolt.x, state.landolt.y);
+                        playSound('wrong');
+                        state.score = Math.max(0.1, parseFloat((state.score - 0.2).toFixed(1)));
+                        updateScoreDisplay();
+                        spawnLandolt();
+                    }
+                }, RED_LIMIT_MS);
+            }
+        }
+
+        function renderLandoltUI() {
+            const container = document.getElementById('landolt-container');
+            const img = document.getElementById('landolt-img');
+            const imgWrapper = document.getElementById('img-wrapper');
+            const iconContainer = document.getElementById('landolt-icon');
+            
+            let icon = iconContainer.querySelector('svg') || iconContainer.querySelector('i');
+            const yellowCounter = document.getElementById('yellow-counter');
+
+            const data = state.landolt;
+            if (!data) return;
+
+            container.style.display = 'flex';
+            container.style.left = `${data.x}%`;
+            container.style.top = `${data.y}%`;
+            container.style.transform = 'translate(-50%, -50%)';
+
+            let imgName = '';
+            switch(data.direction) {
+                case 'Right': imgName = '1.png'; break;
+                case 'Down': imgName = '2.png'; break;
+                case 'Left': imgName = '3.png'; break;
+                case 'Up': imgName = '4.png'; break;
+            }
+
+            let rotateDeg = 0;
+            switch(data.direction) {
+                case 'Up': rotateDeg = 0; break;
+                case 'Right': rotateDeg = 90; break;
+                case 'Down': rotateDeg = 180; break;
+                case 'Left': rotateDeg = 270; break;
+            }
+
+            // --- 色の設定 ---
+            let targetColor = '#1E293B'; // Black
+            let dropShadow = 'drop-shadow(100px 0 0 rgba(30, 41, 59, 1))'; // default black shadow
+
+            // ドロップシャドウハックのオフセットは100pxとする（imgはleft:-100pxに配置）
+            if (data.color === 'Blue') { 
+                targetColor = '#3B82F6';
+                dropShadow = 'drop-shadow(100px 0 0 #3B82F6)';
+            } else if (data.color === 'Red') { 
+                targetColor = '#EF4444'; 
+                dropShadow = 'drop-shadow(100px 0 0 #EF4444)';
+            } else if (data.color === 'Yellow') { 
+                targetColor = '#EAB308'; 
+                dropShadow = 'drop-shadow(100px 0 0 #EAB308)';
+            }
+
+            // 初期化
+            imgWrapper.classList.add('hidden');
+            iconContainer.classList.add('hidden');
+
+            // 画像の読み込み処理
+            img.src = imgName;
+            
+            // --- 重要: ドロップシャドウハック適用 ---
+            // フィルタ適用（右に100pxずらして影を落とす）
+            img.style.filter = dropShadow;
+            
+            img.onload = () => {
+                imgWrapper.classList.remove('hidden');
+            };
+
+            img.onerror = () => {
+                imgWrapper.classList.add('hidden');
+                iconContainer.classList.remove('hidden');
+                if (icon) {
+                    icon.setAttribute('class', `w-[110px] h-[110px] transition-all duration-300 drop-shadow-md`);
+                    icon.style.color = targetColor;
+                    // アイコンの場合は単純なdrop-shadowで光彩をつける
+                    icon.style.filter = `drop-shadow(0 0 5px ${targetColor})`;
+                }
+                iconContainer.style.transform = `rotate(${rotateDeg}deg)`;
+            };
+
+            if (data.color === 'Yellow') {
+                yellowCounter.classList.remove('hidden');
+                yellowCounter.innerText = data.hitsRemaining;
+            } else {
+                yellowCounter.classList.add('hidden');
+            }
+
+            updateHintArea();
+        }
+
+        function updateHintArea() {
+            const hintArea = document.getElementById('hint-area');
+            if (state.levelAlert) {
+                hintArea.innerHTML = `<div class="bg-yellow-100 px-3 py-1 rounded-xl border-b-4 border-yellow-300 flex items-center justify-center gap-1 animate-bounce w-full"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-600 fill-yellow-400 shrink-0"></i><span class="text-yellow-700 font-black text-xs whitespace-nowrap overflow-hidden text-ellipsis">${state.levelAlert}</span></div>`;
+            } else if (state.landolt) {
+                const c = state.landolt.color;
+                let content = '';
+                if (c === 'Red') content = `<span class="text-red-500 font-black text-lg flex gap-1 items-center whitespace-nowrap"><i data-lucide="timer" class="w-5 h-5"></i>いそげ！</span>`;
+                else if (c === 'Blue') content = `<span class="text-blue-500 font-black text-lg flex gap-1 items-center whitespace-nowrap"><i data-lucide="rotate-ccw" class="w-5 h-5"></i>はんたい！</span>`;
+                else if (c === 'Yellow') content = `<span class="text-yellow-500 font-black text-lg flex gap-1 items-center whitespace-nowrap"><i data-lucide="zap" class="w-5 h-5"></i>れんだ！</span>`;
+                else content = `<span class="text-slate-400 font-bold text-sm whitespace-nowrap">むきは？</span>`;
+                hintArea.innerHTML = `<div class="flex items-center gap-1 animate-zoom-in justify-center">${content}</div>`;
+            } else {
+                hintArea.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+        function handleInput(inputDir) {
+            if (state.gameState !== 'playing' || !state.landolt) return;
+            if (state.landolt.color === 'Red' && redTimer) clearTimeout(redTimer);
+
+            let isCorrect = false;
+            let scoreDelta = 0.1;
+            let message = 'ナイス！';
+
+            if (state.landolt.color === 'Blue') {
+                const opposite = DIRECTIONS[(DIRECTIONS.indexOf(state.landolt.direction) + 2) % 4];
+                isCorrect = (inputDir === opposite);
+            } else {
+                isCorrect = (inputDir === state.landolt.direction);
+            }
+
+            if (isCorrect) {
+                if (state.landolt.color === 'Yellow') {
+                    state.landolt.hitsRemaining -= 1;
+                    if (state.landolt.hitsRemaining > 0) {
+                        playSound('correct'); renderLandoltUI(); return;
+                    }
+                }
+                playSound('correct');
+                if (state.landolt.color === 'Red') scoreDelta = 0.2;
+                if (state.landolt.color === 'Blue') scoreDelta = 0.2;
+                if (state.landolt.color === 'Yellow') scoreDelta = 0.3;
+
+                state.score = parseFloat((state.score + scoreDelta).toFixed(1));
+                showFeedback(message, 'success', state.landolt.x, state.landolt.y);
+                checkLevelUp();
+                updateScoreDisplay();
+                spawnLandolt();
+            } else {
+                playSound('wrong');
+                showFeedback('ちがう！', 'error', state.landolt.x, state.landolt.y);
+                state.score = Math.max(0.1, parseFloat((state.score - 0.2).toFixed(1)));
+                updateScoreDisplay();
+            }
+        }
+
+        function checkLevelUp() {
+            let newLevel = state.level;
+            if (state.score >= 0.3 && state.level < 2) newLevel = 2; 
+            if (state.score >= 0.7 && state.level < 3) newLevel = 3; 
+            if (state.score >= 1.2 && state.level < 4) newLevel = 4; 
+            if (state.score >= 1.8 && state.level < 5) newLevel = 5; 
+
+            if (newLevel !== state.level) {
+                state.level = newLevel;
+                const activeSpecials = getActiveSpecialColors();
+                let message = '';
+                let targetColor = null;
+                if (newLevel === 3 && activeSpecials.length > 0) targetColor = activeSpecials[0];
+                else if (newLevel === 4 && activeSpecials.length > 1) targetColor = activeSpecials[1];
+                else if (newLevel === 5 && activeSpecials.length > 2) targetColor = activeSpecials[2];
+
+                if (targetColor) {
+                    if (targetColor === 'Red') message = 'あか色は 1.5びょう！';
+                    if (targetColor === 'Yellow') message = 'きいろは 3かい れんだ！';
+                    if (targetColor === 'Blue') message = 'あお色は はんたい！';
+                }
+                if (message) {
+                    state.levelAlert = message; updateHintArea();
+                    if (alertTimer) clearTimeout(alertTimer);
+                    alertTimer = setTimeout(() => { state.levelAlert = null; updateHintArea(); }, 3000);
+                }
+            }
+        }
+
+        function updateScoreDisplay() { document.getElementById('game-score').innerText = state.score.toFixed(1); }
+        function updateTimeDisplay() {
+            const el = document.getElementById('game-time'); el.innerText = state.timeLeft;
+            if (state.timeLeft >= 10) { el.classList.remove('text-red-500', 'animate-pulse'); el.classList.add('text-slate-700'); }
+        }
+
+        function showFeedback(text, type, x, y) {
+            const el = document.createElement('div');
+            el.className = `absolute font-black text-4xl whitespace-nowrap z-50 pointer-events-none animate-feedback`;
+            if (type === 'success') el.className += ' text-green-500 drop-shadow-[0_4px_0_white]';
+            else if (type === 'error') el.className += ' text-red-500 drop-shadow-[0_4px_0_white]';
+            else el.className += ' text-blue-500';
+            el.style.left = `${x}%`; el.style.top = `${y - 20}%`; el.style.transform = 'translateX(-50%)'; el.innerText = text;
+            document.getElementById('game-canvas').appendChild(el);
+            setTimeout(() => el.remove(), 500);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (state.gameState === 'title') startGame();
+                else if (state.gameState === 'gameover') backToTitle();
+            }
+            if (state.gameState === 'playing') {
+                if (e.key === 'ArrowUp') handleInput('Up');
+                if (e.key === 'ArrowDown') handleInput('Down');
+                if (e.key === 'ArrowLeft') handleInput('Left');
+                if (e.key === 'ArrowRight') handleInput('Right');
+            }
+        });
+
+        updateConfigUI();
+    </script>
+</body>
+</html>

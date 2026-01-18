@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>いろあわせ キオク ゲーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap');
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            touch-action: manipulation; /* ダブルタップズーム防止 */
+        }
+
+        /* アニメーション */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* スコア獲得演出 */
+        @keyframes score-popup {
+            0% { transform: scale(0.5) translateY(0); opacity: 0; }
+            50% { transform: scale(1.5) translateY(-20px); opacity: 1; }
+            100% { transform: scale(1) translateY(-50px); opacity: 0; }
+        }
+        .score-popup {
+            position: absolute;
+            font-weight: 900;
+            color: #f59e0b; /* amber-500 */
+            text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+            pointer-events: none;
+            z-index: 50;
+            animation: score-popup 1s ease-out forwards;
+        }
+
+        /* 紙吹雪 */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .cell-shadow {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .btn-press {
+            transition: transform 0.1s;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        
+        /* 透け防止のためのパターン背景 */
+        .bg-pattern {
+            background-image: radial-gradient(#f9a8d4 2px, transparent 2px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-slate-700 min-h-screen flex flex-col select-none overflow-hidden">
+
+    <div id="confetti-container"></div>
+
+    <!-- ヘッダー (タイトル画面以外で表示) -->
+    <header id="game-header" class="hidden bg-white/80 backdrop-blur-sm shadow-sm p-2 sticky top-0 z-20 border-b border-white">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-lg md:text-2xl font-extrabold text-pink-400 flex items-center gap-2">
+                <i class="fas fa-star text-yellow-300"></i> いろあわせ
+            </h1>
+            
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- モード表示 -->
+                <div id="mode-badge" class="px-2 py-1 md:px-3 rounded-full text-xs md:text-sm font-black border-2 hidden md:block">
+                    <!-- JSで設定 -->
+                </div>
+
+                <!-- スコア表示 -->
+                <div id="level-display" class="flex items-center gap-2 bg-white border-2 border-pink-100 px-3 py-1 rounded-full shadow-sm relative">
+                    <span class="text-pink-400 font-bold text-xs md:text-sm">スコア</span>
+                    <span id="current-score" class="text-xl md:text-2xl font-black text-pink-500 transition-all duration-300">0</span>
+                    <span class="text-pink-300 font-bold text-xs">/</span>
+                    <span id="max-score" class="text-pink-300 font-bold text-xs">MAX</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <!-- スマホでは上に寄せる (justify-start pt-2) -->
+    <main class="flex-grow flex flex-col items-center justify-start md:justify-center pt-2 md:pt-4 p-4 w-full max-w-4xl mx-auto relative overflow-y-auto">
+
+        <!-- 0. タイトル画面 (Title Screen) -->
+        <div id="title-screen" class="w-full max-w-md bg-white p-8 rounded-[3rem] shadow-xl text-center animate-fade-in flex flex-col items-center gap-6 border-8 border-yellow-200 relative overflow-hidden mt-4 md:mt-0">
+            <!-- 装飾 -->
+            <div class="absolute top-[-30px] left-[-30px] w-32 h-32 bg-pink-200 rounded-full blur-2xl opacity-50 animate-float"></div>
+            <div class="absolute bottom-[-30px] right-[-30px] w-40 h-40 bg-blue-200 rounded-full blur-2xl opacity-50 animate-float" style="animation-delay: 1s;"></div>
+            
+            <!-- タイトルロゴ -->
+            <div class="z-10 flex flex-col items-center gap-1 mt-2">
+                <div class="flex gap-2 mb-2">
+                    <div class="w-6 h-6 rounded-lg bg-red-300 animate-pop" style="animation-delay: 0.1s"></div>
+                    <div class="w-6 h-6 rounded-lg bg-sky-300 animate-pop" style="animation-delay: 0.2s"></div>
+                    <div class="w-6 h-6 rounded-lg bg-yellow-300 animate-pop" style="animation-delay: 0.3s"></div>
+                    <div class="w-6 h-6 rounded-lg bg-green-300 animate-pop" style="animation-delay: 0.4s"></div>
+                </div>
+                <h1 class="text-4xl font-black text-slate-700 leading-tight drop-shadow-sm">
+                    <span class="text-pink-400">いろ</span><span class="text-yellow-400">あわせ</span><br>
+                    <span class="text-blue-400 text-5xl">キオク</span>
+                </h1>
+            </div>
+
+            <!-- ハイスコア表示 -->
+            <div class="z-10 bg-orange-50 border-2 border-orange-100 rounded-2xl p-3 w-full animate-pop" style="animation-delay: 0.5s">
+                <div class="text-xs font-bold text-orange-400 mb-1">いままでの さいこう きろく</div>
+                <div class="text-3xl font-black text-orange-500">
+                    <span id="highscore-value">0</span> <span class="text-base text-orange-300">点</span>
+                </div>
+            </div>
+
+            <!-- モード選択ボタン -->
+            <div class="z-10 w-full flex flex-col gap-3 mt-2">
+                <button onclick="goToSettings('practice')" class="w-full bg-green-100 hover:bg-green-200 text-green-600 font-black text-xl py-4 rounded-3xl shadow-md border-b-4 border-green-300 active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-seedling text-2xl"></i>
+                    <div class="flex flex-col items-start leading-none">
+                        <span>れんしゅう</span>
+                        <span class="text-xs font-bold opacity-70">なんかいでも やりなおせるよ</span>
+                    </div>
+                </button>
+
+                <button onclick="goToSettings('challenge')" class="w-full bg-red-100 hover:bg-red-200 text-red-500 font-black text-xl py-4 rounded-3xl shadow-md border-b-4 border-red-300 active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-fire text-2xl"></i>
+                    <div class="flex flex-col items-start leading-none">
+                        <span>ちょうせん</span>
+                        <span class="text-xs font-bold opacity-70">まちがえたら おわり！</span>
+                    </div>
+                </button>
+            </div>
+            <div class="text-xs text-slate-400 mt-2 font-bold">
+                <i class="fas fa-volume-up"></i> 音がなります
+            </div>
+        </div>
+
+        <!-- 1. 設定画面 (Start Screen) -->
+        <div id="start-screen" class="hidden w-full max-w-md bg-white p-6 rounded-[3rem] shadow-xl text-center animate-fade-in flex-col gap-4 border-4 border-blue-100 mt-4 md:mt-0">
+            <h2 class="text-xl font-bold text-slate-600 flex justify-center items-center gap-2">
+                <span id="setting-mode-label" class="bg-slate-100 px-3 py-1 rounded-full text-sm">モード</span>
+                の せってい
+            </h2>
+            
+            <div class="space-y-4 text-left">
+                <!-- パレットサイズ -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-500 mb-2 rounded-full inline-block px-3 py-1 bg-slate-100">マスの かず</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectGridSize(3)" id="btn-grid-3" class="btn-press border-4 border-blue-100 bg-white hover:border-blue-300 hover:bg-blue-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all">
+                            <!-- 3x3 アイコン (9マス) -->
+                            <div class="grid grid-cols-3 gap-0.5 w-8 h-8 pointer-events-none">
+                                <div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div>
+                                <div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div>
+                                <div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div><div class="bg-blue-300 rounded-[1px]"></div>
+                            </div>
+                            <span class="font-bold text-base text-slate-600">すくない</span>
+                            <span class="text-xs text-slate-400 font-bold">3 × 3</span>
+                        </button>
+                        <button onclick="selectGridSize(4)" id="btn-grid-4" class="btn-press border-4 border-pink-300 bg-pink-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all ring-2 ring-pink-100">
+                            <!-- 4x4 アイコン (16マス) -->
+                            <div class="grid grid-cols-4 gap-0.5 w-8 h-8 pointer-events-none">
+                                <div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div>
+                                <div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div>
+                                <div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div>
+                                <div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div><div class="bg-pink-400 rounded-[1px]"></div>
+                            </div>
+                            <span class="font-bold text-base text-pink-500">おおい</span>
+                            <span class="text-xs text-pink-300 font-bold">4 × 4</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 色数 -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-500 mb-2 rounded-full inline-block px-3 py-1 bg-slate-100">いろの かず</label>
+                    <div class="flex gap-2">
+                        <button onclick="selectColorCount(2)" id="btn-color-2" class="btn-press flex-1 py-3 rounded-2xl font-bold text-base border-4 border-blue-100 text-slate-500 hover:bg-blue-50 transition-all">2しょく</button>
+                        <button onclick="selectColorCount(3)" id="btn-color-3" class="btn-press flex-1 py-3 rounded-2xl font-bold text-base border-4 border-blue-100 text-slate-500 hover:bg-blue-50 transition-all">3しょく</button>
+                        <button onclick="selectColorCount(4)" id="btn-color-4" class="btn-press flex-1 py-3 rounded-2xl font-bold text-base border-4 border-pink-300 bg-pink-50 text-pink-500 ring-2 ring-pink-100 transition-all">4しょく</button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-gradient-to-r from-pink-300 to-purple-300 hover:from-pink-400 hover:to-purple-400 text-white font-black text-xl py-4 rounded-full shadow-lg hover:shadow-xl transition-all btn-press mt-2 border-b-4 border-pink-400 active:border-b-0 active:translate-y-1">
+                スタート！
+            </button>
+            
+            <!-- 戻るボタン -->
+            <button onclick="backToTitle()" class="text-slate-400 font-bold text-xs hover:text-slate-600 underline py-2">
+                タイトルに もどる
+            </button>
+        </div>
+
+        <!-- 2. ゲームエリア -->
+        <div id="game-area" class="hidden w-full flex-col items-center gap-2 md:gap-6 relative">
+            
+            <!-- ステータス & ボタンエリア -->
+            <div class="w-full flex flex-col items-center gap-3">
+                <!-- メッセージ -->
+                <div id="status-message" class="text-lg md:text-2xl font-bold text-pink-400 animate-pop bg-white/90 px-6 py-1 rounded-full shadow-sm border border-pink-100">
+                    みほんを おぼえてね！
+                </div>
+
+                <!-- アクションボタンエリア（メッセージのすぐ下、コンパクトに） -->
+                <div class="flex gap-3 items-center justify-center w-full max-w-sm h-12">
+                    <!-- 記憶フェーズ用ボタン -->
+                    <button id="btn-memorized" onclick="Sound.click(); finishMemorize()" class="hidden flex-1 bg-green-300 hover:bg-green-400 text-white font-black text-lg py-2 px-6 rounded-2xl shadow-md border-b-4 border-green-500 active:border-b-0 active:translate-y-1 transition-all whitespace-nowrap">
+                        <i class="fas fa-check-circle mr-1 text-green-100"></i> おぼえた！
+                    </button>
+
+                    <!-- 回答フェーズ用ボタン -->
+                    <button id="btn-check" onclick="Sound.click(); checkAnswer()" class="hidden flex-1 bg-blue-400 hover:bg-blue-500 text-white font-black text-lg py-2 px-6 rounded-2xl shadow-md border-b-4 border-blue-600 active:border-b-0 active:translate-y-1 transition-all whitespace-nowrap">
+                        <i class="fas fa-lightbulb mr-1 text-yellow-200"></i> できた！
+                    </button>
+
+                    <!-- 結果フェーズ用ボタン (次へ) -->
+                    <button id="btn-next" onclick="Sound.click(); nextLevel()" class="hidden flex-1 bg-orange-300 hover:bg-orange-400 text-white font-black text-lg py-2 px-6 rounded-2xl shadow-md border-b-4 border-orange-500 active:border-b-0 active:translate-y-1 transition-all animate-pop whitespace-nowrap">
+                        つぎへ <i class="fas fa-arrow-right ml-1 text-orange-100"></i>
+                    </button>
+                    
+                    <!-- リトライボタン (練習モードのみ) -->
+                    <button id="btn-retry" onclick="Sound.click(); retryLevel()" class="hidden flex-1 bg-slate-400 hover:bg-slate-500 text-white font-black text-lg py-2 px-6 rounded-2xl shadow-md border-b-4 border-slate-600 active:border-b-0 active:translate-y-1 transition-all whitespace-nowrap">
+                        <i class="fas fa-redo mr-1 text-slate-200"></i> もういちど
+                    </button>
+
+                    <!-- 練習モード終了ボタン (小さく表示) -->
+                    <button id="btn-quit-practice" onclick="Sound.click(); backToTitle()" class="hidden w-auto text-slate-400 font-bold text-xs bg-white border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-slate-600 transition-all whitespace-nowrap">
+                        やめる
+                    </button>
+                </div>
+            </div>
+
+            <!-- ゲーム盤面エリア -->
+            <div class="flex flex-col md:flex-row gap-4 md:gap-16 items-center justify-center w-full mt-2 relative">
+                
+                <!-- 獲得スコア演出用コンテナ -->
+                <div id="score-effect-container" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50"></div>
+
+                <!-- プレイヤー (左 / 上) -->
+                <div class="flex flex-col items-center gap-1">
+                    <h3 class="text-sm md:text-base font-bold text-blue-400 bg-blue-50 px-4 py-1 rounded-full">あなた</h3>
+                    <div class="bg-white p-2 rounded-[1.5rem] shadow-xl w-[260px] md:w-[300px] aspect-square border-4 border-white relative">
+                        <!-- グリッド -->
+                        <div id="player-grid" class="grid gap-2 w-full h-full transition-all duration-300">
+                            <!-- JSで生成 -->
+                        </div>
+                        
+                        <!-- ロック中のオーバーレイ (記憶フェーズ用) -->
+                        <div id="player-overlay" class="absolute inset-0 bg-blue-50/60 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-xl">
+                            <div class="bg-white p-4 rounded-full shadow-md">
+                                <i class="fas fa-lock text-4xl text-blue-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ターゲット (右 / 下) -->
+                <div class="flex flex-col items-center gap-1 relative mt-4 md:mt-0">
+                    <h3 class="text-sm md:text-base font-bold text-pink-400 bg-pink-50 px-4 py-1 rounded-full">みほん</h3>
+                    
+                    <!-- カウントダウンタイマー (記憶フェーズのみ表示) -->
+                    <div id="timer-badge" class="absolute -top-10 right-0 bg-yellow-300 text-yellow-800 px-3 py-1 rounded-full font-black text-lg shadow-md animate-pop hidden border-2 border-white transform rotate-12 z-20">
+                        <i class="fas fa-stopwatch mr-1"></i> <span id="time-left">15</span>
+                    </div>
+
+                    <div class="bg-pink-50 p-2 rounded-[1.5rem] shadow-inner w-[180px] md:w-[220px] aspect-square border-4 border-pink-100 relative overflow-hidden">
+                        <!-- グリッド -->
+                        <div id="target-grid" class="grid gap-2 w-full h-full pointer-events-none">
+                            <!-- JSで生成 -->
+                        </div>
+
+                        <!-- 隠しカバー (回答フェーズ用) -->
+                        <div id="target-cover" class="absolute inset-0 bg-pink-200 bg-pattern z-10 flex flex-col items-center justify-center rounded-xl transition-transform duration-500 translate-y-full border-4 border-white">
+                            <span class="text-6xl text-white font-black drop-shadow-md">?</span>
+                            <span class="text-white font-bold text-lg mt-2 drop-shadow-md">みちゃだめ！</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 全クリアモーダル -->
+    <div id="all-clear-modal" class="fixed inset-0 bg-purple-200/80 z-50 hidden items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-[3rem] p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden animate-pop border-8 border-yellow-200">
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-50 to-pink-50"></div>
+            <div class="relative z-10">
+                <div class="text-7xl mb-4 filter drop-shadow-md">👑</div>
+                <h3 class="text-3xl font-black text-pink-500 mb-2">すごい！！</h3>
+                <p class="text-lg text-slate-500 mb-8 font-bold">ぜんぶの もんだいを<br>クリアしたよ！</p>
+                
+                <div class="bg-white/50 rounded-2xl p-4 mb-6">
+                    <div class="text-xs font-bold text-slate-500 mb-1">けっか</div>
+                    <div class="text-4xl font-black text-pink-500">
+                        <span id="all-clear-score">0</span> <span class="text-lg">点</span>
+                    </div>
+                </div>
+
+                <button onclick="Sound.click(); backToTitle()" class="w-full bg-pink-400 hover:bg-pink-500 text-white font-black text-xl py-4 rounded-full shadow-lg transition-all border-b-4 border-pink-600 active:border-b-0 active:translate-y-1">
+                    さいしょに もどる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲームオーバーモーダル (ちょうせんモード用) -->
+    <div id="game-over-modal" class="fixed inset-0 bg-slate-800/80 z-50 hidden items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-[3rem] p-8 max-w-sm w-full shadow-2xl text-center relative overflow-hidden animate-shake border-8 border-slate-300">
+            <div class="relative z-10">
+                <div class="text-6xl mb-4">😢</div>
+                <h3 class="text-2xl font-black text-slate-600 mb-2">ざんねん...</h3>
+                <p class="text-slate-500 mb-6 font-bold">まちがえて しまったよ。</p>
+                
+                <div class="bg-orange-50 rounded-2xl p-4 mb-6 border-2 border-orange-100">
+                    <div class="text-xs font-bold text-orange-400 mb-1">あなたの スコア</div>
+                    <div class="text-3xl font-black text-orange-500">
+                        <span id="game-over-score">0</span> <span class="text-base">点</span>
+                    </div>
+                </div>
+
+                <button onclick="Sound.click(); backToTitle()" class="w-full bg-slate-500 hover:bg-slate-600 text-white font-black text-xl py-4 rounded-full shadow-lg transition-all border-b-4 border-slate-700 active:border-b-0 active:translate-y-1">
+                    さいしょに もどる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 設定定数 (パステルカラー)
+        const COLORS = [
+            'bg-white',           // 0: 白
+            'bg-red-300',         // 1: 赤
+            'bg-sky-300',         // 2: 青
+            'bg-green-300',       // 3: 緑
+            'bg-yellow-300'       // 4: 黄
+        ];
+
+        // モード定数
+        const MODE_PRACTICE = 'practice';
+        const MODE_CHALLENGE = 'challenge';
+        const KEY_HIGHSCORE = 'colorMatch_highScore_v3'; 
+
+        // サウンド管理クラス (Web Audio API)
+        const Sound = {
+            ctx: null,
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playTone: function(freq, type, duration, startTime = 0, vol = 0.1) {
+                if (!this.ctx) this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+                
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime + startTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(this.ctx.currentTime + startTime);
+                osc.stop(this.ctx.currentTime + startTime + duration);
+            },
+            pop: function() { this.playTone(600, 'triangle', 0.1); },
+            click: function() { this.playTone(400, 'sine', 0.15); },
+            correct: function() {
+                this.playTone(523.25, 'sine', 0.3, 0, 0.1);   // C5
+                this.playTone(659.25, 'sine', 0.3, 0.1, 0.1); // E5
+                this.playTone(783.99, 'sine', 0.6, 0.2, 0.1); // G5
+            },
+            wrong: function() {
+                this.playTone(150, 'sawtooth', 0.4, 0, 0.1);
+                this.playTone(140, 'sawtooth', 0.4, 0.1, 0.1);
+            },
+            fanfare: function() {
+                const now = 0;
+                this.playTone(523.25, 'triangle', 0.2, now, 0.1);
+                this.playTone(659.25, 'triangle', 0.2, now + 0.15, 0.1);
+                this.playTone(783.99, 'triangle', 0.2, now + 0.3, 0.1);
+                this.playTone(1046.50, 'triangle', 0.6, now + 0.45, 0.1);
+            }
+        };
+
+        // ゲーム状態
+        let state = {
+            gridSize: 4,      
+            colorCount: 4,    
+            currentCells: 1,  
+            maxCells: 16,     
+            targetGrid: [],   
+            playerGrid: [],   
+            phase: 'setup',   
+            timer: null,
+            timeLeft: 15,
+            mode: MODE_PRACTICE, 
+            highScore: 0,
+            totalScore: 0 // 累計スコア
+        };
+
+        // DOM要素
+        const titleScreen = document.getElementById('title-screen');
+        const startScreen = document.getElementById('start-screen');
+        const gameHeader = document.getElementById('game-header');
+        const gameArea = document.getElementById('game-area');
+        const currentScoreEl = document.getElementById('current-score');
+        const maxScoreEl = document.getElementById('max-score');
+        const modeBadge = document.getElementById('mode-badge');
+        
+        const playerGridEl = document.getElementById('player-grid');
+        const targetGridEl = document.getElementById('target-grid');
+        const playerOverlay = document.getElementById('player-overlay');
+        const targetCover = document.getElementById('target-cover');
+        const statusMessage = document.getElementById('status-message');
+        const scoreEffectContainer = document.getElementById('score-effect-container');
+        
+        const timerBadge = document.getElementById('timer-badge');
+        const timeLeftEl = document.getElementById('time-left');
+
+        const btnMemorized = document.getElementById('btn-memorized');
+        const btnCheck = document.getElementById('btn-check');
+        const btnNext = document.getElementById('btn-next');
+        const btnRetry = document.getElementById('btn-retry');
+        const btnQuitPractice = document.getElementById('btn-quit-practice');
+
+        const highscoreValueEl = document.getElementById('highscore-value');
+        const settingModeLabel = document.getElementById('setting-mode-label');
+
+        const gameOverModal = document.getElementById('game-over-modal');
+        const gameOverScoreEl = document.getElementById('game-over-score');
+        const allClearModal = document.getElementById('all-clear-modal');
+        const allClearScoreEl = document.getElementById('all-clear-score');
+
+        // スコア計算
+        function getLevelScore() {
+            return state.colorCount * state.currentCells;
+        }
+
+        // 理論上の最大累積スコア計算
+        // Σ (colorCount * i) for i=1 to maxCells
+        function getMaxAccumulatedScore() {
+            let total = 0;
+            for(let i = 1; i <= state.maxCells; i++) {
+                total += state.colorCount * i;
+            }
+            return total;
+        }
+
+        // 初期化：ハイスコア読み込み
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedScore = localStorage.getItem(KEY_HIGHSCORE);
+            if (storedScore) {
+                state.highScore = parseInt(storedScore);
+            }
+            highscoreValueEl.textContent = state.highScore;
+        });
+
+        // タイトル画面 -> 設定画面
+        function goToSettings(mode) {
+            Sound.init();
+            Sound.click();
+            state.mode = mode;
+            
+            if (mode === MODE_PRACTICE) {
+                settingModeLabel.textContent = "れんしゅう";
+                settingModeLabel.className = "bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold";
+            } else {
+                settingModeLabel.textContent = "ちょうせん";
+                settingModeLabel.className = "bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm font-bold";
+            }
+
+            titleScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('flex');
+            gameHeader.classList.remove('hidden'); 
+            
+            startScreen.classList.remove('animate-fade-in');
+            void startScreen.offsetWidth;
+            startScreen.classList.add('animate-fade-in');
+        }
+
+        // 設定画面のロジック
+        function selectGridSize(size) {
+            Sound.pop();
+            state.gridSize = size;
+            state.maxCells = size * size;
+            updateSettingsUI();
+        }
+
+        function selectColorCount(count) {
+            Sound.pop();
+            state.colorCount = count;
+            updateSettingsUI();
+        }
+
+        function updateSettingsUI() {
+            // グリッドボタン更新
+            document.getElementById('btn-grid-3').className = state.gridSize === 3 
+                ? 'btn-press border-4 border-pink-300 bg-pink-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all ring-2 ring-pink-100'
+                : 'btn-press border-4 border-blue-100 bg-white hover:border-blue-300 hover:bg-blue-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all';
+            
+            document.getElementById('btn-grid-4').className = state.gridSize === 4
+                ? 'btn-press border-4 border-pink-300 bg-pink-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all ring-2 ring-pink-100'
+                : 'btn-press border-4 border-blue-100 bg-white hover:border-blue-300 hover:bg-blue-50 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all';
+            
+            // テキスト色更新
+            const text3 = document.getElementById('btn-grid-3').querySelectorAll('span');
+            const text4 = document.getElementById('btn-grid-4').querySelectorAll('span');
+            if(state.gridSize === 3) {
+                text3[0].classList.replace('text-slate-600', 'text-pink-500');
+                text3[1].classList.replace('text-slate-400', 'text-pink-300');
+                text4[0].classList.replace('text-pink-500', 'text-slate-600');
+                text4[1].classList.replace('text-pink-300', 'text-slate-400');
+            } else {
+                text3[0].classList.replace('text-pink-500', 'text-slate-600');
+                text3[1].classList.replace('text-pink-300', 'text-slate-400');
+                text4[0].classList.replace('text-slate-600', 'text-pink-500');
+                text4[1].classList.replace('text-slate-400', 'text-pink-300');
+            }
+
+            // 色数ボタン更新
+            [2, 3, 4].forEach(c => {
+                const btn = document.getElementById(`btn-color-${c}`);
+                if (c === state.colorCount) {
+                    btn.className = 'btn-press flex-1 py-3 rounded-2xl font-bold text-base border-4 border-pink-300 bg-pink-50 text-pink-500 ring-2 ring-pink-100 transition-all';
+                } else {
+                    btn.className = 'btn-press flex-1 py-3 rounded-2xl font-bold text-base border-4 border-blue-100 text-slate-500 hover:bg-blue-50 transition-all';
+                }
+            });
+        }
+
+        function startGame() {
+            Sound.click();
+            state.currentCells = 1;
+            state.totalScore = 0; // スコアリセット
+            
+            if (state.mode === MODE_PRACTICE) {
+                modeBadge.textContent = "🔰 れんしゅう";
+                modeBadge.className = "px-3 py-1 rounded-full text-sm font-black border-2 hidden md:block border-green-200 bg-green-50 text-green-500";
+                btnQuitPractice.classList.remove('hidden'); 
+            } else {
+                modeBadge.textContent = "🔥 ちょうせん";
+                modeBadge.className = "px-3 py-1 rounded-full text-sm font-black border-2 hidden md:block border-red-200 bg-red-50 text-red-500";
+                btnQuitPractice.classList.add('hidden'); 
+            }
+
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('flex');
+            gameArea.classList.remove('hidden');
+            gameArea.classList.add('flex');
+            
+            // 最大スコア表示
+            maxScoreEl.textContent = getMaxAccumulatedScore();
+            currentScoreEl.textContent = 0;
+
+            const gridCols = state.gridSize === 3 ? 'grid-cols-3' : 'grid-cols-4';
+            playerGridEl.className = `grid ${gridCols} gap-2 w-full h-full`;
+            targetGridEl.className = `grid ${gridCols} gap-2 w-full h-full`;
+
+            setupLevel();
+        }
+
+        function backToTitle() {
+            if(state.mode === MODE_PRACTICE) Sound.click();
+            allClearModal.classList.remove('flex');
+            allClearModal.classList.add('hidden');
+            gameOverModal.classList.add('hidden');
+            gameOverModal.classList.remove('flex');
+            
+            gameArea.classList.add('hidden');
+            gameArea.classList.remove('flex');
+            gameHeader.classList.add('hidden');
+            
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('flex');
+            
+            titleScreen.classList.remove('hidden');
+            
+            highscoreValueEl.textContent = state.highScore;
+
+            if (state.timer) clearInterval(state.timer);
+            stopConfetti();
+        }
+
+        // レベル初期化
+        function setupLevel() {
+            state.phase = 'setup';
+            // ここではスコア更新しない（正解時に加算するから）
+            
+            const totalCells = state.gridSize * state.gridSize;
+            state.targetGrid = new Array(totalCells).fill(0); 
+            
+            let availableIndices = Array.from({length: totalCells}, (_, i) => i);
+            for (let i = availableIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [availableIndices[i], availableIndices[j]] = [availableIndices[j], availableIndices[i]];
+            }
+            
+            for (let i = 0; i < state.currentCells; i++) {
+                const index = availableIndices[i];
+                const color = Math.floor(Math.random() * state.colorCount) + 1;
+                state.targetGrid[index] = color;
+            }
+
+            state.playerGrid = new Array(totalCells).fill(0);
+
+            renderGrids();
+            startMemorizePhase();
+        }
+
+        // 1. 記憶フェーズ
+        function startMemorizePhase() {
+            state.phase = 'memorize';
+            
+            targetCover.classList.remove('translate-y-0');
+            targetCover.classList.add('translate-y-full'); 
+            
+            playerOverlay.classList.remove('hidden'); 
+            
+            statusMessage.textContent = "いろを おぼえてね！";
+            statusMessage.className = "text-lg md:text-2xl font-bold text-pink-400 animate-pop bg-white/90 px-6 py-1 rounded-full shadow-sm border border-pink-100";
+            
+            hideAllButtons();
+            btnMemorized.classList.remove('hidden');
+            if (state.mode === MODE_PRACTICE) btnQuitPractice.classList.remove('hidden');
+            
+            state.timeLeft = 15;
+            timerBadge.classList.remove('hidden');
+            updateTimerDisplay();
+            
+            if (state.timer) clearInterval(state.timer);
+            state.timer = setInterval(() => {
+                state.timeLeft--;
+                updateTimerDisplay();
+                if (state.timeLeft <= 0) {
+                    finishMemorize();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            timeLeftEl.textContent = state.timeLeft;
+            if (state.timeLeft <= 5) {
+                timerBadge.classList.remove('bg-yellow-300', 'text-yellow-800');
+                timerBadge.classList.add('bg-red-400', 'text-white', 'animate-pulse');
+            } else {
+                timerBadge.classList.add('bg-yellow-300', 'text-yellow-800');
+                timerBadge.classList.remove('bg-red-400', 'text-white', 'animate-pulse');
+            }
+        }
+
+        function finishMemorize() {
+            if (state.timer) clearInterval(state.timer);
+            startPlayPhase();
+        }
+
+        // 2. 回答フェーズ
+        function startPlayPhase() {
+            state.phase = 'play';
+            
+            targetCover.classList.remove('translate-y-full');
+            targetCover.classList.add('translate-y-0'); 
+            
+            playerOverlay.classList.add('hidden');
+            timerBadge.classList.add('hidden');
+            
+            statusMessage.textContent = "おなじ いろに してね！";
+            statusMessage.className = "text-lg md:text-2xl font-bold text-blue-400 bg-white/90 px-6 py-1 rounded-full shadow-sm border border-blue-100";
+            
+            hideAllButtons();
+            btnCheck.classList.remove('hidden');
+            if (state.mode === MODE_PRACTICE) btnQuitPractice.classList.remove('hidden');
+        }
+
+        // 3. 判定ロジック
+        function checkAnswer() {
+            const isMatch = state.playerGrid.every((val, idx) => val === state.targetGrid[idx]);
+            
+            state.phase = 'result';
+            hideAllButtons();
+            if (state.mode === MODE_PRACTICE) btnQuitPractice.classList.remove('hidden');
+
+            if (isMatch) {
+                handleCorrect();
+            } else {
+                handleIncorrect();
+            }
+        }
+
+        function handleCorrect() {
+            Sound.correct();
+            const earnedPoints = getLevelScore();
+            
+            // スコア加算
+            state.totalScore += earnedPoints;
+            currentScoreEl.textContent = state.totalScore;
+            currentScoreEl.classList.remove('animate-pop');
+            void currentScoreEl.offsetWidth; // リフロー
+            currentScoreEl.classList.add('animate-pop');
+
+            // 獲得スコア演出
+            showScoreEffect(earnedPoints);
+
+            statusMessage.innerHTML = '<i class="fas fa-check-circle text-green-300"></i> せいかい！';
+            statusMessage.className = "text-xl md:text-3xl font-black text-green-500 animate-pop bg-white/90 px-8 py-3 rounded-full shadow-md border-4 border-green-200";
+            
+            targetCover.classList.remove('translate-y-0');
+            targetCover.classList.add('translate-y-full');
+            playerOverlay.classList.remove('hidden');
+
+            fireConfetti(30);
+
+            // ハイスコア更新
+            if (state.totalScore > state.highScore) {
+                state.highScore = state.totalScore;
+                localStorage.setItem(KEY_HIGHSCORE, state.highScore);
+            }
+
+            if (state.currentCells >= state.maxCells) {
+                Sound.fanfare();
+                setTimeout(() => {
+                    fireConfetti(200);
+                    allClearScoreEl.textContent = state.totalScore;
+                    allClearModal.classList.remove('hidden');
+                    allClearModal.classList.add('flex');
+                }, 1000);
+            } else {
+                btnNext.classList.remove('hidden');
+            }
+        }
+
+        function showScoreEffect(points) {
+            const el = document.createElement('div');
+            el.className = 'score-popup flex items-center justify-center w-full text-5xl md:text-7xl';
+            el.innerHTML = `+${points}`;
+            el.style.top = '40%';
+            
+            scoreEffectContainer.appendChild(el);
+            
+            setTimeout(() => {
+                el.remove();
+            }, 1000);
+        }
+
+        function handleIncorrect() {
+            Sound.wrong();
+            // 間違えた場合はスコア加算なし
+            
+            if (state.mode === MODE_CHALLENGE) {
+                statusMessage.innerHTML = '<i class="fas fa-times-circle text-red-300"></i> ちがうかも...';
+                statusMessage.className = "text-xl md:text-3xl font-black text-red-400 animate-shake bg-white/90 px-8 py-3 rounded-full shadow-md border-4 border-red-200";
+                
+                targetCover.classList.remove('translate-y-0');
+                targetCover.classList.add('translate-y-full');
+                playerOverlay.classList.remove('hidden');
+
+                setTimeout(() => {
+                    gameOverScoreEl.textContent = state.totalScore; // 獲得済み合計スコアを表示
+                    gameOverModal.classList.remove('hidden');
+                    gameOverModal.classList.add('flex');
+                }, 1500);
+
+            } else {
+                statusMessage.innerHTML = '<i class="fas fa-times-circle text-red-300"></i> ちがうかも...';
+                statusMessage.className = "text-xl md:text-3xl font-black text-red-400 animate-shake bg-white/90 px-8 py-3 rounded-full shadow-md border-4 border-red-200";
+                
+                targetCover.classList.remove('translate-y-0');
+                targetCover.classList.add('translate-y-full');
+                playerOverlay.classList.remove('hidden');
+                
+                btnRetry.classList.remove('hidden');
+            }
+        }
+
+        function nextLevel() {
+            state.currentCells++;
+            setupLevel();
+        }
+
+        function retryLevel() {
+            setupLevel();
+        }
+
+        function hideAllButtons() {
+            btnMemorized.classList.add('hidden');
+            btnCheck.classList.add('hidden');
+            btnNext.classList.add('hidden');
+            btnRetry.classList.add('hidden');
+            btnQuitPractice.classList.add('hidden'); 
+        }
+
+        // グリッド描画と操作
+        function renderGrids() {
+            playerGridEl.innerHTML = '';
+            state.playerGrid.forEach((colorIdx, i) => {
+                const cell = document.createElement('div');
+                cell.className = `w-full h-full rounded-2xl ${COLORS[colorIdx]} cell-shadow cursor-pointer hover:brightness-95 active:scale-95 border-4 border-transparent transition-colors`;
+                cell.onclick = () => handleCellClick(i, cell);
+                playerGridEl.appendChild(cell);
+            });
+
+            targetGridEl.innerHTML = '';
+            state.targetGrid.forEach((colorIdx, i) => {
+                const cell = document.createElement('div');
+                cell.className = `w-full h-full rounded-2xl ${COLORS[colorIdx]} shadow-inner opacity-90`;
+                targetGridEl.appendChild(cell);
+            });
+        }
+
+        function handleCellClick(index, element) {
+            if (state.phase !== 'play') return;
+            Sound.pop(); // ポッ音
+            state.playerGrid[index] = (state.playerGrid[index] + 1) % (state.colorCount + 1);
+            const newColor = COLORS[state.playerGrid[index]];
+            element.className = `w-full h-full rounded-2xl ${newColor} cell-shadow cursor-pointer hover:brightness-95 active:scale-95 border-4 border-transparent transition-colors animate-pop`;
+        }
+
+        function fireConfetti(amount = 100) {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#fca5a5', '#93c5fd', '#86efac', '#fde047', '#d8b4fe']; 
+            
+            for (let i = 0; i < amount; i++) {
+                const confetto = document.createElement('div');
+                confetto.classList.add('confetti');
+                confetto.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetto.style.left = Math.random() * 100 + 'vw';
+                confetto.style.top = -10 + 'px';
+                
+                const duration = Math.random() * 3 + 2 + 's';
+                const delay = Math.random() * 0.5 + 's';
+                
+                confetto.style.animation = `confetti-fall ${duration} linear ${delay} forwards`;
+                container.appendChild(confetto);
+            }
+            
+            setTimeout(() => {
+                if(container.children.length > amount) {
+                    container.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        function stopConfetti() {
+            document.getElementById('confetti-container').innerHTML = '';
+        }
+
+    </script>
+</body>
+</html>

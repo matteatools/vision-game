@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>どうぶつ文字探しパズル V9</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        /* 共通レイアウト */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* タイトル画面 */
+        h1 {
+            color: #006064;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .menu-btn {
+            width: 280px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .menu-btn span {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-practice { background-color: #4caf50; }
+        .btn-challenge-1 { background-color: #ff9800; }
+        .btn-challenge-3 { background-color: #f44336; }
+
+        /* ゲーム画面ヘッダー */
+        #game-header {
+            width: 95%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #quit-btn {
+            background: #90a4ae;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* 本番用スコア・タイマー */
+        .challenge-info {
+            display: none;
+            font-weight: bold;
+            font-size: 18px;
+            color: #006064;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timer-red { color: #d32f2f; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* ヒント・ステータスエリア */
+        #status-area {
+            min-height: 50px;
+            width: 95%;
+            max-width: 600px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            padding: 5px;
+        }
+
+        .hint-card {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 2px solid #b2ebf2;
+            color: #333;
+        }
+        
+        .hint-card.found {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .hint-card.bonus {
+            background-color: #fff9c4;
+            border-color: #fbc02d;
+            color: #f57f17;
+            animation: popInCard 0.4s;
+        }
+
+        @keyframes popInCard {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* ゲーム盤面 */
+        #grid-wrapper {
+            background: white;
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            width: 85vw;
+            max-width: 380px;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            background-color: #f8f9fa;
+            border: 2px solid #cfd8dc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: #455a64;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .cell:active { transform: scale(0.95); }
+
+        .cell.selected {
+            background-color: #fff176 !important;
+            border-color: #fbc02d !important;
+            color: #f57f17 !important;
+        }
+
+        .cell.solved {
+            background-color: #c8e6c9 !important;
+            border-color: #43a047 !important;
+            color: #1b5e20 !important;
+        }
+
+        /* 注釈メッセージ */
+        #rule-note {
+            font-size: 13px;
+            color: #546e7a;
+            margin-bottom: 10px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.5);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        /* 下部コントロール */
+        #bottom-controls {
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        #pass-btn {
+            display: none;
+            background-color: #78909c;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #546e7a;
+        }
+        
+        #pass-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #546e7a;
+        }
+
+        #show-list-btn {
+            display: none;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #e65100;
+        }
+
+        /* モーダル共通 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 90%;
+            width: 320px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* リスト表示用 */
+        #animal-list-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .list-item {
+            font-size: 14px;
+            background: #f1f8e9;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            background: #607d8b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* 飛び出すアニメーション */
+        #popup-anim {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 150px;
+            pointer-events: none;
+            z-index: 200;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        @keyframes popJump {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-30deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5) rotate(10deg); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+        }
+
+        /* 結果画面 */
+        .big-emoji { font-size: 60px; display: block; margin-bottom: 10px; }
+        .score-display { font-size: 40px; font-weight: bold; color: #ff5722; margin: 5px 0; }
+        .record-display { font-size: 16px; color: #006064; margin-bottom: 15px; font-weight: bold; }
+        .new-record-badge { color: #f44336; font-weight: bold; animation: pulse 0.5s infinite; display: none;}
+        
+        #result-btn {
+            background: #00bcd4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #next-level-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- タイトル画面 -->
+    <div id="title-screen" class="screen active">
+        <h1>どうぶつ文字探し</h1>
+        <div style="font-size: 80px; margin-bottom: 20px;">🦁🐴🐰</div>
+        
+        <div class="menu-container">
+            <button class="menu-btn btn-practice" onclick="startGame('practice', 0)">
+                🔰 れんしゅう
+                <span>じっくりあそぶ</span>
+            </button>
+            <button class="menu-btn btn-challenge-1" onclick="startGame('challenge', 60)">
+                🔥 1ぷん コース
+                <span>サクッとチャレンジ！</span>
+            </button>
+            <button class="menu-btn btn-challenge-3" onclick="startGame('challenge', 180)">
+                🔥🔥 3ぷん コース
+                <span>ガッツリたくさん！</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-screen" class="screen">
+        <div id="game-header">
+            <div class="header-left">
+                <button id="quit-btn" onclick="quitGame()">やめる</button>
+            </div>
+            <div class="header-right">
+                <!-- 本番用情報 -->
+                <div id="timer-display" class="challenge-info">残り 60秒</div>
+                <div id="score-display" class="challenge-info">0匹</div>
+            </div>
+        </div>
+
+        <!-- ヒントまたは発見済み表示エリア -->
+        <div id="status-area"></div>
+
+        <div id="grid-wrapper">
+            <div id="grid-container"></div>
+        </div>
+        
+        <!-- ルール説明 -->
+        <div id="rule-note">※おなじ なまえの どうぶつは 1かい だけ！</div>
+
+        <!-- 下部ボタンエリア -->
+        <div id="bottom-controls">
+            <button id="pass-btn" onclick="nextLevel()">パス（つぎへ）</button>
+            <button id="show-list-btn" onclick="showAnimalList()">📖 リスト</button>
+        </div>
+    </div>
+
+    <!-- 飛び出すアニメーション用 -->
+    <div id="popup-anim"></div>
+
+    <!-- クリア画面（練習モード用） -->
+    <div id="practice-clear-modal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="big-emoji">🎉✨</span>
+            <h2>クリア！</h2>
+            <p>ぜんぶ みつけたね！</p>
+            <button id="next-level-btn" onclick="nextLevel()">つぎの もんだい</button>
+        </div>
+    </div>
+
+    <!-- 結果画面（本番モード用） -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="big-emoji">⏰🏁</span>
+            <h2>おしまい！</h2>
+            <p>みつけた どうぶつ</p>
+            <div id="final-score" class="score-display">0匹</div>
+            <div class="record-display">さいこうきろく: <span id="best-record">0</span>匹 <span id="new-record-badge" class="new-record-badge">NEW RECORD!</span></div>
+            <button id="result-btn" onclick="quitGame()">タイトルへ</button>
+        </div>
+    </div>
+
+    <!-- 全リスト表示モーダル -->
+    <div id="list-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>いきものリスト</h3>
+            <div id="animal-list-grid"></div>
+            <button class="close-btn" onclick="closeAnimalList()">とじる</button>
+        </div>
+    </div>
+
+<script>
+    // 動物データ
+    const animals = [
+        { emoji: '🐶', name: 'いぬ' }, { emoji: '🐱', name: 'ねこ' },
+        { emoji: '🐭', name: 'ねずみ' }, { emoji: '🐹', name: 'はむすたー' },
+        { emoji: '🐰', name: 'うさぎ' }, { emoji: '🦊', name: 'きつね' },
+        { emoji: '🐻', name: 'くま' }, { emoji: '🐼', name: 'ぱんだ' },
+        { emoji: '🐨', name: 'こあら' }, { emoji: '🐯', name: 'とら' },
+        { emoji: '🦁', name: 'らいおん' }, { emoji: '🐮', name: 'うし' },
+        { emoji: '🐷', name: 'ぶた' }, { emoji: '🐸', name: 'かえる' },
+        { emoji: '🐵', name: 'さる' }, { emoji: '🐴', name: 'うま' },
+        { emoji: '🦓', name: 'しまうま' }, { emoji: '🐑', name: 'ひつじ' },
+        { emoji: '🐗', name: 'いのしし' }, { emoji: '🐺', name: 'おおかみ' },
+        { emoji: '🦍', name: 'ごりら' }, { emoji: '🐘', name: 'ぞう' },
+        { emoji: '🦛', name: 'かば' }, { emoji: '🦒', name: 'きりん' },
+        { emoji: '🦌', name: 'しか' }, { emoji: '🦔', name: 'はりねずみ' },
+        { emoji: '🐿', name: 'りす' }, { emoji: '🦝', name: 'あらいぐま' },
+        { emoji: '🐫', name: 'らくだ' }, { emoji: '🦨', name: 'すかんく' },
+        { emoji: '🦦', name: 'かわうそ' }, { emoji: '🦇', name: 'こうもり' },
+        { emoji: '🐔', name: 'にわとり' }, { emoji: '🐤', name: 'ひよこ' },
+        { emoji: '🐧', name: 'ぺんぎん' }, { emoji: '🦅', name: 'わし' },
+        { emoji: '🦉', name: 'ふくろう' }, { emoji: '🦆', name: 'かも' },
+        { emoji: '🦩', name: 'ふらみんご' }, { emoji: '🦢', name: 'はくちょう' },
+        { emoji: '🦜', name: 'おうむ' },
+        { emoji: '🐍', name: 'へび' }, { emoji: '🐢', name: 'かめ' },
+        { emoji: '🐊', name: 'わに' }, { emoji: '🦎', name: 'とかげ' },
+        { emoji: '🦋', name: 'ちょうちょ' }, { emoji: '🐛', name: 'あおむし' },
+        { emoji: '🐜', name: 'あり' }, { emoji: '🐝', name: 'はち' },
+        { emoji: '🐞', name: 'てんとうむし' }, { emoji: '🐌', name: 'かたつむり' },
+        { emoji: '🐳', name: 'くじら' }, { emoji: '🐬', name: 'いるか' },
+        { emoji: '🐟', name: 'さかな' }, { emoji: '🦈', name: 'さめ' },
+        { emoji: '🐙', name: 'たこ' }, { emoji: '🦑', name: 'いか' },
+        { emoji: '🦐', name: 'えび' }, { emoji: '🦀', name: 'かに' },
+        { emoji: '🦖', name: 'きょうりゅう' }, { emoji: '🦄', name: 'ゆにこーん' },
+        { emoji: '👻', name: 'おばけ' }
+    ];
+
+    const hiraganaChars = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
+    const gridSize = 5;
+
+    let currentMode = 'practice';
+    let gameDuration = 60; // 秒
+    let gridData = [];
+    let targetAnimals = []; 
+    let foundAnimals = [];
+    let selectedCells = [];
+    
+    // 本番用変数
+    let totalScore = 0;
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    // DOM要素
+    const titleScreen = document.getElementById('title-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const gridContainer = document.getElementById('grid-container');
+    const statusArea = document.getElementById('status-area');
+    const practiceClearModal = document.getElementById('practice-clear-modal');
+    const resultModal = document.getElementById('result-modal');
+    const listModal = document.getElementById('list-modal');
+    const popupAnim = document.getElementById('popup-anim');
+    
+    const timerDisplay = document.getElementById('timer-display');
+    const scoreDisplay = document.getElementById('score-display');
+    const finalScore = document.getElementById('final-score');
+    const bestRecordDisplay = document.getElementById('best-record');
+    const newRecordBadge = document.getElementById('new-record-badge');
+    
+    const passBtn = document.getElementById('pass-btn');
+    const showListBtn = document.getElementById('show-list-btn');
+
+    // 効果音
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'tap') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            gainNode.gain.setValueAtTime(0.1, now);
+            osc.start();
+            osc.stop(now + 0.05);
+        } else if (type === 'pop') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start();
+            osc.stop(now + 0.2);
+        } else if (type === 'bonus') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.setValueAtTime(1200, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start();
+            osc.stop(now + 0.2);
+        } else if (type === 'level_clear') {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.type = 'square';
+                osc2.frequency.value = freq;
+                gain2.gain.setValueAtTime(0.1, now + i*0.1);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + i*0.1 + 0.4);
+                osc2.start(now + i*0.1);
+                osc2.stop(now + i*0.1 + 0.4);
+            });
+        } else if (type === 'finish') {
+            // 明るい終了音
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.type = 'triangle';
+                osc2.frequency.value = freq;
+                gain2.gain.setValueAtTime(0.1, now);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                osc2.start(now);
+                osc2.stop(now + 0.8);
+            });
+        }
+    }
+
+    // ゲーム開始
+    function startGame(mode, duration) {
+        currentMode = mode;
+        gameDuration = duration;
+        
+        titleScreen.classList.remove('active');
+        gameScreen.classList.add('active');
+        
+        // UI初期化
+        const isChallenge = (mode === 'challenge');
+        document.querySelectorAll('.challenge-info').forEach(el => el.style.display = isChallenge ? 'block' : 'none');
+        passBtn.style.display = isChallenge ? 'block' : 'none';
+        showListBtn.style.display = isChallenge ? 'block' : 'none';
+
+        if (isChallenge) {
+            totalScore = 0;
+            timeRemaining = duration;
+            scoreDisplay.textContent = totalScore + '匹';
+            updateTimerDisplay();
+            startTimer();
+        }
+
+        nextLevel();
+    }
+
+    // タイマー管理
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            if (timeRemaining <= 0) {
+                finishGame();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const min = Math.floor(timeRemaining / 60);
+        const sec = timeRemaining % 60;
+        const timeText = min > 0 ? `${min}分${sec}秒` : `${sec}秒`;
+        timerDisplay.textContent = '残り ' + timeText;
+        
+        if (timeRemaining <= 10) {
+            timerDisplay.classList.add('timer-red');
+        } else {
+            timerDisplay.classList.remove('timer-red');
+        }
+    }
+
+    // 記録の保存と取得（Local Storage）
+    function getHighScore(duration) {
+        const key = `animal_puzzle_v9_record_${duration}`;
+        return parseInt(localStorage.getItem(key)) || 0;
+    }
+
+    function saveHighScore(duration, score) {
+        const key = `animal_puzzle_v9_record_${duration}`;
+        const current = getHighScore(duration);
+        if (score > current) {
+            localStorage.setItem(key, score);
+            return true; // 更新した
+        }
+        return false;
+    }
+
+    function finishGame() {
+        clearInterval(timerInterval);
+        playSound('finish');
+        
+        finalScore.textContent = totalScore + '匹';
+        
+        // 記録更新チェック
+        const isNewRecord = saveHighScore(gameDuration, totalScore);
+        const bestScore = getHighScore(gameDuration);
+        
+        bestRecordDisplay.textContent = bestScore;
+        
+        if (isNewRecord) {
+            newRecordBadge.style.display = 'inline';
+        } else {
+            newRecordBadge.style.display = 'none';
+        }
+
+        resultModal.style.display = 'flex';
+    }
+
+    function quitGame() {
+        if (timerInterval) clearInterval(timerInterval);
+        practiceClearModal.style.display = 'none';
+        resultModal.style.display = 'none';
+        listModal.style.display = 'none';
+        gameScreen.classList.remove('active');
+        titleScreen.classList.add('active');
+    }
+
+    // 次のレベルへ
+    function nextLevel() {
+        practiceClearModal.style.display = 'none';
+        selectedCells = [];
+        foundAnimals = [];
+        gridContainer.innerHTML = '';
+        statusArea.innerHTML = '';
+
+        let success = false;
+        let attempts = 0;
+        // 配置試行
+        while (!success && attempts < 100) {
+            success = generateLevel();
+            attempts++;
+        }
+        // フォールバック
+        if(!success) {
+            generateLevel(true);
+        }
+
+        renderGrid();
+        updateStatusArea();
+    }
+
+    // 盤面生成
+    function generateLevel(fallback = false) {
+        let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
+        let shuffled = [...animals].sort(() => 0.5 - Math.random());
+        let targets = [];
+        let count = fallback ? 3 : (Math.random() > 0.4 ? 4 : 3);
+        
+        const isPractice = (currentMode === 'practice' || fallback);
+
+        for (let animal of shuffled) {
+            if (targets.length >= count) break;
+            
+            let path = findPathForWord(grid, animal.name, isPractice);
+            if (path) {
+                path.forEach((pos, index) => {
+                    grid[pos.r][pos.c] = animal.name[index];
+                });
+                targets.push(animal);
+            }
+        }
+        if (targets.length < 3) return false;
+
+        targetAnimals = targets;
+        
+        for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+                if (grid[r][c] === null) {
+                    grid[r][c] = hiraganaChars[Math.floor(Math.random() * hiraganaChars.length)];
+                }
+            }
+        }
+        gridData = grid;
+        return true;
+    }
+
+    function findPathForWord(grid, word, isPractice) {
+        let tryList = [];
+
+        if (isPractice) {
+            for(let i=0; i<50; i++) {
+                tryList.push({r: Math.floor(Math.random()*gridSize), c: Math.floor(Math.random()*gridSize)});
+            }
+        } else {
+            let startPoints = [];
+            for(let r=0; r<gridSize; r++) {
+                for(let c=0; c<gridSize; c++) {
+                    if (grid[r][c] === word[0]) startPoints.unshift({r, c});
+                    else if (grid[r][c] === null) startPoints.push({r, c});
+                }
+            }
+            let priority = startPoints.filter(p => grid[p.r][p.c] === word[0]);
+            let others = startPoints.filter(p => grid[p.r][p.c] !== word[0]).sort(() => 0.5 - Math.random());
+            tryList = [...priority, ...others].slice(0, 50);
+        }
+
+        for (let start of tryList) {
+             let path = solvePath(grid, word, 0, start.r, start.c, [], isPractice);
+             if (path) return path;
+        }
+        return null;
+    }
+
+    function solvePath(grid, word, index, r, c, currentPath, isPractice) {
+        if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) return null;
+        if (currentPath.some(p => p.r === r && p.c === c)) return null;
+        if (grid[r][c] !== null && grid[r][c] !== word[index]) return null;
+        
+        const newPath = [...currentPath, {r, c}];
+        if (index === word.length - 1) return newPath;
+
+        let directions = [{dr:0,dc:1}, {dr:0,dc:-1}, {dr:1,dc:0}, {dr:-1,dc:0}];
+        directions.sort(() => 0.5 - Math.random());
+
+        if (!isPractice) {
+            const nextChar = word[index + 1];
+            directions.sort((a, b) => {
+                let valA = getCellPriority(grid, r+a.dr, c+a.dc, nextChar);
+                let valB = getCellPriority(grid, r+b.dr, c+b.dc, nextChar);
+                return valB - valA;
+            });
+        }
+
+        for (let dir of directions) {
+            let res = solvePath(grid, word, index + 1, r + dir.dr, c + dir.dc, newPath, isPractice);
+            if (res) return res;
+        }
+        return null;
+    }
+
+    function getCellPriority(grid, r, c, targetChar) {
+        if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) return -1;
+        if (grid[r][c] === targetChar) return 2;
+        if (grid[r][c] === null) return 1;
+        return 0;
+    }
+
+    function renderGrid() {
+        gridContainer.innerHTML = '';
+        for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.textContent = gridData[r][c];
+                cell.onclick = () => handleCellClick(r, c, cell);
+                gridContainer.appendChild(cell);
+            }
+        }
+    }
+
+    function updateStatusArea() {
+        statusArea.innerHTML = '';
+        if (currentMode === 'practice') {
+            targetAnimals.forEach(animal => {
+                const isFound = foundAnimals.includes(animal.name);
+                const div = document.createElement('div');
+                div.className = `hint-card ${isFound ? 'found' : ''}`;
+                div.textContent = `${animal.emoji} ${animal.name}`;
+                statusArea.appendChild(div);
+            });
+            foundAnimals.forEach(name => {
+                if (!targetAnimals.some(t => t.name === name)) {
+                    const animal = animals.find(a => a.name === name);
+                    const div = document.createElement('div');
+                    div.className = 'hint-card bonus';
+                    div.textContent = `${animal.emoji} ${animal.name}`;
+                    statusArea.appendChild(div);
+                }
+            });
+
+        } else {
+            if (foundAnimals.length === 0) {
+                statusArea.innerHTML = '<div style="color:#666; font-size:14px;">いきものを さがしてね！</div>';
+            } else {
+                foundAnimals.forEach(name => {
+                    const animal = animals.find(a => a.name === name);
+                    const div = document.createElement('div');
+                    div.className = 'hint-card bonus';
+                    div.textContent = `${animal.emoji} ${animal.name}`;
+                    statusArea.appendChild(div);
+                });
+            }
+        }
+    }
+
+    function handleCellClick(r, c, cellElement) {
+        if (selectedCells.length === 0) {
+            playSound('tap');
+            selectCell(r, c, cellElement);
+        } else {
+            const last = selectedCells[selectedCells.length - 1];
+            if (last.r === r && last.c === c) {
+                resetSelection();
+                return;
+            }
+            const isAdjacent = (Math.abs(last.r - r) + Math.abs(last.c - c)) === 1;
+            if (isAdjacent) {
+                playSound('tap');
+                selectCell(r, c, cellElement);
+            } else {
+                resetSelection();
+                playSound('tap');
+                selectCell(r, c, cellElement);
+            }
+        }
+        checkAnswer();
+    }
+
+    function selectCell(r, c, el) {
+        selectedCells.push({ r, c, char: gridData[r][c], element: el });
+        el.classList.add('selected');
+    }
+
+    function resetSelection() {
+        selectedCells.forEach(item => {
+            item.element.classList.remove('selected');
+        });
+        selectedCells = [];
+    }
+
+    function checkAnswer() {
+        const currentString = selectedCells.map(item => item.char).join('');
+        const match = animals.find(a => a.name === currentString);
+
+        if (match && !foundAnimals.includes(match.name)) {
+            foundAnimals.push(match.name);
+            
+            const isTarget = targetAnimals.some(t => t.name === match.name);
+            if (isTarget) {
+                playSound('pop');
+            } else {
+                playSound('bonus');
+            }
+
+            if (currentMode === 'challenge') {
+                totalScore++;
+                scoreDisplay.textContent = totalScore + '匹';
+            }
+            
+            selectedCells.forEach(item => {
+                item.element.classList.remove('selected');
+                item.element.classList.add('solved');
+            });
+            selectedCells = [];
+
+            triggerPopupAnimation(match.emoji);
+            updateStatusArea();
+            checkLevelComplete();
+        }
+    }
+
+    function checkLevelComplete() {
+        const allTargetsFound = targetAnimals.every(t => foundAnimals.includes(t.name));
+        if (allTargetsFound) {
+            playSound('level_clear');
+            if (currentMode === 'practice') {
+                setTimeout(() => { practiceClearModal.style.display = 'flex'; }, 800);
+            } else {
+                setTimeout(() => { nextLevel(); }, 1000);
+            }
+        }
+    }
+
+    function triggerPopupAnimation(emoji) {
+        popupAnim.style.animation = 'none';
+        popupAnim.offsetHeight;
+        popupAnim.textContent = emoji;
+        popupAnim.style.animation = 'popJump 0.8s ease-out forwards';
+    }
+
+    function showAnimalList() {
+        const listGrid = document.getElementById('animal-list-grid');
+        listGrid.innerHTML = '';
+        animals.forEach(animal => {
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.textContent = `${animal.emoji} ${animal.name}`;
+            listGrid.appendChild(div);
+        });
+        listModal.style.display = 'flex';
+    }
+
+    function closeAnimalList() {
+        listModal.style.display = 'none';
+    }
+
+</script>
+</body>
+</html>

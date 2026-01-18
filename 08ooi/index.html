@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いちばんおおいのどーれだ？</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Import Map for React and Lucide -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+        }
+    }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        /* Custom bounce animation for smoother feeling */
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(5%); }
+        }
+    </style>
+</head>
+<body class="bg-sky-50">
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useMemo, useRef } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { RefreshCw, Check, Star, Circle, Diamond, Trophy, RotateCcw, Clock, XCircle, Home, Timer, Crown, Volume2 } from 'lucide-react';
+
+        // --- Types & Constants ---
+
+        const SIZES = ['L', 'M', 'S'];
+        const SHAPES = ['star', 'circle', 'diamond'];
+        const COLORS = ['red', 'blue', 'yellow'];
+
+        // --- Helper Functions ---
+
+        const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // Generate items
+        const generateLevel = (mode) => {
+            let items = [];
+            let valid = false;
+            let correctAnswer = { type: 'shape', value: '' };
+
+            while (!valid) {
+                items = Array.from({ length: 9 }, (_, i) => ({
+                    id: i,
+                    size: getRandomElement(SIZES),
+                    shape: getRandomElement(SHAPES),
+                    color: getRandomElement(COLORS),
+                    rotation: Math.random() * 60 - 30,
+                }));
+
+                // Count occurrences
+                const counts = {};
+                const typeMap = {};
+
+                items.forEach(item => {
+                    // Shape counts
+                    counts[item.shape] = (counts[item.shape] || 0) + 1;
+                    typeMap[item.shape] = 'shape';
+                    // Color counts
+                    counts[item.color] = (counts[item.color] || 0) + 1;
+                    typeMap[item.color] = 'color';
+                    
+                    // Size counts (Only for normal mode)
+                    if (mode === 'normal') {
+                        counts[item.size] = (counts[item.size] || 0) + 1;
+                        typeMap[item.size] = 'size';
+                    }
+                });
+
+                // Find the global maximum
+                const sortedStats = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+                
+                // Ensure the top 1 is unique (strictly greater than the second place)
+                if (sortedStats.length > 1 && sortedStats[0][1] > sortedStats[1][1]) {
+                    valid = true;
+                    correctAnswer = {
+                        type: typeMap[sortedStats[0][0]],
+                        value: sortedStats[0][0]
+                    };
+                }
+            }
+
+            return { items, answer: correctAnswer };
+        };
+
+        const formatTime = (seconds) => {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        // --- Sound Effects Hook ---
+        const useGameSounds = () => {
+            const audioCtxRef = useRef(null);
+
+            const initAudio = () => {
+                if (!audioCtxRef.current) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) {
+                        audioCtxRef.current = new AudioContextClass();
+                    }
+                }
+                if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+                    audioCtxRef.current.resume();
+                }
+            };
+
+            const playTone = (freq, type, duration, startTime = 0, vol = 0.1) => {
+                if (!audioCtxRef.current) return;
+                const ctx = audioCtxRef.current;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+                // Warm envelope
+                gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+                gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(ctx.currentTime + startTime);
+                osc.stop(ctx.currentTime + startTime + duration);
+            };
+
+            const playSelect = () => {
+                initAudio();
+                playTone(880, 'sine', 0.15, 0, 0.05);
+            };
+
+            const playCorrect = () => {
+                initAudio();
+                playTone(523.25, 'triangle', 0.3, 0, 0.1);
+                playTone(659.25, 'triangle', 0.3, 0.08, 0.1);
+                playTone(783.99, 'triangle', 0.4, 0.16, 0.1);
+            };
+
+            const playWrong = () => {
+                initAudio();
+                playTone(329.63, 'sine', 0.2, 0, 0.1);
+                playTone(293.66, 'sine', 0.4, 0.1, 0.1);
+            };
+
+            const playStart = () => {
+                initAudio();
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    playTone(freq, 'triangle', 0.2, i * 0.08, 0.08);
+                });
+            };
+
+            const playClear = () => {
+                initAudio();
+                const now = 0;
+                const vol = 0.08;
+                playTone(523.25, 'triangle', 0.2, now, vol);
+                playTone(523.25, 'triangle', 0.2, now + 0.15, vol);
+                playTone(523.25, 'triangle', 0.2, now + 0.3, vol);
+                playTone(659.25, 'triangle', 0.6, now + 0.45, vol);
+                playTone(783.99, 'triangle', 0.8, now + 0.45, vol);
+                playTone(1046.50, 'triangle', 1.2, now + 0.45, vol);
+            };
+
+            return { playSelect, playCorrect, playWrong, playStart, playClear };
+        };
+
+        // --- Components ---
+
+        const Figure = ({ size, shape, color, rotation }) => {
+            const sizePx = size === 'L' ? 90 : size === 'M' ? 65 : 45;
+            const colorHex = color === 'red' ? '#ef4444' : color === 'blue' ? '#3b82f6' : '#eab308';
+            
+            const getShapePath = () => {
+                switch (shape) {
+                    case 'circle': return <circle cx="50" cy="50" r="45" />;
+                    case 'diamond': return <polygon points="50,5 95,50 50,95 5,50" />;
+                    case 'star': return <polygon points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35" />;
+                }
+            };
+
+            return (
+                <div 
+                    className="flex items-center justify-center w-full h-full"
+                    style={{ transform: `rotate(${rotation}deg)` }}
+                >
+                    <svg 
+                        viewBox="0 0 100 100" 
+                        style={{ width: `${sizePx}%`, height: `${sizePx}%` }} 
+                        className="drop-shadow-md"
+                    >
+                        <g fill={colorHex}>{getShapePath()}</g>
+                        <g fill="none" stroke="black" strokeWidth="3" strokeOpacity="0.15">{getShapePath()}</g>
+                    </svg>
+                </div>
+            );
+        };
+
+        const OptionButton = ({ isSelected, onClick, children, isCorrectAnswer, showResult, className = "" }) => {
+            let bgClass = "bg-white hover:bg-gray-50 border-gray-200 shadow-sm";
+            
+            if (showResult) {
+                if (isCorrectAnswer) {
+                    bgClass = "bg-green-100 border-green-500 ring-4 ring-green-500 scale-105 z-10";
+                } else if (isSelected && !isCorrectAnswer) {
+                    bgClass = "bg-red-100 border-red-500 opacity-50";
+                } else {
+                    bgClass = "opacity-20 border-gray-100 grayscale";
+                }
+            } else {
+                bgClass = "bg-sky-50 hover:bg-sky-100 border-sky-200 hover:border-sky-300";
+                if (isSelected) bgClass = "bg-sky-100 border-sky-500 ring-4 ring-sky-400 z-10 scale-105";
+            }
+
+            return (
+                <button
+                    onClick={onClick}
+                    disabled={showResult}
+                    className={`
+                        relative rounded-xl border-4 
+                        flex items-center justify-center transition-all duration-200 transform
+                        ${bgClass}
+                        ${!showResult && 'active:scale-90'}
+                        ${className}
+                    `}
+                >
+                    {children}
+                    {showResult && isCorrectAnswer && (
+                        <div className="absolute -top-3 -right-3 rounded-full bg-green-500 text-white p-1 shadow-md z-20 animate-bounce">
+                            <Check size={20} strokeWidth={4} />
+                        </div>
+                    )}
+                </button>
+            );
+        };
+
+        const BackgroundDecoration = () => {
+            const items = useMemo(() => {
+                return Array.from({ length: 80 }, (_, i) => ({
+                    id: i,
+                    size: getRandomElement(SIZES),
+                    shape: getRandomElement(SHAPES),
+                    color: getRandomElement(COLORS),
+                    rotation: Math.random() * 360,
+                    x: Math.random() * 100,
+                    y: Math.random() * 100,
+                    delay: Math.random() * 3
+                }));
+            }, []);
+
+            return (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+                    {items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="absolute animate-pulse"
+                            style={{
+                                left: `${item.x}%`,
+                                top: `${item.y}%`,
+                                animationDelay: `${item.delay}s`,
+                                animationDuration: '2s'
+                            }}
+                        >
+                            <div style={{ width: '180px', height: '180px', transform: `rotate(${item.rotation}deg)` }}>
+                                <Figure {...item} rotation={0} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // --- Main Game Component ---
+
+        const Game = () => {
+            // Game State
+            const [gameState, setGameState] = useState('title');
+            const [gameMode, setGameMode] = useState('normal');
+            const [level, setLevel] = useState(null);
+            const [userSelection, setUserSelection] = useState(null);
+            
+            // Scoring
+            const [questionsCleared, setQuestionsCleared] = useState(0);
+            const [targetQuestions, setTargetQuestions] = useState(5);
+            const [elapsedTime, setElapsedTime] = useState(0);
+            const timerRef = useRef(null);
+
+            // High Scores
+            const [highScores, setHighScores] = useState({
+                easy: { 5: null, 10: null, 15: null },
+                normal: { 5: null, 10: null, 15: null }
+            });
+
+            // UI State
+            const [showResult, setShowResult] = useState(false);
+            const [isCorrectMove, setIsCorrectMove] = useState(false);
+
+            // Sounds
+            const { playSelect, playCorrect, playWrong, playStart, playClear } = useGameSounds();
+
+            useEffect(() => {
+                if (gameState === 'playing') {
+                    timerRef.current = window.setInterval(() => {
+                        setElapsedTime(t => t + 1);
+                    }, 1000);
+                }
+                return () => {
+                    if (timerRef.current) clearInterval(timerRef.current);
+                };
+            }, [gameState]);
+
+            const startGame = (count, mode) => {
+                playStart();
+                setGameMode(mode);
+                setTargetQuestions(count);
+                setQuestionsCleared(0);
+                setElapsedTime(0);
+                setGameState('playing');
+                loadNextLevel(mode);
+            };
+
+            const endGame = () => {
+                playClear();
+                setGameState('result');
+                if (timerRef.current) clearInterval(timerRef.current);
+
+                const currentBest = highScores[gameMode][targetQuestions];
+                if (currentBest === null || elapsedTime < currentBest) {
+                    setHighScores(prev => ({
+                        ...prev,
+                        [gameMode]: {
+                            ...prev[gameMode],
+                            [targetQuestions]: elapsedTime
+                        }
+                    }));
+                }
+            };
+
+            const returnToTitle = () => {
+                playSelect();
+                if (timerRef.current) clearInterval(timerRef.current);
+                setGameState('title');
+                setLevel(null);
+            };
+
+            const loadNextLevel = (mode) => {
+                setLevel(generateLevel(mode));
+                setUserSelection(null);
+                setShowResult(false);
+                setIsCorrectMove(false);
+            };
+
+            const handleSelect = (type, value) => {
+                if (showResult || !level) return;
+                
+                setUserSelection({ type, value });
+                setShowResult(true);
+
+                const isCorrect = (
+                    type === level.answer.type &&
+                    value === level.answer.value
+                );
+                setIsCorrectMove(isCorrect);
+
+                if (isCorrect) {
+                    playCorrect();
+                } else {
+                    playWrong();
+                }
+
+                let nextCleared = questionsCleared;
+                if (isCorrect) {
+                    nextCleared = questionsCleared + 1;
+                    setQuestionsCleared(nextCleared);
+                }
+
+                setTimeout(() => {
+                    if (nextCleared >= targetQuestions) {
+                        endGame();
+                    } else {
+                        loadNextLevel(gameMode);
+                    }
+                }, 700);
+            };
+
+            const handleModeChange = (mode) => {
+                playSelect();
+                setGameMode(mode);
+            }
+
+            // --- Render ---
+
+            if (gameState === 'title') {
+                return (
+                    <div className="min-h-screen w-full bg-sky-50 font-sans flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                        <BackgroundDecoration />
+                        
+                        <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-10 rounded-3xl shadow-xl border-4 border-sky-200 max-w-2xl w-full text-center space-y-6 z-10">
+                            <h1 className="text-4xl sm:text-5xl font-black text-sky-600 tracking-wider leading-snug drop-shadow-sm">
+                                いちばん<br/>おおいのどーれだ？
+                            </h1>
+                            
+                            <div className="flex gap-2 justify-center bg-gray-100 p-1 rounded-xl">
+                                <button
+                                    onClick={() => handleModeChange('easy')}
+                                    className={`flex-1 py-3 rounded-lg font-bold text-lg transition-all ${gameMode === 'easy' ? 'bg-white text-green-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    やさしい
+                                </button>
+                                <button
+                                    onClick={() => handleModeChange('normal')}
+                                    className={`flex-1 py-3 rounded-lg font-bold text-lg transition-all ${gameMode === 'normal' ? 'bg-white text-sky-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    ほんばん
+                                </button>
+                            </div>
+
+                            <div className="bg-sky-50 p-4 rounded-xl border border-sky-100">
+                                <p className="text-gray-600 font-bold text-lg mb-1">
+                                    {gameMode === 'easy' ? 'やさしいモード' : 'ほんばんモード'}
+                                </p>
+                                <p className="text-gray-500 text-sm">
+                                    {gameMode === 'easy' 
+                                        ? '「かたち」と「いろ」、ぜんぶのなかから いちばんおおいのを えらんでね！'
+                                        : '「かたち」と「いろ」と「大きさ」、ぜんぶのなかから いちばんおおいのを えらんでね！'
+                                    }
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-3">
+                                {[5, 10, 15].map((count) => {
+                                    const best = highScores[gameMode][count];
+                                    return (
+                                        <button
+                                            key={count}
+                                            onClick={() => startGame(count, gameMode)}
+                                            className={`
+                                                w-full border-b-4 font-black text-xl py-4 px-6 rounded-xl transition-transform active:scale-95 flex items-center justify-between
+                                                ${gameMode === 'easy' 
+                                                    ? 'bg-green-100 hover:bg-green-200 border-green-300 text-green-700' 
+                                                    : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-700'
+                                                }
+                                            `}
+                                        >
+                                            <span className="flex items-center gap-2"><Check size={24} strokeWidth={3} /> {count} もん</span>
+                                            {best !== null && (
+                                                <span className="text-sm bg-white/50 px-3 py-1 rounded-full flex items-center gap-1">
+                                                    <Crown size={14} className="fill-yellow-500 text-yellow-600"/>
+                                                    {formatTime(best)}
+                                                </span>
+                                            )}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (gameState === 'result') {
+                const isNewRecord = highScores[gameMode][targetQuestions] === elapsedTime;
+                return (
+                    <div className="min-h-screen w-full bg-yellow-50 font-sans flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                        <BackgroundDecoration />
+                        <div className="bg-white/95 p-10 rounded-3xl shadow-xl border-4 border-yellow-200 max-w-lg w-full text-center space-y-8 animate-in zoom-in z-10">
+                            <h2 className="text-4xl font-black text-gray-700">クリア！</h2>
+                            
+                            <div className="py-6 space-y-6">
+                                <div>
+                                    <p className="text-gray-400 font-bold mb-1">かかったじかん</p>
+                                    <div className="text-6xl font-black text-sky-500 flex items-center justify-center gap-3 relative">
+                                        <Timer size={48} className="text-sky-400" />
+                                        {formatTime(elapsedTime)}
+                                        {isNewRecord && (
+                                            <div className="absolute -top-8 -right-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce transform rotate-12">
+                                                NEW RECORD!
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-sky-50 rounded-xl p-4">
+                                    <p className="text-sky-600 font-bold text-lg">
+                                        {gameMode === 'easy' ? 'やさしい' : 'ほんばん'} {targetQuestions}もん せいかい！
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={returnToTitle}
+                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-black text-xl py-4 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                <Home size={24} />
+                                タイトルへ
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (!level) return <div className="p-10 text-center">Loading...</div>;
+
+            return (
+                <div className="h-screen w-full bg-slate-100 font-sans select-none overflow-hidden flex flex-col relative">
+                    {/* Header Info Bar */}
+                    <div className="bg-white border-b-2 border-slate-200 px-4 py-2 flex items-center justify-between z-20 shadow-sm shrink-0">
+                        <button 
+                            onClick={returnToTitle}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-500 px-3 py-2 rounded-lg font-bold text-sm flex items-center gap-1 transition-colors"
+                        >
+                            <RotateCcw size={16} /> やめる
+                        </button>
+
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-yellow-100 p-1.5 rounded-full"><Trophy size={20} className="text-yellow-600" /></div>
+                                <span className="text-2xl font-black text-slate-700">
+                                    {questionsCleared}<span className="text-lg text-gray-400 font-bold mx-1">/</span>{targetQuestions}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="bg-sky-100 p-1.5 rounded-full">
+                                    <Clock size={20} className="text-sky-500" />
+                                </div>
+                                <span className="text-2xl font-black w-16 text-center text-slate-700">
+                                    {formatTime(elapsedTime)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Game Layout */}
+                    <div className="flex-1 w-full max-w-4xl mx-auto flex p-2 gap-2 relative z-0 items-center justify-center">
+                        
+                        {/* LEFT: COLOR */}
+                        <div className="w-24 flex flex-col justify-center gap-4 z-20 pr-2">
+                            {COLORS.map(c => (
+                                <OptionButton 
+                                    key={c} 
+                                    isSelected={userSelection?.type === 'color' && userSelection?.value === c}
+                                    onClick={() => handleSelect('color', c)}
+                                    showResult={showResult}
+                                    isCorrectAnswer={level.answer.type === 'color' && level.answer.value === c}
+                                    className="w-20 h-20"
+                                >
+                                    <div className={`w-14 h-14 rounded-full border-4 border-white shadow-md
+                                        ${c === 'red' ? 'bg-red-500' : c === 'blue' ? 'bg-blue-500' : 'bg-yellow-400'}
+                                    `} />
+                                </OptionButton>
+                            ))}
+                        </div>
+
+                        {/* CENTER: BOARD */}
+                        <div className="flex-1 max-w-[min(80vh,80vw)] aspect-square bg-white rounded-3xl border-4 border-slate-200 shadow-inner relative p-4 z-0 flex items-center justify-center">
+                            <div className="absolute inset-0 opacity-10" 
+                                style={{ backgroundImage: 'radial-gradient(#cbd5e1 2px, transparent 2px)', backgroundSize: '20px 20px' }} />
+                            
+                            <div className="grid grid-cols-3 grid-rows-3 gap-2 w-full h-full">
+                                {level.items.map((item) => (
+                                    <div key={item.id} className="relative w-full h-full flex items-center justify-center">
+                                        <Figure {...item} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {showResult && (
+                                <div className="absolute inset-0 bg-white/40 flex items-center justify-center z-10 backdrop-blur-[2px] animate-in fade-in duration-200 rounded-2xl">
+                                    {isCorrectMove ? (
+                                        <div className="bg-green-500 text-white rounded-full p-8 shadow-2xl animate-bounce">
+                                            <Circle size={80} strokeWidth={4} />
+                                        </div>
+                                    ) : (
+                                        <div className="bg-red-500 text-white rounded-full p-8 shadow-2xl animate-pulse">
+                                            <XCircle size={80} strokeWidth={4} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* RIGHT: SHAPE */}
+                        <div className="flex flex-col gap-2 h-full justify-center">
+                            <div className="w-24 flex flex-col justify-center gap-4 z-20 pl-2">
+                                {SHAPES.map(s => (
+                                    <OptionButton 
+                                        key={s} 
+                                        isSelected={userSelection?.type === 'shape' && userSelection?.value === s}
+                                        onClick={() => handleSelect('shape', s)}
+                                        showResult={showResult}
+                                        isCorrectAnswer={level.answer.type === 'shape' && level.answer.value === s}
+                                        className="w-20 h-20"
+                                    >
+                                        {s === 'star' && <Star size={48} className="fill-gray-800 text-gray-800" />}
+                                        {s === 'circle' && <Circle size={48} className="fill-gray-800 text-gray-800" />}
+                                        {s === 'diamond' && <div className="w-10 h-10 bg-gray-800 rotate-45" />}
+                                    </OptionButton>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* BOTTOM: SIZE (Normal Mode Only) */}
+                    <div className="h-24 flex justify-center items-start pt-2 gap-4 z-20 w-full shrink-0">
+                        {gameMode === 'normal' && SIZES.map(s => (
+                            <OptionButton 
+                                key={s} 
+                                isSelected={userSelection?.type === 'size' && userSelection?.value === s}
+                                onClick={() => handleSelect('size', s)}
+                                showResult={showResult}
+                                isCorrectAnswer={level.answer.type === 'size' && level.answer.value === s}
+                                className="w-20 h-20"
+                            >
+                                <div className={`bg-gray-800 rounded-md shadow-sm ${s === 'L' ? 'w-14 h-14' : s === 'M' ? 'w-10 h-10' : 'w-6 h-6'}`} />
+                            </OptionButton>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<Game />);
+    </script>
+</body>
+</html>

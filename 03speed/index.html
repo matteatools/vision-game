@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Speed Lamp Attack DX</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=M+PLUS+Rounded+1c:wght@700&display=swap');
+
+        body {
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .game-font {
+            font-family: 'Black Ops One', cursive;
+        }
+
+        /* グリッドレイアウト */
+        .game-grid {
+            display: grid;
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        /* ランプのスタイル */
+        .lamp {
+            background: #16213e;
+            border-radius: 4px; /* 機械的な印象にするため少し角ばらせる */
+            border: 2px solid #0f3460;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.05s, background-color 0.1s; /* 反応を鋭く */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lamp:active {
+            transform: scale(0.92);
+        }
+
+        /* 点灯状態 (Active) */
+        .lamp.active {
+            background: #00ff9d;
+            border-color: #fff;
+            box-shadow: 
+                0 0 15px #00ff9d,
+                0 0 30px #00ff9d,
+                inset 0 0 5px rgba(255,255,255,0.9);
+            z-index: 10;
+        }
+
+        /* ミスした時の状態 (Red) */
+        .lamp.miss {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+            background: #ff0055;
+            box-shadow: 0 0 15px #ff0055;
+            border-color: #ff0055;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            animation: ripple 0.3s linear forwards; /* エフェクトも少し鋭く */
+            opacity: 0;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .hud-panel {
+            background: rgba(15, 52, 96, 0.9);
+            border: 1px solid #e94560;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            /* 機械的なパネル感 */
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.98);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none !important; 
+        }
+
+        /* モード選択ボタン */
+        .mode-btn {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 212, 255, 0.2);
+            transition: all 0.1s;
+            /* テック風のデザイン */
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .mode-btn:hover {
+            background: #00d4ff;
+            color: #1a1a2e;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Quitボタン */
+        .quit-btn {
+            background: #ff0055;
+            color: white;
+            font-size: 0.8rem;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+            transition: transform 0.1s;
+            clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+        }
+        .quit-btn:active {
+            transform: scale(0.9);
+        }
+
+        .ranking-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        @keyframes flashText {
+            0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+            50% { transform: scale(1.2); opacity: 0.8; filter: brightness(1.5); }
+            100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+        }
+        .speed-warning {
+            animation: flashText 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen p-2 select-none">
+
+    <!-- ヘッダー -->
+    <div class="w-full max-w-md flex justify-between items-center mb-4 mt-2 px-2">
+        <div class="hud-panel px-4 py-2 text-center w-1/3">
+            <div class="text-[10px] text-gray-300 mb-1">SCORE</div>
+            <div id="scoreDisplay" class="text-2xl font-bold game-font text-green-400">0</div>
+        </div>
+        
+        <button onclick="quitGame()" class="quit-btn mx-2">QUIT</button>
+
+        <div class="hud-panel px-4 py-2 text-center w-1/3">
+            <div class="text-[10px] text-gray-300 mb-1">TIME</div>
+            <div id="timeDisplay" class="text-2xl font-bold game-font text-blue-400">30.0</div>
+        </div>
+    </div>
+
+    <!-- ゲームエリア -->
+    <div class="game-grid" id="gridContainer">
+        <!-- JSで生成されます -->
+    </div>
+
+    <!-- ステータス表示 -->
+    <div class="mt-4 text-gray-400 text-xs text-center font-mono">
+        <p>[SYSTEM] TARGET: ACTIVE LAMPS</p>
+        <p class="mt-1 text-red-400">[WARNING] MISS: -1 PENALTY</p>
+    </div>
+
+    <!-- オーバーレイ -->
+    <div id="overlay">
+        <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-6 game-font italic text-center leading-tight drop-shadow-lg">
+            SPEED<br>ATTACK
+        </h1>
+        
+        <!-- スタートメニュー -->
+        <div id="startMenu" class="flex flex-col items-center w-full max-w-sm px-4">
+            <p class="text-gray-300 mb-4 text-sm tracking-wider font-mono">SELECT GRID SYSTEM</p>
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <button class="mode-btn" onclick="startGame(4)">2 x 2<div class="text-xs font-normal opacity-70">Easy</div></button>
+                <button class="mode-btn" onclick="startGame(9)">3 x 3<div class="text-xs font-normal opacity-70">Normal</div></button>
+                <button class="mode-btn" onclick="startGame(16)">4 x 4<div class="text-xs font-normal opacity-70">Hard</div></button>
+                <button class="mode-btn" onclick="startGame(25)">5 x 5<div class="text-xs font-normal opacity-70">Insane</div></button>
+            </div>
+            <p class="mt-8 text-gray-500 text-xs font-mono">SYSTEM READY...</p>
+        </div>
+
+        <!-- リザルト画面 -->
+        <div id="resultArea" class="hidden flex flex-col items-center w-full max-w-sm px-4">
+            <p class="text-lg text-gray-300 mb-1 font-mono">MISSION RESULT</p>
+            <p id="finalScore" class="text-6xl font-bold text-white game-font mb-2">0</p>
+            
+            <div class="w-full bg-gray-900 bg-opacity-50 border border-gray-700 p-4 mb-6" style="clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);">
+                <p class="text-xs text-center text-blue-300 mb-2 border-b border-gray-700 pb-1 font-mono">TOP 3 LOGS (<span id="resultModeLabel">3x3</span>)</p>
+                <div id="rankingList" class="text-sm font-mono">
+                    <!-- JSで挿入 -->
+                </div>
+            </div>
+
+            <button onclick="showTitle()" class="mode-btn w-full">RETURN TO MENU</button>
+        </div>
+    </div>
+
+    <script>
+        // 設定
+        const GAME_DURATION = 30;
+        const INITIAL_SPEED = 1000;
+        const SPEED_LEVEL_1 = 700;
+        const SPEED_LEVEL_2 = 400;
+        
+        // 状態変数
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let isPlaying = false;
+        let activeIndex = -1;
+        let gameTimer = null;
+        let lampTimer = null;
+        let currentSpeed = INITIAL_SPEED;
+        let currentGridSize = 9;
+        let currentCols = 3;
+        let speedLevel = 0;
+
+        // DOM要素
+        const gridContainer = document.getElementById('gridContainer');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const overlay = document.getElementById('overlay');
+        const startMenu = document.getElementById('startMenu');
+        const resultArea = document.getElementById('resultArea');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const rankingList = document.getElementById('rankingList');
+        const resultModeLabel = document.getElementById('resultModeLabel');
+
+        // 音声コンテキスト (Web Audio API)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        // 機械的な効果音を生成する関数
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const now = audioCtx.currentTime;
+            const masterGain = audioCtx.createGain();
+            masterGain.connect(audioCtx.destination);
+
+            if (type === 'hit') {
+                // 正解音: 高音で短い「ピコッ！」（矩形波）
+                const osc = audioCtx.createOscillator();
+                osc.type = 'square'; // 矩形波でデジタル感を出す
+                osc.frequency.setValueAtTime(1000, now);
+                osc.frequency.exponentialRampToValueAtTime(1500, now + 0.08); // ピッチを少し上げる
+
+                masterGain.gain.setValueAtTime(0.1, now);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08); // キレ良く止める
+
+                osc.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.08);
+
+            } else if (type === 'miss') {
+                // 不正解音: 低音で濁った「ブッ！」（ノコギリ波）
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.15); // ピッチを下げる
+
+                // 2つ目のオシレーターで不協和音を作る（ビビリ音）
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(125, now); 
+                
+                // ミックス用ゲイン
+                masterGain.gain.setValueAtTime(0.15, now);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+                osc.connect(masterGain);
+                osc2.connect(masterGain);
+                
+                osc.start(now);
+                osc2.start(now);
+                osc.stop(now + 0.2);
+                osc2.stop(now + 0.2);
+
+            } else if (type === 'alert') {
+                // スピードアップ音: 「ピロリッ！」
+                const osc = audioCtx.createOscillator();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.setValueAtTime(1200, now + 0.08); // 2段階音程
+
+                masterGain.gain.setValueAtTime(0.1, now);
+                masterGain.gain.linearRampToValueAtTime(0.1, now + 0.15);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+                osc.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.2);
+
+            } else if (type === 'over') {
+                // ゲームオーバー音: 「ヒュゥゥーン…」（パワーダウン）
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.8); // 急激にピッチダウン
+
+                masterGain.gain.setValueAtTime(0.2, now);
+                masterGain.gain.linearRampToValueAtTime(0, now + 0.8);
+
+                osc.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            }
+        }
+
+        // グリッド生成
+        function initGrid(totalCells) {
+            currentGridSize = totalCells;
+            currentCols = Math.sqrt(totalCells);
+            
+            gridContainer.innerHTML = '';
+            gridContainer.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
+            
+            if (currentCols >= 5) {
+                gridContainer.style.gap = '6px';
+            } else {
+                gridContainer.style.gap = '10px';
+            }
+
+            for (let i = 0; i < totalCells; i++) {
+                const lamp = document.createElement('div');
+                lamp.classList.add('lamp');
+                lamp.dataset.index = i;
+                
+                lamp.addEventListener('mousedown', (e) => handleInput(i, e));
+                lamp.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleInput(i, e);
+                }, {passive: false});
+
+                gridContainer.appendChild(lamp);
+            }
+        }
+
+        // 入力処理
+        function handleInput(index, event) {
+            if (!isPlaying) return;
+
+            const lamp = gridContainer.children[index];
+
+            if (index === activeIndex) {
+                score++;
+                scoreDisplay.textContent = score;
+                playSound('hit'); // 機械的ヒット音
+                createRipple(lamp);
+                
+                clearTimeout(lampTimer);
+                activateLamp();
+
+            } else {
+                score--;
+                scoreDisplay.textContent = score; 
+                showFloatingText(lamp, "-1", "red");
+                
+                playSound('miss'); // 機械的ミス音
+                lamp.classList.add('miss');
+                setTimeout(() => lamp.classList.remove('miss'), 300);
+            }
+        }
+
+        function showFloatingText(element, text, color) {
+            const el = document.createElement('div');
+            el.textContent = text;
+            el.style.position = 'absolute';
+            el.style.color = color;
+            el.style.fontWeight = 'bold';
+            el.style.fontSize = '1.5rem';
+            el.style.left = '50%';
+            el.style.top = '50%';
+            el.style.transform = 'translate(-50%, -50%)';
+            el.style.pointerEvents = 'none';
+            el.style.animation = 'floatUp 0.5s ease-out forwards';
+            el.style.textShadow = '0 0 5px rgba(0,0,0,0.8)';
+            el.style.zIndex = '20';
+            el.style.fontFamily = "'Black Ops One', cursive"; // フォント合わせ
+            
+            element.appendChild(el);
+            
+            let pos = 0;
+            let op = 1;
+            const anim = setInterval(() => {
+                pos -= 2;
+                op -= 0.05;
+                el.style.transform = `translate(-50%, calc(-50% + ${pos}px))`;
+                el.style.opacity = op;
+                if(op <= 0) {
+                    clearInterval(anim);
+                    el.remove();
+                }
+            }, 20);
+        }
+
+        function createRipple(element) {
+            const ripple = document.createElement('div');
+            ripple.classList.add('particle');
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 400);
+        }
+
+        function activateLamp() {
+            if (activeIndex !== -1 && gridContainer.children[activeIndex]) {
+                gridContainer.children[activeIndex].classList.remove('active');
+            }
+
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * currentGridSize);
+            } while (newIndex === activeIndex && currentGridSize > 1);
+
+            activeIndex = newIndex;
+            const lamp = gridContainer.children[activeIndex];
+            lamp.classList.add('active');
+
+            lampTimer = setTimeout(() => {
+                if (isPlaying) {
+                    activateLamp();
+                }
+            }, currentSpeed * 1.5);
+        }
+
+        function startGameLoop() {
+            const startTime = Date.now();
+            
+            gameTimer = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                timeLeft = Math.max(0, GAME_DURATION - elapsed);
+                timeDisplay.textContent = timeLeft.toFixed(1);
+
+                if (elapsed >= 20 && speedLevel < 2) {
+                    speedLevel = 2;
+                    currentSpeed = SPEED_LEVEL_2;
+                    
+                    playSound('alert'); // スピードアップ警告音
+                    timeDisplay.className = "text-2xl font-bold game-font text-red-500 speed-warning";
+                    showFloatingText(gridContainer, "MAX SPEED!", "orange");
+                    
+                } else if (elapsed >= 10 && speedLevel < 1) {
+                    speedLevel = 1;
+                    currentSpeed = SPEED_LEVEL_1;
+                    
+                    playSound('alert'); // スピードアップ警告音
+                    timeDisplay.className = "text-2xl font-bold game-font text-yellow-400 speed-warning";
+                    showFloatingText(gridContainer, "SPEED UP!", "yellow");
+                }
+
+                if (timeLeft <= 0) {
+                    endGame(true);
+                }
+            }, 50);
+        }
+
+        function startGame(size) {
+            initGrid(size);
+            
+            score = 0;
+            timeLeft = GAME_DURATION;
+            speedLevel = 0;
+            currentSpeed = INITIAL_SPEED;
+            
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = timeLeft.toFixed(1);
+            timeDisplay.className = "text-2xl font-bold game-font text-blue-400";
+            
+            isPlaying = true;
+            
+            overlay.classList.add('hidden');
+            startMenu.classList.add('hidden');
+            resultArea.classList.add('hidden');
+            
+            // 初回タップ時などにAudioContextを再開させる
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            setTimeout(() => {
+                activateLamp();
+                startGameLoop();
+            }, 300);
+        }
+
+        function quitGame() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            clearInterval(gameTimer);
+            clearTimeout(lampTimer);
+            
+            if (activeIndex !== -1 && gridContainer.children[activeIndex]) {
+                gridContainer.children[activeIndex].classList.remove('active');
+            }
+            activeIndex = -1;
+
+            showTitle();
+        }
+
+        function showTitle() {
+            overlay.classList.remove('hidden');
+            startMenu.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+        }
+
+        function endGame(saveRecord) {
+            isPlaying = false;
+            clearInterval(gameTimer);
+            clearTimeout(lampTimer);
+            
+            if (activeIndex !== -1 && gridContainer.children[activeIndex]) {
+                gridContainer.children[activeIndex].classList.remove('active');
+            }
+            activeIndex = -1;
+
+            playSound('over'); // パワーダウン音
+            
+            if (saveRecord) {
+                saveScore(currentGridSize, score);
+            }
+            showResult();
+        }
+
+        function saveScore(size, newScore) {
+            const key = `speedAttack_best_${size}`;
+            let scores = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            scores.push({ score: newScore, date: new Date().toLocaleDateString() });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 3);
+            
+            localStorage.setItem(key, JSON.stringify(scores));
+        }
+
+        function showResult() {
+            finalScoreDisplay.textContent = score;
+            resultModeLabel.textContent = `${currentCols}x${currentCols}`;
+            
+            const key = `speedAttack_best_${currentGridSize}`;
+            const scores = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            rankingList.innerHTML = '';
+            if (scores.length === 0) {
+                rankingList.innerHTML = '<div class="text-center text-gray-500 py-2">No Records</div>';
+            } else {
+                scores.forEach((s, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'ranking-row';
+                    
+                    const rankClass = `rank-${index + 1}`;
+                    const rankLabel = index === 0 ? '1st' : index === 1 ? '2nd' : '3rd';
+                    
+                    row.innerHTML = `
+                        <span class="${rankClass} font-bold w-12">${rankLabel}</span>
+                        <span class="text-white text-right w-full">${s.score} pts</span>
+                    `;
+                    rankingList.appendChild(row);
+                });
+            }
+
+            overlay.classList.remove('hidden');
+            startMenu.classList.add('hidden');
+            resultArea.classList.remove('hidden');
+        }
+
+        initGrid(9);
+    </script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>くつしたあわせゲーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background-color: #fdf6e3;
+            user-select: none;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        .screen {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+            background-size: cover;
+            background-position: center;
+        }
+        .screen.hidden {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* トップ画面の背景 (画像4.jpg) */
+        #start-screen {
+            background-image: url('4.jpg');
+            background-color: #fff7ed;
+        }
+        #start-screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+        #start-screen > * {
+            z-index: 10;
+        }
+
+        #game-board {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+
+        /* ゲームボードの下地: 無地（温かみのある色） */
+        #game-board-container {
+            background-color: #fffbeb; /* amber-50 アイボリー系 */
+            opacity: 1;
+            box-shadow: inset 0 0 30px rgba(180, 83, 9, 0.1); /* 内側に少し影 */
+            border: 4px solid #fdba74; /* オレンジ色の枠 */
+        }
+
+        .sock-card {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            cursor: grab;
+            will-change: transform, left, top;
+            transition: transform 0.4s ease-out, left 0.4s ease-out, top 0.4s ease-out, opacity 0.3s;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            z-index: 1;
+            transform-origin: center center;
+        }
+
+        .sock-card:active { cursor: grabbing; transition: none; }
+        .sock-card:hover { filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.25)); transform: scale(1.05); z-index: 50; }
+        .sock-card.selected { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) brightness(1.1); z-index: 999 !important; }
+        .sock-card.matched { opacity: 0; pointer-events: none; transform: scale(1.5) rotate(180deg) !important; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .sock-card.flying-in { transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100 !important; }
+        .sock-card.scattered { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
+
+        @keyframes dropIn { 0% { transform: scale(3) translateY(-100px); opacity: 0; } 100% { opacity: 1; } }
+        .animate-drop { animation: dropIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        #sound-toggle { transition: all 0.2s; }
+        #sound-toggle.muted { opacity: 0.5; text-decoration: line-through; }
+
+        /* 猫: 2.0秒 */
+        #cat-agent { will-change: transform, left; transition: left 2.0s linear; }
+        /* 赤ちゃん: 下からポコッと */
+        #baby-agent { will-change: transform, bottom; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* シンプルな縦並びボタン */
+        .simple-btn {
+            @apply w-full text-center px-4 py-4 mb-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-100 font-bold text-lg text-slate-700 relative top-0;
+            border-bottom-width: 5px;
+        }
+        .simple-btn:active {
+            @apply shadow-none border-b-2 translate-y-1;
+        }
+
+        /* 色のバリエーション */
+        .btn-lv1 { @apply border-blue-400 text-blue-700 hover:bg-blue-50; }
+        .btn-lv2 { @apply border-orange-400 text-orange-700 hover:bg-orange-50; }
+        .btn-lv3 { @apply border-pink-400 text-pink-700 hover:bg-pink-50; }
+        .btn-lv4 { @apply border-cyan-400 text-cyan-700 hover:bg-cyan-50; }
+        .btn-lv5 { @apply border-purple-400 text-purple-700 hover:bg-purple-50; }
+
+        @media (max-width: 640px) {
+            .sock-card { width: 85px; height: 85px; } 
+            .simple-btn { @apply py-3 mb-2 text-base; border-bottom-width: 4px; }
+            .simple-btn:active { border-bottom-width: 2px; }
+        }
+    </style>
+</head>
+<body class="w-full h-screen relative overflow-hidden text-slate-700">
+
+    <!-- ■ トップ画面 (背景画像4.jpg) -->
+    <div id="start-screen" class="screen z-50 p-4 overflow-y-auto flex items-center justify-center">
+        <!-- 白いカード風のコンテナ -->
+        <div class="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border-4 border-white p-6">
+            
+            <div class="flex flex-col items-center mb-6">
+                <div class="text-7xl mb-2 animate-bounce drop-shadow-md filter hue-rotate-15">🧦</div>
+                
+                <h1 class="text-3xl font-black text-slate-700 tracking-tight drop-shadow-sm text-center leading-none">
+                    <span class="text-blue-500">く</span><span class="text-pink-500">つ</span><span class="text-yellow-500">し</span><span class="text-green-500">た</span><br>
+                    <span class="text-2xl text-slate-600">あわせ ゲーム</span>
+                </h1>
+                
+                <div class="mt-3 bg-orange-100 text-orange-600 text-sm font-bold px-5 py-1.5 rounded-full border-2 border-orange-200 animate-pulse">
+                    あそぶ レベルを えらんでね！
+                </div>
+            </div>
+
+            <!-- ボタンリスト (完全な縦並び) -->
+            <div class="flex flex-col w-full gap-1">
+                <button onclick="startGame(1)" class="simple-btn btn-lv1">
+                    LV1 　ふつうのモード
+                </button>
+
+                <button onclick="startGame(2)" class="simple-btn btn-lv2">
+                    Lv2 　ネコがくるモード
+                </button>
+
+                <button onclick="startGame(3)" class="simple-btn btn-lv3">
+                    Lv3　ねこと赤ちゃんがくるモード
+                </button>
+
+                <button onclick="startGame(4)" class="simple-btn btn-lv4">
+                    Lv4　くつした２ばいモード
+                </button>
+
+                <button onclick="startGame(5)" class="simple-btn btn-lv5">
+                    Lv5 　2ばい＆ねこ＆赤ちゃん
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ■ ゲーム画面 -->
+    <div id="game-screen" class="screen hidden flex flex-col items-center p-2 overflow-hidden bg-slate-50">
+        <!-- コントロールボタン群 -->
+        <div class="absolute top-3 right-3 z-50 flex gap-2">
+            <button id="sound-toggle" onclick="toggleSound()" class="bg-white/90 backdrop-blur text-slate-600 font-bold text-sm py-2 px-3 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95" title="おとのオン/オフ">
+                🔊
+            </button>
+            <button onclick="showQuitModal()" class="bg-white/90 backdrop-blur text-slate-600 hover:text-red-500 font-bold text-sm py-2 px-4 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95">
+                やめる
+            </button>
+        </div>
+
+        <!-- お邪魔キャラ (画像に差し替え) -->
+        <div id="cat-agent" class="fixed z-[70] pointer-events-none select-none" style="left: 100%; bottom: 20%;">
+            <img src="1.png" alt="ねこ" class="w-64 h-auto drop-shadow-lg">
+        </div>
+        <div id="baby-agent" class="fixed z-[70] pointer-events-none select-none" style="left: 50%; bottom: -400px; transform: translate(-50%, 0);">
+            <img src="2.png" alt="あかちゃん" class="w-80 h-auto drop-shadow-lg">
+        </div>
+
+        <!-- ヘッダー -->
+        <header class="text-center z-50 pointer-events-none mt-1 mb-1 w-full max-w-lg">
+            <div class="bg-white/80 backdrop-blur px-4 py-2 rounded-2xl shadow-sm border border-white/50 inline-block pointer-events-auto flex flex-col items-center w-full">
+                
+                <!-- レベル・ベスト・タイマー -->
+                <div class="flex justify-between items-end w-full mb-1 border-b border-slate-100 pb-1">
+                    <div class="flex flex-col items-start">
+                        <span id="current-level-display" class="font-bold text-slate-400 text-xs leading-none mb-1">Lv.1</span>
+                        <!-- ここにベストスコアを表示 -->
+                        <span id="game-best-time-display" class="font-bold text-orange-400 text-xs leading-none bg-orange-50 px-1.5 py-0.5 rounded">BEST: --:--</span>
+                    </div>
+                    <div class="font-mono font-black text-3xl text-slate-700 leading-none" id="timer-display">00:00</div>
+                </div>
+
+                <div class="flex justify-center gap-4 sm:gap-6 text-sm font-bold text-slate-600 w-full mb-1">
+                    <div>のこり: <span id="pairs-left" class="text-blue-500 text-xl">15</span></div>
+                    <div>かたづけた: <span id="move-count" class="text-slate-600 text-xl">0</span></div>
+                </div>
+                
+                <!-- タイマーバーコンテナ -->
+                <div class="w-full grid grid-cols-2 gap-4 h-6">
+                    <div id="cat-timer-container" class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
+                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="cat-timer-bar" class="h-full bg-orange-400 w-0 transition-all duration-100 ease-linear"></div>
+                        </div>
+                        <p class="text-[10px] font-bold text-orange-400 text-left leading-none mt-0.5">🐱 ねこ</p>
+                    </div>
+                    <div id="baby-timer-container" class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
+                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="baby-timer-bar" class="h-full bg-pink-400 w-0 transition-all duration-100 ease-linear"></div>
+                        </div>
+                        <p class="text-[10px] font-bold text-pink-400 text-right leading-none mt-0.5">👶 あかちゃん</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ゲームボード (背景色: 無地アイボリー) -->
+        <div id="game-board-container" class="flex-grow w-full max-w-4xl relative rounded-xl shadow-inner overflow-hidden m-2 backdrop-blur-sm">
+            <div id="game-board"></div>
+        </div>
+    </div>
+
+    <!-- クリア画面 -->
+    <div id="win-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm mx-4 transform transition-all scale-100 border-4 border-blue-100">
+            <div class="text-7xl mb-4 animate-bounce">🧺</div>
+            <h2 class="text-2xl font-black text-slate-800 mb-1">おせんたく かんりょう！</h2>
+            <div class="text-4xl font-mono font-black text-blue-500 mb-4 tracking-tighter" id="final-time">00:00</div>
+            
+            <div id="new-record-msg" class="hidden text-orange-400 font-bold mb-4 animate-pulse text-lg">
+                🏆 すごい！ しんきろく！
+            </div>
+
+            <div class="bg-slate-50 rounded-xl p-4 mb-6 grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p class="text-xs font-bold text-slate-400">かたづけたかず</p>
+                    <p class="text-xl font-bold text-slate-700" id="final-moves">0</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400">レベル</p>
+                    <p class="text-xl font-bold text-slate-700" id="final-level">1</p>
+                </div>
+            </div>
+            <button onclick="backToTop()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 active:scale-95 text-lg">
+                さいしょに もどる
+            </button>
+        </div>
+    </div>
+
+    <!-- 終了確認モーダル -->
+    <div id="quit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-xs mx-4 border-4 border-slate-200">
+            <h2 class="text-lg font-black text-slate-800 mb-2">さいしょに もどる？</h2>
+            <p class="text-sm font-bold text-slate-500 mb-6">いまの ゲームは おわりになります。</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeQuitModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl transition-colors">
+                    つづける
+                </button>
+                <button onclick="quitGameExecute()" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg">
+                    やめる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const COLORS = [
+            { id: 'red', hex: '#EF4444' }, { id: 'blue', hex: '#3B82F6' },
+            { id: 'green', hex: '#10B981' }, { id: 'yellow', hex: '#F59E0B' },
+            { id: 'purple', hex: '#8B5CF6' }, { id: 'orange', hex: '#F97316' },
+            { id: 'pink', hex: '#EC4899' }, { id: 'cyan', hex: '#06B6D4' },
+            { id: 'lime', hex: '#84CC16' }, { id: 'slate', hex: '#64748B' }   
+        ];
+        const PATTERNS = ['solid', 'stripe', 'dot'];
+
+        let cards = [], selectedCards = [], matchedPairs = 0, totalPairs = 0, moves = 0, isProcessing = false, maxZIndex = 100, isSoundEnabled = true, currentLevel = 1;
+        let startTime = 0, timerInterval = null, elapsedTime = 0;
+        let obstacleTimerInterval, nextCatTime = 0, nextBabyTime = 0;
+        const CAT_INTERVAL_MS = 15000, BABY_INTERVAL_MS = 20000;
+        const SOCK_WIDTH = 100, SOCK_HEIGHT = 100, WALL_MARGIN = 60;
+
+        const LEVEL_CONFIG = {
+            1: { name: 'Lv.1 ふつうのモード', double: false, cat: false, baby: false },
+            2: { name: 'Lv.2 ネコがくるモード', double: false, cat: true, baby: false },
+            3: { name: 'Lv.3 ねこと赤ちゃん', double: false, cat: true, baby: true },
+            4: { name: 'Lv.4 くつした２ばい', double: true, cat: false, baby: false }, 
+            5: { name: 'Lv.5 2ばい＆ねこ＆赤ちゃん', double: true, cat: true, baby: true } 
+        };
+
+        const startScreen = document.getElementById('start-screen'), gameScreen = document.getElementById('game-screen'), boardElement = document.getElementById('game-board');
+        const pairsLeftElement = document.getElementById('pairs-left'), moveCountElement = document.getElementById('move-count');
+        const timerDisplay = document.getElementById('timer-display'), currentLevelDisplay = document.getElementById('current-level-display');
+        const gameBestTimeDisplay = document.getElementById('game-best-time-display');
+        const winModal = document.getElementById('win-modal'), quitModal = document.getElementById('quit-modal');
+        const finalTimeElement = document.getElementById('final-time'), finalMovesElement = document.getElementById('final-moves'), finalLevelElement = document.getElementById('final-level'), newRecordMsg = document.getElementById('new-record-msg');
+        const soundToggleBtn = document.getElementById('sound-toggle'), catElement = document.getElementById('cat-agent'), babyElement = document.getElementById('baby-agent');
+        const catTimerBar = document.getElementById('cat-timer-bar'), babyTimerBar = document.getElementById('baby-timer-bar'), catTimerContainer = document.getElementById('cat-timer-container'), babyTimerContainer = document.getElementById('baby-timer-container');
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(frequency, type = 'sine', duration = 0.1, startTime = 0, volume = 0.1) {
+            if (!isSoundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = frequency;
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + startTime + duration);
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + startTime); osc.stop(audioCtx.currentTime + startTime + duration);
+        }
+
+        const SoundEffects = {
+            select: () => { playTone(400, 'sine', 0.1, 0, 0.1); playTone(600, 'triangle', 0.05, 0.02, 0.05); },
+            cancel: () => { playTone(300, 'sine', 0.1, 0, 0.1); }, 
+            grab: () => { playTone(200, 'sine', 0.05, 0, 0.05); },
+            match: () => { playTone(523.25, 'sine', 0.2, 0, 0.1); playTone(659.25, 'sine', 0.2, 0.1, 0.1); playTone(783.99, 'sine', 0.4, 0.2, 0.1); playTone(1046.50, 'sine', 0.6, 0.3, 0.05); },
+            mismatch: () => { playTone(150, 'sawtooth', 0.3, 0, 0.05); playTone(130, 'sawtooth', 0.3, 0.1, 0.05); },
+            win: () => { [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => playTone(freq, 'triangle', 0.4, i * 0.1, 0.1)); playTone(1046.50, 'square', 1.0, 0.4, 0.1); playTone(1318.51, 'square', 1.0, 0.5, 0.1); },
+            meow: () => { if (!isSoundEnabled) return; const t = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(800, t); osc.frequency.exponentialRampToValueAtTime(1400, t + 0.15); osc.frequency.exponentialRampToValueAtTime(600, t + 0.5); gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.2, t + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.6); },
+            babu: () => { if (!isSoundEnabled) return; const t = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(600, t + 0.2); osc.frequency.linearRampToValueAtTime(300, t + 0.5); gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.3, t + 0.1); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.6); }
+        };
+
+        function toggleSound() { isSoundEnabled = !isSoundEnabled; soundToggleBtn.textContent = isSoundEnabled ? '🔊' : '🔇'; soundToggleBtn.classList.toggle('muted', !isSoundEnabled); }
+        function createSockSVG(c, p) {
+            const path = "M20,5 L45,5 L45,40 C45,52 35,58 25,58 L15,58 C8,58 2,52 2,45 L2,30 L20,30 L20,5 Z";
+            let o = '';
+            if (p === 'stripe') o = `<defs><pattern id="p-s-${c}" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)"><line x1="0" y="0" x2="0" y2="10" stroke="rgba(255,255,255,0.4)" stroke-width="4"/></pattern></defs><path d="${path}" fill="url(#p-s-${c})"/>`;
+            else if (p === 'dot') o = `<defs><pattern id="p-d-${c}" patternUnits="userSpaceOnUse" width="12" height="12"><circle cx="6" cy="6" r="2.5" fill="rgba(255,255,255,0.5)"/></pattern></defs><path d="${path}" fill="url(#p-d-${c})"/>`;
+            return `<svg viewBox="0 0 50 65" width="100%" height="100%" style="overflow:visible;pointer-events:none;"><path d="${path}" fill="none"/><path d="M5,48 Q15,63 45,48" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="4" stroke-linecap="round" /><path d="${path}" fill="${c}" stroke="rgba(0,0,0,0.1)" stroke-width="1"/>${o}<rect x="20" y="5" width="25" height="6" fill="rgba(255,255,255,0.3)"/><path d="M2,30 L20,30 L20,38 C20,38 2,38 2,30 Z" fill="rgba(0,0,0,0.15)"/></svg>`;
+        }
+
+        function getBestTime(l) { const b = localStorage.getItem(`sock-game-best-lv${l}`); return b ? formatTime(parseInt(b)) : '--:--'; }
+        function saveBestTime(l, t) { const k = `sock-game-best-lv${l}`, c = localStorage.getItem(k); if (!c || t < parseInt(c)) { localStorage.setItem(k, t); return true; } return false; }
+
+        function startGame(l) { 
+            currentLevel = l; 
+            startScreen.classList.add('hidden'); 
+            gameScreen.classList.remove('hidden'); 
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {}); 
+            initGame(); 
+        }
+        function backToTop() { stopGameTimers(); winModal.classList.add('hidden'); quitModal.classList.add('hidden'); gameScreen.classList.add('hidden'); startScreen.classList.remove('hidden'); }
+        function showQuitModal() { if (matchedPairs === 0 && moves === 0) { backToTop(); return; } quitModal.classList.remove('hidden'); }
+        function closeQuitModal() { quitModal.classList.add('hidden'); }
+        function quitGameExecute() { backToTop(); }
+
+        function getBoundPosition(width, height, currentCenterX, currentCenterY, moveX, moveY) {
+            const boardRect = boardElement.getBoundingClientRect();
+            const boardW = boardRect.width;
+            const boardH = boardRect.height;
+            const rX = width / 2;
+            const rY = height / 2;
+            const minX = rX;
+            const maxX = boardW - rX;
+            const minY = rY;
+            const maxY = boardH - rY;
+            let targetX = currentCenterX + moveX;
+            let targetY = currentCenterY + moveY;
+            if (targetX < minX) { targetX = minX + (minX - targetX); if (targetX > maxX) targetX = maxX; } else if (targetX > maxX) { targetX = maxX - (targetX - maxX); if (targetX < minX) targetX = minX; }
+            if (targetY < minY) { targetY = minY + (minY - targetY); if (targetY > maxY) targetY = maxY; } else if (targetY > maxY) { targetY = maxY - (targetY - maxY); if (targetY < minY) targetY = minY; }
+            return { left: (targetX / boardW * 100), top: (targetY / boardH * 100) };
+        }
+
+        function getSafeRandomPosition(marginPercent = 10) {
+            const min = marginPercent;
+            const max = 100 - marginPercent;
+            return { left: Math.random() * (max - min) + min, top: Math.random() * (max - min) + min };
+        }
+
+        function initGame() {
+            const config = LEVEL_CONFIG[currentLevel];
+            cards = []; selectedCards = []; matchedPairs = 0; moves = 0; isProcessing = false; maxZIndex = 100;
+            boardElement.innerHTML = ''; 
+            catElement.style.left = '100%'; babyElement.style.bottom = '-400px'; 
+            quitModal.classList.add('hidden');
+            
+            // ヘッダー情報更新
+            currentLevelDisplay.textContent = config.name; 
+            gameBestTimeDisplay.textContent = `BEST: ${getBestTime(currentLevel)}`;
+            
+            catTimerContainer.style.opacity = config.cat ? '1' : '0'; babyTimerContainer.style.opacity = config.baby ? '1' : '0';
+            
+            let tempCards = [];
+            const useColors = config.double ? COLORS : COLORS.slice(0, 5);
+            useColors.forEach(c => { PATTERNS.forEach(p => { const d = { id: `${c.id}-${p}`, color: c, pattern: p, matched: false }; tempCards.push({ ...d, uniqueId: Math.random() }); tempCards.push({ ...d, uniqueId: Math.random() }); }); });
+            totalPairs = tempCards.length / 2; updateStats(); shuffleArray(tempCards); cards = tempCards;
+
+            cards.forEach((c, i) => {
+                const el = document.createElement('div');
+                el.className = 'sock-card animate-drop'; el.id = `card-${i}`; el.dataset.index = i; el.innerHTML = createSockSVG(c.color.hex, c.pattern);
+                setupDraggable(el, i);
+                const pos = getSafeRandomPosition(config.double ? 5 : 10);
+                const rot = Math.floor(Math.random() * 360);
+                el.style.left = `${pos.left}%`; el.style.top = `${pos.top}%`; el.style.zIndex = i + 1;
+                el.style.setProperty('--base-rotation', `${rot}deg`);
+                el.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
+                el.style.animationDelay = `${Math.random() * 0.3}s`;
+                boardElement.appendChild(el);
+            });
+            startMainTimer(); startObstacleTimers();
+        }
+
+        function startMainTimer() { stopMainTimer(); startTime = Date.now(); timerDisplay.textContent = "00:00"; timerInterval = setInterval(() => { elapsedTime = Date.now() - startTime; timerDisplay.textContent = formatTime(elapsedTime); }, 100); }
+        function stopMainTimer() { if (timerInterval) clearInterval(timerInterval); }
+        function formatTime(ms) { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`; }
+
+        function startObstacleTimers() {
+            if (obstacleTimerInterval) clearInterval(obstacleTimerInterval);
+            const c = LEVEL_CONFIG[currentLevel];
+            if (!c.cat && !c.baby) return;
+            const now = Date.now(); nextCatTime = now + CAT_INTERVAL_MS; nextBabyTime = now + BABY_INTERVAL_MS;
+            obstacleTimerInterval = setInterval(() => {
+                const n = Date.now();
+                if (c.cat) { const d = nextCatTime - n; if (d <= 0) { summonCat(); nextCatTime = n + CAT_INTERVAL_MS; } else catTimerBar.style.width = `${Math.min(100, Math.max(0, 100 - (d / CAT_INTERVAL_MS * 100)))}%`; } else catTimerBar.style.width = '0%';
+                if (c.baby) { const d = nextBabyTime - n; if (d <= 0) { summonBaby(); nextBabyTime = n + BABY_INTERVAL_MS; } else babyTimerBar.style.width = `${Math.min(100, Math.max(0, 100 - (d / BABY_INTERVAL_MS * 100)))}%`; } else babyTimerBar.style.width = '0%';
+            }, 100);
+        }
+        function stopGameTimers() { stopMainTimer(); if (obstacleTimerInterval) clearInterval(obstacleTimerInterval); catTimerBar.style.width = '0%'; babyTimerBar.style.width = '0%'; }
+
+        function summonCat() {
+            SoundEffects.meow();
+            catElement.style.transition = 'none'; catElement.style.left = '100%'; void catElement.offsetWidth;
+            catElement.style.transition = 'left 2.0s linear'; catElement.style.left = '-400px';
+            setTimeout(scatterSocks, 300);
+        }
+
+        function summonBaby() {
+            if (matchedPairs < 1) return;
+            SoundEffects.babu();
+            babyElement.style.transition = 'none'; babyElement.style.bottom = '-400px'; void babyElement.offsetWidth;
+            babyElement.style.transition = 'bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; babyElement.style.bottom = '-20px';
+            setTimeout(() => { restoreSocks(); setTimeout(() => { babyElement.style.bottom = '-400px'; }, 1500); }, 500);
+        }
+
+        function restoreSocks() {
+            if (matchedPairs < 1) return;
+            const groups = {}; cards.forEach((c, i) => { if (c.matched) { if (!groups[c.id]) groups[c.id] = []; groups[c.id].push(i); } });
+            const comp = Object.keys(groups).filter(k => groups[k].length === 2);
+            if (comp.length === 0) return;
+            shuffleArray(comp);
+            const count = Math.min(3, Math.max(0, matchedPairs));
+            if (count <= 0) return;
+            const targets = comp.slice(0, count);
+
+            targets.forEach((id, pIdx) => {
+                setTimeout(() => {
+                    groups[id].forEach(idx => {
+                        const c = cards[idx], el = document.getElementById(`card-${idx}`);
+                        c.matched = false;
+                        el.style.display = 'block'; el.style.opacity = '1'; el.style.pointerEvents = 'auto';
+                        el.classList.remove('matched'); el.classList.add('flying-in');
+                        el.style.left = '50%'; el.style.top = '90%'; el.style.transform = 'scale(0.5)'; el.style.zIndex = 1000;
+                        requestAnimationFrame(() => {
+                            const pos = getSafeRandomPosition(5); const rot = Math.floor(Math.random() * 360);
+                            el.style.left = `${pos.left}%`; el.style.top = `${pos.top}%`; el.style.setProperty('--base-rotation', `${rot}deg`);
+                            el.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scale(1)`; el.style.zIndex = ++maxZIndex;
+                        });
+                        setTimeout(() => el.classList.remove('flying-in'), 800);
+                    });
+                    matchedPairs--; updateStats();
+                }, pIdx * 200);
+            });
+        }
+
+        function scatterSocks() {
+            const els = document.querySelectorAll('.sock-card');
+            const boardRect = boardElement.getBoundingClientRect();
+            els.forEach((el, i) => {
+                if (cards[i].matched || selectedCards.includes(i)) return;
+                const percentLeft = parseFloat(el.style.left);
+                const percentTop = parseFloat(el.style.top);
+                const currentCenterX = (percentLeft / 100) * boardRect.width;
+                const currentCenterY = (percentTop / 100) * boardRect.height;
+                const moveRange = boardRect.width * 0.5;
+                const moveX = (Math.random() - 0.5) * moveRange * 2;
+                const moveY = (Math.random() - 0.5) * moveRange * 2;
+                const newPos = getBoundPosition(SOCK_WIDTH, SOCK_HEIGHT, currentCenterX, currentCenterY, moveX, moveY);
+                const curRot = parseInt(el.style.getPropertyValue('--base-rotation') || 0);
+                const newRot = curRot + (Math.random() > 0.5 ? 720 : -720) + Math.floor(Math.random() * 360);
+                el.classList.add('scattered');
+                el.style.left = `${newPos.left}%`; el.style.top = `${newPos.top}%`; el.style.setProperty('--base-rotation', `${newRot}deg`);
+                el.style.transform = `translate(-50%, -50%) rotate(${newRot}deg) scale(1.1)`; el.style.zIndex = Math.floor(Math.random() * 50);
+                setTimeout(() => { el.classList.remove('scattered'); el.style.transform = `translate(-50%, -50%) rotate(${newRot}deg) scale(1)`; }, 600);
+            });
+        }
+
+        function setupDraggable(el, idx) {
+            let startX, startY, initLeftPx, initTopPx;
+            let dragging = false, moved = false;
+            el.addEventListener('pointerdown', (e) => {
+                if (cards[idx].matched || isProcessing) return;
+                if (selectedCards.includes(idx)) { /* cancel logic */ }
+                e.preventDefault(); SoundEffects.grab();
+                dragging = true; moved = false;
+                startX = e.clientX; startY = e.clientY;
+                const rect = el.getBoundingClientRect();
+                const parentRect = boardElement.getBoundingClientRect();
+                const centerX = rect.left - parentRect.left + rect.width / 2;
+                const centerY = rect.top - parentRect.top + rect.height / 2;
+                initLeftPx = centerX; initTopPx = centerY;
+                maxZIndex++; el.style.zIndex = maxZIndex;
+                el.setPointerCapture(e.pointerId); el.style.cursor = 'grabbing'; el.style.transition = 'none';
+            });
+            el.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const dx = e.clientX - startX, dy = e.clientY - startY;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+                const boardRect = boardElement.getBoundingClientRect();
+                let newCenterX = initLeftPx + dx;
+                let newCenterY = initTopPx + dy;
+                const minX = WALL_MARGIN;
+                const maxX = boardRect.width - WALL_MARGIN;
+                const minY = WALL_MARGIN;
+                const maxY = boardRect.height - WALL_MARGIN;
+                newCenterX = Math.max(minX, Math.min(newCenterX, maxX));
+                newCenterY = Math.max(minY, Math.min(newCenterY, maxY));
+                el.style.left = `${newCenterX}px`; el.style.top = `${newCenterY}px`;
+            });
+            el.addEventListener('pointerup', (e) => {
+                if (!dragging) return;
+                dragging = false; el.releasePointerCapture(e.pointerId); el.style.cursor = 'grab';
+                el.style.transition = 'transform 0.3s ease-out, left 0.5s ease-out, top 0.5s ease-out, opacity 0.3s';
+                if (!moved) handleCardClick(idx);
+            });
+        }
+
+        function handleCardClick(i) {
+            if (isProcessing || cards[i].matched) return;
+            const el = document.getElementById(`card-${i}`);
+            if (selectedCards.includes(i)) {
+                selectedCards = selectedCards.filter(idx => idx !== i);
+                el.classList.remove('selected');
+                const rot = el.style.getPropertyValue('--base-rotation');
+                el.style.transform = `translate(-50%, -50%) rotate(${rot})`;
+                SoundEffects.cancel(); return;
+            }
+            if (selectedCards.length >= 2) return;
+            SoundEffects.select(); selectedCards.push(i); el.classList.add('selected');
+            const rot = el.style.getPropertyValue('--base-rotation');
+            el.style.transform = `translate(-50%, -50%) rotate(${rot}) scale(1.2)`;
+            if (selectedCards.length === 2) { isProcessing = true; moves++; updateStats(); checkMatch(); }
+        }
+
+        function checkMatch() {
+            const [i1, i2] = selectedCards, c1 = cards[i1], c2 = cards[i2], e1 = document.getElementById(`card-${i1}`), e2 = document.getElementById(`card-${i2}`);
+            if (c1.id === c2.id) {
+                setTimeout(() => { SoundEffects.match(); c1.matched = true; c2.matched = true; e1.classList.remove('selected'); e2.classList.remove('selected'); e1.classList.add('matched'); e2.classList.add('matched'); matchedPairs++; updateStats(); setTimeout(() => { e1.style.display = 'none'; e2.style.display = 'none'; checkWin(); }, 600); selectedCards = []; isProcessing = false; }, 400);
+            } else {
+                setTimeout(() => { SoundEffects.mismatch(); resetStyle(e1); resetStyle(e2); e1.classList.remove('selected'); e2.classList.remove('selected'); selectedCards = []; isProcessing = false; }, 800);
+            }
+        }
+        function resetStyle(e) { const r = e.style.getPropertyValue('--base-rotation'); e.style.transform = `translate(-50%, -50%) rotate(${r})`; }
+
+        function checkWin() {
+            if (matchedPairs === totalPairs) {
+                stopGameTimers(); const isNew = saveBestTime(currentLevel, elapsedTime);
+                finalTimeElement.textContent = formatTime(elapsedTime); finalMovesElement.textContent = moves; finalLevelElement.textContent = currentLevel;
+                if (isNew) newRecordMsg.classList.remove('hidden'); else newRecordMsg.classList.add('hidden');
+                setTimeout(() => { SoundEffects.win(); winModal.classList.remove('hidden'); }, 300);
+            }
+        }
+
+        function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
+        function updateStats() { pairsLeftElement.textContent = totalPairs - matchedPairs; moveCountElement.textContent = moves; }
+    </script>
+</body>
+</html>

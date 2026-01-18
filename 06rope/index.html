@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>このいっぽん！</title>
+<style>
+    /* --- 基本スタイル --- */
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #e0f2f1;
+        color: #333;
+        font-family: "M PLUS Rounded 1c", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+        touch-action: none;
+        user-select: none;
+    }
+
+    /* 上部パネル */
+    .ui-panel {
+        width: 360px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-weight: bold;
+        pointer-events: none;
+    }
+    .badge {
+        background: #fff;
+        padding: 6px 12px;
+        border-radius: 15px;
+        border: 2px solid #333;
+        font-size: 0.9rem;
+        box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .t-val { color: #f57c00; }
+    .m-val { color: #d32f2f; }
+
+    /* ゲーム枠 */
+    #game-wrapper {
+        position: relative;
+        width: 360px;
+        height: 480px;
+        background-color: #263238;
+        border: 8px solid #5d4037;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        overflow: hidden;
+    }
+
+    /* キャンバス */
+    canvas {
+        display: block;
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+        position: absolute;
+        top: 0; left: 0;
+        z-index: 1;
+    }
+    #confetti { z-index: 20; pointer-events: none; }
+
+    /* タイマーバー */
+    #time-bar {
+        position: absolute;
+        top: 0; left: 0;
+        height: 8px;
+        background: #ff1744;
+        width: 0%;
+        z-index: 10;
+        transition: width 0.1s linear;
+    }
+
+    /* 画面切り替え */
+    .screen {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.96);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: opacity 0.2s;
+    }
+    .hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    h1 {
+        font-size: 2.8rem;
+        color: #ff9800;
+        text-shadow: 3px 3px 0 #fff;
+        -webkit-text-stroke: 1.5px #333;
+        margin-bottom: 15px;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    .btn {
+        width: 240px;
+        padding: 14px;
+        margin: 8px;
+        border: 2px solid rgba(0,0,0,0.1);
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+        font-family: inherit;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none; }
+    
+    .btn-green { background: #43a047; }
+    .btn-orange { background: #fb8c00; }
+    .btn-blue { background: #1e88e5; }
+    .btn-gray { background: #78909c; width: 120px; font-size: 1rem; margin-top: 20px; padding: 10px;}
+
+    /* 結果表示 */
+    .result-box {
+        border: 4px solid #ff9800;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: #fff;
+        text-align: center;
+        width: 80%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .big-score { font-size: 2.8rem; font-weight: 900; color: #333; }
+    .label { color: #888; font-size: 0.9rem; }
+    .new-record { color: #d32f2f; font-weight: bold; font-size: 1.4rem; animation: pop 0.6s infinite alternate; display: none; }
+    @keyframes pop { to { transform: scale(1.1); } }
+
+    /* ポップアップ */
+    #popup {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        padding: 15px 40px;
+        background: #fff;
+        border: 5px solid #333;
+        border-radius: 50px;
+        font-size: 2rem;
+        font-weight: bold;
+        z-index: 50;
+        pointer-events: none;
+        white-space: nowrap;
+        transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    #popup.show { transform: translate(-50%, -50%) scale(1); }
+    .ok { color: #43a047; border-color: #43a047 !important; }
+    .ng { color: #d32f2f; border-color: #d32f2f !important; }
+
+</style>
+</head>
+<body>
+
+    <div class="ui-panel">
+        <div class="badge">レベル <span id="ui-level">1</span></div>
+        <div class="badge t-val">じかん <span id="ui-time">00:00</span></div>
+        <div class="badge m-val">ミス <span id="ui-miss">0</span></div>
+    </div>
+
+    <div id="game-wrapper">
+        <canvas id="mainCanvas" width="360" height="480"></canvas>
+        <canvas id="confetti" width="360" height="480"></canvas>
+        <div id="time-bar"></div>
+
+        <div id="screen-title" class="screen">
+            <h1>このいっぽん！</h1>
+            <div style="margin-bottom:20px; font-weight:bold; color:#555; line-height:1.6;">
+                おなじ いろの<br>つながっている ひもを<br>さがしてね！
+            </div>
+            <button class="btn btn-green" onclick="app.start('normal')">ふつう</button>
+            <button class="btn btn-orange" onclick="app.start('quick')">クイック<br><span style="font-size:0.7em">5びょう いない！</span></button>
+        </div>
+
+        <div id="screen-result" class="screen hidden">
+            <h1 style="color:#1e88e5">クリア！</h1>
+            <div class="result-box">
+                <div id="rec-msg" class="new-record">★ しんきろく！ ★</div>
+                <div class="label">かかった じかん</div>
+                <div id="res-time" class="big-score">00:00</div>
+                <div style="height:15px"></div>
+                <div class="label">まちがえた かず</div>
+                <div id="res-miss" class="big-score">0</div>
+            </div>
+            <button class="btn btn-blue" onclick="app.toTitle()">もういちど</button>
+        </div>
+
+        <div id="popup">せいかい！</div>
+    </div>
+
+    <button class="btn btn-gray" onclick="app.toTitle()">やめる</button>
+
+<script>
+/**
+ * サウンド管理クラス (Web Audio API)
+ */
+class Sound {
+    constructor() {
+        this.ctx = null;
+        this.init();
+    }
+    
+    init() {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+    }
+
+    // 音を鳴らすための準備（ユーザー操作が必要）
+    resume() {
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    }
+
+    playTone(freq, type, duration, startTime = 0) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+        
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + startTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start(this.ctx.currentTime + startTime);
+        osc.stop(this.ctx.currentTime + startTime + duration);
+    }
+
+    // ボタン音
+    click() {
+        this.resume();
+        this.playTone(800, 'sine', 0.1);
+    }
+
+    // 正解音 (ピロリン♪)
+    correct() {
+        this.resume();
+        this.playTone(660, 'sine', 0.1, 0);
+        this.playTone(1320, 'sine', 0.2, 0.1);
+    }
+
+    // 不正解音 (ブッブー)
+    wrong() {
+        this.resume();
+        this.playTone(150, 'sawtooth', 0.2, 0);
+        this.playTone(100, 'sawtooth', 0.4, 0.2);
+    }
+
+    // クリア音 (ファンファーレ)
+    fanfare() {
+        this.resume();
+        const notes = [523, 659, 784, 1046]; // C E G C
+        let time = 0;
+        notes.forEach((freq, i) => {
+            this.playTone(freq, 'triangle', 0.3, time);
+            time += 0.12;
+        });
+        // 最後のジャーン
+        this.playTone(523, 'triangle', 1.0, time);
+        this.playTone(659, 'triangle', 1.0, time);
+        this.playTone(784, 'triangle', 1.0, time);
+        this.playTone(1046, 'triangle', 1.0, time);
+    }
+
+    // 紙吹雪の音 (ポンッ)
+    pop() {
+        this.resume();
+        this.playTone(400 + Math.random()*200, 'sine', 0.1);
+    }
+}
+
+/**
+ * ゲーム本体
+ */
+const CONFIG = {
+    maxLevel: 15,
+    colors: ['#e53935', '#1e88e5', '#43a047', '#fdd835', '#8e24aa'], 
+    ropeW: 14,
+    outlineW: 5,
+    padY: 50,
+    quickMs: 5000
+};
+
+class App {
+    constructor() {
+        this.cvs = document.getElementById('mainCanvas');
+        this.ctx = this.cvs.getContext('2d');
+        this.cfCvs = document.getElementById('confetti');
+        this.cfCtx = this.cfCvs.getContext('2d');
+        
+        this.sound = new Sound();
+
+        // 状態
+        this.ropes = [];
+        this.mode = 'normal';
+        this.level = 1;
+        this.miss = 0;
+        this.isPlaying = false;
+        this.inputOk = false;
+        this.startTime = 0;
+        this.levelStart = 0;
+        
+        this.particles = []; 
+
+        const hitEvent = (e) => {
+            e.preventDefault();
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            this.checkHit(clientX, clientY);
+        };
+        this.cvs.addEventListener('mousedown', hitEvent);
+        this.cvs.addEventListener('touchstart', hitEvent, {passive: false});
+
+        this.loop = this.loop.bind(this);
+        requestAnimationFrame(this.loop);
+    }
+
+    loop() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(this.loop);
+    }
+
+    update() {
+        if (!this.isPlaying) return;
+
+        const now = Date.now();
+        const diff = now - this.startTime;
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('ui-time').innerText = 
+            (m<10?"0":"")+m + ":" + (s<10?"0":"")+s;
+
+        if (this.mode === 'quick' && this.inputOk) {
+            const remain = CONFIG.quickMs - (now - this.levelStart);
+            const pct = Math.max(0, remain / CONFIG.quickMs * 100);
+            document.getElementById('time-bar').style.width = pct + "%";
+            
+            if (remain <= 0) {
+                this.handleMiss(true);
+            }
+        } else {
+            document.getElementById('time-bar').style.width = this.mode === 'quick' ? "100%" : "0%";
+        }
+
+        if (this.particles.length > 0) this.updateConfetti();
+    }
+
+    start(mode) {
+        this.sound.click(); // 音を有効化
+        this.mode = mode;
+        this.level = 1;
+        this.miss = 0;
+        this.isPlaying = true;
+        this.startTime = Date.now();
+        
+        document.getElementById('ui-miss').innerText = "0";
+        document.getElementById('screen-title').classList.add('hidden');
+        document.getElementById('screen-result').classList.add('hidden');
+        
+        this.nextLevel();
+    }
+
+    toTitle() {
+        this.sound.click();
+        this.isPlaying = false;
+        this.ropes = [];
+        this.particles = [];
+        this.cfCtx.clearRect(0,0,360,480);
+        document.getElementById('screen-title').classList.remove('hidden');
+        document.getElementById('screen-result').classList.add('hidden');
+        document.getElementById('popup').classList.remove('show');
+    }
+
+    nextLevel() {
+        document.getElementById('ui-level').innerText = this.level;
+        this.generateRopes(); 
+        
+        this.inputOk = false;
+        setTimeout(() => {
+            this.inputOk = true;
+            this.levelStart = Date.now();
+        }, 300);
+    }
+
+    checkHit(cx, cy) {
+        if (!this.inputOk) return;
+
+        const rect = this.cvs.getBoundingClientRect();
+        const x = (cx - rect.left) * (this.cvs.width / rect.width);
+        const y = (cy - rect.top) * (this.cvs.height / rect.height);
+
+        for (let i = this.ropes.length - 1; i >= 0; i--) {
+            const r = this.ropes[i];
+            this.ctx.lineWidth = 40; 
+            if (this.ctx.isPointInStroke(r.pathObj, x, y)) {
+                if (r.isCorrect) {
+                    r.state = 'good';
+                    this.handleWin();
+                } else {
+                    r.state = 'bad';
+                    this.handleMiss(false);
+                }
+                break;
+            }
+        }
+    }
+
+    handleWin() {
+        this.inputOk = false;
+        this.sound.correct();
+        this.showPopup("せいかい！", "ok");
+        setTimeout(() => {
+            if (this.level < CONFIG.maxLevel) {
+                this.level++;
+                this.nextLevel();
+            } else {
+                this.finish();
+            }
+        }, 800);
+    }
+
+    handleMiss(isTimeout) {
+        this.inputOk = false;
+        this.sound.wrong();
+        this.miss++;
+        document.getElementById('ui-miss').innerText = this.miss;
+        
+        this.showPopup(isTimeout ? "じかんぎれ！" : "ちがうよ！", "ng");
+        
+        this.ropes.forEach(r => { if(r.isCorrect) r.state = 'good'; });
+
+        setTimeout(() => {
+            this.nextLevel();
+        }, 1500);
+    }
+
+    showPopup(msg, cls) {
+        const p = document.getElementById('popup');
+        p.innerText = msg;
+        p.className = cls;
+        p.classList.add('show');
+        setTimeout(() => p.classList.remove('show'), 800);
+    }
+
+    finish() {
+        this.isPlaying = false;
+        this.sound.fanfare();
+        const timeStr = document.getElementById('ui-time').innerText;
+        const ms = Date.now() - this.startTime;
+        
+        document.getElementById('res-time').innerText = timeStr;
+        document.getElementById('res-miss').innerText = this.miss + "かい";
+        
+        const key = `rope_best_${this.mode}`;
+        const prev = JSON.parse(localStorage.getItem(key));
+        let isNew = false;
+        if (!prev || this.miss < prev.miss || (this.miss === prev.miss && ms < prev.time)) {
+            isNew = true;
+            localStorage.setItem(key, JSON.stringify({time: ms, miss: this.miss}));
+        }
+        
+        const recMsg = document.getElementById('rec-msg');
+        recMsg.style.display = isNew ? 'block' : 'none';
+        if (isNew) this.spawnConfetti();
+
+        document.getElementById('screen-result').classList.remove('hidden');
+    }
+
+    // --- ロジック ---
+    generateRopes() {
+        this.ropes = [];
+        
+        let count = 3;
+        if (this.level > 5) count = 4;
+        if (this.level > 10) count = 5;
+
+        const syList = [], eyList = [];
+        const gap = (480 - CONFIG.padY*2) / (count-1);
+        for(let i=0; i<count; i++) {
+            syList.push(CONFIG.padY + i*gap);
+            eyList.push(CONFIG.padY + i*gap);
+        }
+
+        let pairs = Array.from({length:count}, (_,i)=>i);
+        if (this.level >= 3) {
+            for(let k=0; k<20; k++) {
+                this.shuffle(pairs);
+                let straight = 0;
+                for(let i=0; i<count; i++) if(pairs[i]===i) straight++;
+                if(straight < 2) break;
+            }
+        } else {
+            this.shuffle(pairs);
+        }
+
+        const baseColors = [...CONFIG.colors];
+        this.shuffle(baseColors);
+        const startCols = baseColors.slice(0, count);
+        
+        const winIdx = Math.floor(Math.random() * count);
+        const endCols = new Array(count);
+        endCols[pairs[winIdx]] = startCols[winIdx]; 
+
+        const remIdx = [], remColors = [];
+        for(let i=0; i<count; i++) {
+            if (i !== winIdx) {
+                remIdx.push(i);
+                remColors.push(startCols[i]);
+            }
+        }
+        for(let k=0; k<20; k++) {
+            this.shuffle(remColors);
+            let ok = true;
+            for(let m=0; m<remIdx.length; m++) {
+                if (startCols[remIdx[m]] === remColors[m]) ok = false;
+            }
+            if (ok) break;
+        }
+        for(let m=0; m<remIdx.length; m++) {
+            endCols[pairs[remIdx[m]]] = remColors[m];
+        }
+
+        for(let i=0; i<count; i++) {
+            const sx = 50, sy = syList[i];
+            const ex = 310, ey = eyList[pairs[i]];
+            const p = new Path2D();
+            p.moveTo(sx, sy);
+            
+            // 難易度調整: Lv9,10,14,15はS字
+            const isDoubleCurve = (this.level === 9 || this.level === 10 || this.level >= 14);
+
+            if (!isDoubleCurve) {
+                let cp1y, cp2y;
+                if (this.level <= 2) {
+                    cp1y = sy; cp2y = ey;
+                } else {
+                    cp1y = 50 + Math.random() * 380;
+                    cp2y = 50 + Math.random() * 380;
+                }
+                p.bezierCurveTo(sx+100, cp1y, ex-100, cp2y, ex, ey);
+            } else {
+                const mx = 180 + (Math.random()-0.5)*60;
+                const my = 50 + Math.random()*380;
+                p.bezierCurveTo(sx+60, Math.random()*480, mx-60, Math.random()*480, mx, my);
+                p.bezierCurveTo(mx+60, Math.random()*480, ex-60, Math.random()*480, ex, ey);
+            }
+
+            this.ropes.push({
+                pathObj: p, sx, sy, ex, ey,
+                sc: startCols[i], ec: endCols[pairs[i]],
+                isCorrect: (i === winIdx),
+                state: 'normal'
+            });
+        }
+
+        this.shuffle(this.ropes);
+        const last = this.ropes.length - 1;
+        if (this.ropes[last].isCorrect) {
+            const t = this.ropes[last];
+            this.ropes[last] = this.ropes[0];
+            this.ropes[0] = t;
+        }
+    }
+
+    // --- 描画 ---
+    draw() {
+        this.ctx.clearRect(0, 0, 360, 480);
+        if (this.ropes.length === 0) return;
+
+        this.ropes.forEach(r => {
+            this.drawSocket(r.sx, r.sy);
+            this.drawSocket(r.ex, r.ey);
+        });
+        this.ropes.forEach(r => {
+            const p = r.pathObj;
+            this.ctx.lineCap = 'round'; this.ctx.lineJoin = 'round';
+            this.ctx.lineWidth = CONFIG.ropeW + CONFIG.outlineW*2;
+            this.ctx.strokeStyle = '#263238';
+            this.ctx.stroke(p);
+            this.ctx.lineWidth = CONFIG.ropeW;
+            if (r.state === 'good') this.ctx.strokeStyle = '#43a047';
+            else if (r.state === 'bad') this.ctx.strokeStyle = '#e53935';
+            else this.ctx.strokeStyle = '#cfd8dc';
+            this.ctx.stroke(p);
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+            this.ctx.setLineDash([3, 5]);
+            this.ctx.stroke(p);
+            this.ctx.setLineDash([]);
+            this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            this.ctx.stroke(p);
+        });
+        this.ropes.forEach(r => {
+            this.drawLight(r.sx, r.sy, r.sc);
+            this.drawLight(r.ex, r.ey, r.ec);
+        });
+    }
+
+    drawSocket(x, y) {
+        this.ctx.fillStyle = '#546e7a';
+        this.ctx.beginPath(); this.ctx.arc(x,y,14,0,Math.PI*2); this.ctx.fill();
+        this.ctx.strokeStyle='#222'; this.ctx.lineWidth=2; this.ctx.stroke();
+    }
+    drawLight(x, y, c) {
+        this.ctx.fillStyle = c;
+        this.ctx.beginPath(); this.ctx.arc(x,y,9,0,Math.PI*2); this.ctx.fill();
+        this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        this.ctx.beginPath(); this.ctx.arc(x-3,y-3,3,0,Math.PI*2); this.ctx.fill();
+    }
+
+    shuffle(arr) {
+        for(let i=arr.length-1; i>0; i--){
+            const j=Math.floor(Math.random()*(i+1));
+            [arr[i],arr[j]]=[arr[j],arr[i]];
+        }
+    }
+
+    spawnConfetti() {
+        this.sound.pop();
+        this.particles = [];
+        for(let i=0; i<80; i++) {
+            this.particles.push({
+                x: 180, y: 240,
+                vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15 - 5,
+                c: CONFIG.colors[Math.floor(Math.random()*5)],
+                s: Math.random()*8+4,
+                life: 100 + Math.random()*50
+            });
+        }
+    }
+    
+    updateConfetti() {
+        this.cfCtx.clearRect(0,0,360,480);
+        for(let i=this.particles.length-1; i>=0; i--) {
+            const p = this.particles[i];
+            p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life--;
+            if(p.life > 0 && p.y < 480) {
+                this.cfCtx.fillStyle = p.c;
+                this.cfCtx.fillRect(p.x, p.y, p.s, p.s);
+            } else {
+                this.particles.splice(i, 1);
+            }
+        }
+    }
+}
+
+// 起動
+window.onload = () => {
+    window.app = new App();
+};
+</script>
+</body>
+</html>
