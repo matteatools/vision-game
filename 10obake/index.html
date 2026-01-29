@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>げんじゅうをつかまえろ</title>
-    <!-- デザイン用ライブラリ（インターネット接続時のみ有効） -->
+    <!-- デザイン用ライブラリ -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;900&display=swap');
@@ -15,12 +15,17 @@
             user-select: none;
         }
 
-        /* --- 背景デザイン（CSSで描画） --- */
-        .spooky-bg {
+        /* --- 背景デザイン --- */
+        /* 画像がない場合のフォールバック色 */
+        .custom-bg {
             background-color: #0f172a;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4) 0%, transparent 25%), 
-                radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.2) 0%, transparent 25%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        /* 背景画像 (6.jpg) を適用するクラス */
+        .bg-image-6 {
+            background-image: url('6.jpg');
         }
 
         /* --- ミサイルボタン --- */
@@ -115,7 +120,7 @@
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="spooky-bg min-h-screen flex flex-col items-center justify-center text-slate-800 select-none overflow-hidden">
+<body class="custom-bg min-h-screen flex flex-col items-center justify-center text-slate-800 select-none overflow-hidden">
 
     <!-- ゲーム画面 -->
     <div id="game-screen" class="w-full max-w-md p-4 flex flex-col h-screen max-h-[800px] hidden">
@@ -140,24 +145,16 @@
 
         <!-- メインエリア -->
         <div class="flex-grow flex items-center justify-center relative mb-8">
-            <div id="card-area" class="bg-indigo-950 w-80 h-80 rounded-3xl shadow-2xl border-[6px] border-slate-700 flex flex-col items-center justify-center relative overflow-hidden card-enter">
-                <!-- 背景グリッド（コードで描画） -->
-                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <!-- カード: 背景に6.jpgを使用 -->
+            <div id="card-area" class="custom-bg bg-image-6 w-80 h-80 rounded-3xl shadow-2xl border-[6px] border-slate-700 flex flex-col items-center justify-center relative overflow-hidden card-enter">
+                <!-- 背景画像を少し見やすくするための薄いオーバーレイ -->
+                <div class="absolute inset-0 bg-white/30 backdrop-blur-[1px]"></div>
                 
                 <div id="card-content" class="w-full h-full relative z-10"></div>
                 
-                <!-- 捕獲ネット（SVGで描画） -->
+                <!-- 捕獲ネット（7.pngを使用） -->
                 <div id="net-overlay" class="absolute inset-0 pointer-events-none hidden z-20 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" class="w-[90%] h-[90%] text-yellow-300 opacity-90 drop-shadow-lg" style="filter: drop-shadow(0 0 5px rgba(253, 224, 71, 0.5));">
-                        <!-- 網のパターン定義 -->
-                        <defs>
-                            <pattern id="netGrid" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                            </pattern>
-                        </defs>
-                        <!-- 網の形状 -->
-                        <circle cx="50" cy="50" r="48" fill="url(#netGrid)" stroke="currentColor" stroke-width="4"/>
-                    </svg>
+                    <img src="7.png" class="w-[90%] h-[90%] object-contain drop-shadow-lg opacity-90" alt="網">
                 </div>
             </div>
             <!-- フィードバック文字 -->
@@ -212,22 +209,22 @@
         <p class="text-center text-sm text-slate-400 font-bold mt-2">せいかいの ボタンを おしてね！</p>
     </div>
 
-    <!-- メニュー -->
-    <div id="menu-screen" class="fixed inset-0 spooky-bg flex flex-col items-center justify-center text-white p-6 z-50">
-        <!-- 背景装飾 -->
-        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
+    <!-- メニュー (背景に6.jpgを使用) -->
+    <div id="menu-screen" class="fixed inset-0 custom-bg bg-image-6 flex flex-col items-center justify-center text-white p-6 z-50">
+        <!-- 背景を暗くするオーバーレイ -->
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
         
         <h1 class="text-5xl font-black mb-10 text-center tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] leading-tight relative z-10">
             <span class="text-yellow-400">げんじゅう</span>を<br>つかまえろ
         </h1>
         
         <div id="step-mode" class="flex flex-col gap-4 w-full max-w-sm items-center fade-enter relative z-10">
-            <p class="text-slate-300 font-bold mb-2 text-lg">あそびかたを えらんでね</p>
-            <button onclick="selectMode('match')" class="w-full bg-slate-800 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-yellow-400 transition text-center group">
+            <p class="text-white font-bold mb-2 text-lg drop-shadow-md">あそびかたを えらんでね</p>
+            <button onclick="selectMode('match')" class="w-full bg-slate-800/90 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-yellow-400 transition text-center group">
                 <div class="text-xl font-black group-hover:text-yellow-400 transition">そのまま つかまえる</div>
                 <div class="text-sm text-slate-400 mt-1">かたちも いろも おなじ げんじゅう</div>
             </button>
-            <button onclick="selectMode('missing')" class="w-full bg-slate-800 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-blue-400 transition text-center group">
+            <button onclick="selectMode('missing')" class="w-full bg-slate-800/90 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-blue-400 transition text-center group">
                 <div class="text-xl font-black group-hover:text-blue-400 transition">いないの つかまえる</div>
                 <div class="text-sm text-slate-400 mt-1">かたちと いろも ちがう げんじゅう</div>
             </button>
@@ -238,13 +235,13 @@
         </div>
 
         <div id="step-time" class="flex flex-col gap-4 w-full max-w-sm items-center hidden fade-enter relative z-10">
-            <p class="text-slate-300 font-bold mb-2 text-lg">じかんを きめてね</p>
+            <p class="text-white font-bold mb-2 text-lg drop-shadow-md">じかんを きめてね</p>
             <div class="grid grid-cols-1 gap-4 w-full">
-                <button onclick="startGame(30)" class="bg-slate-800 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">30びょう</button>
-                <button onclick="startGame(60)" class="bg-slate-800 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">1ぷん</button>
-                <button onclick="startGame(180)" class="bg-slate-800 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">3ぷん</button>
+                <button onclick="startGame(30)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">30びょう</button>
+                <button onclick="startGame(60)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">1ぷん</button>
+                <button onclick="startGame(180)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">3ぷん</button>
             </div>
-            <button onclick="backToMode()" class="mt-6 text-slate-400 hover:text-white underline text-base font-bold">まえに もどる</button>
+            <button onclick="backToMode()" class="mt-6 text-slate-300 hover:text-white underline text-base font-bold drop-shadow-md">まえに もどる</button>
         </div>
     </div>
 
@@ -328,22 +325,15 @@
         }
         const sound = new SoundController();
 
-        // --- データ（SVGパス） ---
+        // --- データ（画像を使用）---
+        // 画像はシルエットとして使うため、mask-imageで色を付けます
         const ITEMS = [
-            { id: 'heart',  color: '#ef4444', stroke: '#991b1b', name: 'ハート' },     
-            { id: 'drop',   color: '#3b82f6', stroke: '#1e40af', name: 'しずく' },     
-            { id: 'note',   color: '#a855f7', stroke: '#6b21a8', name: '音符' },       
-            { id: 'star',   color: '#eab308', stroke: '#854d0e', name: '星' },         
-            { id: 'clover', color: '#22c55e', stroke: '#166534', name: 'クローバー' }  
+            { id: 'heart',  color: '#ef4444', image: '1.png' },     
+            { id: 'drop',   color: '#3b82f6', image: '2.png' },     
+            { id: 'note',   color: '#a855f7', image: '5.png' }, // noteは5.png      
+            { id: 'star',   color: '#eab308', image: '4.png' }, // starは4.png        
+            { id: 'clover', color: '#22c55e', image: '3.png' }  // cloverは3.png
         ];
-
-        const SVG_PATHS = {
-            heart: `<path d="M32 58 C 20 48 4 36 4 20 C 4 10 12 4 22 4 C 28 4 32 8 32 8 C 32 8 36 4 42 4 C 52 4 60 10 60 20 C 60 36 44 48 32 58 Z" />`,
-            drop: `<path d="M32 6 C 32 6 12 34 12 44 C 12 55 21 62 32 62 C 43 62 52 55 52 44 C 52 34 32 6 32 6 Z" />`,
-            note: `<path d="M18 42 A 6 5 0 1 0 18 52 A 6 5 0 1 0 18 42 Z M46 38 A 6 5 0 1 0 46 48 A 6 5 0 1 0 46 38 Z M22 44 L22 18 L50 12 L50 40 M22 22 L50 16" fill-rule="evenodd"/>`,
-            star: `<path d="M32 4 L40 24 L60 24 L44 36 L50 56 L32 44 L14 56 L20 36 L4 24 L24 24 Z" />`,
-            clover: `<g><rect x="29" y="30" width="6" height="28" rx="3" /><circle cx="32" cy="18" r="11" /><circle cx="17" cy="36" r="11" /><circle cx="47" cy="36" r="11" /></g>`
-        };
 
         let state = {
             score: 0,
@@ -358,17 +348,26 @@
         function initButtons() {
             ITEMS.forEach(item => {
                 const container = document.getElementById(`btn-${item.id}`);
-                container.innerHTML = createSvg(item.id, item.color, item.stroke);
+                container.innerHTML = createImageItem(item.image, item.color);
             });
         }
 
-        function createSvg(itemId, fillColor, strokeColor) {
+        // 画像アイテム生成関数 (Mask Imageを使用)
+        function createImageItem(imageFile, color) {
             return `
-            <svg viewBox="0 0 64 64" class="w-full h-full drop-shadow-sm">
-                <g fill="${fillColor}" stroke="${strokeColor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-                    ${SVG_PATHS[itemId]}
-                </g>
-            </svg>
+            <div style="
+                width: 100%;
+                height: 100%;
+                background-color: ${color};
+                -webkit-mask-image: url('${imageFile}');
+                mask-image: url('${imageFile}');
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+            "></div>
             `;
         }
 
@@ -551,7 +550,9 @@
 
         function createCardItemElement(obj, x, y) {
             const wrapper = document.createElement('div');
+            const shapeItem = ITEMS.find(i => i.id === obj.shapeId);
             const colorItem = ITEMS.find(i => i.id === obj.colorId);
+            
             const size = Math.floor(Math.random() * 20) + 90; 
             wrapper.classList.add('ghost-mover');
             wrapper.style.position = 'absolute';
@@ -571,7 +572,7 @@
             fadeDiv.style.height = '100%';
             fadeDiv.classList.add('ghost-fade');
             
-            fadeDiv.innerHTML = createSvg(obj.shapeId, colorItem.color, colorItem.stroke);
+            fadeDiv.innerHTML = createImageItem(shapeItem.image, colorItem.color);
             idleDiv.appendChild(fadeDiv);
             wrapper.appendChild(idleDiv);
             return wrapper;
