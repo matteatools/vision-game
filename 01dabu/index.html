@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ダブってる？？</title>
+    <title>おなじマークをさがせ！</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -81,14 +81,12 @@
 
         const MODES = { MENU: 'menu', SETTINGS: 'settings', DIFFICULTY: 'difficulty', GAME: 'game', RESULT: 'result' };
 
-        // Updated Game Types based on request
         const GAME_TYPES = {
             SCORE_ATTACK: { id: 'scoreAttack', label: 'スコアアタック', sub: 'じかんないに たくさんみつけよう', icon: <IconClock size={24} />, unit: 'びょう' },
             TIME_ATTACK: { id: 'timeAttack', label: 'タイムアタック', sub: 'きめられた数を はやくみつけよう', icon: <IconTrophy size={24} />, unit: 'もん' },
             PRACTICE: { id: 'practice', label: 'れんしゅう', sub: 'じゆうにあそぶ', icon: <IconInfinity size={24} />, unit: '' },
         };
 
-        // Settings Options
         const SETTINGS_OPTIONS = {
             scoreAttack: [
                 { value: 30, label: '30びょう' },
@@ -245,12 +243,28 @@
             );
         };
 
-        // --- Card Component ---
+        // --- Card Component (Rectangle & Full Width) ---
         const Card = ({ symbols, onSymbolClick, disabled, isWrong }) => {
             const containerRef = useRef(null);
             const itemsRef = useRef([]);
             const itemElementsRef = useRef([]);
-            const containerRadius = 110; 
+            const sizeRef = useRef({ w: 0, h: 0 });
+
+            // リサイズ監視
+            useEffect(() => {
+                const updateSize = () => {
+                    if (containerRef.current) {
+                        sizeRef.current = {
+                            w: containerRef.current.clientWidth,
+                            h: containerRef.current.clientHeight
+                        };
+                    }
+                };
+                updateSize();
+                const observer = new ResizeObserver(updateSize);
+                if (containerRef.current) observer.observe(containerRef.current);
+                return () => observer.disconnect();
+            }, []);
 
             useEffect(() => {
                 const sizeMap = {
@@ -260,18 +274,20 @@
                     4: { class: 'text-6xl sm:text-7xl', px: 70 },
                 };
 
+                // 初期配置用のサイズ（仮）
+                const w = sizeRef.current.w || 300;
+                const h = sizeRef.current.h || 300;
+
                 itemsRef.current = symbols.map((symbol, index) => {
                     const sizeLevel = Math.floor(Math.random() * 4) + 1;
                     const sizeData = sizeMap[sizeLevel];
                     const itemRadius = sizeData.px / 2;
 
-                    const maxR = containerRadius - itemRadius - 10;
-                    const r = Math.sqrt(Math.random()) * maxR;
-                    const theta = Math.random() * 2 * Math.PI;
-                    const x = r * Math.cos(theta);
-                    const y = r * Math.sin(theta);
+                    // 矩形内ランダム配置
+                    const x = itemRadius + Math.random() * (w - itemRadius * 2);
+                    const y = itemRadius + Math.random() * (h - itemRadius * 2);
 
-                    const speed = 0.3 + Math.random() * 0.4;
+                    const speed = 0.5 + Math.random() * 0.8;
                     const moveAngle = Math.random() * 2 * Math.PI;
 
                     return {
@@ -285,6 +301,12 @@
             useEffect(() => {
                 let animationFrameId;
                 const update = () => {
+                    const { w, h } = sizeRef.current;
+                    if (!w || !h) {
+                        animationFrameId = requestAnimationFrame(update);
+                        return;
+                    }
+
                     itemsRef.current.forEach((item, index) => {
                         const el = itemElementsRef.current[index];
                         if (!el) return;
@@ -293,21 +315,31 @@
                         item.y += item.vy;
                         item.rotation += item.rotationSpeed;
 
-                        const dist = Math.sqrt(item.x * item.x + item.y * item.y);
-                        const limit = containerRadius - item.radius;
+                        // 矩形壁判定 (Rectangle Collision)
+                        // 回転や絵文字のサイズ感を考慮してマージンを追加
+                        const margin = 15;
+                        const padding = item.radius + margin;
 
-                        if (dist > limit) {
-                            const nx = item.x / dist;
-                            const ny = item.y / dist;
-                            const dot = item.vx * nx + item.vy * ny;
-                            if (dot > 0) {
-                                item.vx = item.vx - 2 * dot * nx;
-                                item.vy = item.vy - 2 * dot * ny;
-                                item.vx += (Math.random() - 0.5) * 0.1;
-                                item.vy += (Math.random() - 0.5) * 0.1;
-                            }
-                            item.x = nx * limit;
-                            item.y = ny * limit;
+                        // 左右の壁
+                        if (item.x < padding) {
+                            item.x = padding;
+                            item.vx *= -1;
+                            item.vx += (Math.random() - 0.5) * 0.1;
+                        } else if (item.x > w - padding) {
+                            item.x = w - padding;
+                            item.vx *= -1;
+                            item.vx += (Math.random() - 0.5) * 0.1;
+                        }
+
+                        // 上下の壁
+                        if (item.y < padding) {
+                            item.y = padding;
+                            item.vy *= -1;
+                            item.vy += (Math.random() - 0.5) * 0.1;
+                        } else if (item.y > h - padding) {
+                            item.y = h - padding;
+                            item.vy *= -1;
+                            item.vy += (Math.random() - 0.5) * 0.1;
                         }
 
                         el.style.transform = `translate(${item.x}px, ${item.y}px) rotate(${item.rotation}deg)`;
@@ -321,11 +353,11 @@
             return (
                 <div 
                     ref={containerRef} 
-                    className={`relative bg-white rounded-full shadow-xl border-8 border-yellow-400 w-64 h-64 sm:w-80 sm:h-80 flex items-center justify-center transition-transform duration-200 overflow-hidden ${isWrong ? 'animate-shake border-red-400' : ''}`}
+                    className={`relative w-full flex-1 bg-white rounded-3xl shadow-xl border-8 border-yellow-400 overflow-hidden ${isWrong ? 'animate-shake border-red-400' : ''}`}
                 >
                     {itemsRef.current.map((item, index) => (
-                        <div key={item.id} ref={el => itemElementsRef.current[index] = el} className="absolute flex items-center justify-center will-change-transform">
-                            <button onClick={() => !disabled && onSymbolClick(item.symbol)} disabled={disabled} className={`${item.sizeClass} leading-none select-none hover:scale-125 active:scale-95 transition-transform cursor-pointer filter drop-shadow-sm`}>{item.symbol}</button>
+                        <div key={item.id} ref={el => itemElementsRef.current[index] = el} className="absolute top-0 left-0 flex items-center justify-center will-change-transform" style={{width: 0, height: 0}}>
+                            <button onClick={() => !disabled && onSymbolClick(item.symbol)} disabled={disabled} className={`${item.sizeClass} absolute -translate-x-1/2 -translate-y-1/2 leading-none select-none hover:scale-125 active:scale-95 transition-transform cursor-pointer filter drop-shadow-sm`}>{item.symbol}</button>
                         </div>
                     ))}
                 </div>
@@ -518,8 +550,7 @@
                     <div className="min-h-screen bg-indigo-50 flex flex-col items-center justify-center p-4 font-sans text-slate-800 relative z-0">
                         <BackgroundAnimation />
                         <div className="relative z-10 w-full flex flex-col items-center">
-                            <h1 className="text-6xl sm:text-7xl font-black text-indigo-600 mb-2 tracking-tighter drop-shadow-sm text-center bg-white/80 p-4 rounded-xl backdrop-blur-sm shadow-sm">ダブってる？？</h1>
-                            <p className="text-xl sm:text-2xl text-indigo-500 mb-10 font-bold text-center bg-white/80 p-2 rounded-lg backdrop-blur-sm">おなじマークをさがせ！</p>
+                            <h1 className="text-6xl sm:text-7xl font-black text-indigo-600 mb-10 tracking-tighter drop-shadow-sm text-center bg-white/80 p-4 rounded-xl backdrop-blur-sm shadow-sm">おなじマークをさがせ！</h1>
                             <div className="grid gap-4 w-full max-w-md px-4">
                                 {Object.values(GAME_TYPES).map((type) => (
                                     <button key={type.id} onClick={() => selectGameType(type)} className="group relative overflow-hidden bg-white/90 hover:bg-indigo-500 border-b-4 border-indigo-200 hover:border-indigo-700 p-6 rounded-2xl shadow-lg transition-all duration-200 flex items-center text-left backdrop-blur-sm">
@@ -579,7 +610,7 @@
 
             if (mode === MODES.GAME) {
                 return (
-                    <div className="min-h-screen bg-sky-100 flex flex-col items-center font-sans overflow-hidden select-none">
+                    <div className="h-screen bg-sky-100 flex flex-col font-sans overflow-hidden select-none">
                         <div className="w-full bg-white p-2 sm:p-4 shadow-sm flex items-center justify-between px-4 z-10 shrink-0">
                             <div className="flex items-center gap-2">
                                 <div className={`p-2 rounded-lg ${gameType.id === 'scoreAttack' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}`}><IconClock size={24} className="w-5 h-5 sm:w-6 sm:h-6" /></div>
@@ -593,10 +624,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full max-w-4xl p-4 relative">
-                            <div className="absolute top-4 text-slate-500 font-bold text-lg opacity-50 pointer-events-none whitespace-nowrap">同じ絵柄をタッチ！</div>
+                        
+                        {/* Game Area: Flex container fills remaining space */}
+                        <div className="flex-1 w-full flex flex-col md:flex-row gap-2 p-2 sm:p-4 relative min-h-0">
+                            
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 text-slate-500 font-bold text-lg opacity-20 pointer-events-none whitespace-nowrap">同じ絵柄をタッチ！</div>
+                            
+                            {/* Card 1 */}
                             <Card symbols={cards.left} onSymbolClick={handleSymbolClick} disabled={!!matchFound} isWrong={isWrong} />
+                            
+                            {/* Card 2 */}
                             <Card symbols={cards.right} onSymbolClick={handleSymbolClick} disabled={!!matchFound} isWrong={isWrong} />
+                            
                             {matchFound && <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"><div className="text-9xl animate-bounce drop-shadow-2xl">⭕</div></div>}
                             
                             {/* Penalty Message */}
@@ -609,7 +648,7 @@
                             )}
 
                         </div>
-                        <div className="shrink-0 p-2 text-center z-10 mb-4"><button onClick={() => setMode(MODES.MENU)} className="text-slate-400 font-bold hover:text-slate-600 inline-flex items-center gap-2 py-2">やめる</button></div>
+                        <div className="shrink-0 p-2 text-center z-10"><button onClick={() => setMode(MODES.MENU)} className="text-slate-400 font-bold hover:text-slate-600 inline-flex items-center gap-2 py-2">やめる</button></div>
                     </div>
                 );
             }
