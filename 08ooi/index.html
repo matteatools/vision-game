@@ -8,8 +8,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Babel for JSX transformation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Babel for JSX transformation (Version Pinned) -->
+    <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
 
     <!-- Import Map for React and Lucide -->
     <script type="importmap">
@@ -37,7 +37,7 @@
 <body class="bg-sky-50">
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
+    <script type="text/babel" data-type="module" data-presets="react">
         import React, { useState, useEffect, useMemo, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
         import { RefreshCw, Check, Star, Circle, Diamond, Trophy, RotateCcw, Clock, XCircle, Home, Timer, Crown, Volume2 } from 'lucide-react';
