@@ -106,6 +106,7 @@
             height: 140px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         /* ホバー時・タップ時の動き */
@@ -228,7 +229,7 @@
         <!-- 08 -->
         <a href="08ooi/index.html" class="game-card">
             <span class="game-number">No.08</span>
-            <div class="game-title">いちばんおおいのどーれだ？</div>
+            <div class="game-title">いちばんおおいのどれだ？</div>
             <div class="game-desc">いちばんおおいのはかたち？いろ？</div>
         </a>
 
@@ -245,12 +246,39 @@
             <div class="game-title">げんじゅうをつかまえろ</div>
             <div class="game-desc">げんじゅうをつかまえよう！</div>
         </a>
+
+        <!-- 11 -->
+        <a href="11narabe/index.html" class="game-card">
+            <span class="game-number">No.11</span>
+            <div class="game-title">もじならべ</div>
+            <div class="game-desc">ただしくもじをならべよう</div>
+        </a>
+
+        <!-- 12 -->
+        <a href="12block/index.html" class="game-card">
+            <span class="game-number">No.12</span>
+            <div class="game-title">ぴたっとパズル</div>
+            <div class="game-desc">ピースをぴたっとおこう</div>
+        </a>
     </div>
 
     <footer>
         <p>© 2026 Vision Training Games</p>
     </footer>
 
+    <!-- プレビュー用のスクリプト（実際のサイト公開時は削除しても問題ありません） -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // リンク先のパスを取得
+                    const target = card.getAttribute('href');
+                    alert(`【プレビュー確認】\n"${target}" へ移動します。\n(実際のご利用時には対象のページへ遷移します)`);
+                });
+            });
+        });
+    </script>
 </body>
-
 </html>

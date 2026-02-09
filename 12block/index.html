@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ぴたっとパズル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 環境変数からFirebase設定を取得
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pita-puzzle-speedrun';
+
+        window.firebaseUtils = { auth, db, appId, setDoc, getDoc, doc };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
+
+        :root { --cell-size: 35px; }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #FFF9E5;
+            /* パズルピースを敷き詰めた背景パターン */
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FFB347' fill-opacity='0.08'%3E%3Cpath d='M10 10h10v10h-10zM20 10h10v10h-10zM10 20h10v10h-10zM40 40h10v10h-10zM50 40h10v10h-10zM40 50h10v10h-10zM50 50h10v10h-10zM60 10h10v30h-10zM10 60h30v10h-30z'/%3E%3C/g%3E%3C/svg%3E");
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 10px; }
+        .screen.active { display: flex; }
+
+        .title-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 2.5rem;
+            border-radius: 3.5rem;
+            border: 8px solid #FFD93D;
+            box-shadow: 0 10px 0 #FFB347, 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 8vh;
+        }
+
+        #game-area {
+            position: relative;
+            width: calc(var(--cell-size) * 10);
+            height: calc(var(--cell-size) * 10);
+            background-color: #F8FAFC;
+            box-sizing: content-box;
+            border: 1px solid #E2E8F0;
+        }
+
+        .grid-cell { width: var(--cell-size); height: var(--cell-size); border: 1px solid rgba(0,0,0,0.04); box-sizing: border-box; float: left; }
+        .target-cell { background-color: #CBD5E1; border: 2px solid #94A3B8; border-radius: 4px; }
+
+        .block-part {
+            position: absolute;
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border-radius: 6px;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            border: 1.5px solid rgba(255,255,255,0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        }
+
+        .inventory-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 4px; 
+            padding: 8px; 
+            background: rgba(255, 255, 255, 0.92); 
+            border-radius: 12px; 
+            border: 3px solid #FFD93D;
+            min-height: 140px;
+        }
+
+        .inventory-item { 
+            aspect-ratio: 1; 
+            background: #FAFAFA; 
+            border: 1px solid #EEE; 
+            border-radius: 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: grab; 
+            position: relative; 
+            overflow: hidden; 
+            touch-action: none;
+            min-width: 40px;
+            min-height: 40px;
+        }
+
+        .inventory-item.forbidden { opacity: 0.2; pointer-events: none; background: #F1F5F9; }
+        .forbidden-x { position: absolute; color: #EF4444; font-size: 20px; font-weight: bold; z-index: 20; pointer-events: none; }
+        .inventory-item.used { opacity: 0.15; pointer-events: none; background: #E2E8F0; }
+
+        .inventory-preview-part {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 1px;
+        }
+
+        .btn-pop { transition: transform 0.1s; box-shadow: 0 6px 0 #d97706; touch-action: manipulation; }
+        .btn-pop:active { transform: translateY(4px); box-shadow: 0 2px 0 #d97706; }
+
+        #drag-proxy { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.9; }
+        #overlay { background-color: rgba(0, 0, 0, 0.6); }
+
+        .hint-glow { animation: glow-pulse 0.5s ease-in-out infinite alternate; z-index: 10; }
+        @keyframes glow-pulse { from { background-color: #FAFAFA; box-shadow: 0 0 0px #FACC15; } to { background-color: #FEF9C3; box-shadow: 0 0 15px #FACC15; border-color: #FACC15; } }
+        .piece-animating { animation: pop-in 0.5s ease-out; }
+        @keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- TITLE SCREEN -->
+    <div id="title-screen" class="screen active justify-center">
+        <div class="title-card mb-8">
+            <h1 class="text-5xl font-bold text-orange-500">ぴたっとパズル</h1>
+        </div>
+        
+        <div class="flex flex-col gap-5 w-full max-w-xs">
+            <button onclick="startGame('loose')" class="btn-pop bg-green-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-green-700">
+                ゆるっと モード<br>
+                <span class="text-sm font-normal">１・２マスも つかえます</span>
+            </button>
+            <button onclick="startGame('tight')" class="btn-pop bg-orange-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-orange-700">
+                ぴたっと モード<br>
+                <span class="text-sm font-normal">１・２マスは つかえません</span>
+            </button>
+        </div>
+        
+        <div class="mt-10 bg-white/95 p-4 rounded-2xl border-2 border-orange-200 text-orange-600 text-sm font-bold w-64 text-center shadow-lg">
+            🏆 ベストタイム（10問）<br>
+            ゆるっと: <span id="best-loose">--:--</span><br>
+            ぴたっと: <span id="best-tight">--:--</span>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="w-full max-w-md flex flex-wrap justify-between items-center mb-2 gap-y-2">
+            <div class="flex gap-1 items-center">
+                <button onclick="showTitle()" class="bg-white px-2 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-[10px] shadow-sm">タイトルへ</button>
+                <div class="bg-white px-3 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-xs shadow-sm">
+                    ⏱ <span id="timer-display">00:00</span>
+                </div>
+            </div>
+            <div class="bg-white px-3 py-1 rounded-full border-2 border-orange-400 font-bold text-orange-600 text-sm shadow-sm">
+                <span id="stage-display">1 / 10</span>
+            </div>
+            <div class="flex gap-1">
+                <button id="giveup-btn" class="bg-gray-500 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-gray-700 active:translate-y-1 active:border-b-0 shadow-sm">こうさん</button>
+                <button id="hint-btn" class="bg-yellow-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-yellow-600 active:translate-y-1 active:border-b-0 shadow-sm">ヒント</button>
+                <button id="reset-btn" class="bg-red-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-red-600 active:translate-y-1 active:border-b-0 shadow-sm">やりなおし</button>
+            </div>
+        </div>
+
+        <div class="bg-white p-2 rounded-2xl shadow-xl border-4 border-orange-200">
+            <div id="game-area">
+                <div id="grid-board"></div>
+                <div id="blocks-container" class="absolute inset-0 pointer-events-none"></div>
+            </div>
+        </div>
+
+        <div class="w-full max-w-md flex justify-center gap-3 my-3">
+            <button id="rotate-all-btn" class="btn-pop bg-orange-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">🔄 まわす</button>
+            <button id="flip-all-btn" class="btn-pop bg-blue-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">↔️ はんてん</button>
+        </div>
+
+        <div class="w-full max-w-md px-1">
+            <div id="inventory" class="inventory-grid shadow-inner shadow-black/5"></div>
+            <p id="mode-desc" class="text-center text-[10px] font-bold text-orange-400 mt-1"></p>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 flex items-center justify-center hidden z-50">
+        <div class="bg-white/95 p-8 rounded-3xl text-center shadow-2xl mx-4 border-4 border-orange-400">
+            <div id="overlay-emoji" class="text-5xl mb-2">✨</div>
+            <h2 id="overlay-title" class="text-2xl font-bold text-orange-600 mb-1">ぴたっと！</h2>
+            <p id="overlay-message" class="text-gray-500 mb-6 font-bold"></p>
+            <button id="next-btn" class="bg-green-500 text-white px-10 py-3 rounded-full font-bold text-lg shadow-lg"></button>
+        </div>
+    </div>
+
+    <div id="drag-proxy"></div>
+
+    <script>
+        // --- Sound Engine ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration, volume = 0.1) {
+            if (audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const sounds = {
+            pick: () => playTone(440, 'sine', 0.1),
+            place: () => playTone(880, 'sine', 0.1),
+            rotate: () => playTone(660, 'triangle', 0.15),
+            win: () => {
+                playTone(523.25, 'sine', 0.5);
+                setTimeout(() => playTone(659.25, 'sine', 0.5), 100);
+                setTimeout(() => playTone(783.99, 'sine', 0.5), 200);
+                setTimeout(() => playTone(1046.50, 'sine', 0.8), 300);
+            },
+            wrong: () => playTone(220, 'square', 0.2, 0.05),
+            pop: () => playTone(1200, 'sine', 0.1, 0.05)
+        };
+
+        const PIECES = {
+            1: [[0,0]], 2: [[0,0],[0,1]], 3: [[0,0],[0,1],[0,2]], 4: [[0,0],[1,0],[0,1]],
+            5: [[0,0],[0,1],[0,2],[0,3]], 6: [[0,0],[1,0],[0,1],[1,1]], 7: [[0,0],[0,1],[0,2],[1,2]], 8: [[1,0],[0,1],[1,1],[2,1]], 9: [[0,0],[0,1],[1,1],[1,2]],
+            10: [[0,0],[0,1],[0,2],[0,3],[0,4]], 11: [[0,0],[0,1],[0,2],[0,3],[1,3]], 12: [[0,0],[1,0],[0,1],[1,1],[0,2]], 13: [[0,0],[0,1],[0,2],[1,2],[1,3]],
+            14: [[0,0],[0,1],[1,1],[1,2],[2,2]], 15: [[0,0],[1,0],[2,0],[1,1],[1,2]], 16: [[0,0],[1,0],[1,1],[2,1],[2,2]], 17: [[0,0],[0,1],[0,2],[1,2],[2,2]],
+            18: [[0,0],[1,0],[2,0],[0,1],[2,1]], 19: [[1,0],[0,1],[1,1],[2,1],[1,2]], 20: [[0,0],[1,0],[2,0],[3,0],[1,1]], 21: [[1,0],[2,0],[0,1],[1,1],[1,2]]
+        };
+
+        const PIECE_COLORS = {};
+        Object.keys(PIECES).forEach(id => {
+            const hue = (id * 137.5) % 360; 
+            PIECE_COLORS[id] = `hsl(${hue}, 85%, 55%)`;
+        });
+
+        let state = {
+            mode: 'tight',
+            stage: 1,
+            maxStages: 10,
+            startTime: 0,
+            currentTime: 0,
+            timerInterval: null,
+            targetCells: [],
+            correctSolution: [],
+            placedPieces: [],
+            inventoryRotation: 0,
+            inventoryFlipped: false,
+            dragging: null,
+            dragOffset: { x: 0, y: 0 },
+            cellSize: 35,
+            isShowingResult: false,
+            wasGiveUp: false,
+            user: null
+        };
+
+        // --- Firebase ---
+        async function initAuth() {
+            const { auth, db, appId, getDoc, doc } = window.firebaseUtils;
+            try {
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, async (u) => {
+                    state.user = u;
+                    if (u) loadHighScores();
+                });
+            } catch(e) {}
+            
+            // UIイベントの設定
+            document.getElementById('rotate-all-btn').onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryRotation = (state.inventoryRotation + 1) % 4; render(); }};
+            document.getElementById('flip-all-btn').onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryFlipped = !state.inventoryFlipped; render(); }};
+            document.getElementById('giveup-btn').onclick = () => playGiveUpAnimation();
+            document.getElementById('reset-btn').onclick = () => { if(!state.isShowingResult){ sounds.wrong(); state.placedPieces = []; render(); }};
+            document.getElementById('hint-btn').onclick = () => { 
+                if (state.isShowingResult) return;
+                sounds.pop();
+                state.correctSolution.forEach(s => {
+                    const item = document.querySelector(`.inventory-item[data-id="${s.id}"]`);
+                    if (item && !item.classList.contains('used')) {
+                        item.classList.add('hint-glow');
+                        setTimeout(() => item.classList.remove('hint-glow'), 1500);
+                    }
+                });
+            };
+        }
+
+        async function loadHighScores() {
+            const { db, appId, getDoc, doc } = window.firebaseUtils;
+            if (!state.user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.loose) document.getElementById('best-loose').innerText = formatTime(data.loose);
+                if (data.tight) document.getElementById('best-tight').innerText = formatTime(data.tight);
+            }
+        }
+
+        async function saveScore(mode, time) {
+            const { db, appId, getDoc, setDoc, doc } = window.firebaseUtils;
+            if (!state.user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+            const snap = await getDoc(docRef);
+            let current = snap.exists() ? snap.data() : {};
+            if (!current[mode] || time < current[mode]) {
+                current[mode] = time;
+                await setDoc(docRef, current);
+                loadHighScores();
+            }
+        }
+
+        // --- Transformations ---
+        function rotateCoords(coords, times) {
+            let result = coords.map(p => [p[0], p[1]]);
+            for (let i = 0; i < (times % 4); i++) result = result.map(p => [p[1], -p[0]]);
+            return normalize(result);
+        }
+        function flipCoords(coords, isFlipped) {
+            if (!isFlipped) return coords;
+            return normalize(coords.map(p => [-p[0], p[1]]));
+        }
+        function normalize(coords) {
+            const minX = Math.min(...coords.map(p => p[0]));
+            const minY = Math.min(...coords.map(p => p[1]));
+            return coords.map(p => [p[0] - minX, p[1] - minY]);
+        }
+        function getTransformedCoords(pieceId, rot, flip) {
+            let c = PIECES[pieceId];
+            c = rotateCoords(c, rot);
+            c = flipCoords(c, flip);
+            return c;
+        }
+
+        // --- Logic ---
+        function generateStage() {
+            let pool = [];
+            let mandatorySmall = [];
+
+            if (state.mode === 'loose') {
+                mandatorySmall = [1, 2];
+                if (state.stage <= 3) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                else if (state.stage <= 7) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+                else pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            } else {
+                if (state.stage <= 3) pool = [3, 4, 5, 6, 7, 8, 9];
+                else if (state.stage <= 7) pool = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+                else pool = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+            }
+
+            const selectedIds = [];
+            const tempPool = [...pool];
+
+            if (state.mode === 'loose') {
+                const sId = mandatorySmall[Math.floor(Math.random() * mandatorySmall.length)];
+                selectedIds.push(sId);
+                const idxInPool = tempPool.indexOf(sId);
+                if(idxInPool > -1) tempPool.splice(idxInPool, 1);
+            }
+
+            while(selectedIds.length < 3) {
+                const randIdx = Math.floor(Math.random() * tempPool.length);
+                selectedIds.push(tempPool[randIdx]);
+                tempPool.splice(randIdx, 1);
+            }
+
+            selectedIds.sort(() => Math.random() - 0.5);
+
+            let currentPoints = [];
+            let solutionData = [];
+            
+            const p1Rot = Math.floor(Math.random()*4);
+            const p1Flip = Math.random()>0.5;
+            const p1Coords = getTransformedCoords(selectedIds[0], p1Rot, p1Flip);
+            p1Coords.forEach(p => currentPoints.push({x:p[0], y:p[1]}));
+            solutionData.push({ id: selectedIds[0], rot: p1Rot, flip: p1Flip, x: 0, y: 0 });
+
+            for(let i=1; i<3; i++) {
+                let bestPlacements = [];
+                const searchCount = 100;
+
+                for(let attempts = 0; attempts < searchCount; attempts++) {
+                    const rot = Math.floor(Math.random()*4);
+                    const flip = Math.random()>0.5;
+                    const coords = getTransformedCoords(selectedIds[i], rot, flip);
+                    const base = currentPoints[Math.floor(Math.random() * currentPoints.length)];
+                    const anchor = coords[Math.floor(Math.random()*coords.length)];
+                    const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+                    const dir = dirs[Math.floor(Math.random()*4)];
+                    
+                    const ox = base.x + dir[0] - anchor[0];
+                    const oy = base.y + dir[1] - anchor[1];
+                    const abs = coords.map(p => ({x: p[0]+ox, y: p[1]+oy}));
+
+                    if(!abs.some(a => currentPoints.some(c => c.x === a.x && c.y === a.y))) {
+                        let adj = 0;
+                        abs.forEach(a => dirs.forEach(d => { if(currentPoints.some(c => c.x===a.x+d[0] && c.y===a.y+d[1])) adj++; }));
+                        bestPlacements.push({ rot, flip, ox, oy, abs, adj });
+                    }
+                }
+
+                if(bestPlacements.length > 0) {
+                    bestPlacements.sort((a,b) => b.adj - a.adj);
+                    const topN = Math.min(3, bestPlacements.length);
+                    const chosen = bestPlacements[Math.floor(Math.random() * topN)];
+                    chosen.abs.forEach(a => currentPoints.push(a));
+                    solutionData.push({ id: selectedIds[i], rot: chosen.rot, flip: chosen.flip, x: chosen.ox, y: chosen.oy });
+                }
+            }
+
+            const minX = Math.min(...currentPoints.map(p => p.x));
+            const minY = Math.min(...currentPoints.map(p => p.y));
+            const maxX = Math.max(...currentPoints.map(p => p.x));
+            const maxY = Math.max(...currentPoints.map(p => p.y));
+            const ox = Math.floor((10-(maxX-minX+1))/2), oy = Math.floor((10-(maxY-minY+1))/2);
+            
+            state.targetCells = currentPoints.map(p => ({x: p.x-minX+ox, y: p.y-minY+oy}));
+            state.correctSolution = solutionData.map(s => ({ id: s.id, rot: s.rot, flip: s.flip, gridX: s.x-minX+ox, gridY: s.y-minY+oy, coords: getTransformedCoords(s.id, s.rot, s.flip), color: PIECE_COLORS[s.id] }));
+            state.placedPieces = [];
+            state.isShowingResult = false;
+            state.wasGiveUp = false;
+        }
+
+        // --- Timer ---
+        function formatTime(ms) {
+            const totalSec = Math.floor(ms / 1000);
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+        function updateTimer() {
+            state.currentTime = Date.now() - state.startTime;
+            document.getElementById('timer-display').innerText = formatTime(state.currentTime);
+        }
+
+        // --- UI ---
+        window.showTitle = function() {
+            clearInterval(state.timerInterval);
+            document.getElementById('title-screen').classList.add('active');
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('overlay').classList.add('hidden');
+        };
+
+        window.startGame = function(mode) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            state.mode = mode;
+            state.stage = 1;
+            state.startTime = Date.now();
+            document.getElementById('title-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            document.getElementById('mode-desc').innerText = (mode === 'loose') ? 'ゆるっと：１・２マスも つかえます' : 'ぴたっと：１・２マスは つかえません';
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            state.timerInterval = setInterval(updateTimer, 500);
+            startNewLevel();
+        };
+
+        function initBoard() {
+            const board = document.getElementById('grid-board');
+            board.innerHTML = '';
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.dataset.x = i % 10;
+                cell.dataset.y = Math.floor(i / 10);
+                board.appendChild(cell);
+            }
+        }
+        function render() {
+            document.getElementById('stage-display').innerText = `${state.stage} / 10`;
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('target-cell'));
+            state.targetCells.forEach(p => {
+                const cell = document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`);
+                if (cell) cell.classList.add('target-cell');
+            });
+            const inv = document.getElementById('inventory');
+            inv.innerHTML = '';
+            Object.keys(PIECES).forEach(id => {
+                const isForbidden = (state.mode === 'tight' && (id == 1 || id == 2));
+                const isUsed = state.placedPieces.some(p => p.id == id);
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                if (isForbidden) item.classList.add('forbidden');
+                if (isUsed) item.classList.add('used');
+                item.dataset.id = id;
+                if (!isUsed && !isForbidden && !state.isShowingResult) {
+                    item.onpointerdown = (e) => startDrag(e, id, true);
+                }
+                if (isForbidden) {
+                    const xLabel = document.createElement('div');
+                    xLabel.className = 'forbidden-x'; xLabel.innerText = '✘';
+                    item.appendChild(xLabel);
+                }
+                const preview = createPreview(getTransformedCoords(id, state.inventoryRotation, state.inventoryFlipped), PIECE_COLORS[id]);
+                item.appendChild(preview);
+                inv.appendChild(item);
+            });
+            const container = document.getElementById('blocks-container');
+            container.innerHTML = '';
+            state.placedPieces.forEach((p, idx) => {
+                const blockDiv = createBlockVisual(p.coords, p.color);
+                blockDiv.style.left = (p.gridX * state.cellSize) + 'px';
+                blockDiv.style.top = (p.gridY * state.cellSize) + 'px';
+                blockDiv.style.pointerEvents = 'auto';
+                blockDiv.className += ' absolute cursor-grab';
+                if (!state.isShowingResult) blockDiv.onpointerdown = (e) => startDrag(e, idx, false);
+                container.appendChild(blockDiv);
+            });
+        }
+
+        function createPreview(coords, color) {
+            const s = 6;
+            const maxX = Math.max(...coords.map(p => p[0]));
+            const maxY = Math.max(...coords.map(p => p[1]));
+            const div = document.createElement('div');
+            div.className = 'relative pointer-events-none';
+            div.style.width = ((maxX + 1) * s) + 'px';
+            div.style.height = ((maxY + 1) * s) + 'px';
+            coords.forEach(p => {
+                const part = document.createElement('div');
+                part.className = 'inventory-preview-part';
+                part.style.backgroundColor = color;
+                part.style.left = (p[0] * s) + 'px';
+                part.style.top = (p[1] * s) + 'px';
+                div.appendChild(part);
+            });
+            return div;
+        }
+
+        function createBlockVisual(coords, color) {
+            const div = document.createElement('div');
+            div.className = 'relative pointer-events-none';
+            coords.forEach(p => {
+                const part = document.createElement('div');
+                part.className = 'block-part';
+                part.style.backgroundColor = color;
+                part.style.left = (p[0] * state.cellSize) + 'px';
+                part.style.top = (p[1] * state.cellSize) + 'px';
+                div.appendChild(part);
+            });
+            return div;
+        }
+
+        // --- Interaction ---
+        function startDrag(e, idOrIndex, fromInventory) {
+            if (state.isShowingResult) return;
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            sounds.pick();
+            let pieceData;
+            const gameAreaRect = document.getElementById('game-area').getBoundingClientRect();
+            if (fromInventory) {
+                pieceData = { id: idOrIndex, color: PIECE_COLORS[idOrIndex], rot: state.inventoryRotation, flip: state.inventoryFlipped, coords: getTransformedCoords(idOrIndex, state.inventoryRotation, state.inventoryFlipped) };
+                state.dragOffset = { x: state.cellSize / 2, y: state.cellSize / 2 };
+            } else {
+                pieceData = state.placedPieces[idOrIndex];
+                state.dragOffset = { x: e.clientX - (gameAreaRect.left + pieceData.gridX * state.cellSize), y: e.clientY - (gameAreaRect.top + pieceData.gridY * state.cellSize) };
+                state.placedPieces.splice(idOrIndex, 1);
+            }
+            state.dragging = { ...pieceData };
+            const proxy = document.getElementById('drag-proxy');
+            proxy.innerHTML = ''; proxy.appendChild(createBlockVisual(pieceData.coords, pieceData.color));
+            updateDragPos(e.clientX, e.clientY);
+            render();
+            document.getElementById('drag-proxy').setPointerCapture(e.pointerId);
+        }
+        function updateDragPos(x, y) { if (!state.dragging) return; const proxy = document.getElementById('drag-proxy'); proxy.style.left = (x - state.dragOffset.x) + 'px'; proxy.style.top = (y - state.dragOffset.y) + 'px'; }
+        function handlePointerMove(e) { if (state.dragging) updateDragPos(e.clientX, e.clientY); }
+        function handlePointerUp(e) {
+            if (!state.dragging) return;
+            const gameArea = document.getElementById('game-area');
+            const rect = gameArea.getBoundingClientRect();
+            const gx = Math.round((e.clientX - rect.left - state.dragOffset.x) / state.cellSize), gy = Math.round((e.clientY - rect.top - state.dragOffset.y) / state.cellSize);
+            const abs = state.dragging.coords.map(p => ({x: p[0]+gx, y: p[1]+gy}));
+            const inBounds = abs.every(p => p.x>=0 && p.x<10 && p.y>=0 && p.y<10);
+            if (inBounds && !state.placedPieces.some(pp => pp.coords.some(pc => abs.some(a => a.x === pc[0]+pp.gridX && a.y === pc[1]+pp.gridY)))) {
+                state.placedPieces.push({ ...state.dragging, gridX: gx, gridY: gy });
+                sounds.place();
+            } else { sounds.wrong(); }
+            state.dragging = null; document.getElementById('drag-proxy').innerHTML = ''; render(); checkWin();
+        }
+
+        function checkWin(isGiveUp = false) {
+            const covered = [];
+            state.placedPieces.forEach(pp => pp.coords.forEach(c => covered.push({x: c[0]+pp.gridX, y: c[1]+pp.gridY})));
+            const solved = state.targetCells.length > 0 && state.targetCells.every(tc => covered.some(cc => cc.x===tc.x && cc.y===tc.y)) && covered.every(cc => state.targetCells.some(tc => tc.x===cc.x && tc.y===cc.y));
+            
+            if (solved || isGiveUp) {
+                state.isShowingResult = true;
+                if (isGiveUp) {
+                    state.wasGiveUp = true;
+                    document.getElementById('overlay-emoji').innerText = '💡';
+                    document.getElementById('overlay-title').innerText = 'せいかいは こちら';
+                    document.getElementById('overlay-message').innerText = 'もういちど 同じレベルをやってみよう！';
+                    document.getElementById('next-btn').innerText = 'もういちど ➔';
+                    document.getElementById('next-btn').onclick = () => { document.getElementById('overlay').classList.add('hidden'); startNewLevel(); };
+                    setTimeout(() => document.getElementById('overlay').classList.remove('hidden'), 2200);
+                } else {
+                    state.wasGiveUp = false;
+                    if (state.stage < 10) {
+                        document.getElementById('overlay-emoji').innerText = '✨';
+                        document.getElementById('overlay-title').innerText = 'ぴたっと！';
+                        document.getElementById('overlay-message').innerText = `つぎは ${state.stage + 1}問目だ！`;
+                        document.getElementById('next-btn').innerText = 'つぎへ ➔';
+                        document.getElementById('next-btn').onclick = () => { state.stage++; document.getElementById('overlay').classList.add('hidden'); startNewLevel(); };
+                        sounds.win();
+                        setTimeout(() => document.getElementById('overlay').classList.remove('hidden'), 400);
+                    } else {
+                        clearInterval(state.timerInterval);
+                        const finalTime = Date.now() - state.startTime;
+                        saveScore(state.mode, finalTime);
+                        document.getElementById('overlay-emoji').innerText = '🏆';
+                        document.getElementById('overlay-title').innerText = 'ゴール！！';
+                        document.getElementById('overlay-message').innerText = `10問 クリア！タイムは ${formatTime(finalTime)} です！`;
+                        document.getElementById('next-btn').innerText = 'タイトルへ';
+                        document.getElementById('next-btn').onclick = showTitle;
+                        sounds.win();
+                        setTimeout(() => document.getElementById('overlay').classList.remove('hidden'), 500);
+                    }
+                }
+            }
+        }
+
+        async function playGiveUpAnimation() {
+            if (state.isShowingResult) return;
+            state.isShowingResult = true; state.placedPieces = []; render();
+            for (let i = 0; i < state.correctSolution.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 600)); 
+                sounds.pop(); state.placedPieces.push(JSON.parse(JSON.stringify(state.correctSolution[i]))); render();
+                if (document.getElementById('blocks-container').lastElementChild) document.getElementById('blocks-container').lastElementChild.classList.add('piece-animating');
+            }
+            checkWin(true);
+        }
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
+
+        function startNewLevel() {
+            const boardWidth = Math.min(window.innerWidth - 60, 350);
+            state.cellSize = Math.floor(boardWidth / 10);
+            document.documentElement.style.setProperty('--cell-size', state.cellSize + 'px');
+            generateStage();
+            initBoard();
+            render();
+        }
+
+        window.onload = initAuth;
+    </script>
+</body>
+</html>
