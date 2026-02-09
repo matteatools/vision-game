@@ -266,19 +266,5 @@
         <p>© 2026 Vision Training Games</p>
     </footer>
 
-    <!-- プレビュー用のスクリプト（実際のサイト公開時は削除しても問題ありません） -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.game-card');
-            cards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // リンク先のパスを取得
-                    const target = card.getAttribute('href');
-                    alert(`【プレビュー確認】\n"${target}" へ移動します。\n(実際のご利用時には対象のページへ遷移します)`);
-                });
-            });
-        });
-    </script>
 </body>
 </html>
