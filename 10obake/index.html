@@ -13,17 +13,16 @@
             font-family: 'M PLUS Rounded 1c', sans-serif;
             touch-action: manipulation;
             user-select: none;
+            overflow: hidden;
         }
 
         /* --- 背景デザイン --- */
-        /* 画像がない場合のフォールバック色 */
         .custom-bg {
             background-color: #0f172a;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-        /* 背景画像 (6.jpg) を適用するクラス */
         .bg-image-6 {
             background-image: url('6.jpg');
         }
@@ -41,12 +40,12 @@
             inset: 0;
             background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
             border-radius: 1rem;
-            box-shadow: 0 8px 0 #0f172a, 0 15px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 0 #0f172a, 0 10px 15px rgba(0,0,0,0.4);
         }
 
         .missile-btn {
             position: absolute;
-            inset: 4px 4px 8px 4px;
+            inset: 3px 3px 6px 3px;
             background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
             border-radius: 0.8rem;
             border: 2px solid #cbd5e1;
@@ -56,16 +55,16 @@
             align-items: center;
             justify-content: center;
             box-shadow: 
-                inset 0 2px 0 rgba(255,255,255,0.8),
-                inset 0 -4px 0 rgba(0,0,0,0.1),
-                0 4px 0 #94a3b8;
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 -2px 0 rgba(0,0,0,0.1),
+                0 2px 0 #94a3b8;
         }
 
         .missile-btn:active {
-            transform: translateY(4px);
+            transform: translateY(2px);
             box-shadow: 
-                inset 0 2px 0 rgba(255,255,255,0.4),
-                inset 0 2px 5px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                inset 0 1px 3px rgba(0,0,0,0.2),
                 0 0 0 #94a3b8;
         }
 
@@ -77,12 +76,12 @@
                 #1e293b 10px,
                 #1e293b 20px
             );
-            padding: 4px;
+            padding: 3px;
             border-radius: 1.2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
-        /* --- ネット（網）アニメーション --- */
+        /* --- ネットアニメーション --- */
         @keyframes net-catch-sequence {
             0% { transform: scale(0.5); opacity: 0; }
             20% { transform: scale(1.1) rotate(5deg); opacity: 1; }
@@ -103,7 +102,6 @@
             animation: text-pop 0.3s ease-out forwards;
         }
 
-        /* --- アニメーション定義 --- */
         .card-enter { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -118,154 +116,161 @@
         @keyframes ghost-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } 70% { opacity: 0.9; } 80% { opacity: 0.3; } }
         .fade-enter { opacity: 0; transform: translateY(10px); animation: fadeIn 0.3s forwards; }
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
-<body class="custom-bg min-h-screen flex flex-col items-center justify-center text-slate-800 select-none overflow-hidden">
+<body class="custom-bg min-h-screen flex flex-col items-center justify-center text-slate-800 select-none">
 
     <!-- ゲーム画面 -->
-    <div id="game-screen" class="w-full max-w-md p-4 flex flex-col h-screen max-h-[800px] hidden">
+    <div id="game-screen" class="w-full max-w-2xl px-2 py-2 flex flex-col h-screen hidden">
         
         <!-- ヘッダー -->
-        <div class="flex justify-between items-center mb-6 px-2 relative z-10">
-            <button onclick="quitGame()" class="absolute left-0 top-0 bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-600 transition z-50 border border-slate-500 shadow-md">
+        <div class="flex justify-between items-center px-2 py-1 relative z-10 shrink-0">
+            <button onclick="quitGame()" class="bg-slate-700/80 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-600 transition border border-slate-500 shadow-md">
                 やめる
             </button>
 
-            <div class="w-full flex justify-center gap-8 items-end pt-2">
+            <div class="flex-1 flex justify-center gap-4 sm:gap-10 items-center">
                 <div class="text-center">
-                    <p class="text-sm text-slate-400 font-bold tracking-widest">てんすう</p>
-                    <p id="score-display" class="text-4xl font-black text-yellow-400 font-mono tracking-tighter drop-shadow-md">0000</p>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-widest leading-tight">てんすう</p>
+                    <p id="score-display" class="text-2xl sm:text-3xl font-black text-yellow-400 font-mono tracking-tighter drop-shadow-md">0000</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-sm text-slate-400 font-bold tracking-widest">じかん</p>
-                    <p id="time-display" class="text-4xl font-black text-white font-mono tracking-tighter drop-shadow-md">60</p>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-widest leading-tight">じかん</p>
+                    <p id="time-display" class="text-2xl sm:text-3xl font-black text-white font-mono tracking-tighter drop-shadow-md">60</p>
                 </div>
             </div>
+            <div class="w-12"></div> <!-- バランス用空要素 -->
         </div>
 
         <!-- メインエリア -->
-        <div class="flex-grow flex items-center justify-center relative mb-8">
-            <!-- カード: 背景に6.jpgを使用 -->
-            <div id="card-area" class="custom-bg bg-image-6 w-80 h-80 rounded-3xl shadow-2xl border-[6px] border-slate-700 flex flex-col items-center justify-center relative overflow-hidden card-enter">
-                <!-- 背景画像を少し見やすくするための薄いオーバーレイ -->
+        <div class="flex-grow flex flex-col items-center justify-center relative min-h-0 py-2">
+            <!-- カードエリア: 画面サイズに合わせて自動縮小 -->
+            <div id="card-area" class="custom-bg bg-image-6 w-[min(60vh,85vw)] aspect-square rounded-3xl shadow-2xl border-[4px] sm:border-[6px] border-slate-700 flex flex-col items-center justify-center relative overflow-hidden card-enter shrink-0">
                 <div class="absolute inset-0 bg-white/30 backdrop-blur-[1px]"></div>
-                
                 <div id="card-content" class="w-full h-full relative z-10"></div>
-                
-                <!-- 捕獲ネット（7.pngを使用） -->
+                <!-- 捕獲ネット -->
                 <div id="net-overlay" class="absolute inset-0 pointer-events-none hidden z-20 flex items-center justify-center">
-                    <img src="7.png" class="w-[90%] h-[90%] object-contain drop-shadow-lg opacity-90" alt="網">
+                    <img src="7.png" class="w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90" alt="網">
                 </div>
             </div>
             <!-- フィードバック文字 -->
             <div id="feedback-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none z-30"></div>
         </div>
 
-        <!-- コントロール -->
-        <div class="grid grid-cols-3 gap-4 mb-4 z-10 px-2">
-            <div class="col-span-3 flex justify-center gap-6 mb-2">
-                <div class="hazard-border w-24 h-24">
-                    <div class="missile-btn-container" onclick="handleItemClick('heart')">
-                        <div class="missile-btn-base"></div>
-                        <div class="missile-btn active:scale-95">
-                            <div class="w-14 h-14 pointer-events-none" id="btn-heart"></div>
+        <!-- コントロールエリア -->
+        <div class="w-full max-w-md mx-auto shrink-0 pb-2">
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 px-2">
+                <div class="col-span-3 flex justify-center gap-4 sm:gap-6 mb-1">
+                    <div class="hazard-border w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+                        <div class="missile-btn-container" onclick="handleItemClick('heart')">
+                            <div class="missile-btn-base"></div>
+                            <div class="missile-btn">
+                                <div class="w-[70%] h-[70%] pointer-events-none" id="btn-heart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hazard-border w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+                        <div class="missile-btn-container" onclick="handleItemClick('drop')">
+                            <div class="missile-btn-base"></div>
+                            <div class="missile-btn">
+                                <div class="w-[70%] h-[70%] pointer-events-none" id="btn-drop"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="hazard-border w-24 h-24">
-                    <div class="missile-btn-container" onclick="handleItemClick('drop')">
+                <div class="hazard-border w-full h-16 sm:h-20 md:h-24">
+                    <div class="missile-btn-container" onclick="handleItemClick('clover')">
                         <div class="missile-btn-base"></div>
-                        <div class="missile-btn active:scale-95">
-                            <div class="w-14 h-14 pointer-events-none" id="btn-drop"></div>
+                        <div class="missile-btn">
+                            <div class="w-[70%] h-[70%] pointer-events-none" id="btn-clover"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hazard-border w-full h-16 sm:h-20 md:h-24">
+                    <div class="missile-btn-container" onclick="handleItemClick('star')">
+                        <div class="missile-btn-base"></div>
+                        <div class="missile-btn">
+                            <div class="w-[70%] h-[70%] pointer-events-none" id="btn-star"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hazard-border w-full h-16 sm:h-20 md:h-24">
+                    <div class="missile-btn-container" onclick="handleItemClick('note')">
+                        <div class="missile-btn-base"></div>
+                        <div class="missile-btn">
+                            <div class="w-[70%] h-[70%] pointer-events-none" id="btn-note"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="hazard-border w-full h-24">
-                <div class="missile-btn-container" onclick="handleItemClick('clover')">
-                    <div class="missile-btn-base"></div>
-                    <div class="missile-btn active:scale-95">
-                        <div class="w-14 h-14 pointer-events-none" id="btn-clover"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="hazard-border w-full h-24">
-                <div class="missile-btn-container" onclick="handleItemClick('star')">
-                    <div class="missile-btn-base"></div>
-                    <div class="missile-btn active:scale-95">
-                        <div class="w-14 h-14 pointer-events-none" id="btn-star"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="hazard-border w-full h-24">
-                <div class="missile-btn-container" onclick="handleItemClick('note')">
-                    <div class="missile-btn-base"></div>
-                    <div class="missile-btn active:scale-95">
-                        <div class="w-14 h-14 pointer-events-none" id="btn-note"></div>
-                    </div>
-                </div>
-            </div>
+            <p class="text-center text-[10px] sm:text-xs text-slate-400 font-bold mt-2">せいかいの ボタンを おしてね！</p>
         </div>
-        <p class="text-center text-sm text-slate-400 font-bold mt-2">せいかいの ボタンを おしてね！</p>
     </div>
 
-    <!-- メニュー (背景に6.jpgを使用) -->
-    <div id="menu-screen" class="fixed inset-0 custom-bg bg-image-6 flex flex-col items-center justify-center text-white p-6 z-50">
-        <!-- 背景を暗くするオーバーレイ -->
+    <!-- メニュー画面 -->
+    <div id="menu-screen" class="fixed inset-0 custom-bg bg-image-6 flex flex-col items-center justify-center text-white p-4 z-50 overflow-hidden">
         <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
         
-        <h1 class="text-5xl font-black mb-10 text-center tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] leading-tight relative z-10">
-            <span class="text-yellow-400">げんじゅう</span>を<br>つかまえろ
-        </h1>
-        
-        <div id="step-mode" class="flex flex-col gap-4 w-full max-w-sm items-center fade-enter relative z-10">
-            <p class="text-white font-bold mb-2 text-lg drop-shadow-md">あそびかたを えらんでね</p>
-            <button onclick="selectMode('match')" class="w-full bg-slate-800/90 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-yellow-400 transition text-center group">
-                <div class="text-xl font-black group-hover:text-yellow-400 transition">そのまま つかまえる</div>
-                <div class="text-sm text-slate-400 mt-1">かたちも いろも おなじ げんじゅう</div>
-            </button>
-            <button onclick="selectMode('missing')" class="w-full bg-slate-800/90 text-white p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-blue-400 transition text-center group">
-                <div class="text-xl font-black group-hover:text-blue-400 transition">いないの つかまえる</div>
-                <div class="text-sm text-slate-400 mt-1">かたちと いろも ちがう げんじゅう</div>
-            </button>
-            <button onclick="selectMode('mixed')" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 text-black p-5 rounded-xl shadow-xl hover:brightness-110 active:scale-95 transition text-center border-b-4 border-yellow-800 mt-2">
-                <div class="text-2xl font-black">どっちも つかまえる</div>
-                <div class="text-xs font-bold mt-1 opacity-80">そのまま つかまえる が できないときだけ いないの つかまえる</div>
-            </button>
-        </div>
-
-        <div id="step-time" class="flex flex-col gap-4 w-full max-w-sm items-center hidden fade-enter relative z-10">
-            <p class="text-white font-bold mb-2 text-lg drop-shadow-md">じかんを きめてね</p>
-            <div class="grid grid-cols-1 gap-4 w-full">
-                <button onclick="startGame(30)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">30びょう</button>
-                <button onclick="startGame(60)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">1ぷん</button>
-                <button onclick="startGame(180)" class="bg-slate-800/90 text-white font-black text-xl py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">3ぷん</button>
+        <div class="relative z-10 w-full max-w-sm flex flex-col items-center max-h-full">
+            <h1 class="text-3xl sm:text-5xl font-black mb-6 sm:mb-10 text-center tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] leading-tight shrink-0">
+                <span class="text-yellow-400">げんじゅう</span>を<br>つかまえろ
+            </h1>
+            
+            <div id="step-mode" class="flex flex-col gap-3 w-full items-center fade-enter overflow-y-auto custom-scrollbar px-2 py-2">
+                <p class="text-white font-bold mb-1 text-sm sm:text-lg drop-shadow-md">あそびかたを えらんでね</p>
+                <button onclick="selectMode('match')" class="w-full bg-slate-800/90 text-white p-3 sm:p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-yellow-400 transition text-center group shrink-0">
+                    <div class="text-lg sm:text-xl font-black group-hover:text-yellow-400 transition">そのまま つかまえる</div>
+                    <div class="text-[10px] sm:text-sm text-slate-400 mt-0.5">かたちも いろも おなじ げんじゅう</div>
+                </button>
+                <button onclick="selectMode('missing')" class="w-full bg-slate-800/90 text-white p-3 sm:p-4 rounded-xl border border-slate-600 shadow-lg hover:bg-slate-700 hover:border-blue-400 transition text-center group shrink-0">
+                    <div class="text-lg sm:text-xl font-black group-hover:text-blue-400 transition">いないの つかまえる</div>
+                    <div class="text-[10px] sm:text-sm text-slate-400 mt-0.5">かたちと いろも ちがう げんじゅう</div>
+                </button>
+                <button onclick="selectMode('mixed')" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 text-black p-4 sm:p-5 rounded-xl shadow-xl hover:brightness-110 active:scale-95 transition text-center border-b-4 border-yellow-800 mt-1 shrink-0">
+                    <div class="text-xl sm:text-2xl font-black">どっちも つかまえる</div>
+                    <div class="text-[9px] sm:text-xs font-bold mt-1 opacity-80">いなければ「いないの」をつかまえる</div>
+                </button>
             </div>
-            <button onclick="backToMode()" class="mt-6 text-slate-300 hover:text-white underline text-base font-bold drop-shadow-md">まえに もどる</button>
+
+            <div id="step-time" class="flex flex-col gap-3 w-full items-center hidden fade-enter overflow-y-auto custom-scrollbar px-2 py-2">
+                <p class="text-white font-bold mb-2 text-sm sm:text-lg drop-shadow-md">じかんを きめてね</p>
+                <div class="grid grid-cols-1 gap-3 w-full">
+                    <button onclick="startGame(30)" class="bg-slate-800/90 text-white font-black text-lg sm:text-xl py-3 sm:py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">30びょう</button>
+                    <button onclick="startGame(60)" class="bg-slate-800/90 text-white font-black text-lg sm:text-xl py-3 sm:py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">1ぷん</button>
+                    <button onclick="startGame(180)" class="bg-slate-800/90 text-white font-black text-lg sm:text-xl py-3 sm:py-4 rounded-xl border border-slate-600 shadow hover:bg-slate-700 hover:border-green-400 transition">3ぷん</button>
+                </div>
+                <button onclick="backToMode()" class="mt-4 text-slate-300 hover:text-white underline text-sm sm:text-base font-bold drop-shadow-md">まえに もどる</button>
+            </div>
         </div>
     </div>
 
-    <!-- 結果 -->
-    <div id="result-screen" class="fixed inset-0 bg-slate-900/95 flex flex-col items-center justify-center text-white p-6 z-50 hidden">
-        <h2 class="text-5xl font-black mb-6 text-red-500 tracking-widest drop-shadow-lg">おわり！</h2>
-        <div class="text-center mb-10 bg-slate-800 p-8 rounded-2xl border-2 border-slate-600">
-            <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">あなたの てんすう</p>
-            <p id="final-score" class="text-8xl font-black text-yellow-400 font-mono">0000</p>
+    <!-- 結果画面 -->
+    <div id="result-screen" class="fixed inset-0 bg-slate-900/95 flex flex-col items-center justify-center text-white p-6 z-50 hidden overflow-y-auto custom-scrollbar">
+        <h2 class="text-4xl sm:text-5xl font-black mb-6 text-red-500 tracking-widest drop-shadow-lg">おわり！</h2>
+        <div class="text-center mb-8 bg-slate-800 p-6 sm:p-8 rounded-2xl border-2 border-slate-600 w-full max-w-xs">
+            <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2">あなたの てんすう</p>
+            <p id="final-score" class="text-6xl sm:text-8xl font-black text-yellow-400 font-mono leading-none">0000</p>
         </div>
-        <button onclick="showMenu()" class="bg-indigo-600 text-white font-bold text-xl py-4 px-12 rounded-full hover:bg-indigo-500 transition shadow-lg border-b-4 border-indigo-800 active:translate-y-1 active:border-b-0">タイトルに もどる</button>
+        <button onclick="showMenu()" class="bg-indigo-600 text-white font-bold text-lg sm:text-xl py-4 px-10 sm:px-12 rounded-full hover:bg-indigo-500 transition shadow-lg border-b-4 border-indigo-800 active:translate-y-1 active:border-b-0">タイトルに もどる</button>
     </div>
 
     <script>
-        // --- サウンド管理 ---
         class SoundController {
             constructor() { this.ctx = null; this.gainNode = null; }
             init() {
                 if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    this.gainNode = this.ctx.createGain();
-                    this.gainNode.connect(this.ctx.destination);
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) {
+                        this.ctx = new AudioContextClass();
+                        this.gainNode = this.ctx.createGain();
+                        this.gainNode.connect(this.ctx.destination);
+                    }
                 }
-                if (this.ctx.state === 'suspended') this.ctx.resume();
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
             }
             playTone(freq, type, duration, startTime = 0, vol = 0.1) {
                 if (!this.ctx) return;
@@ -275,375 +280,197 @@
                 osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
                 gain.gain.setValueAtTime(vol, this.ctx.currentTime + startTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start(this.ctx.currentTime + startTime);
-                osc.stop(this.ctx.currentTime + startTime + duration);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(this.ctx.currentTime + startTime); osc.stop(this.ctx.currentTime + startTime + duration);
             }
             playClick() { this.init(); this.playTone(800, 'sine', 0.1, 0, 0.1); }
             playShoot() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                this.init(); if (!this.ctx) return;
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'square'; osc.frequency.setValueAtTime(800, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.15);
             }
-            playCorrect() {
-                this.init();
-                this.playTone(880, 'sine', 0.3, 0, 0.1); 
-                this.playTone(1108, 'sine', 0.3, 0.05, 0.1); 
-                this.playTone(1318, 'sine', 0.4, 0.1, 0.1); 
-                this.playTone(1760, 'sine', 0.5, 0.15, 0.1); 
-            }
+            playCorrect() { this.init(); this.playTone(880, 'sine', 0.3, 0, 0.1); this.playTone(1318, 'sine', 0.4, 0.1, 0.1); }
             playWrong() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                this.init(); if (!this.ctx) return;
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, this.ctx.currentTime);
                 osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.3);
             }
-            playTimeUp() {
-                this.init();
-                this.playTone(1500, 'square', 0.8, 0, 0.2);
-            }
+            playTimeUp() { this.init(); this.playTone(1500, 'square', 0.8, 0, 0.2); }
         }
         const sound = new SoundController();
 
-        // --- データ（画像を使用）---
-        // 画像はシルエットとして使うため、mask-imageで色を付けます
         const ITEMS = [
             { id: 'heart',  color: '#ef4444', image: '1.png' },     
             { id: 'drop',   color: '#3b82f6', image: '2.png' },     
-            { id: 'note',   color: '#a855f7', image: '5.png' }, // noteは5.png      
-            { id: 'star',   color: '#eab308', image: '4.png' }, // starは4.png        
-            { id: 'clover', color: '#22c55e', image: '3.png' }  // cloverは3.png
+            { id: 'note',   color: '#a855f7', image: '5.png' },      
+            { id: 'star',   color: '#eab308', image: '4.png' },        
+            { id: 'clover', color: '#22c55e', image: '3.png' }  
         ];
 
-        let state = {
-            score: 0,
-            timeLeft: 60,
-            isPlaying: false,
-            currentAnswer: null,
-            timerInterval: null,
-            currentMode: 'mixed',
-            ghostTimers: []
-        };
+        let state = { score: 0, timeLeft: 60, isPlaying: false, currentAnswer: null, timerInterval: null, currentMode: 'mixed', ghostTimers: [] };
 
         function initButtons() {
             ITEMS.forEach(item => {
                 const container = document.getElementById(`btn-${item.id}`);
-                container.innerHTML = createImageItem(item.image, item.color);
+                if (container) container.innerHTML = createImageItem(item.image, item.color);
             });
         }
 
-        // 画像アイテム生成関数 (Mask Imageを使用)
         function createImageItem(imageFile, color) {
-            return `
-            <div style="
-                width: 100%;
-                height: 100%;
-                background-color: ${color};
-                -webkit-mask-image: url('${imageFile}');
-                mask-image: url('${imageFile}');
-                -webkit-mask-size: contain;
-                mask-size: contain;
-                -webkit-mask-repeat: no-repeat;
-                mask-repeat: no-repeat;
-                -webkit-mask-position: center;
-                mask-position: center;
-            "></div>
-            `;
+            return `<div style="width: 100%; height: 100%; background-color: ${color}; -webkit-mask-image: url('${imageFile}'); mask-image: url('${imageFile}'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;"></div>`;
         }
 
         function selectMode(mode) {
-            sound.playClick();
-            state.currentMode = mode;
+            sound.playClick(); state.currentMode = mode;
             document.getElementById('step-mode').classList.add('hidden');
             const timeStep = document.getElementById('step-time');
-            timeStep.classList.remove('hidden');
-            timeStep.classList.remove('fade-enter');
-            void timeStep.offsetWidth;
-            timeStep.classList.add('fade-enter');
+            timeStep.classList.remove('hidden'); timeStep.classList.remove('fade-enter');
+            void timeStep.offsetWidth; timeStep.classList.add('fade-enter');
         }
 
         function backToMode() {
             sound.playClick();
             document.getElementById('step-time').classList.add('hidden');
             const modeStep = document.getElementById('step-mode');
-            modeStep.classList.remove('hidden');
-            modeStep.classList.remove('fade-enter');
-            void modeStep.offsetWidth;
-            modeStep.classList.add('fade-enter');
+            modeStep.classList.remove('hidden'); modeStep.classList.remove('fade-enter');
+            void modeStep.offsetWidth; modeStep.classList.add('fade-enter');
         }
 
         function startGame(duration) {
-            sound.playClick();
-            state.timeLeft = duration;
+            sound.playClick(); state.timeLeft = duration;
             document.getElementById('menu-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            
             initButtons();
-            
-            state.score = 0;
-            state.isPlaying = true;
+            state.score = 0; state.isPlaying = true;
             updateUI();
-
             if (state.timerInterval) clearInterval(state.timerInterval);
-            state.ghostTimers.forEach(t => clearTimeout(t));
-            state.ghostTimers = [];
-
+            state.ghostTimers.forEach(t => clearTimeout(t)); state.ghostTimers = [];
             state.timerInterval = setInterval(() => {
-                state.timeLeft--;
-                updateUI();
+                state.timeLeft--; updateUI();
                 if (state.timeLeft <= 0) endGame();
             }, 1000);
-
             generateNextCard();
         }
 
         function endGame() {
-            sound.playTimeUp();
-            clearInterval(state.timerInterval);
-            state.ghostTimers.forEach(t => clearTimeout(t));
-            state.isPlaying = false;
+            sound.playTimeUp(); clearInterval(state.timerInterval);
+            state.ghostTimers.forEach(t => clearTimeout(t)); state.isPlaying = false;
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('final-score').textContent = String(state.score).padStart(4, '0');
         }
 
-        function quitGame() {
-            sound.playClick();
-            clearInterval(state.timerInterval);
-            state.ghostTimers.forEach(t => clearTimeout(t));
-            state.isPlaying = false;
-            showMenu();
-        }
-
-        function showMenu() {
-            sound.playClick();
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('menu-screen').classList.remove('hidden');
-            backToMode();
-        }
+        function quitGame() { sound.playClick(); clearInterval(state.timerInterval); state.ghostTimers.forEach(t => clearTimeout(t)); state.isPlaying = false; showMenu(); }
+        function showMenu() { document.getElementById('game-screen').classList.add('hidden'); document.getElementById('result-screen').classList.add('hidden'); document.getElementById('menu-screen').classList.remove('hidden'); backToMode(); }
 
         function updateUI() {
             document.getElementById('score-display').textContent = String(state.score).padStart(4, '0');
             const timeEl = document.getElementById('time-display');
             timeEl.textContent = state.timeLeft;
-            if (state.timeLeft <= 10) timeEl.classList.add('text-red-500');
-            else timeEl.classList.remove('text-red-500');
+            if (state.timeLeft <= 10) timeEl.classList.add('text-red-500'); else timeEl.classList.remove('text-red-500');
         }
 
         function generateNextCard() {
-            state.ghostTimers.forEach(t => clearTimeout(t));
-            state.ghostTimers = [];
-            
+            state.ghostTimers.forEach(t => clearTimeout(t)); state.ghostTimers = [];
             const net = document.getElementById('net-overlay');
-            net.classList.add('hidden');
-            net.classList.remove('net-anim');
-
+            net.classList.add('hidden'); net.classList.remove('net-anim');
             for (let i = 0; i < 100; i++) {
                 const cardData = createCardData();
                 if (validateCard(cardData.obj1, cardData.obj2, cardData.correctId)) {
                     state.currentAnswer = cardData.correctId;
-                    
                     const cardArea = document.getElementById('card-area');
-                    cardArea.classList.remove('card-enter');
-                    void cardArea.offsetWidth;
-                    cardArea.classList.add('card-enter');
-                    
-                    renderCard(cardData.obj1, cardData.obj2);
-                    return;
+                    cardArea.classList.remove('card-enter'); void cardArea.offsetWidth; cardArea.classList.add('card-enter');
+                    renderCard(cardData.obj1, cardData.obj2); return;
                 }
             }
-            const fallback = createCardData();
-            state.currentAnswer = fallback.correctId;
-            renderCard(fallback.obj1, fallback.obj2);
+            generateNextCard(); // フォールバック
         }
 
         function createCardData() {
             const correctItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
             const correctId = correctItem.id;
-            let isMatchRule;
-            if (state.currentMode === 'match') isMatchRule = true;
-            else if (state.currentMode === 'missing') isMatchRule = false;
-            else isMatchRule = Math.random() < 0.2;
-
+            let isMatchRule = state.currentMode === 'match' ? true : (state.currentMode === 'missing' ? false : Math.random() < 0.2);
             let obj1, obj2; 
             if (isMatchRule) {
-                const shape1 = correctItem.id;
-                const color1 = correctItem.id; 
-                let distractor;
-                while (true) {
-                    const r = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-                    if (r.id !== correctItem.id) { distractor = r; break; }
-                }
-                let distractorColor;
-                while (true) {
-                    const r = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-                    if (r.id !== distractor.id && r.id !== correctItem.id) { distractorColor = r; break; }
-                }
-                obj1 = { shapeId: shape1, colorId: color1 };
-                obj2 = { shapeId: distractor.id, colorId: distractorColor.id };
+                obj1 = { shapeId: correctItem.id, colorId: correctItem.id };
+                let d1 = ITEMS.find(i => i.id !== correctItem.id);
+                let d2 = ITEMS.find(i => i.id !== d1.id && i.id !== correctItem.id);
+                obj2 = { shapeId: d1.id, colorId: d2.id };
             } else {
-                const distractors = ITEMS.filter(i => i.id !== correctItem.id);
-                distractors.sort(() => Math.random() - 0.5);
-                obj1 = { shapeId: distractors[0].id, colorId: distractors[2].id };
-                obj2 = { shapeId: distractors[1].id, colorId: distractors[3].id };
+                const ds = ITEMS.filter(i => i.id !== correctItem.id).sort(() => Math.random() - 0.5);
+                obj1 = { shapeId: ds[0].id, colorId: ds[2].id }; obj2 = { shapeId: ds[1].id, colorId: ds[3].id };
             }
             if (Math.random() > 0.5) [obj1, obj2] = [obj2, obj1];
             return { obj1, obj2, correctId };
         }
 
-        function validateCard(obj1, obj2, intendedCorrectId) {
-            let matchItem = null;
-            if (obj1.shapeId === obj1.colorId) matchItem = obj1.shapeId;
-            if (obj2.shapeId === obj2.colorId) {
-                if (matchItem && matchItem !== obj2.shapeId) return false;
-                matchItem = obj2.shapeId;
-            }
-            if (matchItem) return matchItem === intendedCorrectId;
-            const shownShapes = [obj1.shapeId, obj2.shapeId];
-            const shownColors = [obj1.colorId, obj2.colorId];
-            const candidates = ITEMS.filter(item => !shownShapes.includes(item.id) && !shownColors.includes(item.id));
-            return candidates.length === 1 && candidates[0].id === intendedCorrectId;
+        function validateCard(o1, o2, tid) {
+            let m = null;
+            if (o1.shapeId === o1.colorId) m = o1.shapeId;
+            if (o2.shapeId === o2.colorId) { if (m && m !== o2.shapeId) return false; m = o2.shapeId; }
+            if (m) return m === tid;
+            const ss = [o1.shapeId, o2.shapeId], cs = [o1.colorId, o2.colorId];
+            const cans = ITEMS.filter(item => !ss.includes(item.id) && !cs.includes(item.id));
+            return cans.length === 1 && cans[0].id === tid;
         }
 
-        function renderCard(obj1, obj2) {
-            const container = document.getElementById('card-content');
-            container.innerHTML = '';
-            let pos1 = getRandomSafePosition();
-            let pos2;
-            for(let i=0; i<50; i++) {
-                pos2 = getRandomSafePosition();
-                const dist = Math.hypot(pos1.x - pos2.x, pos1.y - pos2.y);
-                if (dist > 35) break; 
-            }
-            const el1 = createCardItemElement(obj1, pos1.x, pos1.y);
-            const el2 = createCardItemElement(obj2, pos2.x, pos2.y);
-            container.appendChild(el1);
-            container.appendChild(el2);
-            startGhostMovement(el1, pos1);
-            startGhostMovement(el2, pos2);
+        function renderCard(o1, o2) {
+            const container = document.getElementById('card-content'); container.innerHTML = '';
+            let p1 = getRandomSafePos(), p2;
+            for(let i=0; i<50; i++) { p2 = getRandomSafePos(); if (Math.hypot(p1.x - p2.x, p1.y - p2.y) > 30) break; }
+            const el1 = createCardItem(o1, p1.x, p1.y), el2 = createCardItem(o2, p2.x, p2.y);
+            container.appendChild(el1); container.appendChild(el2);
+            startGhostMovement(el1, p1); startGhostMovement(el2, p2);
         }
 
-        function getRandomSafePosition() {
-            return { x: Math.random() * 60 + 5, y: Math.random() * 60 + 5 };
-        }
+        function getRandomSafePos() { return { x: Math.random() * 60 + 5, y: Math.random() * 60 + 5 }; }
 
-        function createCardItemElement(obj, x, y) {
+        function createCardItem(obj, x, y) {
             const wrapper = document.createElement('div');
-            const shapeItem = ITEMS.find(i => i.id === obj.shapeId);
-            const colorItem = ITEMS.find(i => i.id === obj.colorId);
-            
-            const size = Math.floor(Math.random() * 20) + 90; 
-            wrapper.classList.add('ghost-mover');
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = x + '%';
-            wrapper.style.top = y + '%';
-            wrapper.style.width = size + 'px';
-            wrapper.style.height = size + 'px';
-            
-            const idleDiv = document.createElement('div');
-            idleDiv.style.width = '100%';
-            idleDiv.style.height = '100%';
-            const idleType = Math.floor(Math.random() * 2) + 1;
-            idleDiv.classList.add(`ghost-idle-${idleType}`);
-
-            const fadeDiv = document.createElement('div');
-            fadeDiv.style.width = '100%';
-            fadeDiv.style.height = '100%';
-            fadeDiv.classList.add('ghost-fade');
-            
-            fadeDiv.innerHTML = createImageItem(shapeItem.image, colorItem.color);
-            idleDiv.appendChild(fadeDiv);
-            wrapper.appendChild(idleDiv);
-            return wrapper;
+            const shapeItem = ITEMS.find(i => i.id === obj.shapeId), colorItem = ITEMS.find(i => i.id === obj.colorId);
+            const size = Math.floor(Math.random() * 20) + 70; // 少し小さめに
+            wrapper.classList.add('ghost-mover'); wrapper.style.position = 'absolute';
+            wrapper.style.left = x + '%'; wrapper.style.top = y + '%'; wrapper.style.width = size + 'px'; wrapper.style.height = size + 'px';
+            const idle = document.createElement('div'); idle.classList.add(`ghost-idle-${Math.floor(Math.random()*2)+1}`);
+            idle.style.width = '100%'; idle.style.height = '100%';
+            const fade = document.createElement('div'); fade.classList.add('ghost-fade');
+            fade.style.width = '100%'; fade.style.height = '100%';
+            fade.innerHTML = createImageItem(shapeItem.image, colorItem.color);
+            idle.appendChild(fade); wrapper.appendChild(idle); return wrapper;
         }
 
-        function startGhostMovement(element, currentPos) {
+        function startGhostMovement(el, cur) {
             if (!state.isPlaying) return;
-            const duration = Math.random() * 1000 + 1500;
-            const nextPos = calculateNextPosition(currentPos);
-            element.style.transition = `top ${duration}ms ease-in-out, left ${duration}ms ease-in-out`;
-            element.style.left = nextPos.x + '%';
-            element.style.top = nextPos.y + '%';
-            const timerId = setTimeout(() => { startGhostMovement(element, nextPos); }, duration);
-            state.ghostTimers.push(timerId);
+            const dur = Math.random() * 1000 + 1500; const nxt = { x: Math.max(0, Math.min(70, cur.x + (Math.random()-0.5)*40)), y: Math.max(0, Math.min(70, cur.y + (Math.random()-0.5)*40)) };
+            el.style.transition = `top ${dur}ms ease-in-out, left ${dur}ms ease-in-out`;
+            el.style.left = nxt.x + '%'; el.style.top = nxt.y + '%';
+            state.ghostTimers.push(setTimeout(() => startGhostMovement(el, nxt), dur));
         }
 
-        function calculateNextPosition(current) {
-            let moveX = (Math.random() - 0.5) * 60;
-            let moveY = (Math.random() - 0.5) * 60;
-            if (Math.random() < 0.3) { moveX *= -0.4; moveY *= -0.4; }
-            let nextX = current.x + moveX;
-            let nextY = current.y + moveY;
-            if (nextX < 0 || nextX > 70) nextX = Math.random() * 40 + 15;
-            if (nextY < 0 || nextY > 70) nextY = Math.random() * 40 + 15;
-            return { x: nextX, y: nextY };
-        }
-
-        function handleItemClick(itemId) {
-            if (!state.isPlaying) return;
-            sound.playShoot();
-            if (itemId === state.currentAnswer) handleCorrect();
-            else handleWrong();
-        }
+        function handleItemClick(itemId) { if (!state.isPlaying) return; sound.playShoot(); if (itemId === state.currentAnswer) handleCorrect(); else handleWrong(); }
 
         function handleCorrect() {
-            state.score += 100;
-            updateUI();
-            sound.playCorrect();
-            
-            const net = document.getElementById('net-overlay');
-            net.classList.remove('hidden');
-            net.classList.remove('net-anim');
-            void net.offsetWidth;
-            net.classList.add('net-anim');
-
+            state.score += 100; updateUI(); sound.playCorrect();
+            const net = document.getElementById('net-overlay'); net.classList.remove('hidden', 'net-anim'); void net.offsetWidth; net.classList.add('net-anim');
             const overlay = document.getElementById('feedback-overlay');
-            overlay.innerHTML = '<div class="text-4xl font-black text-yellow-400 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] text-anim" style="-webkit-text-stroke: 1px #000;">つかまえた！</div>';
-
-            setTimeout(() => {
-                overlay.innerHTML = ''; 
-                net.classList.add('hidden'); 
-                generateNextCard();
-            }, 800);
+            overlay.innerHTML = '<div class="text-3xl sm:text-4xl font-black text-yellow-400 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] text-anim">つかまえた！</div>';
+            setTimeout(() => { overlay.innerHTML = ''; net.classList.add('hidden'); generateNextCard(); }, 800);
         }
 
         function handleWrong() {
-            state.score = Math.max(0, state.score - 50);
-            updateUI();
-            sound.playWrong();
-            
-            const card = document.getElementById('card-area');
-            card.classList.remove('shake');
-            void card.offsetWidth;
-            card.classList.add('shake');
-
+            state.score = Math.max(0, state.score - 50); updateUI(); sound.playWrong();
+            const card = document.getElementById('card-area'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
             const overlay = document.getElementById('feedback-overlay');
-            overlay.innerHTML = '<div class="text-4xl font-black text-red-500 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] text-anim" style="-webkit-text-stroke: 1px #000;">ちがうよ</div>';
-            
-            setTimeout(() => {
-                overlay.innerHTML = '';
-            }, 800);
+            overlay.innerHTML = '<div class="text-3xl sm:text-4xl font-black text-red-500 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] text-anim">ちがうよ</div>';
+            setTimeout(() => overlay.innerHTML = '', 800);
         }
     </script>
 </body>
