@@ -10,12 +10,22 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 環境変数からFirebase設定を取得
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pita-puzzle-speedrun';
+        // Firebaseの初期化（環境変数がない場合でもエラーにならないように保護）
+        let db = null;
+        let auth = null;
+        let appId = 'pita-puzzle-local';
+
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'pita-puzzle-speedrun';
+            }
+        } catch (e) {
+            console.log("Firebase is skipping initialization (Local Mode)");
+        }
 
         window.firebaseUtils = { auth, db, appId, setDoc, getDoc, doc };
     </script>
@@ -27,7 +37,6 @@
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: #FFF9E5;
-            /* パズルピースを敷き詰めた背景パターン */
             background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FFB347' fill-opacity='0.08'%3E%3Cpath d='M10 10h10v10h-10zM20 10h10v10h-10zM10 20h10v10h-10zM40 40h10v10h-10zM50 40h10v10h-10zM40 50h10v10h-10zM50 50h10v10h-10zM60 10h10v30h-10zM10 60h30v10h-30z'/%3E%3C/g%3E%3C/svg%3E");
             overflow: hidden;
             touch-action: none;
@@ -50,7 +59,7 @@
             border: 8px solid #FFD93D;
             box-shadow: 0 10px 0 #FFB347, 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
-            margin-top: 8vh;
+            margin-top: 5vh;
         }
 
         #game-area {
@@ -206,16 +215,18 @@
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(freq, type, duration, volume = 0.1) {
             if (audioCtx.state === 'suspended') return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
         }
 
         const sounds = {
@@ -267,22 +278,33 @@
         };
 
         // --- Firebase ---
-        async function initAuth() {
-            const { auth, db, appId, getDoc, doc } = window.firebaseUtils;
+        async function setupGame() {
+            const utils = window.firebaseUtils;
             try {
-                await signInAnonymously(auth);
-                onAuthStateChanged(auth, async (u) => {
-                    state.user = u;
-                    if (u) loadHighScores();
-                });
+                if (utils.auth) {
+                    await signInAnonymously(utils.auth);
+                    onAuthStateChanged(utils.auth, (u) => {
+                        state.user = u;
+                        if (u) loadHighScores();
+                    });
+                }
             } catch(e) {}
             
-            // UIイベントの設定
-            document.getElementById('rotate-all-btn').onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryRotation = (state.inventoryRotation + 1) % 4; render(); }};
-            document.getElementById('flip-all-btn').onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryFlipped = !state.inventoryFlipped; render(); }};
-            document.getElementById('giveup-btn').onclick = () => playGiveUpAnimation();
-            document.getElementById('reset-btn').onclick = () => { if(!state.isShowingResult){ sounds.wrong(); state.placedPieces = []; render(); }};
-            document.getElementById('hint-btn').onclick = () => { 
+            // 全てのボタンにイベントを繋ぐ（DOMが用意されてから）
+            const btnRotate = document.getElementById('rotate-all-btn');
+            if(btnRotate) btnRotate.onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryRotation = (state.inventoryRotation + 1) % 4; render(); }};
+            
+            const btnFlip = document.getElementById('flip-all-btn');
+            if(btnFlip) btnFlip.onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryFlipped = !state.inventoryFlipped; render(); }};
+            
+            const btnGiveup = document.getElementById('giveup-btn');
+            if(btnGiveup) btnGiveup.onclick = () => playGiveUpAnimation();
+            
+            const btnReset = document.getElementById('reset-btn');
+            if(btnReset) btnReset.onclick = () => { if(!state.isShowingResult){ sounds.wrong(); state.placedPieces = []; render(); }};
+            
+            const btnHint = document.getElementById('hint-btn');
+            if(btnHint) btnHint.onclick = () => { 
                 if (state.isShowingResult) return;
                 sounds.pop();
                 state.correctSolution.forEach(s => {
@@ -293,31 +315,45 @@
                     }
                 });
             };
+
+            // サイズ調整と初期化
+            updateCellSize();
+            initBoard();
+        }
+
+        function updateCellSize() {
+            const boardWidth = Math.min(window.innerWidth - 60, 350);
+            state.cellSize = Math.floor(boardWidth / 10);
+            document.documentElement.style.setProperty('--cell-size', state.cellSize + 'px');
         }
 
         async function loadHighScores() {
             const { db, appId, getDoc, doc } = window.firebaseUtils;
-            if (!state.user) return;
-            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
-            const snap = await getDoc(docRef);
-            if (snap.exists()) {
-                const data = snap.data();
-                if (data.loose) document.getElementById('best-loose').innerText = formatTime(data.loose);
-                if (data.tight) document.getElementById('best-tight').innerText = formatTime(data.tight);
-            }
+            if (!state.user || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.loose) document.getElementById('best-loose').innerText = formatTime(data.loose);
+                    if (data.tight) document.getElementById('best-tight').innerText = formatTime(data.tight);
+                }
+            } catch(e){}
         }
 
         async function saveScore(mode, time) {
             const { db, appId, getDoc, setDoc, doc } = window.firebaseUtils;
-            if (!state.user) return;
-            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
-            const snap = await getDoc(docRef);
-            let current = snap.exists() ? snap.data() : {};
-            if (!current[mode] || time < current[mode]) {
-                current[mode] = time;
-                await setDoc(docRef, current);
-                loadHighScores();
-            }
+            if (!state.user || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+                const snap = await getDoc(docRef);
+                let current = snap.exists() ? snap.data() : {};
+                if (!current[mode] || time < current[mode]) {
+                    current[mode] = time;
+                    await setDoc(docRef, current);
+                    loadHighScores();
+                }
+            } catch(e){}
         }
 
         // --- Transformations ---
@@ -349,12 +385,12 @@
 
             if (state.mode === 'loose') {
                 mandatorySmall = [1, 2];
-                if (state.stage <= 3) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                else if (state.stage <= 7) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-                else pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+                if (state.stage <= 3) pool = [1, 2, 3, 4, 5, 6, 7];
+                else if (state.stage <= 7) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                else pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
             } else {
-                if (state.stage <= 3) pool = [3, 4, 5, 6, 7, 8, 9];
-                else if (state.stage <= 7) pool = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+                if (state.stage <= 3) pool = [3, 4, 5, 6, 7, 8];
+                else if (state.stage <= 7) pool = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
                 else pool = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
             }
 
@@ -411,8 +447,7 @@
 
                 if(bestPlacements.length > 0) {
                     bestPlacements.sort((a,b) => b.adj - a.adj);
-                    const topN = Math.min(3, bestPlacements.length);
-                    const chosen = bestPlacements[Math.floor(Math.random() * topN)];
+                    const chosen = bestPlacements[Math.floor(Math.random() * Math.min(3, bestPlacements.length))];
                     chosen.abs.forEach(a => currentPoints.push(a));
                     solutionData.push({ id: selectedIds[i], rot: chosen.rot, flip: chosen.flip, x: chosen.ox, y: chosen.oy });
                 }
@@ -475,6 +510,7 @@
                 board.appendChild(cell);
             }
         }
+
         function render() {
             document.getElementById('stage-display').innerText = `${state.stage} / 10`;
             document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('target-cell'));
@@ -644,15 +680,18 @@
         window.addEventListener('pointerup', handlePointerUp);
 
         function startNewLevel() {
-            const boardWidth = Math.min(window.innerWidth - 60, 350);
-            state.cellSize = Math.floor(boardWidth / 10);
-            document.documentElement.style.setProperty('--cell-size', state.cellSize + 'px');
+            updateCellSize();
             generateStage();
             initBoard();
             render();
         }
 
-        window.onload = initAuth;
+        window.addEventListener('resize', () => {
+            updateCellSize();
+            render();
+        });
+
+        window.onload = setupGame;
     </script>
 </body>
 </html>
