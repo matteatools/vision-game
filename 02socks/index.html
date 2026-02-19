@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,7 +14,7 @@
             overflow: hidden;
             touch-action: none;
         }
-        
+
         .screen {
             position: absolute;
             inset: 0;
@@ -27,6 +28,7 @@
             background-size: cover;
             background-position: center;
         }
+
         .screen.hidden {
             display: none;
             opacity: 0;
@@ -38,6 +40,7 @@
             background-image: url('4.jpg');
             background-color: #fff7ed;
         }
+
         #start-screen::before {
             content: '';
             position: absolute;
@@ -46,7 +49,8 @@
             backdrop-filter: blur(2px);
             z-index: -1;
         }
-        #start-screen > * {
+
+        #start-screen>* {
             z-index: 10;
         }
 
@@ -60,10 +64,13 @@
 
         /* ゲームボードの下地: 無地（温かみのある色） */
         #game-board-container {
-            background-color: #fffbeb; /* amber-50 アイボリー系 */
+            background-color: #fffbeb;
+            /* amber-50 アイボリー系 */
             opacity: 1;
-            box-shadow: inset 0 0 30px rgba(180, 83, 9, 0.1); /* 内側に少し影 */
-            border: 4px solid #fdba74; /* オレンジ色の枠 */
+            box-shadow: inset 0 0 30px rgba(180, 83, 9, 0.1);
+            /* 内側に少し影 */
+            border: 4px solid #fdba74;
+            /* オレンジ色の枠 */
         }
 
         .sock-card {
@@ -73,70 +80,252 @@
             cursor: grab;
             will-change: transform, left, top;
             transition: transform 0.4s ease-out, left 0.4s ease-out, top 0.4s ease-out, opacity 0.3s;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.15));
             -webkit-tap-highlight-color: transparent;
             touch-action: none;
             z-index: 1;
             transform-origin: center center;
         }
 
-        .sock-card:active { cursor: grabbing; transition: none; }
-        .sock-card:hover { filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.25)); transform: scale(1.05); z-index: 50; }
-        .sock-card.selected { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) brightness(1.1); z-index: 999 !important; }
-        .sock-card.matched { opacity: 0; pointer-events: none; transform: scale(1.5) rotate(180deg) !important; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .sock-card.flying-in { transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100 !important; }
-        .sock-card.scattered { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
+        .sock-card:active {
+            cursor: grabbing;
+            transition: none;
+        }
 
-        @keyframes dropIn { 0% { transform: scale(3) translateY(-100px); opacity: 0; } 100% { opacity: 1; } }
-        .animate-drop { animation: dropIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        
-        #sound-toggle { transition: all 0.2s; }
-        #sound-toggle.muted { opacity: 0.5; text-decoration: line-through; }
+        .sock-card:hover {
+            filter: drop-shadow(4px 8px 12px rgba(0, 0, 0, 0.25));
+            transform: scale(1.05);
+            z-index: 50;
+        }
+
+        .sock-card.selected {
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.7)) brightness(1.1);
+            z-index: 999 !important;
+        }
+
+        .sock-card.matched {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.5) rotate(180deg) !important;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .sock-card.flying-in {
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100 !important;
+        }
+
+        .sock-card.scattered {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+
+        @keyframes dropIn {
+            0% {
+                transform: scale(3) translateY(-100px);
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .animate-drop {
+            animation: dropIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        #sound-toggle {
+            transition: all 0.2s;
+        }
+
+        #sound-toggle.muted {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
 
         /* 猫: 2.0秒 */
-        #cat-agent { will-change: transform, left; transition: left 2.0s linear; }
+        #cat-agent {
+            will-change: transform, left;
+            transition: left 2.0s linear;
+        }
+
         /* 赤ちゃん: 下からポコッと */
-        #baby-agent { will-change: transform, bottom; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #baby-agent {
+            will-change: transform, bottom;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
         /* シンプルな縦並びボタン */
         .simple-btn {
-            @apply w-full text-center px-4 py-4 mb-3 bg-white border-2 rounded-xl shadow-sm transition-all duration-100 font-bold text-lg text-slate-700 relative top-0;
-            border-bottom-width: 5px;
+            @apply w-full text-center px-4 py-5 mb-4 bg-white border-2 rounded-xl shadow-sm transition-all duration-100 font-bold text-2xl text-slate-700 relative top-0;
+            border-bottom-width: 6px;
         }
+
         .simple-btn:active {
             @apply shadow-none border-b-2 translate-y-1;
         }
 
         /* 色のバリエーション */
-        .btn-lv1 { @apply border-blue-400 text-blue-700 hover:bg-blue-50; }
-        .btn-lv2 { @apply border-orange-400 text-orange-700 hover:bg-orange-50; }
-        .btn-lv3 { @apply border-pink-400 text-pink-700 hover:bg-pink-50; }
-        .btn-lv4 { @apply border-cyan-400 text-cyan-700 hover:bg-cyan-50; }
-        .btn-lv5 { @apply border-purple-400 text-purple-700 hover:bg-purple-50; }
+        .btn-lv1 {
+            @apply border-blue-400 text-blue-700 hover:bg-blue-50;
+        }
+
+        .btn-lv2 {
+            @apply border-orange-400 text-orange-700 hover:bg-orange-50;
+        }
+
+        .btn-lv3 {
+            @apply border-pink-400 text-pink-700 hover:bg-pink-50;
+        }
+
+        .btn-lv4 {
+            @apply border-cyan-400 text-cyan-700 hover:bg-cyan-50;
+        }
+
+        .btn-lv5 {
+            @apply border-purple-400 text-purple-700 hover:bg-purple-50;
+        }
 
         @media (max-width: 640px) {
-            .sock-card { width: 85px; height: 85px; } 
-            .simple-btn { @apply py-3 mb-2 text-base; border-bottom-width: 4px; }
-            .simple-btn:active { border-bottom-width: 2px; }
+            .sock-card {
+                width: 85px;
+                height: 85px;
+            }
+
+            .simple-btn {
+                @apply py-4 mb-3 text-xl;
+                border-bottom-width: 5px;
+            }
+
+            .simple-btn:active {
+                border-bottom-width: 2px;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: popFade 0.8s forwards;
+            z-index: 1500;
+        }
+
+        @keyframes popFade {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .combo-text {
+            position: absolute;
+            font-weight: 900;
+            color: #fbbf24;
+            font-size: 2.5rem;
+            pointer-events: none;
+            animation: comboPop 1s forwards;
+            z-index: 2000;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
+            white-space: nowrap;
+        }
+
+        @keyframes comboPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(-50%, -150%) scale(1.2) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -200%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .timer-bar.warning {
+            animation: flashRed 0.3s infinite alternate;
+        }
+
+        @keyframes flashRed {
+            to {
+                background-color: #ef4444;
+                filter: brightness(1.5);
+            }
+        }
+
+        .timer-bar.frozen {
+            background-color: #3b82f6 !important;
+            filter: brightness(1.2);
+        }
+
+        .freeze-item {
+            position: absolute;
+            font-size: 3.5rem;
+            cursor: pointer;
+            z-index: 1500;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
+            animation: floatItem 2s infinite ease-in-out;
+            user-select: none;
+        }
+
+        @keyframes floatItem {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -60%) scale(1.1);
+            }
+        }
+
+        .frozen-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 8px solid #60a5fa;
+            box-shadow: inset 0 0 60px rgba(59, 130, 246, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 40;
+        }
+
+        .frozen-overlay.active {
+            opacity: 1;
         }
     </style>
 </head>
+
 <body class="w-full h-screen relative overflow-hidden text-slate-700">
 
     <!-- ■ トップ画面 (背景画像4.jpg) -->
     <div id="start-screen" class="screen z-50 p-4 overflow-y-auto flex items-center justify-center">
         <!-- 白いカード風のコンテナ -->
         <div class="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border-4 border-white p-6">
-            
+
             <div class="flex flex-col items-center mb-6">
                 <div class="text-7xl mb-2 animate-bounce drop-shadow-md filter hue-rotate-15">🧦</div>
-                
+
                 <h1 class="text-3xl font-black text-slate-700 tracking-tight drop-shadow-sm text-center leading-none">
-                    <span class="text-blue-500">く</span><span class="text-pink-500">つ</span><span class="text-yellow-500">し</span><span class="text-green-500">た</span><br>
+                    <span class="text-blue-500">く</span><span class="text-pink-500">つ</span><span
+                        class="text-yellow-500">し</span><span class="text-green-500">た</span><br>
                     <span class="text-2xl text-slate-600">あわせ ゲーム</span>
                 </h1>
-                
-                <div class="mt-3 bg-orange-100 text-orange-600 text-sm font-bold px-5 py-1.5 rounded-full border-2 border-orange-200 animate-pulse">
+
+                <div
+                    class="mt-3 bg-orange-100 text-orange-600 text-sm font-bold px-5 py-1.5 rounded-full border-2 border-orange-200 animate-pulse">
                     あそぶ レベルを えらんでね！
                 </div>
             </div>
@@ -171,10 +360,13 @@
     <div id="game-screen" class="screen hidden flex flex-col items-center p-2 overflow-hidden bg-slate-50">
         <!-- コントロールボタン群 -->
         <div class="absolute top-3 right-3 z-50 flex gap-2">
-            <button id="sound-toggle" onclick="toggleSound()" class="bg-white/90 backdrop-blur text-slate-600 font-bold text-sm py-2 px-3 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95" title="おとのオン/オフ">
+            <button id="sound-toggle" onclick="toggleSound()"
+                class="bg-white/90 backdrop-blur text-slate-600 font-bold text-sm py-2 px-3 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95"
+                title="おとのオン/オフ">
                 🔊
             </button>
-            <button onclick="showQuitModal()" class="bg-white/90 backdrop-blur text-slate-600 hover:text-red-500 font-bold text-sm py-2 px-4 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95">
+            <button onclick="showQuitModal()"
+                class="bg-white/90 backdrop-blur text-slate-600 hover:text-red-500 font-bold text-sm py-2 px-4 rounded-full shadow-md transition-all hover:shadow-lg border border-slate-200 pointer-events-auto active:scale-95">
                 やめる
             </button>
         </div>
@@ -183,40 +375,50 @@
         <div id="cat-agent" class="fixed z-[70] pointer-events-none select-none" style="left: 100%; bottom: 20%;">
             <img src="1.png" alt="ねこ" class="w-64 h-auto drop-shadow-lg">
         </div>
-        <div id="baby-agent" class="fixed z-[70] pointer-events-none select-none" style="left: 50%; bottom: -400px; transform: translate(-50%, 0);">
+        <div id="baby-agent" class="fixed z-[70] pointer-events-none select-none"
+            style="left: 50%; bottom: -400px; transform: translate(-50%, 0);">
             <img src="2.png" alt="あかちゃん" class="w-80 h-auto drop-shadow-lg">
         </div>
 
         <!-- ヘッダー -->
         <header class="text-center z-50 pointer-events-none mt-1 mb-1 w-full max-w-lg">
-            <div class="bg-white/80 backdrop-blur px-4 py-2 rounded-2xl shadow-sm border border-white/50 inline-block pointer-events-auto flex flex-col items-center w-full">
-                
+            <div
+                class="bg-white/80 backdrop-blur px-4 py-2 rounded-2xl shadow-sm border border-white/50 inline-block pointer-events-auto flex flex-col items-center w-full">
+
                 <!-- レベル・ベスト・タイマー -->
                 <div class="flex justify-between items-end w-full mb-1 border-b border-slate-100 pb-1">
                     <div class="flex flex-col items-start">
-                        <span id="current-level-display" class="font-bold text-slate-400 text-xs leading-none mb-1">Lv.1</span>
+                        <span id="current-level-display"
+                            class="font-bold text-slate-400 text-xs leading-none mb-1">Lv.1</span>
                         <!-- ここにベストスコアを表示 -->
-                        <span id="game-best-time-display" class="font-bold text-orange-400 text-xs leading-none bg-orange-50 px-1.5 py-0.5 rounded">BEST: --:--</span>
+                        <span id="game-best-time-display"
+                            class="font-bold text-orange-400 text-xs leading-none bg-orange-50 px-1.5 py-0.5 rounded">BEST:
+                            --:--</span>
                     </div>
-                    <div class="font-mono font-black text-3xl text-slate-700 leading-none" id="timer-display">00:00</div>
+                    <div class="font-mono font-black text-3xl text-slate-700 leading-none" id="timer-display">00:00
+                    </div>
                 </div>
 
                 <div class="flex justify-center gap-4 sm:gap-6 text-sm font-bold text-slate-600 w-full mb-1">
                     <div>のこり: <span id="pairs-left" class="text-blue-500 text-xl">15</span></div>
                     <div>かたづけた: <span id="move-count" class="text-slate-600 text-xl">0</span></div>
                 </div>
-                
+
                 <!-- タイマーバーコンテナ -->
                 <div class="w-full grid grid-cols-2 gap-4 h-6">
-                    <div id="cat-timer-container" class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
+                    <div id="cat-timer-container"
+                        class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
                         <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div id="cat-timer-bar" class="h-full bg-orange-400 w-0 transition-all duration-100 ease-linear"></div>
+                            <div id="cat-timer-bar"
+                                class="h-full bg-orange-400 w-0 transition-all duration-100 ease-linear"></div>
                         </div>
                         <p class="text-[10px] font-bold text-orange-400 text-left leading-none mt-0.5">🐱 ねこ</p>
                     </div>
-                    <div id="baby-timer-container" class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
+                    <div id="baby-timer-container"
+                        class="flex flex-col gap-0.5 transition-opacity duration-300 opacity-0">
                         <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div id="baby-timer-bar" class="h-full bg-pink-400 w-0 transition-all duration-100 ease-linear"></div>
+                            <div id="baby-timer-bar"
+                                class="h-full bg-pink-400 w-0 transition-all duration-100 ease-linear"></div>
                         </div>
                         <p class="text-[10px] font-bold text-pink-400 text-right leading-none mt-0.5">👶 あかちゃん</p>
                     </div>
@@ -225,18 +427,22 @@
         </header>
 
         <!-- ゲームボード (背景色: 無地アイボリー) -->
-        <div id="game-board-container" class="flex-grow w-full max-w-4xl relative rounded-xl shadow-inner overflow-hidden m-2 backdrop-blur-sm">
+        <div id="game-board-container"
+            class="flex-grow w-full max-w-4xl relative rounded-xl shadow-inner overflow-hidden m-2 backdrop-blur-sm">
+            <div id="frozen-overlay" class="frozen-overlay"></div>
             <div id="game-board"></div>
         </div>
     </div>
 
     <!-- クリア画面 -->
-    <div id="win-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm mx-4 transform transition-all scale-100 border-4 border-blue-100">
+    <div id="win-modal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+        <div
+            class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm mx-4 transform transition-all scale-100 border-4 border-blue-100">
             <div class="text-7xl mb-4 animate-bounce">🧺</div>
             <h2 class="text-2xl font-black text-slate-800 mb-1">おせんたく かんりょう！</h2>
             <div class="text-4xl font-mono font-black text-blue-500 mb-4 tracking-tighter" id="final-time">00:00</div>
-            
+
             <div id="new-record-msg" class="hidden text-orange-400 font-bold mb-4 animate-pulse text-lg">
                 🏆 すごい！ しんきろく！
             </div>
@@ -251,22 +457,26 @@
                     <p class="text-xl font-bold text-slate-700" id="final-level">1</p>
                 </div>
             </div>
-            <button onclick="backToTop()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 active:scale-95 text-lg">
+            <button onclick="backToTop()"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 active:scale-95 text-lg">
                 さいしょに もどる
             </button>
         </div>
     </div>
 
     <!-- 終了確認モーダル -->
-    <div id="quit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+    <div id="quit-modal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
         <div class="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-xs mx-4 border-4 border-slate-200">
             <h2 class="text-lg font-black text-slate-800 mb-2">さいしょに もどる？</h2>
             <p class="text-sm font-bold text-slate-500 mb-6">いまの ゲームは おわりになります。</p>
             <div class="flex gap-3 justify-center">
-                <button onclick="closeQuitModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl transition-colors">
+                <button onclick="closeQuitModal()"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl transition-colors">
                     つづける
                 </button>
-                <button onclick="quitGameExecute()" class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg">
+                <button onclick="quitGameExecute()"
+                    class="flex-1 bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg">
                     やめる
                 </button>
             </div>
@@ -279,13 +489,15 @@
             { id: 'green', hex: '#10B981' }, { id: 'yellow', hex: '#F59E0B' },
             { id: 'purple', hex: '#8B5CF6' }, { id: 'orange', hex: '#F97316' },
             { id: 'pink', hex: '#EC4899' }, { id: 'cyan', hex: '#06B6D4' },
-            { id: 'lime', hex: '#84CC16' }, { id: 'slate', hex: '#64748B' }   
+            { id: 'lime', hex: '#84CC16' }, { id: 'slate', hex: '#64748B' }
         ];
         const PATTERNS = ['solid', 'stripe', 'dot'];
 
         let cards = [], selectedCards = [], matchedPairs = 0, totalPairs = 0, moves = 0, isProcessing = false, maxZIndex = 100, isSoundEnabled = true, currentLevel = 1;
         let startTime = 0, timerInterval = null, elapsedTime = 0;
         let obstacleTimerInterval, nextCatTime = 0, nextBabyTime = 0;
+        let comboCount = 0, lastMatchTime = 0;
+        let freezeEndTime = 0, itemSpawnTimer = null;
         const CAT_INTERVAL_MS = 15000, BABY_INTERVAL_MS = 20000;
         const SOCK_WIDTH = 100, SOCK_HEIGHT = 100, WALL_MARGIN = 60;
 
@@ -293,8 +505,8 @@
             1: { name: 'Lv.1 ふつうのモード', double: false, cat: false, baby: false },
             2: { name: 'Lv.2 ネコがくるモード', double: false, cat: true, baby: false },
             3: { name: 'Lv.3 ねこと赤ちゃん', double: false, cat: true, baby: true },
-            4: { name: 'Lv.4 くつした２ばい', double: true, cat: false, baby: false }, 
-            5: { name: 'Lv.5 2ばい＆ねこ＆赤ちゃん', double: true, cat: true, baby: true } 
+            4: { name: 'Lv.4 くつした２ばい', double: true, cat: false, baby: false },
+            5: { name: 'Lv.5 2ばい＆ねこ＆赤ちゃん', double: true, cat: true, baby: true }
         };
 
         const startScreen = document.getElementById('start-screen'), gameScreen = document.getElementById('game-screen'), boardElement = document.getElementById('game-board');
@@ -305,6 +517,7 @@
         const finalTimeElement = document.getElementById('final-time'), finalMovesElement = document.getElementById('final-moves'), finalLevelElement = document.getElementById('final-level'), newRecordMsg = document.getElementById('new-record-msg');
         const soundToggleBtn = document.getElementById('sound-toggle'), catElement = document.getElementById('cat-agent'), babyElement = document.getElementById('baby-agent');
         const catTimerBar = document.getElementById('cat-timer-bar'), babyTimerBar = document.getElementById('baby-timer-bar'), catTimerContainer = document.getElementById('cat-timer-container'), babyTimerContainer = document.getElementById('baby-timer-container');
+        const frozenOverlay = document.getElementById('frozen-overlay');
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(frequency, type = 'sine', duration = 0.1, startTime = 0, volume = 0.1) {
@@ -320,13 +533,14 @@
 
         const SoundEffects = {
             select: () => { playTone(400, 'sine', 0.1, 0, 0.1); playTone(600, 'triangle', 0.05, 0.02, 0.05); },
-            cancel: () => { playTone(300, 'sine', 0.1, 0, 0.1); }, 
+            cancel: () => { playTone(300, 'sine', 0.1, 0, 0.1); },
             grab: () => { playTone(200, 'sine', 0.05, 0, 0.05); },
             match: () => { playTone(523.25, 'sine', 0.2, 0, 0.1); playTone(659.25, 'sine', 0.2, 0.1, 0.1); playTone(783.99, 'sine', 0.4, 0.2, 0.1); playTone(1046.50, 'sine', 0.6, 0.3, 0.05); },
             mismatch: () => { playTone(150, 'sawtooth', 0.3, 0, 0.05); playTone(130, 'sawtooth', 0.3, 0.1, 0.05); },
             win: () => { [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => playTone(freq, 'triangle', 0.4, i * 0.1, 0.1)); playTone(1046.50, 'square', 1.0, 0.4, 0.1); playTone(1318.51, 'square', 1.0, 0.5, 0.1); },
             meow: () => { if (!isSoundEnabled) return; const t = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(800, t); osc.frequency.exponentialRampToValueAtTime(1400, t + 0.15); osc.frequency.exponentialRampToValueAtTime(600, t + 0.5); gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.2, t + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.6); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.6); },
-            babu: () => { if (!isSoundEnabled) return; const t = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(600, t + 0.2); osc.frequency.linearRampToValueAtTime(300, t + 0.5); gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.3, t + 0.1); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.6); }
+            babu: () => { if (!isSoundEnabled) return; const t = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(600, t + 0.2); osc.frequency.linearRampToValueAtTime(300, t + 0.5); gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.3, t + 0.1); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.6); },
+            freeze: () => { playTone(1200, 'sine', 0.1, 0, 0.1); playTone(1500, 'sine', 0.3, 0.1, 0.1); }
         };
 
         function toggleSound() { isSoundEnabled = !isSoundEnabled; soundToggleBtn.textContent = isSoundEnabled ? '🔊' : '🔇'; soundToggleBtn.classList.toggle('muted', !isSoundEnabled); }
@@ -341,12 +555,12 @@
         function getBestTime(l) { const b = localStorage.getItem(`sock-game-best-lv${l}`); return b ? formatTime(parseInt(b)) : '--:--'; }
         function saveBestTime(l, t) { const k = `sock-game-best-lv${l}`, c = localStorage.getItem(k); if (!c || t < parseInt(c)) { localStorage.setItem(k, t); return true; } return false; }
 
-        function startGame(l) { 
-            currentLevel = l; 
-            startScreen.classList.add('hidden'); 
-            gameScreen.classList.remove('hidden'); 
-            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {}); 
-            initGame(); 
+        function startGame(l) {
+            currentLevel = l;
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+            initGame();
         }
         function backToTop() { stopGameTimers(); winModal.classList.add('hidden'); quitModal.classList.add('hidden'); gameScreen.classList.add('hidden'); startScreen.classList.remove('hidden'); }
         function showQuitModal() { if (matchedPairs === 0 && moves === 0) { backToTop(); return; } quitModal.classList.remove('hidden'); }
@@ -379,16 +593,17 @@
         function initGame() {
             const config = LEVEL_CONFIG[currentLevel];
             cards = []; selectedCards = []; matchedPairs = 0; moves = 0; isProcessing = false; maxZIndex = 100;
-            boardElement.innerHTML = ''; 
-            catElement.style.left = '100%'; babyElement.style.bottom = '-400px'; 
+            comboCount = 0; lastMatchTime = 0;
+            boardElement.innerHTML = '';
+            catElement.style.left = '100%'; babyElement.style.bottom = '-400px';
             quitModal.classList.add('hidden');
-            
+
             // ヘッダー情報更新
-            currentLevelDisplay.textContent = config.name; 
+            currentLevelDisplay.textContent = config.name;
             gameBestTimeDisplay.textContent = `BEST: ${getBestTime(currentLevel)}`;
-            
+
             catTimerContainer.style.opacity = config.cat ? '1' : '0'; babyTimerContainer.style.opacity = config.baby ? '1' : '0';
-            
+
             let tempCards = [];
             const useColors = config.double ? COLORS : COLORS.slice(0, 5);
             useColors.forEach(c => { PATTERNS.forEach(p => { const d = { id: `${c.id}-${p}`, color: c, pattern: p, matched: false }; tempCards.push({ ...d, uniqueId: Math.random() }); tempCards.push({ ...d, uniqueId: Math.random() }); }); });
@@ -407,6 +622,13 @@
                 boardElement.appendChild(el);
             });
             startMainTimer(); startObstacleTimers();
+
+            // アイテムスポーン（ねこ or 赤ちゃんがいるレベルのみ）
+            if (config.cat || config.baby) {
+                // 15〜25秒ごとにスポーン
+                const nextSpawn = 15000 + Math.random() * 10000;
+                itemSpawnTimer = setTimeout(spawnFreezeItem, nextSpawn);
+            }
         }
 
         function startMainTimer() { stopMainTimer(); startTime = Date.now(); timerDisplay.textContent = "00:00"; timerInterval = setInterval(() => { elapsedTime = Date.now() - startTime; timerDisplay.textContent = formatTime(elapsedTime); }, 100); }
@@ -418,13 +640,54 @@
             const c = LEVEL_CONFIG[currentLevel];
             if (!c.cat && !c.baby) return;
             const now = Date.now(); nextCatTime = now + CAT_INTERVAL_MS; nextBabyTime = now + BABY_INTERVAL_MS;
+
             obstacleTimerInterval = setInterval(() => {
                 const n = Date.now();
-                if (c.cat) { const d = nextCatTime - n; if (d <= 0) { summonCat(); nextCatTime = n + CAT_INTERVAL_MS; } else catTimerBar.style.width = `${Math.min(100, Math.max(0, 100 - (d / CAT_INTERVAL_MS * 100)))}%`; } else catTimerBar.style.width = '0%';
-                if (c.baby) { const d = nextBabyTime - n; if (d <= 0) { summonBaby(); nextBabyTime = n + BABY_INTERVAL_MS; } else babyTimerBar.style.width = `${Math.min(100, Math.max(0, 100 - (d / BABY_INTERVAL_MS * 100)))}%`; } else babyTimerBar.style.width = '0%';
+                const isFrozen = n < freezeEndTime;
+
+                if (isFrozen) {
+                    // 凍結中は時間を先延ばしにする&バーの色を変える
+                    nextCatTime += 100; nextBabyTime += 100;
+                    catTimerBar.classList.add('frozen'); babyTimerBar.classList.add('frozen');
+                    catTimerBar.classList.remove('warning'); babyTimerBar.classList.remove('warning');
+                    frozenOverlay.classList.add('active');
+                    return;
+                } else {
+                    catTimerBar.classList.remove('frozen'); babyTimerBar.classList.remove('frozen');
+                    frozenOverlay.classList.remove('active');
+                }
+
+                if (c.cat) {
+                    const d = nextCatTime - n;
+                    if (d <= 0) { summonCat(); nextCatTime = n + CAT_INTERVAL_MS; }
+                    else {
+                        const pct = Math.min(100, Math.max(0, 100 - (d / CAT_INTERVAL_MS * 100)));
+                        catTimerBar.style.width = `${pct}%`;
+                        catTimerBar.classList.toggle('warning', d < 4000); // 残り4秒で警告
+                    }
+                } else catTimerBar.style.width = '0%';
+
+                if (c.baby) {
+                    const d = nextBabyTime - n;
+                    if (d <= 0) { summonBaby(); nextBabyTime = n + BABY_INTERVAL_MS; }
+                    else {
+                        const pct = Math.min(100, Math.max(0, 100 - (d / BABY_INTERVAL_MS * 100)));
+                        babyTimerBar.style.width = `${pct}%`;
+                        babyTimerBar.classList.toggle('warning', d < 4000);
+                    }
+                } else babyTimerBar.style.width = '0%';
             }, 100);
         }
-        function stopGameTimers() { stopMainTimer(); if (obstacleTimerInterval) clearInterval(obstacleTimerInterval); catTimerBar.style.width = '0%'; babyTimerBar.style.width = '0%'; }
+        function stopGameTimers() {
+            stopMainTimer();
+            if (obstacleTimerInterval) clearInterval(obstacleTimerInterval);
+            if (itemSpawnTimer) clearTimeout(itemSpawnTimer);
+            catTimerBar.style.width = '0%'; babyTimerBar.style.width = '0%';
+            catTimerBar.classList.remove('warning', 'frozen'); babyTimerBar.classList.remove('warning', 'frozen');
+            frozenOverlay.classList.remove('active');
+            freezeEndTime = 0;
+            const items = document.querySelectorAll('.freeze-item'); items.forEach(i => i.remove());
+        }
 
         function summonCat() {
             SoundEffects.meow();
@@ -494,42 +757,88 @@
         }
 
         function setupDraggable(el, idx) {
-            let startX, startY, initLeftPx, initTopPx;
+            let startX, startY;
             let dragging = false, moved = false;
+
             el.addEventListener('pointerdown', (e) => {
                 if (cards[idx].matched || isProcessing) return;
-                if (selectedCards.includes(idx)) { /* cancel logic */ }
-                e.preventDefault(); SoundEffects.grab();
+                // 選択中のカードを再度つかんだ場合のキャンセル挙動などはここでは維持
+                e.preventDefault();
+                SoundEffects.grab();
                 dragging = true; moved = false;
                 startX = e.clientX; startY = e.clientY;
-                const rect = el.getBoundingClientRect();
-                const parentRect = boardElement.getBoundingClientRect();
-                const centerX = rect.left - parentRect.left + rect.width / 2;
-                const centerY = rect.top - parentRect.top + rect.height / 2;
-                initLeftPx = centerX; initTopPx = centerY;
+
                 maxZIndex++; el.style.zIndex = maxZIndex;
-                el.setPointerCapture(e.pointerId); el.style.cursor = 'grabbing'; el.style.transition = 'none';
+                el.setPointerCapture(e.pointerId);
+                el.style.cursor = 'grabbing';
+                // ドラッグ中はtransitionを切る（遅延なく追従させるため）
+                el.style.transition = 'none';
             });
+
             el.addEventListener('pointermove', (e) => {
                 if (!dragging) return;
-                const dx = e.clientX - startX, dy = e.clientY - startY;
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
-                const boardRect = boardElement.getBoundingClientRect();
-                let newCenterX = initLeftPx + dx;
-                let newCenterY = initTopPx + dy;
-                const minX = WALL_MARGIN;
-                const maxX = boardRect.width - WALL_MARGIN;
-                const minY = WALL_MARGIN;
-                const maxY = boardRect.height - WALL_MARGIN;
-                newCenterX = Math.max(minX, Math.min(newCenterX, maxX));
-                newCenterY = Math.max(minY, Math.min(newCenterY, maxY));
-                el.style.left = `${newCenterX}px`; el.style.top = `${newCenterY}px`;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                // 少しでも動いたらmovedフラグを立てる（クリック判定用）
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+
+                // 見た目だけtransformで動かす (GPU合成で高速)
+                // 元々の rotate は保持しつつ、マウス移動分(dx, dy)を加算
+                const rot = el.style.getPropertyValue('--base-rotation') || '0deg';
+                el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot}) scale(1.1)`;
             });
+
             el.addEventListener('pointerup', (e) => {
                 if (!dragging) return;
-                dragging = false; el.releasePointerCapture(e.pointerId); el.style.cursor = 'grab';
-                el.style.transition = 'transform 0.3s ease-out, left 0.5s ease-out, top 0.5s ease-out, opacity 0.3s';
-                if (!moved) handleCardClick(idx);
+                dragging = false;
+                el.releasePointerCapture(e.pointerId);
+                el.style.cursor = 'grab';
+
+                // 離した瞬間に位置を確定させる
+                if (moved) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    const boardRect = boardElement.getBoundingClientRect();
+                    // 現在の%座標をピクセルに換算
+                    const curLeftPercent = parseFloat(el.style.left);
+                    const curTopPercent = parseFloat(el.style.top);
+                    const curLeftPx = (curLeftPercent / 100) * boardRect.width;
+                    const curTopPx = (curTopPercent / 100) * boardRect.height;
+
+                    let newLeftPx = curLeftPx + dx;
+                    let newTopPx = curTopPx + dy;
+
+                    // 画面外にはみ出さないように制限
+                    const minX = WALL_MARGIN;
+                    const maxX = boardRect.width - WALL_MARGIN;
+                    const minY = WALL_MARGIN;
+                    const maxY = boardRect.height - WALL_MARGIN;
+
+                    newLeftPx = Math.max(minX, Math.min(newLeftPx, maxX));
+                    newTopPx = Math.max(minY, Math.min(newTopPx, maxY));
+
+                    // %に戻してstyleに適用
+                    const newLeftPercent = (newLeftPx / boardRect.width) * 100;
+                    const newTopPercent = (newTopPx / boardRect.height) * 100;
+
+                    el.style.left = `${newLeftPercent}%`;
+                    el.style.top = `${newTopPercent}%`;
+                }
+
+                // トランジションを戻す
+                el.style.transition = 'transform 0.4s ease-out, left 0.4s ease-out, top 0.4s ease-out, opacity 0.3s';
+
+                // transformをリセット（座標移動はleft/topに移ったので）
+                const rot = el.style.getPropertyValue('--base-rotation');
+                el.style.transform = `translate(-50%, -50%) rotate(${rot}) scale(1)`;
+
+                if (!moved) {
+                    handleCardClick(idx);
+                } else {
+                    // ドロップ時の音などあればここで
+                }
             });
         }
 
@@ -553,12 +862,108 @@
         function checkMatch() {
             const [i1, i2] = selectedCards, c1 = cards[i1], c2 = cards[i2], e1 = document.getElementById(`card-${i1}`), e2 = document.getElementById(`card-${i2}`);
             if (c1.id === c2.id) {
-                setTimeout(() => { SoundEffects.match(); c1.matched = true; c2.matched = true; e1.classList.remove('selected'); e2.classList.remove('selected'); e1.classList.add('matched'); e2.classList.add('matched'); matchedPairs++; updateStats(); setTimeout(() => { e1.style.display = 'none'; e2.style.display = 'none'; checkWin(); }, 600); selectedCards = []; isProcessing = false; }, 400);
+                setTimeout(() => {
+                    SoundEffects.match();
+                    c1.matched = true; c2.matched = true;
+                    e1.classList.remove('selected'); e2.classList.remove('selected');
+                    e1.classList.add('matched'); e2.classList.add('matched');
+                    matchedPairs++; updateStats();
+
+                    // Center of the match
+                    const r1 = e1.getBoundingClientRect();
+                    const r2 = e2.getBoundingClientRect();
+                    const boardR = boardElement.getBoundingClientRect();
+                    const cx = ((r1.left + r2.left) / 2 - boardR.left) + r1.width / 2;
+                    const cy = ((r1.top + r2.top) / 2 - boardR.top) + r1.height / 2;
+
+                    createParticles(cx, cy);
+
+                    const now = Date.now();
+                    if (now - lastMatchTime < 4000) {
+                        comboCount++;
+                        if (comboCount > 1) showComboText(cx, cy, comboCount);
+                    } else {
+                        comboCount = 1;
+                    }
+                    lastMatchTime = now;
+
+                    setTimeout(() => { e1.style.display = 'none'; e2.style.display = 'none'; checkWin(); }, 600);
+                    selectedCards = []; isProcessing = false;
+                }, 400);
             } else {
-                setTimeout(() => { SoundEffects.mismatch(); resetStyle(e1); resetStyle(e2); e1.classList.remove('selected'); e2.classList.remove('selected'); selectedCards = []; isProcessing = false; }, 800);
+                setTimeout(() => { SoundEffects.mismatch(); resetStyle(e1); resetStyle(e2); e1.classList.remove('selected'); e2.classList.remove('selected'); selectedCards = []; isProcessing = false; comboCount = 0; }, 800);
             }
         }
         function resetStyle(e) { const r = e.style.getPropertyValue('--base-rotation'); e.style.transform = `translate(-50%, -50%) rotate(${r})`; }
+
+        function createParticles(x, y) {
+            const colors = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#EC4899'];
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 50 + Math.random() * 60;
+                p.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                p.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                boardElement.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+        }
+
+        function showComboText(x, y, count) {
+            const t = document.createElement('div');
+            t.className = 'combo-text';
+            t.style.left = x + 'px';
+            t.style.top = y + 'px';
+            const msgs = ['いいね！', 'やった！', 'すごい！', 'てんさい！', 'かみさま！'];
+            const msg = msgs[Math.min(count - 2, msgs.length - 1)];
+            t.textContent = `${count}かい れんぞく！ ${msg}`;
+            boardElement.appendChild(t);
+            setTimeout(() => t.remove(), 1000);
+        }
+
+        function spawnFreezeItem() {
+            if (freezeEndTime > Date.now()) {
+                // すでに凍結中ならスキップして次を予約
+                itemSpawnTimer = setTimeout(spawnFreezeItem, 10000);
+                return;
+            }
+            const el = document.createElement('div');
+            el.className = 'freeze-item';
+            el.innerHTML = '🧊';
+            const pos = getSafeRandomPosition(10);
+            el.style.left = `${pos.left}%`; el.style.top = `${pos.top}%`;
+
+            el.onclick = (e) => {
+                e.stopPropagation();
+                activateFreeze();
+                el.remove();
+            };
+
+            boardElement.appendChild(el);
+
+            // 8秒で消える
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 8000);
+
+            // 次回のスポーン予約
+            const nextSpawn = 15000 + Math.random() * 15000;
+            itemSpawnTimer = setTimeout(spawnFreezeItem, nextSpawn);
+        }
+
+        function activateFreeze() {
+            SoundEffects.freeze();
+            freezeEndTime = Date.now() + 8000; // 8秒間停止
+            const t = document.createElement('div');
+            t.className = 'combo-text'; /* 流用 */
+            t.style.left = '50%'; t.style.top = '50%';
+            t.style.color = '#3b82f6';
+            t.textContent = "こおった！"; /* TIME STOP! -> こおった！ */
+            boardElement.appendChild(t);
+            setTimeout(() => t.remove(), 1000);
+        }
 
         function checkWin() {
             if (matchedPairs === totalPairs) {
@@ -569,8 +974,9 @@
             }
         }
 
-        function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
+        function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } }
         function updateStats() { pairsLeftElement.textContent = totalPairs - matchedPairs; moveCountElement.textContent = moves; }
     </script>
 </body>
+
 </html>
