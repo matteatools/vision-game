@@ -40,6 +40,25 @@
             background: #e2e8f0;
             border-radius: 10px;
         }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+        .highlight-match {
+            animation: pulse-ring 1s infinite;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.5);
+        }
     </style>
 </head>
 <body class="bg-sky-50">
@@ -54,6 +73,12 @@
         const SIZES = ['L', 'M', 'S'];
         const SHAPES = ['star', 'circle', 'diamond'];
         const COLORS = ['red', 'blue', 'yellow'];
+        
+        const LABELS = {
+            red: 'あか', blue: 'あお', yellow: 'きいろ',
+            star: 'ほし', circle: 'まる', diamond: 'ひしがた',
+            L: 'だい', M: 'ちゅう', S: 'しょう'
+        };
 
         // --- Helper Functions ---
         const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -96,7 +121,7 @@
                     };
                 }
             }
-            return { items, answer: correctAnswer };
+            return { id: Math.random().toString(36).substr(2, 9), items, answer: correctAnswer };
         };
 
         const formatTime = (seconds) => {
@@ -203,6 +228,7 @@
             const [questionsCleared, setQuestionsCleared] = useState(0);
             const [targetQuestions, setTargetQuestions] = useState(5);
             const [elapsedTime, setElapsedTime] = useState(0);
+            const [showHowToPlay, setShowHowToPlay] = useState(false);
             const timerRef = useRef(null);
 
             const [highScores, setHighScores] = useState({
@@ -250,21 +276,44 @@
             if (gameState === 'title') {
                 return (
                     <div className="min-h-screen w-full bg-sky-50 font-sans flex items-center justify-center p-2 relative overflow-hidden">
+                        {showHowToPlay && (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                                <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 animate-in zoom-in flex flex-col max-h-[90vh]">
+                                    <h2 className="text-2xl font-black text-sky-600 text-center border-b-2 border-sky-100 pb-2">あそびかた</h2>
+                                    <div className="flex-1 overflow-y-auto space-y-4 text-sm sm:text-base text-gray-700">
+                                        <p className="font-bold flex items-center gap-2"><Star className="text-yellow-500 shrink-0"/> <span>9つのアイテムから、いちばん多いものをさがそう！</span></p>
+                                        <div className="bg-sky-50 p-3 rounded-xl border border-sky-100">
+                                            <p className="font-bold text-sky-700 mb-1">【やさしい】</p>
+                                            <p>「かたち」と「いろ」のどちらかが答えになります。</p>
+                                        </div>
+                                        <div className="bg-sky-50 p-3 rounded-xl border border-sky-100">
+                                            <p className="font-bold text-sky-700 mb-1">【ほんばん】</p>
+                                            <p>「かたち」「いろ」「おおきさ」から答えをさがします。しっかり見てね！</p>
+                                        </div>
+                                        <p className="font-bold flex items-center gap-2 text-green-600"><Timer className="text-green-500 shrink-0"/> <span>はやく正解して記録をめざそう！</span></p>
+                                    </div>
+                                    <button onClick={() => { playSelect(); setShowHowToPlay(false); }} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl shadow-md transition-transform active:scale-95">
+                                        とじる
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         <div className="bg-white/95 backdrop-blur-sm p-4 sm:p-8 rounded-3xl shadow-xl border-4 border-sky-200 max-w-lg w-full max-h-[95vh] flex flex-col z-10 overflow-hidden">
-                            <div className="flex-1 overflow-y-auto custom-scrollbar px-2 py-4 space-y-4 sm:space-y-6">
+                            <div className="flex-1 overflow-y-auto custom-scrollbar px-2 py-4 space-y-4 sm:space-y-6 flex flex-col items-center">
                                 <h1 className="text-2xl sm:text-4xl font-black text-sky-600 tracking-wider text-center leading-tight drop-shadow-sm">
                                     いちばん<br/>おおいのどーれだ？
                                 </h1>
-                                <div className="flex gap-2 justify-center bg-gray-100 p-1 rounded-xl shrink-0">
+                                <button onClick={() => { playSelect(); setShowHowToPlay(true); }} className="text-sm font-bold text-sky-500 hover:text-sky-600 underline underline-offset-2 flex items-center gap-1 active:scale-95 transition-transform"><Star size={16}/> あそびかた</button>
+                                <div className="w-full flex gap-2 justify-center bg-gray-100 p-1 rounded-xl shrink-0">
                                     <button onClick={() => { playSelect(); setGameMode('easy'); }} className={`flex-1 py-2 rounded-lg font-bold text-sm sm:text-base transition-all ${gameMode === 'easy' ? 'bg-white text-green-600 shadow-md' : 'text-gray-400'}`}>やさしい</button>
                                     <button onClick={() => { playSelect(); setGameMode('normal'); }} className={`flex-1 py-2 rounded-lg font-bold text-sm sm:text-base transition-all ${gameMode === 'normal' ? 'bg-white text-sky-600 shadow-md' : 'text-gray-400'}`}>ほんばん</button>
                                 </div>
-                                <div className="bg-sky-50 p-3 rounded-xl border border-sky-100 text-center">
-                                    <p className="text-gray-500 text-xs sm:text-sm">
-                                        {gameMode === 'easy' ? '「かたち」と「いろ」から えらんでね！' : '「かたち」「いろ」「大きさ」から えらんでね！'}
+                                <div className="w-full bg-sky-50 p-3 rounded-xl border border-sky-100 text-center">
+                                    <p className="text-gray-500 text-xs sm:text-sm font-bold">
+                                        {gameMode === 'easy' ? '「かたち」と「いろ」から えらんでね！' : '「かたち」「いろ」「おおきさ」から えらんでね！'}
                                     </p>
                                 </div>
-                                <div className="grid grid-cols-1 gap-2">
+                                <div className="w-full grid grid-cols-1 gap-2">
                                     {[5, 10, 15].map((count) => (
                                         <button key={count} onClick={() => startGame(count, gameMode)} className={`w-full border-b-4 font-black text-base sm:text-lg py-3 px-4 sm:px-6 rounded-xl transition-transform active:scale-95 flex items-center justify-between ${gameMode === 'easy' ? 'bg-green-100 hover:bg-green-200 border-green-300 text-green-700' : 'bg-sky-100 hover:bg-sky-200 border-sky-300 text-sky-700'}`}>
                                             <span className="flex items-center gap-2"><Check size={18} strokeWidth={3} /> {count} もん</span>
@@ -313,45 +362,62 @@
                     <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col min-h-0 overflow-hidden">
                         <div className="flex-1 flex items-center justify-center p-2 sm:p-4 gap-2 sm:gap-6 min-h-0">
                             {/* COLOR BUTTONS */}
-                            <div className="flex flex-col justify-center gap-2 shrink-0">
+                            <div className="flex flex-col justify-center gap-3 shrink-0">
                                 {COLORS.map(c => (
-                                    <OptionButton key={c} isSelected={userSelection?.type === 'color' && userSelection?.value === c} onClick={() => handleSelect('color', c)} showResult={showResult} isCorrectAnswer={level.answer.type === 'color' && level.answer.value === c}>
-                                        <div className={`w-[70%] h-[70%] rounded-full border-2 border-white shadow-sm ${c === 'red' ? 'bg-red-500' : c === 'blue' ? 'bg-blue-500' : 'bg-yellow-400'}`} />
-                                    </OptionButton>
+                                    <div key={c} className="flex flex-col items-center gap-1">
+                                        <OptionButton isSelected={userSelection?.type === 'color' && userSelection?.value === c} onClick={() => handleSelect('color', c)} showResult={showResult} isCorrectAnswer={level.answer.type === 'color' && level.answer.value === c}>
+                                            <div className={`w-[70%] h-[70%] rounded-full border-2 border-white shadow-sm ${c === 'red' ? 'bg-red-500' : c === 'blue' ? 'bg-blue-500' : 'bg-yellow-400'}`} />
+                                        </OptionButton>
+                                        <span className="text-xs sm:text-sm font-bold text-gray-500">{LABELS[c]}</span>
+                                    </div>
                                 ))}
                             </div>
                             {/* GAME BOARD */}
                             <div className="flex-1 flex items-center justify-center min-w-0 h-full">
                                 <div className="relative w-full aspect-square max-h-full max-w-[min(65vh,100%)] bg-white rounded-2xl border-2 sm:border-4 border-slate-200 shadow-inner p-2">
                                     <div className="grid grid-cols-3 grid-rows-3 gap-1 sm:gap-2 w-full h-full">
-                                        {level.items.map((item) => <div key={item.id} className="relative w-full h-full flex items-center justify-center"><Figure {...item} /></div>)}
+                                        {level.items.map((item, index) => {
+                                            const isMatchingPattern = showResult && level.answer.type && item[level.answer.type] === level.answer.value;
+                                            const figureClasses = showResult ? (isMatchingPattern ? 'opacity-100 scale-110 z-10 highlight-match' : 'opacity-20 scale-90 grayscale') : 'opacity-100';
+                                            return (
+                                                <div key={`${level.id}-${item.id}`} className={`relative w-full h-full flex items-center justify-center transition-all duration-300 ${figureClasses} animate-pop-in`} style={{ animationDelay: `${index * 0.04}s` }}>
+                                                    <Figure {...item} />
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                     {showResult && (
-                                        <div className="absolute inset-0 bg-white/40 flex items-center justify-center z-10 backdrop-blur-[1px] rounded-2xl">
-                                            {isCorrectMove ? <Circle size={80} className="text-green-500 animate-bounce" strokeWidth={4} /> : <XCircle size={80} className="text-red-500 animate-pulse" strokeWidth={4} />}
+                                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                                            {isCorrectMove ? <Circle size={100} className="text-green-500/80 animate-ping opacity-70 drop-shadow-lg" strokeWidth={3} /> : <XCircle size={100} className="text-red-500/80 animate-pulse drop-shadow-lg" strokeWidth={4} />}
                                         </div>
                                     )}
                                 </div>
                             </div>
                             {/* SHAPE BUTTONS */}
-                            <div className="flex flex-col justify-center gap-2 shrink-0">
+                            <div className="flex flex-col justify-center gap-3 shrink-0">
                                 {SHAPES.map(s => (
-                                    <OptionButton key={s} isSelected={userSelection?.type === 'shape' && userSelection?.value === s} onClick={() => handleSelect('shape', s)} showResult={showResult} isCorrectAnswer={level.answer.type === 'shape' && level.answer.value === s}>
-                                        {s === 'star' && <Star size="70%" className="fill-gray-800 text-gray-800" />}
-                                        {s === 'circle' && <Circle size="70%" className="fill-gray-800 text-gray-800" />}
-                                        {s === 'diamond' && <div className="w-[50%] h-[50%] bg-gray-800 rotate-45" />}
-                                    </OptionButton>
+                                    <div key={s} className="flex flex-col items-center gap-1">
+                                        <OptionButton isSelected={userSelection?.type === 'shape' && userSelection?.value === s} onClick={() => handleSelect('shape', s)} showResult={showResult} isCorrectAnswer={level.answer.type === 'shape' && level.answer.value === s}>
+                                            {s === 'star' && <Star size="70%" className="fill-gray-800 text-gray-800" />}
+                                            {s === 'circle' && <Circle size="70%" className="fill-gray-800 text-gray-800" />}
+                                            {s === 'diamond' && <div className="w-[50%] h-[50%] bg-gray-800 rotate-45" />}
+                                        </OptionButton>
+                                        <span className="text-xs sm:text-sm font-bold text-gray-500">{LABELS[s]}</span>
+                                    </div>
                                 ))}
                             </div>
                         </div>
 
                         {/* SIZE BUTTONS */}
                         {gameMode === 'normal' && (
-                            <div className="h-auto py-2 flex justify-center items-center gap-4 z-20 shrink-0 border-t border-slate-200 bg-white/50">
+                            <div className="h-auto py-3 flex justify-center items-center gap-6 z-20 shrink-0 border-t border-slate-200 bg-white/50">
                                 {SIZES.map(s => (
-                                    <OptionButton key={s} isSelected={userSelection?.type === 'size' && userSelection?.value === s} onClick={() => handleSelect('size', s)} showResult={showResult} isCorrectAnswer={level.answer.type === 'size' && level.answer.value === s}>
-                                        <div className={`bg-gray-800 rounded-md shadow-sm ${s === 'L' ? 'w-[65%] h-[65%]' : s === 'M' ? 'w-[45%] h-[45%]' : 'w-[25%] h-[25%]'}`} />
-                                    </OptionButton>
+                                    <div key={s} className="flex flex-col items-center gap-1">
+                                        <OptionButton isSelected={userSelection?.type === 'size' && userSelection?.value === s} onClick={() => handleSelect('size', s)} showResult={showResult} isCorrectAnswer={level.answer.type === 'size' && level.answer.value === s}>
+                                            <div className={`bg-gray-800 rounded-md shadow-sm ${s === 'L' ? 'w-[65%] h-[65%]' : s === 'M' ? 'w-[45%] h-[45%]' : 'w-[25%] h-[25%]'}`} />
+                                        </OptionButton>
+                                        <span className="text-xs sm:text-sm font-bold text-gray-500 w-12 text-center">{LABELS[s]}</span>
+                                    </div>
                                 ))}
                             </div>
                         )}
