@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,35 +11,29 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebaseの初期化（環境変数がない場合でもエラーにならないように保護）
-        let db = null;
-        let auth = null;
-        let appId = 'pita-puzzle-local';
-
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'pita-puzzle-speedrun';
-            }
-        } catch (e) {
-            console.log("Firebase is skipping initialization (Local Mode)");
-        }
+        // 環境変数からFirebase設定を取得
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pita-puzzle-speedrun';
 
         window.firebaseUtils = { auth, db, appId, setDoc, getDoc, doc };
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
 
-        :root { --cell-size: 35px; }
+        :root {
+            --cell-size: 35px;
+        }
 
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: #FFF9E5;
+            /* パズルピースを敷き詰めた背景パターン */
             background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FFB347' fill-opacity='0.08'%3E%3Cpath d='M10 10h10v10h-10zM20 10h10v10h-10zM10 20h10v10h-10zM40 40h10v10h-10zM50 40h10v10h-10zM40 50h10v10h-10zM50 50h10v10h-10zM60 10h10v30h-10zM10 60h30v10h-30z'/%3E%3C/g%3E%3C/svg%3E");
             overflow: hidden;
+            overscroll-behavior: none;
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
@@ -46,95 +41,186 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
         }
 
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100vh; padding: 10px; }
-        .screen.active { display: flex; }
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            padding: 2vh 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex;
+        }
 
         .title-card {
             background: rgba(255, 255, 255, 0.95);
             padding: 3rem 2.5rem;
             border-radius: 3.5rem;
             border: 8px solid #FFD93D;
-            box-shadow: 0 10px 0 #FFB347, 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 0 #FFB347, 0 20px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-top: 5vh;
+            margin-top: 8vh;
         }
 
         #game-area {
             position: relative;
-            width: calc(var(--cell-size) * 10);
-            height: calc(var(--cell-size) * 10);
             background-color: #F8FAFC;
             box-sizing: content-box;
             border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 auto;
         }
 
-        .grid-cell { width: var(--cell-size); height: var(--cell-size); border: 1px solid rgba(0,0,0,0.04); box-sizing: border-box; float: left; }
-        .target-cell { background-color: #CBD5E1; border: 2px solid #94A3B8; border-radius: 4px; }
+        .grid-cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-sizing: border-box;
+            float: left;
+        }
+
+        .target-cell {
+            background-color: #CBD5E1;
+            border: 2px solid #94A3B8;
+            border-radius: 4px;
+        }
 
         .block-part {
             position: absolute;
             width: var(--cell-size);
             height: var(--cell-size);
             border-radius: 6px;
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15);
             box-sizing: border-box;
-            border: 1.5px solid rgba(255,255,255,0.8);
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
         }
 
-        .inventory-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 4px; 
-            padding: 8px; 
-            background: rgba(255, 255, 255, 0.92); 
-            border-radius: 12px; 
-            border: 3px solid #FFD93D;
-            min-height: 140px;
+        .inventory-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: flex-start;
+            gap: 8px 14px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            border: 4px solid #FFD93D;
+            min-height: 100px;
+            box-shadow: 0 4px 12px rgba(255, 217, 61, 0.15), inset 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: min-height 0.3s ease;
         }
 
-        .inventory-item { 
-            aspect-ratio: 1; 
-            background: #FAFAFA; 
-            border: 1px solid #EEE; 
-            border-radius: 6px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: grab; 
-            position: relative; 
-            overflow: hidden; 
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            position: relative;
             touch-action: none;
-            min-width: 40px;
-            min-height: 40px;
+            padding: 8px;
+            border-radius: 12px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
         }
 
-        .inventory-item.forbidden { opacity: 0.2; pointer-events: none; background: #F1F5F9; }
-        .forbidden-x { position: absolute; color: #EF4444; font-size: 20px; font-weight: bold; z-index: 20; pointer-events: none; }
-        .inventory-item.used { opacity: 0.15; pointer-events: none; background: #E2E8F0; }
+        .inventory-item:active {
+            transform: scale(0.9);
+        }
+
+        .inventory-item:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .inventory-item.forbidden {
+            display: none;
+        }
+
+        .forbidden-x {
+            display: none;
+        }
+
+        .inventory-item.used {
+            display: none;
+        }
 
         .inventory-preview-part {
             position: absolute;
             width: 6px;
             height: 6px;
-            border-radius: 1px;
+            border-radius: 2px;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-sizing: border-box;
         }
 
-        .btn-pop { transition: transform 0.1s; box-shadow: 0 6px 0 #d97706; touch-action: manipulation; }
-        .btn-pop:active { transform: translateY(4px); box-shadow: 0 2px 0 #d97706; }
+        .btn-pop {
+            transition: transform 0.1s;
+            box-shadow: 0 6px 0 #d97706;
+            touch-action: manipulation;
+        }
 
-        #drag-proxy { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.9; }
-        #overlay { background-color: rgba(0, 0, 0, 0.6); }
+        .btn-pop:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #d97706;
+        }
 
-        .hint-glow { animation: glow-pulse 0.5s ease-in-out infinite alternate; z-index: 10; }
-        @keyframes glow-pulse { from { background-color: #FAFAFA; box-shadow: 0 0 0px #FACC15; } to { background-color: #FEF9C3; box-shadow: 0 0 15px #FACC15; border-color: #FACC15; } }
-        .piece-animating { animation: pop-in 0.5s ease-out; }
-        @keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        #drag-proxy {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.9;
+        }
+
+        #overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .hint-glow {
+            animation: glow-pulse 0.5s ease-in-out infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes glow-pulse {
+            from {
+                background-color: #FAFAFA;
+                box-shadow: 0 0 0px #FACC15;
+            }
+
+            to {
+                background-color: #FEF9C3;
+                box-shadow: 0 0 15px #FACC15;
+                border-color: #FACC15;
+            }
+        }
+
+        .piece-animating {
+            animation: pop-in 0.5s ease-out;
+        }
+
+        @keyframes pop-in {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- TITLE SCREEN -->
@@ -142,19 +228,22 @@
         <div class="title-card mb-8">
             <h1 class="text-5xl font-bold text-orange-500">ぴたっとパズル</h1>
         </div>
-        
+
         <div class="flex flex-col gap-5 w-full max-w-xs">
-            <button onclick="startGame('loose')" class="btn-pop bg-green-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-green-700">
+            <button onclick="startGame('loose')"
+                class="btn-pop bg-green-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-green-700">
                 ゆるっと モード<br>
                 <span class="text-sm font-normal">１・２マスも つかえます</span>
             </button>
-            <button onclick="startGame('tight')" class="btn-pop bg-orange-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-orange-700">
+            <button onclick="startGame('tight')"
+                class="btn-pop bg-orange-500 text-white py-6 rounded-3xl font-bold text-2xl shadow-orange-700">
                 ぴたっと モード<br>
                 <span class="text-sm font-normal">１・２マスは つかえません</span>
             </button>
         </div>
-        
-        <div class="mt-10 bg-white/95 p-4 rounded-2xl border-2 border-orange-200 text-orange-600 text-sm font-bold w-64 text-center shadow-lg">
+
+        <div
+            class="mt-10 bg-white/95 p-4 rounded-2xl border-2 border-orange-200 text-orange-600 text-sm font-bold w-64 text-center shadow-lg">
             🏆 ベストタイム（10問）<br>
             ゆるっと: <span id="best-loose">--:--</span><br>
             ぴたっと: <span id="best-tight">--:--</span>
@@ -165,18 +254,24 @@
     <div id="game-screen" class="screen">
         <div class="w-full max-w-md flex flex-wrap justify-between items-center mb-2 gap-y-2">
             <div class="flex gap-1 items-center">
-                <button onclick="showTitle()" class="bg-white px-2 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-[10px] shadow-sm">タイトルへ</button>
-                <div class="bg-white px-3 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-xs shadow-sm">
+                <button onclick="showTitle()"
+                    class="bg-white px-2 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-[10px] shadow-sm">タイトルへ</button>
+                <div
+                    class="bg-white px-3 py-1 rounded-full border-2 border-gray-300 font-bold text-gray-500 text-xs shadow-sm">
                     ⏱ <span id="timer-display">00:00</span>
                 </div>
             </div>
-            <div class="bg-white px-3 py-1 rounded-full border-2 border-orange-400 font-bold text-orange-600 text-sm shadow-sm">
+            <div
+                class="bg-white px-3 py-1 rounded-full border-2 border-orange-400 font-bold text-orange-600 text-sm shadow-sm">
                 <span id="stage-display">1 / 10</span>
             </div>
             <div class="flex gap-1">
-                <button id="giveup-btn" class="bg-gray-500 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-gray-700 active:translate-y-1 active:border-b-0 shadow-sm">こうさん</button>
-                <button id="hint-btn" class="bg-yellow-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-yellow-600 active:translate-y-1 active:border-b-0 shadow-sm">ヒント</button>
-                <button id="reset-btn" class="bg-red-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-red-600 active:translate-y-1 active:border-b-0 shadow-sm">やりなおし</button>
+                <button id="giveup-btn" onclick="giveUp()"
+                    class="bg-gray-500 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-gray-700 active:translate-y-1 active:border-b-0 shadow-sm">こうさん</button>
+                <button id="hint-btn" onclick="showHint()"
+                    class="bg-yellow-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-yellow-600 active:translate-y-1 active:border-b-0 shadow-sm">ヒント</button>
+                <button id="reset-btn" onclick="resetStage()"
+                    class="bg-red-400 text-white px-2 py-1 rounded-full text-[10px] font-bold border-b-4 border-red-600 active:translate-y-1 active:border-b-0 shadow-sm">やりなおし</button>
             </div>
         </div>
 
@@ -187,9 +282,13 @@
             </div>
         </div>
 
-        <div class="w-full max-w-md flex justify-center gap-3 my-3">
-            <button id="rotate-all-btn" class="btn-pop bg-orange-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">🔄 まわす</button>
-            <button id="flip-all-btn" class="btn-pop bg-blue-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">↔️ はんてん</button>
+        <div class="w-full max-w-md flex justify-center gap-3 my-3 relative z-10">
+            <button id="rotate-all-btn" onclick="rotateAll()"
+                class="btn-pop bg-orange-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">🔄
+                まわす</button>
+            <button id="flip-all-btn" onclick="flipAll()"
+                class="btn-pop bg-blue-500 text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-1 shadow-sm">↔️
+                はんてん</button>
         </div>
 
         <div class="w-full max-w-md px-1">
@@ -204,7 +303,8 @@
             <div id="overlay-emoji" class="text-5xl mb-2">✨</div>
             <h2 id="overlay-title" class="text-2xl font-bold text-orange-600 mb-1">ぴたっと！</h2>
             <p id="overlay-message" class="text-gray-500 mb-6 font-bold"></p>
-            <button id="next-btn" class="bg-green-500 text-white px-10 py-3 rounded-full font-bold text-lg shadow-lg"></button>
+            <button id="next-btn"
+                class="bg-green-500 text-white px-10 py-3 rounded-full font-bold text-lg shadow-lg"></button>
         </div>
     </div>
 
@@ -215,18 +315,16 @@
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTone(freq, type, duration, volume = 0.1) {
             if (audioCtx.state === 'suspended') return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e){}
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
         }
 
         const sounds = {
@@ -244,16 +342,16 @@
         };
 
         const PIECES = {
-            1: [[0,0]], 2: [[0,0],[0,1]], 3: [[0,0],[0,1],[0,2]], 4: [[0,0],[1,0],[0,1]],
-            5: [[0,0],[0,1],[0,2],[0,3]], 6: [[0,0],[1,0],[0,1],[1,1]], 7: [[0,0],[0,1],[0,2],[1,2]], 8: [[1,0],[0,1],[1,1],[2,1]], 9: [[0,0],[0,1],[1,1],[1,2]],
-            10: [[0,0],[0,1],[0,2],[0,3],[0,4]], 11: [[0,0],[0,1],[0,2],[0,3],[1,3]], 12: [[0,0],[1,0],[0,1],[1,1],[0,2]], 13: [[0,0],[0,1],[0,2],[1,2],[1,3]],
-            14: [[0,0],[0,1],[1,1],[1,2],[2,2]], 15: [[0,0],[1,0],[2,0],[1,1],[1,2]], 16: [[0,0],[1,0],[1,1],[2,1],[2,2]], 17: [[0,0],[0,1],[0,2],[1,2],[2,2]],
-            18: [[0,0],[1,0],[2,0],[0,1],[2,1]], 19: [[1,0],[0,1],[1,1],[2,1],[1,2]], 20: [[0,0],[1,0],[2,0],[3,0],[1,1]], 21: [[1,0],[2,0],[0,1],[1,1],[1,2]]
+            1: [[0, 0]], 2: [[0, 0], [0, 1]], 3: [[0, 0], [0, 1], [0, 2]], 4: [[0, 0], [1, 0], [0, 1]],
+            5: [[0, 0], [0, 1], [0, 2], [0, 3]], 6: [[0, 0], [1, 0], [0, 1], [1, 1]], 7: [[0, 0], [0, 1], [0, 2], [1, 2]], 8: [[1, 0], [0, 1], [1, 1], [2, 1]], 9: [[0, 0], [0, 1], [1, 1], [1, 2]],
+            10: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], 11: [[0, 0], [0, 1], [0, 2], [0, 3], [1, 3]], 12: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2]], 13: [[0, 0], [0, 1], [0, 2], [1, 2], [1, 3]],
+            14: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]], 15: [[0, 0], [1, 0], [2, 0], [1, 1], [1, 2]], 16: [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2]], 17: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
+            18: [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1]], 19: [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]], 20: [[0, 0], [1, 0], [2, 0], [3, 0], [1, 1]], 21: [[1, 0], [2, 0], [0, 1], [1, 1], [1, 2]]
         };
 
         const PIECE_COLORS = {};
         Object.keys(PIECES).forEach(id => {
-            const hue = (id * 137.5) % 360; 
+            const hue = (id * 137.5) % 360;
             PIECE_COLORS[id] = `hsl(${hue}, 85%, 55%)`;
         });
 
@@ -274,86 +372,88 @@
             cellSize: 35,
             isShowingResult: false,
             wasGiveUp: false,
-            user: null
+            user: null,
+            boardCols: 10, // Default for initial setup
+            boardRows: 10  // Default for initial setup
         };
 
         // --- Firebase ---
-        async function setupGame() {
-            const utils = window.firebaseUtils;
+        async function initAuth() {
+            const { auth, db, appId, getDoc, doc } = window.firebaseUtils || {};
+            if (!auth) return; // Prevent crashes if Firebase isn't initialized
+
             try {
-                if (utils.auth) {
-                    await signInAnonymously(utils.auth);
-                    onAuthStateChanged(utils.auth, (u) => {
-                        state.user = u;
-                        if (u) loadHighScores();
-                    });
-                }
-            } catch(e) {}
-            
-            // 全てのボタンにイベントを繋ぐ（DOMが用意されてから）
-            const btnRotate = document.getElementById('rotate-all-btn');
-            if(btnRotate) btnRotate.onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryRotation = (state.inventoryRotation + 1) % 4; render(); }};
-            
-            const btnFlip = document.getElementById('flip-all-btn');
-            if(btnFlip) btnFlip.onclick = () => { if(!state.isShowingResult){ sounds.rotate(); state.inventoryFlipped = !state.inventoryFlipped; render(); }};
-            
-            const btnGiveup = document.getElementById('giveup-btn');
-            if(btnGiveup) btnGiveup.onclick = () => playGiveUpAnimation();
-            
-            const btnReset = document.getElementById('reset-btn');
-            if(btnReset) btnReset.onclick = () => { if(!state.isShowingResult){ sounds.wrong(); state.placedPieces = []; render(); }};
-            
-            const btnHint = document.getElementById('hint-btn');
-            if(btnHint) btnHint.onclick = () => { 
-                if (state.isShowingResult) return;
-                sounds.pop();
-                state.correctSolution.forEach(s => {
-                    const item = document.querySelector(`.inventory-item[data-id="${s.id}"]`);
-                    if (item && !item.classList.contains('used')) {
-                        item.classList.add('hint-glow');
-                        setTimeout(() => item.classList.remove('hint-glow'), 1500);
-                    }
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, async (u) => {
+                    state.user = u;
+                    if (u) loadHighScores();
                 });
-            };
-
-            // サイズ調整と初期化
-            updateCellSize();
-            initBoard();
+            } catch (e) { console.warn('Firebase auth failed', e); }
         }
 
-        function updateCellSize() {
-            const boardWidth = Math.min(window.innerWidth - 60, 350);
-            state.cellSize = Math.floor(boardWidth / 10);
-            document.documentElement.style.setProperty('--cell-size', state.cellSize + 'px');
-        }
+        window.rotateAll = function () {
+            if (!state.isShowingResult) {
+                sounds.rotate();
+                state.inventoryRotation = (state.inventoryRotation + 1) % 4;
+                render();
+            }
+        };
+
+        window.flipAll = function () {
+            if (!state.isShowingResult) {
+                sounds.rotate();
+                state.inventoryFlipped = !state.inventoryFlipped;
+                render();
+            }
+        };
+
+        window.giveUp = function () {
+            playGiveUpAnimation();
+        };
+
+        window.resetStage = function () {
+            if (!state.isShowingResult) {
+                sounds.wrong();
+                state.placedPieces = [];
+                render();
+            }
+        };
+
+        window.showHint = function () {
+            if (state.isShowingResult) return;
+            sounds.pop();
+            state.correctSolution.forEach(s => {
+                const item = document.querySelector(`.inventory-item[data-id="${s.id}"]`);
+                if (item && !item.classList.contains('used')) {
+                    item.classList.add('hint-glow');
+                    setTimeout(() => item.classList.remove('hint-glow'), 1500);
+                }
+            });
+        };
 
         async function loadHighScores() {
             const { db, appId, getDoc, doc } = window.firebaseUtils;
-            if (!state.user || !db) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
-                const snap = await getDoc(docRef);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    if (data.loose) document.getElementById('best-loose').innerText = formatTime(data.loose);
-                    if (data.tight) document.getElementById('best-tight').innerText = formatTime(data.tight);
-                }
-            } catch(e){}
+            if (!state.user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.loose) document.getElementById('best-loose').innerText = formatTime(data.loose);
+                if (data.tight) document.getElementById('best-tight').innerText = formatTime(data.tight);
+            }
         }
 
         async function saveScore(mode, time) {
             const { db, appId, getDoc, setDoc, doc } = window.firebaseUtils;
-            if (!state.user || !db) return;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
-                const snap = await getDoc(docRef);
-                let current = snap.exists() ? snap.data() : {};
-                if (!current[mode] || time < current[mode]) {
-                    current[mode] = time;
-                    await setDoc(docRef, current);
-                    loadHighScores();
-                }
-            } catch(e){}
+            if (!state.user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'records', 'best');
+            const snap = await getDoc(docRef);
+            let current = snap.exists() ? snap.data() : {};
+            if (!current[mode] || time < current[mode]) {
+                current[mode] = time;
+                await setDoc(docRef, current);
+                loadHighScores();
+            }
         }
 
         // --- Transformations ---
@@ -385,12 +485,12 @@
 
             if (state.mode === 'loose') {
                 mandatorySmall = [1, 2];
-                if (state.stage <= 3) pool = [1, 2, 3, 4, 5, 6, 7];
-                else if (state.stage <= 7) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                else pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+                if (state.stage <= 3) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                else if (state.stage <= 7) pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+                else pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
             } else {
-                if (state.stage <= 3) pool = [3, 4, 5, 6, 7, 8];
-                else if (state.stage <= 7) pool = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+                if (state.stage <= 3) pool = [3, 4, 5, 6, 7, 8, 9];
+                else if (state.stage <= 7) pool = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
                 else pool = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
             }
 
@@ -401,10 +501,10 @@
                 const sId = mandatorySmall[Math.floor(Math.random() * mandatorySmall.length)];
                 selectedIds.push(sId);
                 const idxInPool = tempPool.indexOf(sId);
-                if(idxInPool > -1) tempPool.splice(idxInPool, 1);
+                if (idxInPool > -1) tempPool.splice(idxInPool, 1);
             }
 
-            while(selectedIds.length < 3) {
+            while (selectedIds.length < 3) {
                 const randIdx = Math.floor(Math.random() * tempPool.length);
                 selectedIds.push(tempPool[randIdx]);
                 tempPool.splice(randIdx, 1);
@@ -414,40 +514,41 @@
 
             let currentPoints = [];
             let solutionData = [];
-            
-            const p1Rot = Math.floor(Math.random()*4);
-            const p1Flip = Math.random()>0.5;
+
+            const p1Rot = Math.floor(Math.random() * 4);
+            const p1Flip = Math.random() > 0.5;
             const p1Coords = getTransformedCoords(selectedIds[0], p1Rot, p1Flip);
-            p1Coords.forEach(p => currentPoints.push({x:p[0], y:p[1]}));
+            p1Coords.forEach(p => currentPoints.push({ x: p[0], y: p[1] }));
             solutionData.push({ id: selectedIds[0], rot: p1Rot, flip: p1Flip, x: 0, y: 0 });
 
-            for(let i=1; i<3; i++) {
+            for (let i = 1; i < 3; i++) {
                 let bestPlacements = [];
                 const searchCount = 100;
 
-                for(let attempts = 0; attempts < searchCount; attempts++) {
-                    const rot = Math.floor(Math.random()*4);
-                    const flip = Math.random()>0.5;
+                for (let attempts = 0; attempts < searchCount; attempts++) {
+                    const rot = Math.floor(Math.random() * 4);
+                    const flip = Math.random() > 0.5;
                     const coords = getTransformedCoords(selectedIds[i], rot, flip);
                     const base = currentPoints[Math.floor(Math.random() * currentPoints.length)];
-                    const anchor = coords[Math.floor(Math.random()*coords.length)];
-                    const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
-                    const dir = dirs[Math.floor(Math.random()*4)];
-                    
+                    const anchor = coords[Math.floor(Math.random() * coords.length)];
+                    const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                    const dir = dirs[Math.floor(Math.random() * 4)];
+
                     const ox = base.x + dir[0] - anchor[0];
                     const oy = base.y + dir[1] - anchor[1];
-                    const abs = coords.map(p => ({x: p[0]+ox, y: p[1]+oy}));
+                    const abs = coords.map(p => ({ x: p[0] + ox, y: p[1] + oy }));
 
-                    if(!abs.some(a => currentPoints.some(c => c.x === a.x && c.y === a.y))) {
+                    if (!abs.some(a => currentPoints.some(c => c.x === a.x && c.y === a.y))) {
                         let adj = 0;
-                        abs.forEach(a => dirs.forEach(d => { if(currentPoints.some(c => c.x===a.x+d[0] && c.y===a.y+d[1])) adj++; }));
+                        abs.forEach(a => dirs.forEach(d => { if (currentPoints.some(c => c.x === a.x + d[0] && c.y === a.y + d[1])) adj++; }));
                         bestPlacements.push({ rot, flip, ox, oy, abs, adj });
                     }
                 }
 
-                if(bestPlacements.length > 0) {
-                    bestPlacements.sort((a,b) => b.adj - a.adj);
-                    const chosen = bestPlacements[Math.floor(Math.random() * Math.min(3, bestPlacements.length))];
+                if (bestPlacements.length > 0) {
+                    bestPlacements.sort((a, b) => b.adj - a.adj);
+                    const topN = Math.min(3, bestPlacements.length);
+                    const chosen = bestPlacements[Math.floor(Math.random() * topN)];
                     chosen.abs.forEach(a => currentPoints.push(a));
                     solutionData.push({ id: selectedIds[i], rot: chosen.rot, flip: chosen.flip, x: chosen.ox, y: chosen.oy });
                 }
@@ -457,10 +558,30 @@
             const minY = Math.min(...currentPoints.map(p => p.y));
             const maxX = Math.max(...currentPoints.map(p => p.x));
             const maxY = Math.max(...currentPoints.map(p => p.y));
-            const ox = Math.floor((10-(maxX-minX+1))/2), oy = Math.floor((10-(maxY-minY+1))/2);
-            
-            state.targetCells = currentPoints.map(p => ({x: p.x-minX+ox, y: p.y-minY+oy}));
-            state.correctSolution = solutionData.map(s => ({ id: s.id, rot: s.rot, flip: s.flip, gridX: s.x-minX+ox, gridY: s.y-minY+oy, coords: getTransformedCoords(s.id, s.rot, s.flip), color: PIECE_COLORS[s.id] }));
+            // Instead of centering on 10x10, just shift to 0,0 locally for the display bounding box
+            const targetW = maxX - minX + 1;
+            const targetH = maxY - minY + 1;
+
+            // Allow 1 padding cell on all sides
+            const padX = 1;
+            const padY = 1;
+            const boardW = targetW + padX * 2;
+            const boardH = targetH + padY * 2;
+
+            state.boardCols = boardW;
+            state.boardRows = boardH;
+
+            // Map the points to the new smaller local grid
+            state.targetCells = currentPoints.map(p => ({ x: p.x - minX + padX, y: p.y - minY + padY }));
+            state.correctSolution = solutionData.map(s => ({
+                id: s.id,
+                rot: s.rot,
+                flip: s.flip,
+                gridX: s.x - minX + padX,
+                gridY: s.y - minY + padY,
+                coords: getTransformedCoords(s.id, s.rot, s.flip),
+                color: PIECE_COLORS[s.id]
+            }));
             state.placedPieces = [];
             state.isShowingResult = false;
             state.wasGiveUp = false;
@@ -479,15 +600,15 @@
         }
 
         // --- UI ---
-        window.showTitle = function() {
+        window.showTitle = function () {
             clearInterval(state.timerInterval);
             document.getElementById('title-screen').classList.add('active');
             document.getElementById('game-screen').classList.remove('active');
             document.getElementById('overlay').classList.add('hidden');
         };
 
-        window.startGame = function(mode) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+        window.startGame = function (mode) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             state.mode = mode;
             state.stage = 1;
             state.startTime = Date.now();
@@ -501,16 +622,27 @@
 
         function initBoard() {
             const board = document.getElementById('grid-board');
+            const gameArea = document.getElementById('game-area');
+
+            // 動的に幅と高さを設定
+            gameArea.style.width = `calc(var(--cell-size) * ${state.boardCols})`;
+            gameArea.style.height = `calc(var(--cell-size) * ${state.boardRows})`;
+            board.style.width = `calc(var(--cell-size) * ${state.boardCols})`;
+            board.style.height = `calc(var(--cell-size) * ${state.boardRows})`;
+
             board.innerHTML = '';
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < state.boardCols * state.boardRows; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell';
-                cell.dataset.x = i % 10;
-                cell.dataset.y = Math.floor(i / 10);
+                cell.dataset.x = i % state.boardCols;
+                cell.dataset.y = Math.floor(i / state.boardCols);
+
+                // 不要なマス（ターゲット外）は薄くする
+                cell.style.borderColor = 'rgba(0,0,0,0.02)';
+
                 board.appendChild(cell);
             }
         }
-
         function render() {
             document.getElementById('stage-display').innerText = `${state.stage} / 10`;
             document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('target-cell'));
@@ -615,9 +747,9 @@
             const gameArea = document.getElementById('game-area');
             const rect = gameArea.getBoundingClientRect();
             const gx = Math.round((e.clientX - rect.left - state.dragOffset.x) / state.cellSize), gy = Math.round((e.clientY - rect.top - state.dragOffset.y) / state.cellSize);
-            const abs = state.dragging.coords.map(p => ({x: p[0]+gx, y: p[1]+gy}));
-            const inBounds = abs.every(p => p.x>=0 && p.x<10 && p.y>=0 && p.y<10);
-            if (inBounds && !state.placedPieces.some(pp => pp.coords.some(pc => abs.some(a => a.x === pc[0]+pp.gridX && a.y === pc[1]+pp.gridY)))) {
+            const abs = state.dragging.coords.map(p => ({ x: p[0] + gx, y: p[1] + gy }));
+            const inBounds = abs.every(p => p.x >= 0 && p.x < state.boardCols && p.y >= 0 && p.y < state.boardRows);
+            if (inBounds && !state.placedPieces.some(pp => pp.coords.some(pc => abs.some(a => a.x === pc[0] + pp.gridX && a.y === pc[1] + pp.gridY)))) {
                 state.placedPieces.push({ ...state.dragging, gridX: gx, gridY: gy });
                 sounds.place();
             } else { sounds.wrong(); }
@@ -626,9 +758,9 @@
 
         function checkWin(isGiveUp = false) {
             const covered = [];
-            state.placedPieces.forEach(pp => pp.coords.forEach(c => covered.push({x: c[0]+pp.gridX, y: c[1]+pp.gridY})));
-            const solved = state.targetCells.length > 0 && state.targetCells.every(tc => covered.some(cc => cc.x===tc.x && cc.y===tc.y)) && covered.every(cc => state.targetCells.some(tc => tc.x===cc.x && tc.y===cc.y));
-            
+            state.placedPieces.forEach(pp => pp.coords.forEach(c => covered.push({ x: c[0] + pp.gridX, y: c[1] + pp.gridY })));
+            const solved = state.targetCells.length > 0 && state.targetCells.every(tc => covered.some(cc => cc.x === tc.x && cc.y === tc.y)) && covered.every(cc => state.targetCells.some(tc => tc.x === cc.x && tc.y === cc.y));
+
             if (solved || isGiveUp) {
                 state.isShowingResult = true;
                 if (isGiveUp) {
@@ -669,7 +801,7 @@
             if (state.isShowingResult) return;
             state.isShowingResult = true; state.placedPieces = []; render();
             for (let i = 0; i < state.correctSolution.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, 600)); 
+                await new Promise(resolve => setTimeout(resolve, 600));
                 sounds.pop(); state.placedPieces.push(JSON.parse(JSON.stringify(state.correctSolution[i]))); render();
                 if (document.getElementById('blocks-container').lastElementChild) document.getElementById('blocks-container').lastElementChild.classList.add('piece-animating');
             }
@@ -679,19 +811,36 @@
         window.addEventListener('pointermove', handlePointerMove);
         window.addEventListener('pointerup', handlePointerUp);
 
+        function updateBoardSize() {
+            // パソコンなどの横長/縦短な画面の場合も考慮して、高さと幅から最適サイズを計算
+            const availableHeight = window.innerHeight - 300; // ヘッダー、ボタン、パレットなどの余裕を持たせる
+            const availableWidth = window.innerWidth - 40;
+
+            // 最低200px、最大400pxの範囲で幅と高さに収まるようにする
+            const boardSize = Math.min(availableWidth, Math.max(availableHeight, 200), 400);
+
+            // セルサイズは「最大の列数・行数」に合わせて計算する
+            const maxDimension = Math.max(state.boardCols || 10, state.boardRows || 10);
+            state.cellSize = Math.max(25, Math.floor(boardSize / maxDimension));
+            document.documentElement.style.setProperty('--cell-size', state.cellSize + 'px');
+        }
+
         function startNewLevel() {
-            updateCellSize();
             generateStage();
+            updateBoardSize(); // generateStageの後に呼んで正しいcol/rowを使う
             initBoard();
             render();
         }
 
         window.addEventListener('resize', () => {
-            updateCellSize();
-            render();
+            if (document.getElementById('game-screen').classList.contains('active')) {
+                updateBoardSize();
+                render();
+            }
         });
 
-        window.onload = setupGame;
+        window.onload = initAuth;
     </script>
 </body>
+
 </html>
