@@ -1,2472 +1,270 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>九九ポーカー - Mobile Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ビジョントレーニングゲーム</title>
     <style>
-        :root {
-            --bg: #030712;
-            /* サイバー風ディープダーク */
-            --bg-accent: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 100%);
-            --panel: rgba(15, 23, 42, 0.4);
-            --panel-border: rgba(99, 102, 241, 0.3);
-            --accent: #0ea5e9;
-            --accent-glow: 0 0 15px rgba(14, 165, 233, 0.6);
-            --card-front: rgba(255, 255, 255, 0.95);
-            --card-back: linear-gradient(135deg, #0f172a, #1e293b);
-            --text: #f8fafc;
-            --text-neon: 0 0 5px #0ea5e9, 0 0 10px #0ea5e9;
-            --c1: #3b82f6;
-            --c2: #0ea5e9;
-            --c3: #10b981;
-            --c4: #84cc16;
-            --c5: #ef4444;
-            --c6: #f59e0b;
-            --c7: #f97316;
-            --c8: #ec4899;
-            --c9: #8b5cf6;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
+        /* サイト全体の基本設定 */
         body {
-            background: var(--bg-accent);
-            color: var(--text);
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Yu Gothic", sans-serif;
+            
+            /* 明るい黄色の背景に変更 */
+            background-color: #fff9c4; 
+            
+            /* 目の絵文字を背景画像として設定 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='40'%3E%F0%9F%91%80%3C/text%3E%3C/svg%3E");
+            
+            /* 背景を斜めに動かすアニメーション */
+            animation: bg-scroll 20s linear infinite;
+            
+            color: #333;
+            text-align: center;
             margin: 0;
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+            padding: 20px;
         }
 
-        /* 巨大背景キャラクターコンテナ */
-        #bg-characters {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-            justify-content: center;
-            align-items: center;
-            opacity: 0.6;
+        /* 背景を動かすキーフレーム */
+        @keyframes bg-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 80px 80px; }
         }
 
-        .bg-char {
-            height: 70vh;
-            /* かなり大きく */
-            max-height: 800px;
-            object-fit: contain;
-            transition: opacity 0.5s;
-        }
-
-        #bg-char-center {
-            height: 50vh;
-            max-height: 500px;
-            object-fit: contain;
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
-            transform: scale(0.9);
-        }
-
-        #bg-char-center.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* 全体をラップして背景キャラの上に配置 */
-        #game-wrapper {
-            position: relative;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
-
-        /* Header UI (Glassmorphism) */
+        /* ヘッダーエリア（吹き出しとタイトル） */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background: #0f172a;
-            border-bottom: 1px solid var(--panel-border);
-            font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            z-index: 10;
-        }
-
-        #turn-ui {
-            background: rgba(14, 165, 233, 0.15);
-            color: var(--accent);
-            padding: 6px 16px;
-            border-radius: 99px;
-            border: 1px solid var(--accent);
-            box-shadow: var(--accent-glow);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8rem;
-        }
-
-        /* Main Field */
-        main {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, auto);
-            align-content: center;
-            gap: 8px;
-            padding: 15px;
-            max-width: 450px;
-            margin: 0 auto;
-            width: 100%;
-            min-height: 0;
-            overflow-y: auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Card Design (Glassmorphism & Neon) */
-        .card {
-            background: #ffffff;
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(200, 200, 200, 0.2);
-            color: #1e293b;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1;
-        }
-
-        .card.hidden {
-            background: var(--card-back);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Pattern for card back */
-        .card.hidden::after {
-            content: "×";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        .card.hidden * {
-            display: none;
-        }
-
-        .card.selected {
-            transform: translateY(-8px);
-            /* 浮き上がり具合も少し控えめに */
-            box-shadow: 0 0 0 3px var(--accent), 0 8px 12px -3px rgba(0, 0, 0, 0.5);
-            z-index: 5;
-        }
-
-        /* ターゲット化されたカードのアニメーション */
-        .card.targeted {
-            transform: scale(1.15);
-            box-shadow: 0 0 0 4px var(--c6), 0 0 20px 5px var(--c6);
-            /* 黄色い光 */
-            z-index: 10;
-            animation: blink 0.4s alternate infinite;
-        }
-
-        @keyframes blink {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0.6;
-            }
-        }
-
-        /* 数字のデザイン（白フチをつけて背景なしで配置） */
-        .card .val {
-            position: relative;
-            z-index: 2;
-            /* 背景より手前に */
-            font-size: clamp(2.5rem, 10vmin, 3.5rem);
-            /* さらに数字を大きく */
-            font-weight: 900;
-            line-height: 1;
-            color: #0f172a;
-            opacity: 0.7;
-            /* 透過率を70%に設定 */
-            /* 太い白フチをつけて、背景と同化しないようにする */
-            text-shadow:
-                -2px -2px 0 #fff,
-                2px -2px 0 #fff,
-                -2px 2px 0 #fff,
-                2px 2px 0 #fff,
-                -3px 0 0 #fff,
-                3px 0 0 #fff,
-                0 -3px 0 #fff,
-                0 3px 0 #fff,
-                0 4px 8px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-            /* クリック判定を邪魔しない */
-        }
-
-        /* Kuku Lamps (Matrix Dots) - 背景としての3x3グリッド */
-        .lamps {
-            position: absolute;
-            inset: 0;
-            /* カード全面に広げる */
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 1px;
-            /* 隙間を小さく */
-            padding: 2px;
-            /* 外枠の余白を小さく */
-            background: var(--card-front);
-            /* 隙間の色 */
+            margin-bottom: 40px;
+            margin-top: 20px;
+            position: relative; /* 背景の上に浮き上がらせるため */
             z-index: 1;
         }
 
-        .lamp {
-            width: 100%;
-            height: 100%;
-            border-radius: 3px;
-            /* 角の丸みを少し小さく */
-        }
-
-        /* Footer (Glass Panels) */
-        footer {
-            background: #0f172a;
-            padding: 15px 10px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            border-top: 1px solid var(--panel-border);
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.5);
-            z-index: 20;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* サイバーライン装飾 */
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 10%;
-            width: 80%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            box-shadow: var(--accent-glow);
-        }
-
-        .hand-label {
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--accent);
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .hand {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 0 5px;
-            height: auto;
-        }
-
-        .hand .card {
-            flex: 0 1 70px;
-            /* フレキシブルに縮小しつつ最大幅を確保 */
-            max-width: 70px;
-            aspect-ratio: 1;
-        }
-
-        .hand .card .val {
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
-            /* 手札の数字は少し小さめに調整 */
-        }
-
-        .controls {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .msg {
-            font-size: 0.9rem;
-            /* 少し小さく */
-            height: 1.2em;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
-        /* Modern Neon Buttons */
-        button {
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            color: #ffffff;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            width: 90%;
-            max-width: 320px;
-            box-shadow: var(--accent-glow);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(45deg);
-            transition: 0.3s;
-        }
-
-        button:hover::after {
-            left: 100%;
-            top: 100%;
-        }
-
-        button:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 5px rgba(14, 165, 233, 0.8);
-        }
-
-        button:disabled {
-            background: #334155;
-            color: #64748b;
-            box-shadow: none;
-            opacity: 0.7;
-        }
-
-        .icon-btn {
-            background: transparent;
-            color: #94a3b8;
-            border: 1px solid #475569;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            width: auto;
-            box-shadow: none;
-            margin-right: 8px;
-        }
-
-        /* Action Overlay (CPU & Player) */
-        #action-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(15, 23, 42, 0.98);
-            border: 2px solid var(--accent);
-            padding: 24px;
-            border-radius: 20px;
-            z-index: 100;
-            display: none;
-            width: 85%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        #action-cards {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 15px;
-            height: auto;
-        }
-
-        #action-cards .card {
-            width: 65px;
-            /* サイズを固定 */
-            height: 65px;
-            flex-shrink: 0;
-            /* 枚数が増えても縮小させない */
-        }
-
-        #action-cards .card .val {
-            font-size: 1.8rem;
-            /* オーバーレイ用の固定文字サイズ */
-        }
-
-        /* Result Screen */
-        #result-screen {
-            position: fixed;
-            inset: 0;
-            background: #020617;
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 40px 20px;
-            text-align: center;
-            overflow-y: auto;
-        }
-
-        .result-item {
-            margin: 8px;
-            font-size: 1.1rem;
-            opacity: 0;
-            transition: 0.5s;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            max-width: 300px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 4px;
-        }
-
-        .player-final {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 340px;
-            transform: scale(0.9);
-            opacity: 0;
-            transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .player-final.active {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        /* Title Screen */
-        #title-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            background-image: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        /* タイトル背景の装飾 */
-        #title-screen::before {
-            content: '';
-            position: absolute;
-            inset: -50%;
-            background: conic-gradient(from 0deg, transparent 0%, rgba(56, 189, 248, 0.1) 25%, transparent 50%, rgba(139, 92, 246, 0.1) 75%, transparent 100%);
-            animation: rotate 20s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes rotate {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ポップなタイトルロゴ */
-        .title-logo {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.5));
-        }
-
-        .title-char {
-            font-size: 6rem;
-            font-weight: 900;
-            font-family: 'Arial Rounded MT Bold', 'Varela Round', 'Segoe UI', sans-serif;
-            text-transform: uppercase;
-            /* 太いフチ取りでポップに */
-            text-shadow:
-                -3px -3px 0 #1e293b,
-                3px -3px 0 #1e293b,
-                -3px 3px 0 #1e293b,
-                3px 3px 0 #1e293b,
-                0 8px 0 #0f172a;
-            animation: bounce-pop 1.5s infinite ease-in-out alternate;
-        }
-
-        /* 文字ごとの色と跳ねるタイミングをずらす */
-        .char-q1 {
-            color: #f472b6;
-            animation-delay: 0s;
-        }
-
-        /* ピンク */
-        .char-q2 {
-            color: #38bdf8;
-            animation-delay: 0.2s;
-        }
-
-        /* 水色 */
-        .char-p {
-            color: #fcd34d;
-            animation-delay: 0.4s;
-        }
-
-        /* 黄色 */
-
-        @keyframes bounce-pop {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-
-            100% {
-                transform: translateY(-15px) scale(1.05) rotate(3deg);
-            }
-        }
-
-        /* サブタイトルをステッカー風に */
-        .title-sub {
-            font-size: 1.1rem;
-            color: #0f172a;
-            background: #fde047;
-            padding: 8px 24px;
-            border-radius: 99px;
-            border: 3px solid #0f172a;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            font-weight: 900;
-            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
-            transform: rotate(-3deg);
-        }
-
-        /* キャラクター選択UI */
-        .char-select-container {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .char-select-title {
+        /* 吹き出しのデザイン */
+        .fukidashi {
+            display: inline-block;
+            background-color: #ff3d00; /* 元気なオレンジ赤 */
             color: white;
             font-weight: bold;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 30px;
+            position: relative;
+            margin-bottom: 15px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            animation: fuwa 2s infinite ease-in-out;
+            border: 2px solid white;
         }
-
-        .char-select-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            width: 90vw;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .char-select-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.2s;
-            opacity: 0.6;
-            filter: grayscale(80%);
-        }
-
-        .char-select-item:hover {
-            opacity: 0.8;
-            transform: scale(1.05);
-        }
-
-        .char-select-item.selected {
-            opacity: 1;
-            filter: grayscale(0%);
-            transform: scale(1.1);
-        }
-
-        .char-select-img {
-            width: clamp(40px, 12vw, 60px);
-            height: clamp(40px, 12vw, 60px);
-            border-radius: 12px;
-            object-fit: cover;
-            border: 3px solid transparent;
-            background: rgba(15, 23, 42, 0.8);
-            margin-bottom: 5px;
-        }
-
-        .char-select-item.selected .char-select-img {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent);
-        }
-
-        .char-select-name {
-            font-size: 0.8rem;
-            color: #cbd5e1;
-            font-weight: bold;
-        }
-
-        .char-select-item.selected .char-select-name {
-            color: var(--accent);
-            text-shadow: var(--text-neon);
-        }
-
-        .char-select-badge {
+        
+        /* 吹き出しのしっぽ */
+        .fukidashi::after {
+            content: '';
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--accent);
-            color: #0f172a;
-            font-size: 0.7rem;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 10px;
-            display: none;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .char-select-item.selected .char-select-badge {
-            display: block;
-        }
-
-        .title-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 80%;
-            max-width: 300px;
-        }
-
-        .start-btn {
-            font-size: clamp(0.9rem, 4vw, 1.1rem);
-            padding: clamp(10px, 3vh, 16px) 20px;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-            animation: pulse 2s infinite;
-            width: 100%;
-        }
-
-        .start-btn.hard {
-            background: #ef4444;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            animation: none;
-        }
-
-        .rule-btn {
-            background: #334155;
-            color: #f8fafc;
-            font-size: 1rem;
-            padding: 12px 20px;
-            box-shadow: none;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-            }
-
-            50% {
-                transform: scale(1.03);
-                box-shadow: 0 4px 20px rgba(56, 189, 248, 0.6);
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-            }
-        }
-
-        /* レスポンシブ対応（スマホ向け） */
-        @media (max-width: 600px),
-        (max-height: 700px) {
-            .title-char {
-                font-size: clamp(3.5rem, 15vw, 6rem);
-            }
-
-            .title-logo {
-                margin-bottom: 5px !important;
-                margin-top: 10px !important;
-            }
-
-            .title-sub {
-                font-size: clamp(0.8rem, 3.5vw, 1.1rem);
-                padding: 4px 16px;
-                margin-bottom: 15px;
-            }
-
-            .char-select-container {
-                margin-bottom: 15px;
-            }
-
-            .char-select-name {
-                font-size: clamp(0.6rem, 2.5vw, 0.8rem);
-            }
-
-            #rule-modal .rule-content {
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Character Avatar & Cut-in (巨大化) */
-        .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            /* 四角ベースのモダンな形へ */
-            object-fit: cover;
-            border: 2px solid var(--accent);
-            background: rgba(15, 23, 42, 0.8);
-            box-shadow: var(--accent-glow);
-        }
-
-        .cpu-score {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-            font-family: 'Inter', sans-serif;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        #action-character {
-            position: absolute;
-            bottom: calc(100% - 15px);
+            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            height: 220px;
-            /* 300pxから縮小して見切れを防止 */
-            max-height: 40vh;
-            object-fit: contain;
-            z-index: -1;
-            animation: slideUpFade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            will-change: transform, opacity;
+            border-style: solid;
+            border-width: 10px 10px 0 10px;
+            border-color: #ff3d00 transparent transparent transparent;
         }
 
-        @keyframes slideUpFade {
-            from {
-                opacity: 0;
-                transform: translate(-50%, 60px) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0) scale(1);
-            }
+        @keyframes fuwa {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
-        .ro-character {
-            height: 160px;
-            object-fit: contain;
-            margin-bottom: -15px;
-            z-index: 5;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            will-change: transform, opacity;
+        h1 {
+            color: #0d47a1; /* 濃い青で見やすく */
+            margin: 0;
+            font-size: 28px;
+            text-shadow: 3px 3px 0px #fff; /* 文字の周りを白く縁取り */
         }
 
-        @keyframes popIn {
-            from {
-                opacity: 0;
-                transform: scale(0.5) translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        /* ゲームリストのグリッドレイアウト */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* ルールモーダル用 */
-        #rule-modal .rule-content {
-            text-align: left;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #cbd5e1;
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 10px;
-        }
-
-        #rule-modal h4 {
-            color: var(--accent);
-            margin: 15px 0 5px 0;
-            font-size: 1rem;
-        }
-
-        /* ターン告知用 */
-        #turn-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(2, 6, 23, 0.95);
-            z-index: 2500;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #title-screen {
-            position: absolute;
-            inset: 0;
+        /* 各ゲームのカードデザイン */
+        .game-card {
+            background: white;
+            border: 4px solid #ffca28; /* 枠線を黄色系に */
+            border-radius: 20px;
+            padding: 20px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 6px 0 #ff6f00; /* 影をオレンジに */
+            transition: all 0.1s;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            text-align: center;
+            height: 140px;
+            position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            cursor: pointer;
         }
 
-        #turn-character {
-            height: 60vh;
-            max-width: 100%;
-            object-fit: contain;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* ホバー時・タップ時の動き */
+        .game-card:hover {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #ff6f00;
+            background-color: #fffde7;
+            border-color: #ff6f00;
         }
 
-        #turn-name {
-            font-size: 3rem;
-            color: white;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-align: center;
-            line-height: 1.2;
-            margin-top: 10px;
-            animation: slideUp 0.3s ease-out forwards;
+        .game-card:active {
+            transform: translateY(6px);
+            box-shadow: none;
         }
 
-        @keyframes popIn {
-            from {
-                transform: scale(0.6) translateY(50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
+        /* カード内のテキストデザイン */
+        .game-number {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff6f00;
+            background: #fff8e1;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .game-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            margin-top: 15px;
         }
 
-        /* ラウンド開始オーバーレイ */
-        #round-start-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #020617;
-            z-index: 3000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .game-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
         }
 
-        #round-start-text {
-            font-size: clamp(3rem, 10vw, 5rem);
-            color: white;
-            font-weight: 900;
-            letter-spacing: 4px;
-            text-align: center;
-            line-height: 1.2;
-            text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
-            transform: scale(0.5);
-            opacity: 0;
-            z-index: 10;
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #555;
+            position: relative;
+            z-index: 1;
+            background-color: rgba(255,255,255,0.7); /* 文字が見やすいように背景を少し白く */
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 20px;
         }
 
-        .text-pop {
-            animation: textPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes textPop {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-
-            50% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        #round-start-chars {
-            display: flex;
-            gap: clamp(5px, 2vw, 20px);
-            margin-bottom: -30px;
-            z-index: 5;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .rs-char {
-            height: clamp(100px, 25vh, 220px);
-            width: clamp(70px, 28vw, 150px);
-            object-fit: contain;
-            transform: translateY(100px);
-            opacity: 0;
-            will-change: transform, opacity;
-        }
-
-        .char-slide-up {
-            animation: charSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes charSlideUp {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        /* スマホ向けの調整 */
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            .game-grid { grid-template-columns: 1fr; }
+            .game-card { height: auto; padding: 25px 20px; }
         }
     </style>
 </head>
-
 <body>
 
-    <!-- Title Screen -->
-    <div id="title-screen">
-        <div class="title-logo" style="margin-top: 50px;">
-            <span class="title-char char-q1">Q</span>
-            <span class="title-char char-q2">Q</span>
-            <span class="title-char char-p">P</span>
-        </div>
-        <div class="title-sub">九九のポーカー</div>
+    <header>
+        <div class="fukidashi">サクッとあそべる！</div>
+        <h1>ビジョントレーニングゲーム</h1>
+    </header>
 
-        <div class="char-select-container">
-            <div class="char-select-title">対戦メンバーを4人選んでください（1人目があなた）</div>
-            <div class="char-select-grid" id="char-select-grid">
-                <!-- JSで動的に生成 -->
-            </div>
-            <button onclick="selectRandomChars()"
-                style="margin-top: 10px; padding: 8px 16px; font-size: 0.9rem; background: #475569; width: auto;">🎲
-                おまかせ</button>
-        </div>
+    <div class="game-grid">
+        <!-- 01 -->
+        <a href="01dabu/index.html" class="game-card">
+            <span class="game-number">No.01</span>
+            <div class="game-title">おなじマークをさがせ！</div>
+            <div class="game-desc">おなじマークをさがそう</div>
+        </a>
 
-        <div class="title-buttons">
-            <button onclick="startGame(true)" class="start-btn">ヒントあり START</button>
-            <button onclick="startGame(false)" class="start-btn hard">ヒントなし START</button>
-        </div>
+        <!-- 02 -->
+        <a href="02socks/index.html" class="game-card">
+            <span class="game-number">No.02</span>
+            <div class="game-title">くつしたあわせ</div>
+            <div class="game-desc">くつしたをそろえておかたづけ♪</div>
+        </a>
 
-        <button onclick="showRuleModal()"
-            style="position: absolute; top: 15px; right: 15px; background: rgba(51, 65, 85, 0.8); color: #cbd5e1; font-size: 0.8rem; padding: 6px 12px; border-radius: 6px; box-shadow: none; border: 1px solid #475569;">
-            ❓ ルール
-        </button>
+        <!-- 03 -->
+        <a href="03speed/index.html" class="game-card">
+            <span class="game-number">No.03</span>
+            <div class="game-title">SPEED ATTACK</div>
+            <div class="game-desc">ひかるボタンをすばやくおせ！</div>
+        </a>
+
+        <!-- 04 -->
+        <a href="04count/index.html" class="game-card">
+            <span class="game-number">No.04</span>
+            <div class="game-title">SPEED COUNT</div>
+            <div class="game-desc">すうじをじゅんにすばやくおせ！</div>
+        </a>
+
+        <!-- 05 -->
+        <a href="05siryoku/index.html" class="game-card">
+            <span class="game-number">No.05</span>
+            <div class="game-title">すーぱーしりょくてすと</div>
+            <div class="game-desc">すごい「しりょく」てすと！？</div>
+        </a>
+
+        <!-- 06 -->
+        <a href="06rope/index.html" class="game-card">
+            <span class="game-number">No.06</span>
+            <div class="game-title">このいっぽん</div>
+            <div class="game-desc">おなじいろのつながるロープはどれ？</div>
+        </a>
+
+        <!-- 07 -->
+        <a href="07colormemo/index.html" class="game-card">
+            <span class="game-number">No.07</span>
+            <div class="game-title">いろあわせきおく</div>
+            <div class="game-desc">いろのはいちをおぼえよう</div>
+        </a>
+
+        <!-- 08 -->
+        <a href="08ooi/index.html" class="game-card">
+            <span class="game-number">No.08</span>
+            <div class="game-title">いちばんおおいのどれだ？</div>
+            <div class="game-desc">いちばんおおいのはかたち？いろ？</div>
+        </a>
+
+        <!-- 09 -->
+        <a href="09word/index.html" class="game-card">
+            <span class="game-number">No.09</span>
+            <div class="game-title">どうぶつもじさがし</div>
+            <div class="game-desc">もじのなかのどうぶつみつかる？</div>
+        </a>
+
+        <!-- 10 -->
+        <a href="10obake/index.html" class="game-card">
+            <span class="game-number">No.10</span>
+            <div class="game-title">げんじゅうをつかまえろ</div>
+            <div class="game-desc">げんじゅうをつかまえよう！</div>
+        </a>
+
+        <!-- 11 -->
+        <a href="11narabe/index.html" class="game-card">
+            <span class="game-number">No.11</span>
+            <div class="game-title">もじならべ</div>
+            <div class="game-desc">ただしくもじをならべよう</div>
+        </a>
+
+        <!-- 12 -->
+        <a href="12block/index.html" class="game-card">
+            <span class="game-number">No.12</span>
+            <div class="game-title">ぴたっとパズル</div>
+            <div class="game-desc">ピースをぴたっとおこう</div>
+        </a>
     </div>
 
-    <!-- 背景巨大キャラクター -->
-    <div id="bg-characters">
-        <img id="bg-char-center" src="" style="display:none;" alt="">
-    </div>
+    <footer>
+        <p>© 2026 Vision Training Games</p>
+    </footer>
 
-    <div id="game-wrapper">
-        <header>
-            <div style="display:flex; align-items:center;">
-                <button class="icon-btn" onclick="showQuitModal()"
-                    style="border-radius:8px; padding:6px 12px;">✖</button>
-                <div id="round-ui" style="letter-spacing:1px; color:#cbd5e1;">ROUND 1/4</div>
-            </div>
-            <div id="turn-ui">YOUR TURN</div>
-            <div id="score-ui" style="display:flex; align-items:center; gap:8px;">
-                <img id="you-avatar" class="avatar" src="" style="display:none;">
-                <span id="score-text" style="text-shadow: 0 0 5px #fff;">SCORE: 0</span>
-            </div>
-        </header>
-
-        <!-- CPUスコア表示バーをモダンに -->
-        <div id="cpu-score-bar"
-            style="display: flex; justify-content: space-evenly; background: #0f172a; padding: 8px 0; font-size: 0.8rem; border-bottom: 1px solid var(--panel-border); box-shadow: 0 4px 10px rgba(0,0,0,0.3); position:relative; z-index:10;">
-            <!-- dynamically generated -->
-        </div>
-
-        <main id="field"></main>
-
-        <footer>
-            <div class="hand-label">Your Hand</div>
-            <div class="hand" id="hand"></div>
-            <div class="controls">
-                <div class="msg" id="msg">カードを選ぶかパスしてください</div>
-                <button id="action-btn" onclick="handleAction()">パス</button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- ターン開始のアニメーションオーバーレイ -->
-    <div id="turn-overlay">
-        <img id="turn-character" src="">
-        <div id="turn-name"></div>
-    </div>
-
-    <!-- ラウンド開始のアニメーションオーバーレイ -->
-    <div id="round-start-overlay">
-        <div id="round-start-chars"></div>
-        <div id="round-start-text"></div>
-    </div>
-
-    <div id="action-overlay"
-        style="background: #0f172a; border: 1px solid var(--accent); box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);">
-        <img id="action-character" src="" style="display:none;">
-        <h3 id="action-name"
-            style="margin:0 0 10px 0; color:var(--accent); font-size: 1.8rem; text-shadow: var(--text-neon); letter-spacing: 2px;">
-            CPU</h3>
-        <p id="action-desc" style="font-size:1rem; color:#cbd5e1;">カードを捨てました</p>
-        <div id="action-cards"></div>
-    </div>
-
-    <div id="result-screen"
-        style="background: radial-gradient(circle at center, rgba(30,27,75,0.95), rgba(3,7,18,0.98));">
-        <h2
-            style="color:var(--accent); font-size: 3rem; margin-bottom: 20px; letter-spacing: 6px; text-shadow: var(--text-neon), 0 10px 20px rgba(0,0,0,0.8);">
-            RESULT</h2>
-        <div id="cpu-results" style="width: 100%; display:flex; flex-direction:column; align-items:center;"></div>
-        <div id="player-final" class="player-final"
-            style="position:relative; margin-top:80px; background:#0f172a; border:1px solid var(--accent); box-shadow: var(--accent-glow);">
-            <img id="final-character" src=""
-                style="position:absolute; top:-100px; left:50%; transform:translateX(-50%); height:200px; object-fit:contain; display:none;">
-            <div style="font-size:0.9rem; margin-bottom:12px; color:var(--accent); letter-spacing: 2px;">YOUR FINAL HAND
-            </div>
-            <div id="final-hand"
-                style="display:flex; gap:8px; justify-content:center; margin-bottom:20px; height: auto;"></div>
-            <div id="final-score"
-                style="font-size:3.5rem; font-weight:900; color:white; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5);">
-                0</div>
-            <div style="font-size: 1rem; color: #94a3b8; letter-spacing:1px; margin-top:5px;">TOTAL POINTS</div>
-            <div id="final-roles"
-                style="font-size:1rem; color:#fcd34d; margin-top:20px; font-weight: bold; text-shadow: 0 0 5px rgba(252,211,77,0.5);">
-            </div>
-        </div>
-        <div style="display: flex; gap: 15px; margin-top: 40px; flex-wrap: wrap; justify-content: center;">
-            <button onclick="location.reload()"
-                style="width:auto; padding: 16px 30px; font-size: 1.1rem; background: #334155; box-shadow: none;">タイトルへ</button>
-            <button onclick="replayGame()" style="width:auto; padding: 16px 40px; font-size: 1.1rem;">もう一度遊ぶ</button>
-        </div>
-    </div>
-
-    <!-- ラウンドリザルト用のオーバーレイ（中身はJSで動的に生成） -->
-    <div id="round-overlay"
-        style="display:none; position:fixed; inset:0; background:rgba(2, 6, 23, 0.98); z-index:500; flex-direction:column; align-items:center; justify-content:center; padding: 20px; text-align: center;">
-    </div>
-
-    <!-- 中断確認モーダル -->
-    <div id="quit-modal"
-        style="display:none; position:fixed; inset:0; background:rgba(2, 6, 23, 0.9); z-index:3000; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
-        <div
-            style="background:var(--panel); padding:25px 20px; border-radius:15px; text-align:center; border:2px solid #475569; width: 100%; max-width: 300px;">
-            <p style="font-size:1.1rem; margin-top:0; margin-bottom:25px;">ゲームを中断して<br>タイトルに戻りますか？</p>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button onclick="hideQuitModal()"
-                    style="background:#475569; color:white; padding:12px 0; width:50%; box-shadow:none;">キャンセル</button>
-                <button onclick="location.reload()"
-                    style="background:#ef4444; color:white; padding:12px 0; width:50%; box-shadow:none;">戻る</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ルール確認モーダル -->
-    <div id="rule-modal"
-        style="display:none; position:fixed; inset:0; background:rgba(2, 6, 23, 0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
-        <div
-            style="background:var(--panel); padding:25px 20px; border-radius:15px; text-align:center; border:2px solid var(--accent); width: 100%; max-width: 340px;">
-            <h3 style="color:var(--accent); margin-top:0; font-size:1.5rem; letter-spacing:2px;">ルール</h3>
-            <div class="rule-content">
-                <p style="margin-top:0;">手札の5枚を使って、同じ「九九の段」に属する数字を集めるゲームです。</p>
-
-                <h4>💡 ヒント（ランプ）の見方</h4>
-                <p style="margin-top:5px; margin-bottom:5px; font-size:0.8rem;">
-                    カード背景のランプは、その数字が属する段を表しています。配置は左上から以下の通りです。</p>
-                <div
-                    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 100px; margin: 0 auto 10px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 6px;">
-                    <div
-                        style="background: var(--c1); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        1</div>
-                    <div
-                        style="background: var(--c2); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        2</div>
-                    <div
-                        style="background: var(--c3); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        3</div>
-                    <div
-                        style="background: var(--c4); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        4</div>
-                    <div
-                        style="background: var(--c5); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        5</div>
-                    <div
-                        style="background: var(--c6); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        6</div>
-                    <div
-                        style="background: var(--c7); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        7</div>
-                    <div
-                        style="background: var(--c8); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        8</div>
-                    <div
-                        style="background: var(--c9); color: white; text-align: center; font-size: 0.8rem; font-weight: bold; border-radius: 2px; aspect-ratio: 1; display:flex; align-items:center; justify-content:center;">
-                        9</div>
-                </div>
-
-                <h4>役と得点</h4>
-                <ul style="padding-left: 20px; margin-top:5px; margin-bottom:5px;">
-                    <li><strong>3カード</strong>（同じ段が3枚）: 3000点</li>
-                    <li><strong>4カード</strong>（同じ段が4枚）: 4000点</li>
-                    <li><strong>5カード</strong>（同じ段が5枚）: 5000点</li>
-                </ul>
-
-                <h4>🤝 ハブルール（重複利用）</h4>
-                <p style="margin-top:5px; font-size:0.85rem;">1つの数字を複数の段の役で<strong>同時に使うことができます</strong>。<br>
-                    （例：「36」は4の段、6の段、9の段などの役の一部として重複カウントされ、複数の役ができた場合は点数がすべて合算されます）</p>
-
-                <h4>特別役</h4>
-                <p style="margin-top:5px;">1, 25, 49, 64, 81 の5枚を集めると「LEGENDARY SQUARES」となり <strong>10000点</strong>
-                    を獲得します。</p>
-
-                <h4>進行</h4>
-                <p style="margin-top:5px;">1ラウンドにつき各プレイヤーは2回アクション（捨てる＆場から補充、またはパス）を行います。<br>全4ラウンドの合計スコアで勝敗を決めます。</p>
-
-                <h4>🤖 キャラクターの特徴</h4>
-                <ul style="margin-top:5px; margin-bottom:5px; list-style:none; padding-left:0; font-size:0.8rem;">
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="01/01Q.png" onerror="this.src='01/01A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">01 カエデ:</strong> 真面目。小さい役でも着実に集めていく。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="02/02Q.png" onerror="this.src='02/02A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">02 スノウ:</strong> 積極的。複数段を積極的に狙っていく。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="03/03Q.png" onerror="this.src='03/03A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">03 ピヨン:</strong> 破天荒。常に9000点越えを目指す。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="04/04Q.png" onerror="this.src='04/04A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">04 ノエル:</strong> 安全第一。2つの段で3カードを目指す。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="05/05Q.png" onerror="this.src='05/05A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">05 カワエ:</strong> 柔軟。4カード中心で点数を稼ぐ。</div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="06/06Q.png" onerror="this.src='06/06A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">06 ラビィ:</strong> こだわり。3・6・9の倍数が好き。</div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="07/07Q.png" onerror="this.src='07/07A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">07 アオン:</strong> 慎重。1枚しかカードは捨てない。</div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="08/08Q.png" onerror="this.src='08/08A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">08 ワニタ:</strong> 理論派。確立を考えてカードを選ぶ。</div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="09/09Q.png" onerror="this.src='09/09A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">09 パンク:</strong> 前向き。パスは嫌い。いい役を狙い続ける。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="10/10Q.png" onerror="this.src='10/10A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">10 ミケン:</strong> 奇策。場のカードを使い揃えようとする。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="11/11Q.png" onerror="this.src='11/11A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">11 ハムコ:</strong> 我が道。自分の信じた組み合わせを求める。
-                        </div>
-                    </li>
-                    <li
-                        style="display:flex; align-items:center; gap:8px; margin-bottom:6px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 6px;">
-                        <img src="12/12Q.png" onerror="this.src='12/12A.png'"
-                            style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid var(--accent)">
-                        <div style="flex:1"><strong style="color:var(--accent)">12 プリス:</strong> ロマン。5カードが最優先。</div>
-                    </li>
-                </ul>
-            </div>
-            <button onclick="hideRuleModal()"
-                style="background:#475569; color:white; padding:12px 0; width:80%; box-shadow:none;">閉じる</button>
-        </div>
-    </div>
-
-    <script>
-        /**
-         * Sound System (Simple Web Audio)
-         */
-        const Sound = {
-            init() { },
-            play() { },
-            startBGM() { },
-            stopBGM() { }
-        };
-
-        function toggleBGM() {
-            // function stubbed for performance
-        }
-
-        /**
-         * Kuku (Multiplication) Logic
-         */
-        const NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 24, 25, 27, 28, 30, 32, 35, 36, 40, 42, 45, 48, 49, 54, 56, 63, 64, 72, 81];
-
-        // Returns which rows (1-9) the number belongs to
-        const getRows = (n) => {
-            let r = [];
-            for (let i = 1; i <= 9; i++) {
-                if (n % i === 0 && n / i <= 9) r.push(i);
-            }
-            return r;
-        };
-
-        /**
-         * Game State
-         */
-        let totalScores = [0, 0, 0, 0];
-        let deck = [], field = [], players = [];
-        let round = 1, turn = 0;
-        let startPlayer = 0;
-        let currentTurnCount = 0;
-        let phase = 'discard'; // 'discard' or 'pick'
-        let selectedIndices = [];
-        let needPick = 0;
-        let pendingDiscards = []; // プレイヤーが捨てるカードを一時保存する変数
-        let isAnimating = false; // アニメーション中の操作ロック用フラグ
-        let isHintEnabled = true; // ヒント（ランプ）の有無
-        let selectedPlayerCharIds = []; // タイトルで選択したプレイヤーとCPUのキャラID (最大4つ)
-        let playerChars = [];
-        let bestPlayerHand = { score: -1, hand: [], round: 0, rolesText: '' };
-
-        const CHAR_NAMES = {
-            1: "カエデ", 2: "スノウ", 3: "ピヨン", 4: "ノエル",
-            5: "カワエ", 6: "ラビィ", 7: "アオン", 8: "ワニタ",
-            9: "パンク", 10: "ミケン", 11: "ハムコ", 12: "プリス"
-        };
-
-        const setCharImg = (imgEl, id, exp) => {
-            if (!id) return;
-            const padded = id.toString().padStart(2, '0');
-            imgEl.src = `${padded}/${padded}${exp}.png`;
-            imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = `${padded}/${padded}A.png`; };
-        };
-
-        const getCharImgTag = (id, exp, cls = "", style = "") => {
-            const padded = id.toString().padStart(2, '0');
-            const src = `${padded}/${padded}${exp}.png`;
-            const fallback = `${padded}/${padded}A.png`;
-            return `<img src="${src}" class="${cls}" style="${style}" onerror="this.src='${fallback}'">`;
-        };
-
-        function showQuitModal() {
-            Sound.play(600, 0.1, 'square');
-            document.getElementById('quit-modal').style.display = 'flex';
-        }
-
-        function hideQuitModal() {
-            Sound.play(400, 0.1, 'square');
-            document.getElementById('quit-modal').style.display = 'none';
-        }
-
-        function showRuleModal() {
-            Sound.init();
-            Sound.play(600, 0.1, 'square');
-            document.getElementById('rule-modal').style.display = 'flex';
-        }
-
-        function hideRuleModal() {
-            Sound.play(400, 0.1, 'square');
-            document.getElementById('rule-modal').style.display = 'none';
-        }
-
-        async function showTurnAnnouncement(t) {
-            if (t === 0) return; // 自分のターンの時はスキップする
-
-            isAnimating = true;
-            const overlay = document.getElementById('turn-overlay');
-            const img = document.getElementById('turn-character');
-            const nameEl = document.getElementById('turn-name');
-
-            let handScore = calc(players[t].hand).total;
-            let exp = handScore === 0 ? 'N' : (handScore >= 5000 ? 'C' : 'B');
-            if (handScore >= 9000) exp = 'G';
-            setCharImg(img, players[t].charId, exp);
-            nameEl.innerHTML = `${players[t].name}<br>のターン！`;
-            nameEl.style.textShadow = players[t].isCPU ? '0 0 15px #f87171' : '0 0 15px var(--accent)';
-
-            overlay.style.display = 'flex';
-            Sound.play(players[t].isCPU ? 400 : 800, 0.1, 'triangle');
-
-            await new Promise(r => setTimeout(r, 1000));
-
-            overlay.style.display = 'none';
-            isAnimating = false;
-        }
-
-        async function showRoundStart() {
-            isAnimating = true;
-            const overlay = document.getElementById('round-start-overlay');
-            const textEl = document.getElementById('round-start-text');
-            const charsEl = document.getElementById('round-start-chars');
-
-            charsEl.innerHTML = '';
-            textEl.className = '';
-            textEl.style.opacity = '0';
-
-            let displayDuration = 1500;
-
-            if (round === 1) {
-                // ラウンド1: 相手キャラ全員表示
-                textEl.innerHTML = 'ラウンド１<br>スタート！';
-                textEl.style.color = '#fcd34d'; // ゴールドっぽく
-
-                // CPUプレイヤーのキャラIDを取得 (players[1]〜[3])
-                for (let i = 1; i <= 3; i++) {
-                    const img = document.createElement('img');
-                    img.className = 'rs-char char-slide-up';
-                    img.style.animationDelay = `${(i - 1) * 0.15}s`;
-                    setCharImg(img, players[i].charId, 'A'); // 表情A（通常系）
-                    charsEl.appendChild(img);
-                }
-                displayDuration = 2500;
-            } else {
-                // ラウンド2以降: 文字のみ
-                textEl.innerHTML = `ラウンド${round}<br>スタート！`;
-                textEl.style.color = '#ffffff';
-                displayDuration = 1200;
-            }
-
-            overlay.style.display = 'flex';
-
-            // 少し遅れて文字をポップ
-            setTimeout(() => {
-                textEl.className = 'text-pop';
-                if (round === 1) {
-                    Sound.play(800, 0.1, 'square');
-                    setTimeout(() => Sound.play(1200, 0.2, 'square'), 100);
-                } else {
-                    Sound.play(1000, 0.15, 'triangle');
-                }
-            }, round === 1 ? 600 : 100);
-
-            await new Promise(r => setTimeout(r, displayDuration));
-
-            overlay.style.display = 'none';
-            isAnimating = false;
-        }
-
-        function initTitleScreen() {
-            const grid = document.getElementById('char-select-grid');
-            grid.innerHTML = '';
-            for (let i = 1; i <= 12; i++) {
-                const item = document.createElement('div');
-                item.className = 'char-select-item';
-                item.dataset.id = i;
-
-                // Qアイコンを表示
-                item.innerHTML = `
-                    <div style="position: relative;">
-                        ${getCharImgTag(i, 'Q', 'char-select-img')}
-                        <div class="char-select-badge"></div>
-                    </div>
-                    <div class="char-select-name">${CHAR_NAMES[i]}</div>
-                `;
-
-                item.onclick = () => handleCharSelect(i, item);
-                grid.appendChild(item);
-            }
-
-            // デフォルトでは誰も選択されていない状態にするため、以下の呼び出しを削除またはコメントアウト
-            // selectRandomChars();
-        }
-
-        function handleCharSelect(id, itemEl) {
-            const index = selectedPlayerCharIds.indexOf(id);
-            if (index > -1) {
-                // すでに選択されていれば解除（ただし最後の1人は解除できないようにするか、0になってもOKとするか。今回は0も許容で次タップ時に追加）
-                selectedPlayerCharIds.splice(index, 1);
-            } else {
-                // 未選択なら追加（追加順に 1P, CPU1, CPU2, CPU3 になる）。4人選ばれている場合は一番古いものを消す。
-                if (selectedPlayerCharIds.length >= 4) {
-                    selectedPlayerCharIds.shift();
-                }
-                selectedPlayerCharIds.push(id);
-            }
-            updateCharSelectUI();
-        }
-
-        function selectRandomChars() {
-            let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].sort(() => Math.random() - 0.5);
-            selectedPlayerCharIds = nums.slice(0, 4);
-            updateCharSelectUI();
-        }
-
-        function updateCharSelectUI() {
-            document.querySelectorAll('.char-select-item').forEach(el => {
-                el.classList.remove('selected');
-                const badge = el.querySelector('.char-select-badge');
-                badge.innerText = '';
-
-                const id = parseInt(el.dataset.id);
-                const orderIndex = selectedPlayerCharIds.indexOf(id);
-
-                if (orderIndex > -1) {
-                    el.classList.add('selected');
-                    if (orderIndex === 0) {
-                        badge.innerText = '1P';
-                        badge.style.background = 'var(--accent)';
-                    } else {
-                        badge.innerText = `CPU${orderIndex}`;
-                        badge.style.background = '#f87171'; // CPUは赤っぽく
-                    }
-                }
-            });
-
-            // スタートボタンの有効/無効切り替え（4人揃わないと開始不可）
-            const startBtns = document.querySelectorAll('.start-btn');
-            startBtns.forEach(btn => {
-                btn.disabled = selectedPlayerCharIds.length < 4;
-            });
-        }
-
-        initTitleScreen(); // ゲーム読み込み時にキャラ選択画面を生成
-
-        function startGame(hint) {
-            isHintEnabled = hint;
-
-            // AudioContextをユーザーアクションから初期化
-            Sound.init();
-            Sound.play(880, 0.1);
-            Sound.startBGM();
-
-            // タイトルを非表示にしてゲーム開始
-            document.getElementById('title-screen').style.display = 'none';
-            initGame();
-        }
-
-        function initGame() {
-            totalScores = [0, 0, 0, 0];
-            round = 1;
-
-            // もし何らかの理由で4人選ばれていなかったら、足りない分をランダムに追加
-            if (selectedPlayerCharIds.length < 4) {
-                let available = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter(id => !selectedPlayerCharIds.includes(id));
-                available.sort(() => Math.random() - 0.5);
-                while (selectedPlayerCharIds.length < 4 && available.length > 0) {
-                    selectedPlayerCharIds.push(available.pop());
-                }
-            }
-
-            playerChars = [...selectedPlayerCharIds];
-
-            bestPlayerHand = { score: -1, hand: [], round: 0, rolesText: '' };
-
-            initRound();
-        }
-
-        async function initRound() {
-            // Shuffle deck
-            deck = [...NUMS].sort(() => Math.random() - 0.5);
-
-            // Init Players
-            players = [];
-            for (let i = 0; i < 4; i++) {
-                players.push({
-                    name: i === 0 ? "YOU" : CHAR_NAMES[playerChars[i]],
-                    hand: deck.splice(0, 5),
-                    isCPU: i !== 0,
-                    charId: playerChars[i]
-                });
-            }
-
-            // Init Field (16 cards)
-            field = [];
-            for (let i = 0; i < 16; i++) {
-                field.push({ val: deck.splice(0, 1)[0], open: false, targeted: false });
-            }
-
-            // スタートプレイヤーをラウンドごとにずらす (R1: YOU, R2: CPU1, R3: CPU2, R4: CPU3)
-            startPlayer = (round - 1) % 4;
-            turn = startPlayer;
-            currentTurnCount = 0;
-            phase = 'discard';
-            selectedIndices = [];
-            needPick = 0;
-            pendingDiscards = [];
-            isAnimating = false;
-
-            document.getElementById('msg').innerText = players[turn].isCPU ? "相手のターンです" : "カードを選んで捨ててください";
-
-            render();
-
-            await showRoundStart();
-
-            // 最初のターンがCPUの場合は自動実行
-            if (players[turn].isCPU) {
-                setTimeout(cpu, 500);
-            } else {
-                document.getElementById('msg').innerText = "カードを選ぶかパスしてください";
-            }
-        }
-
-        function createCard(v, open, sel = false, cb = null, targeted = false) {
-            const d = document.createElement('div');
-            d.className = `card ${!open ? 'hidden' : ''} ${sel ? 'selected' : ''} ${targeted ? 'targeted' : ''} `;
-
-            if (open) {
-                let innerHTML = '';
-                if (isHintEnabled) {
-                    const rows = getRows(v);
-                    let lamps = '<div class="lamps">';
-                    for (let i = 1; i <= 9; i++) {
-                        // Color mapping logic
-                        const isActive = rows.includes(i);
-                        // 該当する段のみ色を付け、該当しない場合は薄いグレーにする
-                        lamps += `<div class="lamp" style="background: ${isActive ? `var(--c${i})` : '#f1f5f9'};"></div>`;
-                    }
-                    lamps += '</div>';
-                    // 背景のランプグリッドの上に、数字を配置
-                    innerHTML = `${lamps} <div class="val">${v}</div>`;
-                } else {
-                    // ヒントなしの場合は数字のみ中央に配置（背景を暗くして文字を白に）
-                    innerHTML = `<div class="val" style="opacity:1; text-shadow:none; color:var(--text); background:var(--card-back); width:100%; height:100%; display:flex; align-items:center; justify-content:center;">${v}</div>`;
-                }
-                d.innerHTML = innerHTML;
-            } else {
-                // Keep layout consistent for hidden cards
-                d.innerHTML = '';
-            }
-
-            if (cb) d.onclick = cb;
-            return d;
-        }
-
-        function render() {
-            // Render Field
-            const fEl = document.getElementById('field');
-            fEl.innerHTML = '';
-            field.forEach((c, i) => fEl.appendChild(createCard(c.val, c.open, false, () => onField(i), c.targeted)));
-
-            // Render Hand
-            const hEl = document.getElementById('hand');
-            hEl.innerHTML = '';
-            players[0].hand.forEach((v, i) => {
-                const isS = selectedIndices.includes(i);
-                hEl.appendChild(createCard(v, true, isS, () => onHand(i)));
-            });
-
-            // UI Updates
-            document.getElementById('round-ui').innerText = `ROUND ${round}/4`;
-
-            const turnEl = document.getElementById('turn-ui');
-            turnEl.innerText = players[turn].isCPU ? `${players[turn].name} THINKING...` : "YOUR TURN";
-            turnEl.style.color = players[turn].isCPU ? '#cbd5e1' : '#ffffff';
-            turnEl.style.background = players[turn].isCPU ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(99, 102, 241, 0.4))';
-            turnEl.style.borderColor = players[turn].isCPU ? 'rgba(255,255,255,0.1)' : 'var(--accent)';
-            turnEl.style.boxShadow = players[turn].isCPU ? 'none' : 'var(--accent-glow)';
-
-            // ターン開始・アクション時のキャラクター表示は専用の関数で1秒間だけ中央に表示するため、
-            // 常に表示される背景キャラクターとしての処理はここから削除しました。
-
-            // 総合スコアを表示 (アイコンは Q を使用)
-            const youAvatar = document.getElementById('you-avatar');
-            youAvatar.style.display = 'block';
-            setCharImg(youAvatar, playerChars[0], 'Q');
-            document.getElementById('score-text').innerText = `TOTAL: ${totalScores[0]}`;
-
-            // CPUスコアバーの更新 (アイコンは Q を使用)
-            document.getElementById('cpu-score-bar').innerHTML = `
-            <div class="cpu-score">${getCharImgTag(playerChars[1], 'Q', 'avatar')} ${players[1].name}: <span style="color:white">${totalScores[1]}</span></div>
-            <div class="cpu-score">${getCharImgTag(playerChars[2], 'Q', 'avatar')} ${players[2].name}: <span style="color:white">${totalScores[2]}</span></div>
-            <div class="cpu-score">${getCharImgTag(playerChars[3], 'Q', 'avatar')} ${players[3].name}: <span style="color:white">${totalScores[3]}</span></div>
-        `;
-
-            const btn = document.getElementById('action-btn');
-            // パスは常に押せるように（フェーズがdiscardの時）
-            btn.disabled = (turn !== 0 || phase !== 'discard' || isAnimating);
-
-            if (phase === 'discard') {
-                if (selectedIndices.length === 0) {
-                    btn.innerText = "パス";
-                    if (turn === 0) document.getElementById('msg').innerText = "カードを選ぶかパスしてください";
-                } else {
-                    btn.innerText = "捨てて交換";
-                    if (turn === 0) document.getElementById('msg').innerText = `${selectedIndices.length}枚 選んでいます`;
-                }
-            } else if (phase === 'pick') {
-                btn.innerText = "補充中";
-            }
-        }
-
-        function onHand(i) {
-            if (turn !== 0 || phase !== 'discard' || isAnimating) return;
-
-            const p = selectedIndices.indexOf(i);
-            if (p > -1) {
-                selectedIndices.splice(p, 1);
-                Sound.play(600, 0.05);
-            } else {
-                if (selectedIndices.length < 3) { // Max 3 cards exchange
-                    selectedIndices.push(i);
-                    Sound.play(800, 0.05);
-                }
-            }
-            render();
-        }
-
-        async function onField(i) {
-            if (turn !== 0 || phase !== 'pick' || isAnimating) return;
-
-            isAnimating = true; // 操作をロック
-
-            // Player picks card
-            Sound.play(1200, 0.1, 'triangle');
-
-            // 選ばれたカードをハイライトして再描画
-            field[i].targeted = true;
-            render();
-
-            // アニメーションを見せるために少し待機（テンポアップのため200msに短縮）
-            await new Promise(r => setTimeout(r, 200));
-
-            // 選んだ場所のカードを手札に加える
-            players[0].hand.push(field[i].val);
-
-            // その場所に、保留していた捨て札をオープンにして配置する
-            const putVal = pendingDiscards.shift();
-            field[i] = { val: putVal, open: true, targeted: false };
-
-            needPick--;
-            isAnimating = false; // ロック解除
-
-            if (needPick === 0) {
-                phase = 'discard';
-                document.getElementById('msg').innerText = "相手のターンです";
-                next();
-            } else {
-                document.getElementById('msg').innerText = `あと ${needPick} 枚 選んでください`;
-                render();
-            }
-        }
-
-        async function handleAction() {
-            if (phase === 'discard' && !isAnimating) {
-                // パス処理（0枚選択時）
-                if (selectedIndices.length === 0) {
-                    isAnimating = true;
-                    Sound.play(300, 0.15, 'square');
-
-                    render();
-
-                    const ov = document.getElementById('action-overlay');
-                    const ovC = document.getElementById('action-cards');
-                    const ovDesc = document.getElementById('action-desc');
-                    const ovChar = document.getElementById('action-character');
-                    document.getElementById('action-name').innerText = players[0].name;
-                    ovDesc.innerText = "パスしました";
-                    ovC.innerHTML = '';
-                    let handScore = calc(players[0].hand).total;
-                    let sExp = handScore === 0 ? 'N' : (handScore >= 5000 ? 'C' : 'B');
-                    if (handScore >= 9000) sExp = 'G';
-                    setCharImg(ovChar, players[0].charId, sExp);
-                    ovChar.style.display = 'block';
-                    ov.style.display = 'block';
-
-                    await new Promise(r => setTimeout(r, 800));
-
-                    ov.style.display = 'none';
-                    ovChar.style.display = 'none';
-                    isAnimating = false;
-
-                    next();
-                    return;
-                }
-
-                // 交換処理（1枚以上選択時）
-                Sound.play(400, 0.15, 'square');
-                needPick = selectedIndices.length;
-
-                // Discard selected
-                pendingDiscards = [];
-                selectedIndices.sort((a, b) => b - a).forEach(i => {
-                    pendingDiscards.push(players[0].hand.splice(i, 1)[0]);
-                });
-
-                // 一旦描画を更新し、手札からカードを消してボタンを無効化
-                render();
-
-                // Show Overlay
-                const ov = document.getElementById('action-overlay');
-                const ovC = document.getElementById('action-cards');
-                const ovDesc = document.getElementById('action-desc');
-                const ovChar = document.getElementById('action-character');
-                document.getElementById('action-name').innerText = players[0].name;
-                ovDesc.innerText = "カードを捨てました";
-                ovC.innerHTML = '';
-                pendingDiscards.forEach(v => ovC.appendChild(createCard(v, true)));
-
-                let handScore = calc(players[0].hand).total;
-                let sExp = handScore === 0 ? 'N' : (handScore >= 5000 ? 'C' : 'B');
-                if (handScore >= 9000) sExp = 'G';
-                setCharImg(ovChar, players[0].charId, sExp);
-                ovChar.style.display = 'block';
-                ov.style.display = 'block';
-
-                // 待機時間を短縮
-                await new Promise(r => setTimeout(r, 800));
-
-                ov.style.display = 'none';
-                ovChar.style.display = 'none';
-
-                // 待機後、ここでは場に追加せず、補充フェーズへ移行する
-                selectedIndices = [];
-                phase = 'pick';
-                document.getElementById('msg').innerText = `場から ${needPick} 枚 補充してください`;
-                render();
-            }
-        }
-
-        async function next() {
-            currentTurnCount++;
-
-            // 4人 × 2ターン = 8回アクションが終わったらラウンド終了
-            if (currentTurnCount >= 8) {
-                render(); // ラウンド終了処理に入る前に、最後に捨てたカードの盤面を描画する
-                await processRoundEnd();
-                return;
-            }
-
-            turn = (turn + 1) % 4;
-
-            render();
-
-            // Trigger CPU logic if needed
-            if (players[turn].isCPU) {
-                setTimeout(cpu, 500);
-            } else {
-                document.getElementById('msg').innerText = "カードを選んで捨ててください";
-                phase = 'discard';
-                selectedIndices = [];
-                render();
-            }
-        }
-
-        // ------------- 新CPU AI ロジック -------------
-
-        // 指定された手札から、各段（1〜9）に何枚カードが含まれているかをカウントして返す
-        function getRowCounts(hand) {
-            const counts = Array(10).fill(0);
-            hand.forEach(v => {
-                getRows(v).forEach(r => counts[r]++);
-            });
-            return counts;
-        }
-
-        // ハブカード（複数の段に属するカード、ex: 12, 18, 24, 36など）かどうか
-        function isHubCard(v) {
-            return getRows(v).length >= 3;
-        }
-
-        async function cpu() {
-            const c = players[turn];
-            const charId = c.charId;
-            const currentHand = [...c.hand];
-            const counts = getRowCounts(currentHand);
-
-            // 場のオープンカードをカウントし、集めやすさを評価する
-            let fieldCounts = Array(10).fill(0);
-            field.forEach(card => {
-                if (card.open) getRows(card.val).forEach(r => fieldCounts[r]++);
-            });
-
-            let maxCount = Math.max(...counts.slice(1));
-            let targetRow = 1;
-            let bestPotential = -1;
-
-            for (let i = 1; i <= 9; i++) {
-                // ポテンシャル: 手札の枚数 + (場の枚数 * 0.8) + (段の大きさ * 0.01 高得点優先)
-                let potential = counts[i] + (fieldCounts[i] * 0.8) + (i * 0.01);
-                if (potential > bestPotential) {
-                    bestPotential = potential;
-                    targetRow = i;
-                }
-            }
-
-            // 既に3枚以上揃っている段がある場合、あえて崩さない (5カード狙いのキャラ以外)
-            if (maxCount >= 3 && counts[targetRow] < 3 && charId !== 3 && charId !== 12) {
-                targetRow = counts.indexOf(maxCount);
-            }
-
-            // 何枚捨てるか、どのカードを残すかをキャラクターごとに決定する
-            let keepIndices = [];
-            let discardIndices = [];
-            let discardCount = 0;
-
-            // キャラクター別の思考ルーチン
-            switch (charId) {
-                case 1: // 01カエデ: 手堅く確実にカードを集める (3カード優先、揃ったらパス)
-                    if (maxCount >= 3) {
-                        discardCount = 0; // 手堅くパス
-                    } else {
-                        // 最大派閥を残して他を捨てる (最大2枚まで捨てる)
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 2);
-                    }
-                    break;
-
-                case 2: // 02スノウ: ハブカードを上手く使って二つの段を完成
-                    currentHand.forEach((v, idx) => {
-                        // ハブカードか、最大派閥のカードを残す
-                        if (isHubCard(v) || getRows(v).includes(targetRow)) keepIndices.push(idx);
-                        else discardIndices.push(idx);
-                    });
-                    discardCount = Math.min(discardIndices.length, 2);
-                    // 3カードが2つできていればパス
-                    if (counts.filter(cnt => cnt >= 3).length >= 2) discardCount = 0;
-                    break;
-
-                case 3: // 03ピヨン: 破天荒。常に9000点越え（Squares = 1, 25, 49, 64, 81）を目指す。ただし、手札と場に4枚以上見えている時限定。
-                    const squares = [1, 25, 49, 64, 81];
-                    let hasSquaresSq = currentHand.filter(v => squares.includes(v));
-                    let fieldSquares = field.filter(c => c.open && squares.includes(c.val));
-                    let totalVisibleSquares = hasSquaresSq.length + fieldSquares.length;
-
-                    if (hasSquaresSq.length === 5) {
-                        discardCount = 0; // 5枚揃ったらパス
-                    } else if (totalVisibleSquares >= 4) {
-                        // ロマンの可能性十分あり、全力で狙う
-                        currentHand.forEach((v, idx) => {
-                            if (squares.includes(v)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 3); // 限界の3枚まで捨てる
-                    } else {
-                        // 無理そうなら現状のベストポテンシャル（targetRow）に従って5カードを狙う
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 3);
-                        if (maxCount === 5) discardCount = 0; // 普通の5カード完成でパス
-                    }
-                    break;
-
-                case 4: // 04ノエル: 二つに3カードを作る
-                    if (counts.filter(cnt => cnt >= 3).length >= 2) {
-                        discardCount = 0;
-                    } else {
-                        // ハブカードを最優先で残しつつ、2つの段を育てようとする
-                        let topTwoRows = [];
-                        let tempCounts = [...counts].map((c, i) => ({ row: i, count: c })).filter(x => x.row > 0);
-                        tempCounts.sort((a, b) => b.count - a.count);
-                        topTwoRows.push(tempCounts[0].row);
-                        if (tempCounts[1].count > 0) topTwoRows.push(tempCounts[1].row);
-
-                        currentHand.forEach((v, idx) => {
-                            let rows = getRows(v);
-                            if (isHubCard(v) || rows.includes(topTwoRows[0]) || (topTwoRows[1] && rows.includes(topTwoRows[1]))) {
-                                keepIndices.push(idx);
-                            } else {
-                                discardIndices.push(idx);
-                            }
-                        });
-                        discardCount = Math.min(discardIndices.length, 2);
-                    }
-                    break;
-
-                case 5: // 05カワエ: とにかく4カードねらい
-                    if (maxCount >= 4) {
-                        discardCount = 0;
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 3);
-                    }
-                    break;
-
-                case 6: // 06ラビィ: 3・6・9の段を絡ませて作る
-                    if (counts[3] >= 3 || counts[6] >= 3 || counts[9] >= 3) {
-                        discardCount = 0; // 3, 6, 9のどれかが3カードになればパスしがち
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            let rows = getRows(v);
-                            if (rows.includes(3) || rows.includes(6) || rows.includes(9)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 2);
-                        // もし全部3,6,9に絡んでいたら、一番多い段以外を1枚捨てるなどのロジック
-                        if (discardCount === 0 && maxCount < 3) discardCount = 1;
-                    }
-                    break;
-
-                case 7: // 07アオン: パスをしがち。手堅くカードを作る。
-                    if (maxCount >= 3) {
-                        discardCount = 0; // 3カードで絶対パス
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        // 捨てるのは最大1枚だけ（ビビり）
-                        discardCount = Math.min(discardIndices.length, 1);
-                    }
-                    break;
-
-                case 8: // 08ワニタ: 確率を見極める (他プレイヤーの妨害も考慮しやすくなる)
-                    if (maxCount >= 4) {
-                        discardCount = 0;
-                    } else {
-                        // ワニタは全体のポテンシャル算定をそのまま信じる
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 2);
-                    }
-                    break;
-
-                case 9: // 09パンク: 絶対パスはしない。より良い手を目指す。
-                    if (maxCount === 5) {
-                        discardCount = 0; // さすがに5カードならパス
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.max(1, Math.min(discardIndices.length, 2)); // 役があっても必ず1枚は捨てる
-                    }
-                    break;
-
-                case 10: // 10ミケン: 奇策。場のカードを使い揃えようとする。
-                    // 自分の手札を無視して、最も場に出ている段をターゲットに無理やり合わせに行く
-                    let bestFieldRow = 1;
-                    let maxFieldCount = -1;
-                    for (let i = 1; i <= 9; i++) {
-                        if (fieldCounts[i] > maxFieldCount) {
-                            maxFieldCount = fieldCounts[i];
-                            bestFieldRow = i;
-                        }
-                    }
-                    currentHand.forEach((v, idx) => {
-                        if (getRows(v).includes(bestFieldRow)) keepIndices.push(idx);
-                        else discardIndices.push(idx);
-                    });
-                    discardCount = Math.min(discardIndices.length, 3);
-                    if (counts[bestFieldRow] >= 3) discardCount = 0; // すでに役があればパス考慮
-                    if (discardCount > 0 && maxCount >= 3) discardCount = 1; // 別の役ができているなら微調整
-                    break;
-
-                case 11: // 11ハムコ: 我が道。自分と場のカードで組み合わせを考える。
-                    // ポテンシャル（自分+場）から導き出された targetRow に素直に従う。
-                    if (maxCount >= 4) {
-                        discardCount = 0;
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 2); // 独自のペースで2枚捨てる
-                    }
-                    break;
-
-                case 12: // 12プリス: ロマン。5カードが最優先。可能性があるなら狙う。
-                    if (maxCount === 5) {
-                        discardCount = 0;
-                    } else {
-                        currentHand.forEach((v, idx) => {
-                            if (getRows(v).includes(targetRow)) keepIndices.push(idx);
-                            else discardIndices.push(idx);
-                        });
-                        discardCount = Math.min(discardIndices.length, 3); // 5枚になるまで最大枚数ガンガン捨てる
-                    }
-                    break;
-
-                default:
-                    discardCount = maxCount > 0 ? 1 : 2;
-                    break;
-            }
-
-            // 何らかの理由でdiscardIndicesが空だがdiscardCount>0の場合のフォールバック
-            if (discardIndices.length === 0 && discardCount > 0) {
-                for (let i = 0; i < currentHand.length; i++) {
-                    if (!keepIndices.includes(i)) discardIndices.push(i);
-                }
-                if (discardIndices.length === 0) { // 全部キープ対象になってしまった場合ランダムに設定
-                    discardIndices = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
-                }
-            }
-
-            // 最終的に捨てるインデックスを決定
-            discardIndices = discardIndices.slice(0, discardCount);
-
-            if (discardCount === 0) {
-                // パス処理
-                const ov = document.getElementById('action-overlay');
-                const ovC = document.getElementById('action-cards');
-                const ovDesc = document.getElementById('action-desc');
-                const ovChar = document.getElementById('action-character');
-                document.getElementById('action-name').innerText = c.name;
-                ovDesc.innerText = "パスしました";
-                ovC.innerHTML = '';
-                let handScore = calc(c.hand).total;
-                let cExp = handScore === 0 ? 'N' : (handScore >= 5000 ? 'C' : 'B');
-                if (handScore >= 9000) cExp = 'G';
-                setCharImg(ovChar, c.charId, cExp);
-                ovChar.style.display = 'block';
-                ov.style.display = 'block';
-                Sound.play(300, 0.1);
-
-                await new Promise(r => setTimeout(r, 800));
-
-                ov.style.display = 'none';
-                ovChar.style.display = 'none';
-                next();
-                return;
-            }
-
-            let disc = [];
-            // 選ばれたインデックスを降順にして後ろから削除（配列崩れ防止）
-            discardIndices.sort((a, b) => b - a).forEach(idx => {
-                disc.push(c.hand.splice(idx, 1)[0]);
-            });
-
-            // Show Overlay
-            const ov = document.getElementById('action-overlay');
-            const ovC = document.getElementById('action-cards');
-            const ovDesc = document.getElementById('action-desc');
-            const ovChar = document.getElementById('action-character');
-            document.getElementById('action-name').innerText = c.name;
-            ovDesc.innerText = "カードを捨てました";
-            ovC.innerHTML = '';
-            disc.forEach(v => ovC.appendChild(createCard(v, true)));
-            let handScore = calc(c.hand).total;
-            let cExp = handScore === 0 ? 'N' : (handScore >= 5000 ? 'C' : 'B');
-            if (handScore >= 9000) cExp = 'G';
-            setCharImg(ovChar, c.charId, cExp);
-            ovChar.style.display = 'block';
-            ov.style.display = 'block';
-            Sound.play(300, 0.1);
-
-            // 待機時間を短縮
-            await new Promise(r => setTimeout(r, 800));
-
-            ov.style.display = 'none';
-            ovChar.style.display = 'none';
-
-            // どこからカードを引くか決定する（これもキャラクターによって判断を変える）
-            let targets = [];
-            let availableIndices = field.map((_, idx) => idx);
-
-            for (let i = 0; i < discardCount; i++) {
-                let openIndices = availableIndices.filter(idx => field[idx].open);
-                let target = -1;
-
-                // オープンカードの中から最も自分が欲しいカードを選ぶ
-                if (openIndices.length > 0) {
-                    let bestOpIdx = -1;
-                    let bestScore = -1;
-
-                    for (let opIdx of openIndices) {
-                        let cardVal = field[opIdx].val;
-                        let cardRows = getRows(cardVal);
-                        let score = 0;
-
-                        // ターゲットの段のカードが最優先
-                        if (charId === 3) {
-                            const squares = [1, 25, 49, 64, 81];
-                            let hasSquaresSqCount = players[turn].hand.filter(v => squares.includes(v)).length;
-                            let fieldSquaresCount = field.filter(c => c.open && squares.includes(c.val)).length;
-                            // 手札+場で4枚以上あるなら強烈に狙う
-                            if (squares.includes(cardVal) && (hasSquaresSqCount + fieldSquaresCount) >= 4) {
-                                score += 200;
-                            } else {
-                                // 無理そうなら通常の段を狙うロジックにフォールバック
-                                if (cardRows.includes(targetRow)) score += 100;
-                                if (isHubCard(cardVal)) score += 30;
-                            }
-                        } else if (cardRows.includes(targetRow)) {
-                            score += 100;
-                            // ターゲットの段の中でも複数列に属するハブカードはさらに価値が高い
-                            if (isHubCard(cardVal)) score += 50;
-                        } else {
-                            // キャラ特有のサブターゲット
-                            if ((charId === 2 || charId === 10 || charId === 4) && isHubCard(cardVal)) {
-                                score += 80;
-                            } else if (charId === 6 && (cardRows.includes(3) || cardRows.includes(6) || cardRows.includes(9))) {
-                                score += 80;
-                            }
-                            // 汎用的なブロック＆キープ戦略: ハブカードは他人に取らせない
-                            else if (isHubCard(cardVal)) {
-                                score += 30;
-                            }
-                        }
-
-                        // 少しの揺らぎを入れて完全に同じ動きにならないようにする
-                        score += Math.random() * 10;
-
-                        if (score > bestScore && score > 20) { // 基準(20)を超えるものだけ拾う
-                            bestScore = score;
-                            bestOpIdx = opIdx;
-                        }
-                    }
-
-                    if (bestOpIdx !== -1) {
-                        target = bestOpIdx;
-                    }
-                }
-
-                // 目当てのカードがなければ伏せカード（ランダム）から引く
-                if (target === -1) {
-                    let closedIndices = availableIndices.filter(idx => !field[idx].open);
-                    if (charId === 7) {
-                        // 07アオン: 慎重。裏向いたカードはとらない
-                        target = openIndices.length > 0 ? openIndices[Math.floor(Math.random() * openIndices.length)] : availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                    } else if (closedIndices.length > 0) {
-                        target = closedIndices[Math.floor(Math.random() * closedIndices.length)];
-                    } else {
-                        target = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                    }
-                }
-
-                targets.push(target);
-                availableIndices = availableIndices.filter(idx => idx !== target);
-            }
-
-            // 引く対象のカードをハイライトする
-            targets.forEach(idx => {
-                field[idx].targeted = true;
-            });
-            render();
-            Sound.play(1000, 0.1, 'triangle');
-
-            // ハイライト演出のために少し待機（テンポアップのため400msに短縮）
-            await new Promise(r => setTimeout(r, 400));
-
-            // 待機後にカードを交換する
-            for (let i = 0; i < discardCount; i++) {
-                let target = targets[i];
-                // 引いたカードを手札に加える
-                c.hand.push(field[target].val);
-                // その場所に捨てたカードをオープンで配置する
-                field[target] = { val: disc[i], open: true, targeted: false };
-            }
-
-            next();
-        }
-
-        function calc(hand) {
-            // Special Role: Squares (1, 25, 49, 64, 81 are 1x1, 5x5, 7x7, 8x8, 9x9)
-            const sp = [1, 25, 49, 64, 81];
-            if (sp.every(s => hand.includes(s))) {
-                return { total: 10000, roles: [{ name: "LEGENDARY SQUARES", score: 10000 }] };
-            }
-
-            let t = 0;
-            let rs = [];
-            const counts = Array(10).fill(0);
-
-            // Count how many cards belong to each row (1-dan to 9-dan)
-            hand.forEach(v => {
-                getRows(v).forEach(r => counts[r]++);
-            });
-
-            for (let i = 1; i <= 9; i++) {
-                if (counts[i] >= 3) {
-                    let name = "3カード";
-                    let score = 3000;
-
-                    if (counts[i] === 4) { name = "4カード"; score = 4000; }
-                    if (counts[i] >= 5) { name = "5カード"; score = 5000; }
-
-                    t += score;
-
-                    rs.push({ name: `${i}の段 ${name}`, score: score });
-                }
-            }
-
-            return { total: t, roles: rs };
-        }
-
-        async function processRoundEnd() {
-            const overlay = document.getElementById('round-overlay');
-            overlay.style.display = 'flex';
-
-            // 表示順: CPU1(1) → CPU2(2) → CPU3(3) → YOU(0)
-            const displayOrder = [1, 2, 3, 0];
-
-            for (let idx of displayOrder) {
-                const p = players[idx];
-                const res = calc(p.hand);
-
-                // スコアを加算
-                totalScores[idx] += res.total;
-
-                // プレイヤー(idx===0)のベストハンドを記録（同点なら後のラウンドを優先）
-                if (idx === 0) {
-                    if (res.total >= bestPlayerHand.score) {
-                        bestPlayerHand = {
-                            score: res.total,
-                            hand: [...p.hand],
-                            round: round,
-                            rolesText: res.roles.length > 0 ? res.roles.map(r => r.name).join(' + ') : '役なし'
-                        };
-                    }
-                }
-
-                // プレイヤーごとのUIをリセットして構築
-                overlay.innerHTML = `
-                <div style="color:#94a3b8; font-size:1rem; margin-bottom:5px;">ROUND ${round} RESULT</div>
-                <div id="ro-char-container" style="height:170px; margin-bottom:10px;"></div>
-                <h2 style="color:${idx === 0 ? 'var(--accent)' : '#f87171'}; font-size: 2.5rem; margin-top:0; margin-bottom: 25px; letter-spacing: 2px;">
-                    ${p.name}！
-                </h2>
-                
-                <div id="ro-cards" style="display:flex; gap:6px; justify-content:center; margin-bottom:30px; height:70px; width:100%; max-width:400px; opacity:0; transform:translateY(20px); transition:0.4s;"></div>
-                
-                <div id="ro-roles" style="font-size:1.2rem; margin-bottom:30px; min-height:80px; display:flex; flex-direction:column; gap:10px;"></div>
-                
-                <div id="ro-total" style="font-size:2rem; font-weight:bold; color:white; opacity:0; transform:scale(0.8); transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
-                
-                <div id="ro-grand" style="font-size:1.8rem; color:#fcd34d; margin-top:15px; font-weight:900; opacity:0; transform:scale(0.8); transition:0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-shadow: 0 0 10px rgba(252, 211, 77, 0.5);"></div>
-            `;
-
-                const cardsContainer = document.getElementById('ro-cards');
-                const rolesContainer = document.getElementById('ro-roles');
-                const totalContainer = document.getElementById('ro-total');
-                const grandContainer = document.getElementById('ro-grand');
-                // 1. キャラクター画像とカードを並べる
-                // ラウンド結果による表情の切り替え
-                let exp = 'N'; // 0点
-                if (res.total >= 9000) exp = 'G'; // 9000以上
-                else if (res.total >= 5000) exp = 'C'; // 5000〜8000
-                else if (res.total >= 3000) exp = 'B'; // 3000・4000点
-
-                const charDiv = document.getElementById('ro-char-container');
-                const imgEl = document.createElement('img');
-                imgEl.className = 'ro-character';
-                setCharImg(imgEl, p.charId, exp);
-                charDiv.appendChild(imgEl);
-
-                p.hand.sort((a, b) => a - b).forEach(v => {
-                    const c = createCard(v, true);
-                    c.style.width = "18%"; // サイズ調整
-                    c.style.maxWidth = "60px";
-                    cardsContainer.appendChild(c);
-                });
-
-                // 少し待ってからカードをシュッと出す
-                await new Promise(r => setTimeout(r, 400));
-                cardsContainer.style.opacity = 1;
-                cardsContainer.style.transform = "translateY(0)";
-                Sound.play(400, 0.1);
-
-                await new Promise(r => setTimeout(r, 800));
-
-                // 2. 役を1行ずつ表示
-                if (res.roles.length === 0) {
-                    rolesContainer.innerHTML = `<div style="color:#64748b;">役なし</div>`;
-                    Sound.play(250, 0.2, 'square');
-                    await new Promise(r => setTimeout(r, 800));
-                } else {
-                    for (let r of res.roles) {
-                        const rDiv = document.createElement('div');
-                        rDiv.innerHTML = `<span style="color:var(--accent); margin-right:15px;">${r.name.split(' ')[0]}</span> <span style="margin-right:15px;">${r.name.split(' ')[1]}</span> <span style="color:white; font-weight:bold;">${r.score}点！</span>`;
-                        rDiv.style.opacity = 0;
-                        rDiv.style.transform = "translateX(-20px)";
-                        rDiv.style.transition = "0.3s";
-                        rolesContainer.appendChild(rDiv);
-
-                        // アニメーション適用
-                        setTimeout(() => {
-                            rDiv.style.opacity = 1;
-                            rDiv.style.transform = "translateX(0)";
-                        }, 50);
-
-                        Sound.play(600, 0.1, 'triangle');
-                        await new Promise(r => setTimeout(r, 700)); // 次の役が出るまでの間隔
-                    }
-                }
-
-                // 3. 今回の合計点表示
-                totalContainer.innerText = `合計　${res.total}点`;
-                totalContainer.style.opacity = 1;
-                totalContainer.style.transform = "scale(1)";
-                if (res.total > 0) {
-                    Sound.play(800, 0.2, 'square');
-                }
-
-                // 4. 2ラウンド目以降なら「総合計」も表示
-                if (round >= 2) {
-                    await new Promise(r => setTimeout(r, 800));
-                    grandContainer.innerText = `総合計　${totalScores[idx]}点！！`;
-                    grandContainer.style.opacity = 1;
-                    grandContainer.style.transform = "scale(1)";
-                    Sound.play(1000, 0.3, 'sine');
-                    // 少し長めに余韻を残す
-                    await new Promise(r => setTimeout(r, 2000));
-                } else {
-                    // 1ラウンド目は合計点を出したあと待機
-                    await new Promise(r => setTimeout(r, 1500));
-                }
-
-                // 画面を暗転させて次のプレイヤーへ
-                overlay.innerHTML = '';
-                await new Promise(r => setTimeout(r, 300));
-            }
-
-            overlay.style.display = 'none';
-
-            round++;
-            if (round > 4) {
-                finishGame();
-            } else {
-                initRound();
-            }
-        }
-
-        async function finishGame() {
-            const screen = document.getElementById('result-screen');
-            const list = document.getElementById('cpu-results');
-            screen.style.display = 'flex';
-            list.innerHTML = '';
-
-            // ランキング順にソート
-            let ranking = totalScores.map((score, index) => ({ score, index, name: players[index].name }))
-                .sort((a, b) => b.score - a.score);
-
-            // Show CPU results
-            for (let i = 0; i < 4; i++) {
-                const p = ranking[i];
-                const d = document.createElement('div');
-                d.className = 'result-item';
-                d.innerHTML = `<span style="display:flex; align-items:center; gap:8px;">${getCharImgTag(players[p.index].charId, 'Q', 'avatar')} ${i + 1}位: ${p.name}</span> <span>${p.score} <small>pts</small></span>`;
-                if (p.index === 0) d.style.color = "var(--accent)"; // あなたのスコアを強調
-
-                list.appendChild(d);
-
-                await new Promise(r => setTimeout(r, 600));
-                Sound.play(400 + (i * 100), 0.1);
-                d.style.opacity = 1;
-            }
-
-            await new Promise(r => setTimeout(r, 1000));
-
-            // ベストハンドを表示
-            const finalChar = document.getElementById('final-character');
-
-            // 自分の順位（0〜3, 0が1位）
-            const myRankIndex = ranking.findIndex(r => r.index === 0);
-
-            let finalExp = 'K'; // 最下位
-            if (myRankIndex === 0) finalExp = 'D';      // 1位
-            else if (myRankIndex === 1) finalExp = 'E'; // 2位
-            else if (myRankIndex === 2) finalExp = 'M'; // 3位
-
-            setCharImg(finalChar, players[0].charId, finalExp);
-            finalChar.style.display = 'block';
-
-            // ベスト手札のテキストに変更
-            document.querySelector('#player-final div').innerText = `BEST HAND (ROUND ${bestPlayerHand.round})`;
-
-            const fHand = document.getElementById('final-hand');
-            fHand.innerHTML = '';
-            bestPlayerHand.hand.sort((a, b) => a - b).forEach(v => fHand.appendChild(createCard(v, true)));
-
-            document.getElementById('final-score').innerText = totalScores[0];
-
-            // 役表示の形式を修正
-            document.getElementById('final-roles').innerText = `ROUND ${bestPlayerHand.round} 役: ${bestPlayerHand.rolesText} (${bestPlayerHand.score} pts)`;
-            document.getElementById('player-final').classList.add('active');
-
-            // Fanfare
-            Sound.play(523, 0.2);
-            setTimeout(() => Sound.play(659, 0.2), 200);
-            setTimeout(() => Sound.play(783, 0.4), 400);
-        }
-
-        function replayGame() {
-            Sound.play(880, 0.1);
-            document.getElementById('result-screen').style.display = 'none';
-            document.getElementById('player-final').classList.remove('active');
-
-            // 前回のヒント設定(isHintEnabled)を引き継いでゲームリセット
-            initGame();
-        }
-    </script>
 </body>
-
 </html>
