@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>約分シューティング: RETRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --main-color: #0f0;
+            --max-width: 600px;
+            /* ゲームの最大幅を制限してPCでも遊びやすく */
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            /* 余白部分の色 */
+            color: var(--main-color);
+            font-family: 'DotGothic16', monospace;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+            /* 画面中央寄せ */
+            height: 100vh;
+            height: 100dvh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* アプリ全体のコンテナ */
+        #app-container {
+            width: 100%;
+            max-width: var(--max-width);
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        #game-area {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            border-bottom: 2px solid #333;
+        }
+
+        #scanline-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        canvas {
+            background-color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            width: 100%;
+            height: 100%;
+            display: block;
+            /* pixelatedはJS側で制御するがCSSでも念のため */
+            image-rendering: pixelated;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+            font-size: clamp(16px, 4vw, 24px);
+            /* 画面サイズに合わせて文字サイズ調整 */
+            font-weight: bold;
+            z-index: 10;
+            text-shadow: 2px 2px 0 #000;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #pause-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 30;
+            background-color: #000;
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 8px 12px;
+            font-family: 'DotGothic16', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 0 5px #0f0;
+            display: none;
+            touch-action: manipulation;
+        }
+
+        #pause-btn:active {
+            background-color: #0f0;
+            color: #000;
+        }
+
+        #bomb-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            z-index: 40;
+            background-color: #000;
+            border: 3px solid #ff9800;
+            color: #ff9800;
+            padding: 8px 12px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            cursor: pointer;
+            box-shadow: 0 0 10px #ff9800;
+            display: none;
+            touch-action: manipulation;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        #bomb-btn:active {
+            transform: scale(0.95);
+            background-color: #ff9800;
+            color: #000;
+        }
+
+        #bomb-btn.bomb-ready {
+            display: block;
+            animation: bombPulse 2s infinite;
+        }
+
+        @keyframes bombPulse {
+            0% {
+                box-shadow: 0 0 10px #ff9800;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #ff9800, inset 0 0 10px #ff9800;
+            }
+
+            100% {
+                box-shadow: 0 0 10px #ff9800;
+            }
+        }
+
+        #life-container {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .life-heart {
+            width: 20px;
+            height: 20px;
+            background-color: #f0f;
+            box-shadow: 0 0 8px #f0f;
+            clip-path: polygon(20% 0%, 40% 0%, 50% 20%, 60% 0%, 80% 0%, 100% 20%, 100% 50%, 50% 100%, 0% 50%, 0% 20%);
+            transition: opacity 0.2s;
+        }
+
+        .life-lost {
+            background-color: #333;
+            box-shadow: none;
+            opacity: 0.3;
+        }
+
+        #level-notify {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            color: #ffeb3b;
+            opacity: 0;
+            transition: opacity 0.1s;
+            text-shadow: 2px 2px 0 #000;
+            text-align: center;
+            font-family: 'DotGothic16', monospace;
+            margin-top: 10px;
+        }
+
+        .show-notify {
+            opacity: 1 !important;
+            animation: blink 0.2s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0
+            }
+
+            100% {
+                opacity: 1
+            }
+        }
+
+        #boss-warning {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 8vw, 3rem);
+            color: #f00;
+            text-shadow: 4px 4px 0 #500;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 25;
+            white-space: nowrap;
+        }
+
+        .boss-anim {
+            animation: bossFlash 2s steps(4);
+        }
+
+        @keyframes bossFlash {
+            0% {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            10% {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            20% {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            30% {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            40% {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            50% {
+                opacity: 1;
+                visibility: visible;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            transition: opacity 0.3s;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .screen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 50, 0, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 50, 0, 0.5) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .penalty-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 15;
+            display: none;
+        }
+
+        .penalty-active {
+            display: block;
+            animation: flash 0.2s steps(2);
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: clamp(2rem, 8vw, 3rem);
+            color: #0f0;
+            text-shadow: 4px 4px 0 #050;
+            text-align: center;
+            line-height: 1.2;
+            font-family: 'DotGothic16', sans-serif;
+            letter-spacing: 5px;
+        }
+
+        .sub-text {
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ccc;
+            padding: 0 10px;
+            line-height: 1.6;
+            max-width: 100%;
+        }
+
+        .mode-select-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 350px;
+            align-items: stretch;
+        }
+
+        .mode-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .big-btn {
+            padding: 15px 10px;
+            font-size: clamp(0.9rem, 4vw, 1.2rem);
+            font-family: 'Press Start 2P', cursive;
+            background-color: #000;
+            color: #0f0;
+            border: 4px solid #0f0;
+            box-shadow: 0 0 10px #0f0, inset 0 0 10px #0f0;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.1s;
+            width: 100%;
+            touch-action: manipulation;
+        }
+
+        .big-btn:hover {
+            background-color: #0f0;
+            color: #000;
+        }
+
+        .big-btn:active {
+            transform: scale(0.98);
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            color: #ffeb3b;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .title-btn {
+            border-color: #fff !important;
+            color: #fff !important;
+            box-shadow: 0 0 10px #fff, inset 0 0 10px #fff !important;
+            margin-top: 10px;
+        }
+
+        .title-btn:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+
+        /* Control Panel Layout */
+        #controls-container {
+            width: 100%;
+            background-color: #111;
+            border-top: 4px solid #333;
+            display: flex;
+            flex-direction: row;
+            padding: 6px;
+            /* iPhone Home Bar対応 */
+            padding-bottom: max(6px, env(safe-area-inset-bottom));
+            box-sizing: border-box;
+            z-index: 30;
+            touch-action: manipulation;
+            flex-shrink: 0;
+            gap: 6px;
+            height: auto;
+            min-height: 160px;
+            /* 少し高さを確保 */
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            width: 24%;
+            gap: 6px;
+        }
+
+        #panel-center {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 6px;
+        }
+
+        .center-row {
+            display: flex;
+            flex: 1;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .ctrl-btn {
+            border: 2px dashed #444;
+            background-color: #0a0a0a;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            /* iOS Safariでの選択防止 */
+            transition: transform 0.05s, box-shadow 0.05s, opacity 0.5s;
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            height: auto;
+            padding: 2px 0;
+            touch-action: manipulation;
+
+            opacity: 0.15;
+            pointer-events: none;
+            filter: grayscale(100%);
+            -webkit-tap-highlight-color: transparent;
+            /* タップ時のハイライト削除 */
+        }
+
+        .ctrl-btn.unlocked {
+            border-style: solid;
+            background-color: #222;
+            opacity: 1;
+            pointer-events: auto;
+            filter: none;
+            box-shadow: 0 4px 0 #000;
+            animation: lightUp 0.5s ease-out;
+        }
+
+        @keyframes lightUp {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+                background-color: #fff;
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .ctrl-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #000;
+        }
+
+        .btn-num {
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            line-height: 1.1;
+            pointer-events: none;
+        }
+
+        .btn-sub {
+            font-size: clamp(0.5rem, 2.5vw, 0.7rem);
+            opacity: 0.8;
+            font-family: 'DotGothic16', monospace;
+            margin-top: 2px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            #controls-container {
+                padding: 4px;
+                padding-bottom: max(4px, env(safe-area-inset-bottom));
+                gap: 4px;
+                min-height: 140px;
+                /* スマホでは少しコンパクトに */
+            }
+
+            .side-panel,
+            #panel-center,
+            .center-row {
+                gap: 4px;
+            }
+        }
+
+        /* 画面高さが非常に低い場合（横持ちスマホなど）の調整 */
+        @media (max-height: 500px) {
+            #controls-container {
+                min-height: 100px;
+            }
+
+            .btn-num {
+                font-size: 1rem;
+            }
+
+            .btn-sub {
+                display: none;
+            }
+
+            /* サブテキストを隠してスペース確保 */
+        }
+
+        /* Standard Primes */
+        .btn-2 {
+            border-color: #e53935;
+            color: #e53935;
+            text-shadow: 0 0 5px #e53935;
+        }
+
+        .btn-3 {
+            border-color: #1e88e5;
+            color: #1e88e5;
+            text-shadow: 0 0 5px #1e88e5;
+        }
+
+        .btn-5 {
+            border-color: #fdd835;
+            color: #fdd835;
+            text-shadow: 0 0 5px #fdd835;
+        }
+
+        .btn-7 {
+            border-color: #d000f0;
+            color: #d000f0;
+            text-shadow: 0 0 5px #d000f0;
+        }
+
+        .btn-11 {
+            border-color: #00e5ff;
+            color: #00e5ff;
+            text-shadow: 0 0 5px #00e5ff;
+        }
+
+        .btn-13 {
+            border-color: #ff9100;
+            color: #ff9100;
+            text-shadow: 0 0 5px #ff9100;
+        }
+
+        /* Special Buttons */
+        .btn-power {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            border-width: 3px;
+        }
+
+        .btn-power .btn-sub::before {
+            content: "■";
+            font-size: 0.8em;
+            margin-right: 3px;
+            vertical-align: 1px;
+        }
+
+        .btn-mix {
+            background: linear-gradient(to bottom, #111, #222);
+            border-style: double;
+            border-width: 5px;
+        }
+
+        .btn-mix .btn-sub::before {
+            content: "×";
+            font-size: 1.1em;
+            margin-right: 1px;
+            font-weight: bold;
+        }
+
+        .btn-4 {
+            border-color: #536dfe;
+            color: #8c9eff;
+        }
+
+        .btn-6 {
+            border-color: #00bcd4;
+            color: #4dd0e1;
+        }
+
+        .btn-8 {
+            border-color: #7c4dff;
+            color: #b388ff;
+        }
+
+        .btn-9 {
+            border-color: #f06292;
+            color: #f48fb1;
+        }
+
+        .btn-10 {
+            border-color: #66bb6a;
+            color: #a5d6a7;
+        }
+
+        .btn-12 {
+            border-color: #ffa726;
+            color: #ffcc80;
+        }
+
+        .key-hint {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.5rem;
+            color: #fff;
+            opacity: 0.5;
+            font-family: sans-serif;
+        }
+
+        .guide-text {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+            pointer-events: none;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            opacity: 0.7;
+        }
+
+        #miss-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(60px, 15vw, 100px);
+            color: #f00;
+            text-shadow: 4px 4px 0 #500;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 12;
+        }
+
+        .show-miss {
+            animation: popMiss 0.2s ease-out;
+        }
+
+        @keyframes popMiss {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+        <div id="game-area">
+            <!-- 走査線オーバーレイ -->
+            <div id="scanline-overlay"></div>
+
+            <!-- 動的背景 (星) 用キャンバス -->
+            <canvas id="bgCanvas"
+                style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1; pointer-events: none;"></canvas>
+
+            <div id="ui-layer">
+                <div>SCORE: <span id="score">0</span></div>
+                <div style="font-size: 0.6em; color: #ffeb3b; margin-top: 2px;">HI: <span id="high-score">0</span></div>
+                <div id="level-notify">NEW BUTTON!</div>
+            </div>
+
+            <button id="pause-btn" onclick="game.togglePause()">PAUSE</button>
+            <button id="bomb-btn" onclick="game.useBomb()">BOMB<br>★★★</button>
+
+            <div id="life-container">
+                <div class="life-heart" id="life-1"></div>
+                <div class="life-heart" id="life-2"></div>
+                <div class="life-heart" id="life-3"></div>
+                <div class="life-heart" id="life-4"></div>
+                <div class="life-heart" id="life-5"></div>
+            </div>
+
+            <div id="boss-warning">WARNING!</div>
+            <div id="penalty-overlay" class="penalty-flash"></div>
+            <div id="miss-feedback">MISS</div>
+
+            <canvas id="gameCanvas" style="position: relative; z-index: 5; background: transparent;"></canvas>
+
+            <div class="guide-text" style="z-index: 10;">SHOOT THE NUMBERS WITH DIVISORS</div>
+
+            <div id="start-screen" class="screen">
+                <h1>PRIME<br>SHOOTER</h1>
+                <div class="mode-select-container">
+                    <div class="mode-btn-wrapper">
+                        <button class="big-btn" onclick="game.start('normal')">NORMAL MODE</button>
+                        <div class="score-label">HI: <span id="hi-normal">0</span></div>
+                    </div>
+                    <div class="mode-btn-wrapper">
+                        <button class="big-btn" onclick="game.start('boss_rush')"
+                            style="border-color: #f00; color: #f00; box-shadow: 0 0 10px #f00, inset 0 0 10px #f00;">BOSS
+                            RUSH</button>
+                        <div class="score-label" style="color: #f00;">HI: <span id="hi-boss">0</span></div>
+                    </div>
+                    <div class="mode-btn-wrapper">
+                        <button class="big-btn" onclick="game.start('full_open')"
+                            style="border-color: #0ff; color: #0ff; box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;">FULL
+                            OPEN</button>
+                        <div class="score-label" style="color: #0ff;">HI: <span id="hi-full">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pause-screen" class="screen hidden">
+                <h1>PAUSED</h1>
+                <button class="big-btn" onclick="game.togglePause()">RESUME</button>
+                <button class="big-btn title-btn" onclick="game.quitToTitle()">TITLE</button>
+            </div>
+
+            <div id="game-over-screen" class="screen hidden">
+                <h1 style="color: #f00;">GAME OVER</h1>
+                <p class="sub-text">
+                    SCORE: <span id="final-score"
+                        style="font-size: 1.5em; font-family: 'Press Start 2P'; color: #ffeb3b;">0</span><br>
+                </p>
+                <button class="big-btn" onclick="game.retry()">RETRY</button>
+                <button class="big-btn title-btn" onclick="game.quitToTitle()">TITLE</button>
+            </div>
+        </div>
+
+        <div id="controls-container">
+            <!-- LEFT PANEL -->
+            <div id="panel-left" class="side-panel">
+                <button id="btn-4" class="ctrl-btn btn-power btn-4" onpointerdown="game.handleButtonPress(4, event)">
+                    <span class="btn-num">4</span>
+                    <span class="btn-sub">2×2</span>
+                </button>
+                <button id="btn-8" class="ctrl-btn btn-power btn-8" onpointerdown="game.handleButtonPress(8, event)">
+                    <span class="btn-num">8</span>
+                    <span class="btn-sub">2×2×2</span>
+                </button>
+                <button id="btn-9" class="ctrl-btn btn-power btn-9" onpointerdown="game.handleButtonPress(9, event)">
+                    <span class="btn-num">9</span>
+                    <span class="btn-sub">3×3</span>
+                </button>
+            </div>
+
+            <!-- CENTER PANEL -->
+            <div id="panel-center">
+                <!-- ROW 1 -->
+                <div class="center-row">
+                    <button id="btn-2" class="ctrl-btn btn-2" onpointerdown="game.handleButtonPress(2, event)">
+                        <span class="btn-num">2</span>
+                    </button>
+                    <button id="btn-3" class="ctrl-btn btn-3" onpointerdown="game.handleButtonPress(3, event)">
+                        <span class="btn-num">3</span>
+                    </button>
+                    <button id="btn-5" class="ctrl-btn btn-5" onpointerdown="game.handleButtonPress(5, event)">
+                        <span class="btn-num">5</span>
+                    </button>
+                </div>
+                <!-- ROW 2 -->
+                <div class="center-row">
+                    <button id="btn-7" class="ctrl-btn btn-7" onpointerdown="game.handleButtonPress(7, event)">
+                        <span class="btn-num">7</span>
+                    </button>
+                    <button id="btn-11" class="ctrl-btn btn-11" onpointerdown="game.handleButtonPress(11, event)">
+                        <span class="btn-num">11</span>
+                        <span class="key-hint">Q</span>
+                    </button>
+                    <button id="btn-13" class="ctrl-btn btn-13" onpointerdown="game.handleButtonPress(13, event)">
+                        <span class="btn-num">13</span>
+                        <span class="key-hint">W</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div id="panel-right" class="side-panel">
+                <button id="btn-6" class="ctrl-btn btn-mix btn-6" onpointerdown="game.handleButtonPress(6, event)">
+                    <span class="btn-num">6</span>
+                    <span class="btn-sub">2×3</span>
+                </button>
+                <button id="btn-10" class="ctrl-btn btn-mix btn-10" onpointerdown="game.handleButtonPress(10, event)">
+                    <span class="btn-num">10</span>
+                    <span class="btn-sub">2×5</span>
+                </button>
+                <button id="btn-12" class="ctrl-btn btn-mix btn-12" onpointerdown="game.handleButtonPress(12, event)">
+                    <span class="btn-num">12</span>
+                    <span class="btn-sub">6×2</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 画面揺れ用アニメーション */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        .shake-hard {
+            animation: shake-hard 0.6s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-2px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(4px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-6px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(6px, 0, 0);
+            }
+        }
+
+        @keyframes shake-hard {
+
+            10%,
+            90% {
+                transform: translate3d(-5px, -5px, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(10px, 5px, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-15px, -10px, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(15px, 10px, 0);
+            }
+        }
+
+        /* コンボ表示用UI */
+        #combo-display {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 6vw, 3rem);
+            color: #ffeb3b;
+            text-shadow: 2px 2px 0 #d32f2f, 4px 4px 0 #000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 15;
+            white-space: nowrap;
+            text-align: center;
+            transition: transform 0.1s;
+        }
+
+        .show-combo {
+            animation: comboPop 1.5s ease-out forwards;
+        }
+
+        @keyframes comboPop {
+            0% {
+                transform: translate(-50%, -30%) scale(0.5);
+                opacity: 0;
+            }
+
+            10% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+
+            20% {
+                transform: translate(-50%, -50%) scale(1.0);
+                opacity: 1;
+            }
+
+            80% {
+                transform: translate(-50%, -60%) scale(1.0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -70%) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        #combo-multiplier {
+            font-size: 0.5em;
+            color: #fff;
+            display: block;
+            margin-top: 5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+    </style>
+
+    <!-- 追加のUI要素: コンボ表示 -->
+    <div id="combo-display">
+        <span id="combo-count">2 CHAIN!</span>
+        <span id="combo-multiplier">SCORE x1.5</span>
+    </div>
+
+    <script>
+        class SoundManager {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = false;
+
+                // BGM用
+                this.bgmOsc = null;
+                this.bgmGain = null;
+                this.bgmInterval = null;
+                this.bgmStep = 0;
+                this.bgmSequence = [
+                    220, 220, 330, 330, 293, 293, 220, null,
+                    196, 196, 293, 293, 261, 261, 196, null,
+                    164, 164, 246, 246, 220, 220, 164, null,
+                    261, 261, 392, 392, 329, 329, 261, null
+                ];
+                this.bgmSpeed = 150; // ms per step
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            startBGM() {
+                if (!this.ctx || this.isMuted || this.bgmInterval) return;
+                this.bgmStep = 0;
+
+                this.bgmInterval = setInterval(() => {
+                    if (this.isMuted) return;
+                    const freq = this.bgmSequence[this.bgmStep % this.bgmSequence.length];
+                    if (freq) {
+                        this.playTone(freq, 'square', 0.1, 0.05); // BGMは音量控えめに
+                    }
+                    this.bgmStep++;
+
+                    // ゲーム進行に応じてBGM速度アップ
+                    if (this.bgmStep % 32 === 0 && this.bgmSpeed > 80) {
+                        // BGMスピード変更時に再設定する部分は複雑化を避けるため今回は固定間隔
+                    }
+                }, this.bgmSpeed);
+            }
+
+            stopBGM() {
+                if (this.bgmInterval) {
+                    clearInterval(this.bgmInterval);
+                    this.bgmInterval = null;
+                }
+            }
+
+            setBGMSpeed(speed) {
+                if (this.bgmSpeed === speed) return;
+                this.bgmSpeed = speed;
+                if (this.bgmInterval) {
+                    this.stopBGM();
+                    this.startBGM();
+                }
+            }
+
+            playTone(freq, type, duration, vol = 0.1, slide = 0) {
+                if (!this.ctx || this.isMuted) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                if (slide !== 0) {
+                    osc.frequency.exponentialRampToValueAtTime(freq + slide, this.ctx.currentTime + duration);
+                }
+
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            }
+
+            playNoise(duration, vol = 0.2) {
+                if (!this.ctx || this.isMuted) return;
+                const bufferSize = this.ctx.sampleRate * duration;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1000;
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noise.start();
+            }
+
+            playShoot() { this.playTone(800, 'square', 0.1, 0.1, -400); }
+            playSpecialShoot() { this.playTone(400, 'sawtooth', 0.3, 0.1, 400); }
+            playHit() { this.playTone(200, 'square', 0.05, 0.1); }
+            playExplosion() { this.playNoise(0.3, 0.3); }
+            playBossExplosion() { this.playNoise(0.8, 0.5); }
+            playLevelUp() {
+                this.playTone(440, 'square', 0.1, 0.1);
+                setTimeout(() => this.playTone(554, 'square', 0.1, 0.1), 100);
+                setTimeout(() => this.playTone(659, 'square', 0.2, 0.1), 200);
+            }
+            playDamage() { this.playTone(100, 'sawtooth', 0.3, 0.3, -50); }
+            playError() { this.playTone(80, 'square', 0.1, 0.2); }
+        }
+
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.bgCanvas = document.getElementById('bgCanvas');
+                this.gameArea = document.getElementById('game-area');
+                this.ctx = this.canvas.getContext('2d');
+                this.bgCtx = this.bgCanvas.getContext('2d');
+                this.scoreEl = document.getElementById('score');
+                this.highScoreEl = document.getElementById('high-score');
+                this.finalScoreEl = document.getElementById('final-score');
+
+                this.hiNormalEl = document.getElementById('hi-normal');
+                this.hiBossEl = document.getElementById('hi-boss');
+                this.hiFullEl = document.getElementById('hi-full');
+
+                this.levelNotifyEl = document.getElementById('level-notify');
+                this.bossWarningEl = document.getElementById('boss-warning');
+                this.startScreen = document.getElementById('start-screen');
+                this.pauseScreen = document.getElementById('pause-screen');
+                this.gameOverScreen = document.getElementById('game-over-screen');
+                this.penaltyOverlay = document.getElementById('penalty-overlay');
+                this.controlsContainer = document.getElementById('controls-container');
+                this.missFeedback = document.getElementById('miss-feedback');
+                this.pauseBtn = document.getElementById('pause-btn');
+                this.bombBtn = document.getElementById('bomb-btn');
+
+                this.sound = new SoundManager();
+
+                this.width = 0;
+                this.height = 0;
+                this.score = 0;
+                this.currentMode = 'normal';
+                this.highScores = {
+                    normal: parseInt(localStorage.getItem('primeShooterHS_normal')) || 0,
+                    boss_rush: parseInt(localStorage.getItem('primeShooterHS_boss_rush')) || 0,
+                    full_open: parseInt(localStorage.getItem('primeShooterHS_full_open')) || 0
+                };
+
+                this.lives = 5;
+                this.isRunning = false;
+                this.isPaused = false;
+                this.animationId = null;
+                this.lastTime = 0;
+
+                this.spawnTimer = 0;
+                this.spawnInterval = 2500;
+
+                this.player = { x: 0, y: 0, w: 40, h: 40 };
+                this.bullets = [];
+                this.enemies = [];
+                this.particles = [];
+                this.stars = [];
+
+                // 初期の星を生成
+                this.initStars();
+
+                // UI用ポップアップテキスト管理
+                this.floatingTexts = [];
+
+                // ボムシステム
+                this.bombs = 0;
+                this.maxBombs = 3;
+
+                // コンボシステム用
+                this.combo = 0;
+                this.comboTimer = 0;
+                this.comboDisplay = document.getElementById('combo-display');
+                this.comboCountEl = document.getElementById('combo-count');
+                this.comboMultiEl = document.getElementById('combo-multiplier');
+
+                this.activePrimes = [];
+                this.unlockedButtons = new Set();
+
+                // 全ボタンと全素数
+                this.allButtons = [2, 3, 5, 7, 11, 13, 4, 6, 8, 9, 10, 12];
+                this.allPrimes = [2, 3, 5, 7, 11, 13];
+
+                this.progression = [
+                    { score: 0, type: 'prime', value: 2 },
+                    { score: 0, type: 'prime', value: 3 },
+                    { score: 10, type: 'prime', value: 5 },
+                    { score: 25, type: 'special', value: 6 },
+                    { score: 25, type: 'special', value: 4 },
+                    { score: 25, type: 'special', value: 9 },
+                    { score: 45, type: 'prime', value: 7 },
+                    { score: 65, type: 'special', value: 10 },
+                    { score: 85, type: 'prime', value: 11 },
+                    { score: 105, type: 'special', value: 12 },
+                    { score: 125, type: 'prime', value: 13 },
+                    { score: 145, type: 'special', value: 8 }
+                ];
+
+                this.combinations = {
+                    4: [2, 2], 6: [2, 3], 8: [4, 2], 9: [3, 3], 10: [2, 5], 12: [6, 2]
+                };
+
+                this.queueBossSpawn = false;
+
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('keydown', (e) => this.handleInput(e));
+
+                this.resize();
+                this.updateButtonsUI();
+                this.updateHighScoreDisplay();
+            }
+
+            resize() {
+                const container = document.getElementById('game-area');
+                this.width = container.clientWidth;
+                this.height = container.clientHeight;
+
+                // 高解像度対応
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.width * dpr;
+                this.canvas.height = this.height * dpr;
+                this.ctx.scale(dpr, dpr);
+
+                // CSSサイズ設定
+                this.canvas.style.width = this.width + 'px';
+                this.canvas.style.height = this.height + 'px';
+
+                this.bgCanvas.width = this.width * dpr;
+                this.bgCanvas.height = this.height * dpr;
+                this.bgCtx.scale(dpr, dpr);
+                this.bgCanvas.style.width = this.width + 'px';
+                this.bgCanvas.style.height = this.height + 'px';
+
+                // Canvasコンテキストのピクセル化設定（リサイズでリセットされるため再設定）
+                this.ctx.imageSmoothingEnabled = false;
+                this.bgCtx.imageSmoothingEnabled = false;
+
+                this.player.x = this.width / 2;
+                this.player.y = this.height - 60;
+            }
+
+            updateHighScoreDisplay() {
+                this.hiNormalEl.innerText = this.highScores.normal;
+                this.hiBossEl.innerText = this.highScores.boss_rush;
+                this.hiFullEl.innerText = this.highScores.full_open;
+
+                if (this.currentMode) {
+                    this.highScoreEl.innerText = this.highScores[this.currentMode];
+                }
+            }
+
+            checkHighScore() {
+                if (this.score > this.highScores[this.currentMode]) {
+                    this.highScores[this.currentMode] = this.score;
+                    localStorage.setItem(`primeShooterHS_${this.currentMode}`, this.score);
+                    this.updateHighScoreDisplay();
+                }
+            }
+
+            start(mode) {
+                this.sound.init();
+                this.currentMode = mode || 'normal';
+                this.score = 0;
+                this.lives = 5;
+                this.scoreEl.innerText = 0;
+                this.updateLivesUI();
+                this.updateHighScoreDisplay();
+
+                this.isRunning = true;
+                this.isPaused = false;
+                this.spawnInterval = 2500;
+                this.spawnTimer = 0;
+                this.queueBossSpawn = false;
+
+                this.bullets = [];
+                this.enemies = [];
+                this.particles = [];
+                this.floatingTexts = [];
+
+                this.bombs = 0;
+                this.updateBombUI();
+
+                this.combo = 0;
+                this.comboTimer = 0;
+
+                this.activePrimes = [];
+                this.unlockedButtons = new Set();
+                this.penaltyOverlay.classList.remove('penalty-active');
+
+                if (this.currentMode === 'normal') {
+                    this.checkLevelProgression();
+                } else {
+                    // BOSS_RUSH と FULL_OPEN は最初から全開放
+                    this.allButtons.forEach(v => this.unlockedButtons.add(v));
+                    this.activePrimes = [...this.allPrimes];
+                    this.updateButtonsUI();
+
+                    if (this.currentMode === 'boss_rush') {
+                        // 即座にボスを出す準備
+                        this.spawnTimer = this.spawnInterval;
+                    }
+                }
+
+                this.startScreen.classList.add('hidden');
+                this.pauseScreen.classList.add('hidden');
+                this.gameOverScreen.classList.add('hidden');
+                this.pauseBtn.style.display = 'block';
+
+                this.sound.startBGM();
+
+                this.lastTime = performance.now();
+                this.loop(this.lastTime);
+            }
+
+            retry() {
+                this.start(this.currentMode);
+            }
+
+            togglePause() {
+                if (!this.isRunning) return;
+                this.isPaused = !this.isPaused;
+
+                if (this.isPaused) {
+                    this.pauseScreen.classList.remove('hidden');
+                    this.sound.stopBGM();
+                } else {
+                    this.pauseScreen.classList.add('hidden');
+                    this.sound.startBGM();
+                    this.lastTime = performance.now();
+                    this.loop(this.lastTime);
+                }
+            }
+
+            quitToTitle() {
+                this.isRunning = false;
+                this.isPaused = false;
+                cancelAnimationFrame(this.animationId);
+                this.sound.stopBGM();
+
+                this.checkHighScore();
+
+                this.pauseScreen.classList.add('hidden');
+                this.gameOverScreen.classList.add('hidden');
+                this.startScreen.classList.remove('hidden');
+                this.pauseBtn.style.display = 'none';
+                this.levelNotifyEl.classList.remove('show-notify');
+                this.penaltyOverlay.classList.remove('penalty-active');
+                this.bossWarningEl.classList.remove('boss-anim');
+                this.missFeedback.classList.remove('show-miss');
+
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                this.drawPlayer(this.width / 2, this.height - 60);
+                this.player.x = this.width / 2;
+            }
+
+            updateBombUI() {
+                if (!this.bombBtn) return;
+                if (this.bombs > 0) {
+                    this.bombBtn.classList.add('bomb-ready');
+                    const stars = '★'.repeat(this.bombs) + '☆'.repeat(this.maxBombs - this.bombs);
+                    this.bombBtn.innerHTML = `BOMB<br><span style="font-size: 0.8em">${stars}</span>`;
+                } else {
+                    this.bombBtn.classList.remove('bomb-ready');
+                    const stars = '☆'.repeat(this.maxBombs);
+                    this.bombBtn.innerHTML = `BOMB<br><span style="font-size: 0.8em; opacity: 0.5;">${stars}</span>`;
+                }
+            }
+
+            useBomb() {
+                if (!this.isRunning || this.isPaused || this.bombs <= 0) return;
+
+                this.bombs--;
+                this.updateBombUI();
+
+                this.sound.playBossExplosion();
+
+                // 派手な画面揺れ
+                this.gameArea.classList.remove('shake-hard', 'shake');
+                void this.gameArea.offsetWidth;
+                this.gameArea.classList.add('shake-hard');
+                setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
+
+                // 画面フラッシュ
+                this.bgCtx.fillStyle = 'rgba(255, 150, 0, 0.6)';
+                this.bgCtx.fillRect(0, 0, this.width, this.height);
+
+                this.createFloatingText(`BOMB BOMBER!`, this.player.x, this.player.y - 60, '#ff9800', true);
+
+                let pointsEarned = 0;
+
+                // 全敵破壊
+                for (let i = this.enemies.length - 1; i >= 0; i--) {
+                    const e = this.enemies[i];
+                    this.createParticles(e.x, e.y, e.isBoss ? 60 : 30, '#ff9800');
+
+                    let pts = e.isBoss ? 10 : 2;
+                    pointsEarned += pts;
+                }
+
+                if (pointsEarned > 0) {
+                    this.score += pointsEarned;
+                    this.scoreEl.innerText = this.score;
+                    this.checkLevelProgression();
+                }
+
+                this.enemies = []; // 全クリア
+            }
+
+            updateLivesUI() {
+                for (let i = 1; i <= 5; i++) {
+                    const heart = document.getElementById(`life-${i}`);
+                    if (i <= this.lives) {
+                        heart.classList.remove('life-lost');
+                    } else {
+                        heart.classList.add('life-lost');
+                    }
+                }
+            }
+
+            takeDamage() {
+                this.lives--;
+                this.updateLivesUI();
+                this.sound.playDamage();
+                this.resetCombo();
+
+                // 画面揺れ(Shake)
+                this.gameArea.classList.remove('shake', 'shake-hard');
+                void this.gameArea.offsetWidth;
+                this.gameArea.classList.add('shake');
+                setTimeout(() => this.gameArea.classList.remove('shake'), 400);
+
+                this.penaltyOverlay.classList.remove('penalty-active');
+                void this.penaltyOverlay.offsetWidth;
+                this.penaltyOverlay.classList.add('penalty-active');
+                setTimeout(() => {
+                    this.penaltyOverlay.classList.remove('penalty-active');
+                }, 200);
+
+                this.enemies = [];
+                this.bullets = [];
+
+                this.spawnTimer = -2000;
+
+                if (this.lives <= 0) {
+                    this.stop();
+                }
+            }
+
+            checkLevelProgression() {
+                if (this.currentMode !== 'normal') return;
+
+                let updated = false;
+                let newButtonTexts = [];
+
+                this.progression.forEach(step => {
+                    if (this.score >= step.score) {
+                        if (!this.unlockedButtons.has(step.value)) {
+                            this.unlockedButtons.add(step.value);
+                            if (step.type === 'prime') {
+                                if (!this.activePrimes.includes(step.value)) {
+                                    this.activePrimes.push(step.value);
+                                }
+                            }
+                            updated = true;
+                            newButtonTexts.push(step.value);
+                        }
+                    }
+                });
+
+                if (updated) {
+                    this.updateButtonsUI();
+                    if (this.score > 0) {
+                        this.sound.playLevelUp();
+                        this.queueBossSpawn = true;
+                        const text = newButtonTexts.length > 1 ?
+                            `UNLOCKED: [${newButtonTexts.join(', ')}]` :
+                            `UNLOCKED: [${newButtonTexts[0]}]`;
+                        this.showLevelNotify(text);
+                    }
+                }
+            }
+
+            updateButtonsUI() {
+                this.allButtons.forEach(val => {
+                    const btn = document.getElementById(`btn-${val}`);
+                    if (this.unlockedButtons.has(val)) {
+                        btn.classList.add('unlocked');
+                    } else {
+                        btn.classList.remove('unlocked');
+                    }
+                });
+            }
+
+            showLevelNotify(text) {
+                this.levelNotifyEl.innerText = text;
+                this.levelNotifyEl.classList.add('show-notify');
+                setTimeout(() => {
+                    this.levelNotifyEl.classList.remove('show-notify');
+                }, 2000);
+            }
+
+            stop() {
+                this.isRunning = false;
+                cancelAnimationFrame(this.animationId);
+                this.sound.stopBGM();
+                this.finalScoreEl.innerText = this.score;
+                this.checkHighScore();
+                this.gameOverScreen.classList.remove('hidden');
+                this.pauseBtn.style.display = 'none';
+            }
+
+            handleButtonPress(val, event) {
+                if (event) {
+                    event.preventDefault(); // ダブルタップズーム等の防止
+                    // pointerdownなのでフォーカスは奪わないが念のため
+                }
+                this.shoot(val);
+            }
+
+            shoot(val) {
+                if (!this.isRunning || this.isPaused) return;
+                if (!this.unlockedButtons.has(val)) return;
+
+                // ターゲットになるようにソート順を調整
+                const targets = this.enemies
+                    .filter(e => {
+                        if (e.type === 'pair') {
+                            return (e.val1 % val === 0 && e.val2 % val === 0);
+                        } else {
+                            return e.value % val === 0;
+                        }
+                    })
+                    .sort((a, b) => {
+                        if (a.isBoss && !b.isBoss) return -1;
+                        if (!a.isBoss && b.isBoss) return 1;
+                        return b.y - a.y; // それ以外は低い位置を優先
+                    });
+
+                if (targets.length > 0) {
+                    const target = targets[0];
+                    if (this.combinations[val]) {
+                        this.shootSpecial(val, target);
+                        this.sound.playSpecialShoot();
+                    } else {
+                        this.sound.playShoot();
+                        this.bullets.push({
+                            x: this.player.x,
+                            y: this.player.y - 20,
+                            value: val,
+                            radius: 12,
+                            speed: 20,
+                            color: this.getBtnColor(val),
+                            target: target,
+                            state: 'active'
+                        });
+                    }
+                } else {
+                    this.triggerPenalty();
+                }
+            }
+
+            shootSpecial(val, target) {
+                const parts = this.combinations[val];
+                const mergeY = this.player.y - 100;
+                const mergeX = this.player.x;
+
+                this.bullets.push({
+                    x: this.player.x - 60, y: this.player.y, value: parts[0],
+                    radius: 8, speed: 10, color: this.getBtnColor(parts[0]),
+                    target: target, mergeTarget: { x: mergeX, y: mergeY },
+                    state: 'merging_left', finalValue: val, finalColor: this.getBtnColor(val)
+                });
+
+                this.bullets.push({
+                    x: this.player.x + 60, y: this.player.y, value: parts[1],
+                    radius: 8, speed: 10, color: this.getBtnColor(parts[1]),
+                    target: target, mergeTarget: { x: mergeX, y: mergeY },
+                    state: 'merging_right', finalValue: val, finalColor: this.getBtnColor(val)
+                });
+            }
+
+            triggerPenalty() {
+                this.score -= 5;
+                this.scoreEl.innerText = this.score;
+
+                if (this.score < 0) {
+                    this.stop();
+                    return;
+                }
+
+                this.sound.playError();
+                this.resetCombo();
+
+                // 画面揺れ(Shake)
+                this.gameArea.classList.remove('shake');
+                void this.gameArea.offsetWidth;
+                this.gameArea.classList.add('shake');
+                setTimeout(() => this.gameArea.classList.remove('shake'), 400);
+
+                this.penaltyOverlay.classList.remove('penalty-active');
+                void this.penaltyOverlay.offsetWidth;
+                this.penaltyOverlay.classList.add('penalty-active');
+                setTimeout(() => {
+                    this.penaltyOverlay.classList.remove('penalty-active');
+                }, 200);
+
+                this.missFeedback.classList.remove('show-miss');
+                void this.missFeedback.offsetWidth;
+                this.missFeedback.classList.add('show-miss');
+
+                if (navigator.vibrate) navigator.vibrate(200);
+            }
+
+            // --- 追加: コンボ処理 ---
+            addCombo() {
+                this.combo++;
+                this.comboTimer = 3000; // コンボ継続時間 3秒
+
+                // 10コンボごとにボムを追加
+                if (this.combo > 0 && this.combo % 10 === 0) {
+                    if (this.bombs < this.maxBombs) {
+                        this.bombs++;
+                        this.updateBombUI();
+                        this.createFloatingText('BOMB GET!', this.player.x, this.player.y - 40, '#ff9800', true);
+                        this.sound.playLevelUp(); // 音を追加
+                    }
+                }
+
+                if (this.combo >= 2) {
+                    let multiplier = 1.0;
+                    if (this.combo >= 2) multiplier = 1.2;
+                    if (this.combo >= 5) multiplier = 1.5;
+                    if (this.combo >= 10) multiplier = 2.0;
+
+                    this.comboCountEl.innerText = `${this.combo} CHAIN!`;
+                    this.comboMultiEl.innerText = `SCORE x${multiplier.toFixed(1)}`;
+
+                    this.comboDisplay.classList.remove('show-combo');
+                    void this.comboDisplay.offsetWidth;
+                    this.comboDisplay.classList.add('show-combo');
+
+                    // 少しだけ画面を揺らす（プチシェイク）
+                    if (this.combo % 5 === 0) {
+                        this.gameArea.classList.remove('shake');
+                        void this.gameArea.offsetWidth;
+                        this.gameArea.classList.add('shake');
+                        setTimeout(() => this.gameArea.classList.remove('shake'), 400);
+                    }
+
+                    // コンボ中はBGMスピードを上げる
+                    if (this.combo >= 10) this.sound.setBGMSpeed(90);
+                    else if (this.combo >= 5) this.sound.setBGMSpeed(110);
+                    else this.sound.setBGMSpeed(130);
+                }
+            }
+
+            resetCombo() {
+                this.combo = 0;
+                this.comboTimer = 0;
+            }
+
+            handleInput(e) {
+                if (!this.isRunning || this.isPaused) return;
+                let val = 0;
+                switch (e.key) {
+                    case '2': val = 2; break;
+                    case '3': val = 3; break;
+                    case '5': val = 5; break;
+                    case '7': val = 7; break;
+                    case 'q': case 'Q': val = 11; break;
+                    case 'w': case 'W': val = 13; break;
+                    case '4': val = 4; break;
+                    case '6': val = 6; break;
+                    case '8': val = 8; break;
+                    case '9': val = 9; break;
+                }
+                if (val > 0) this.shoot(val);
+            }
+
+            gcd(a, b) {
+                if (b === 0) return a;
+                return this.gcd(b, a % b);
+            }
+
+            spawnBoss() {
+                const isPairBoss = Math.random() < 0.5;
+                if (isPairBoss) {
+                    this.spawnPairBoss();
+                } else {
+                    this.spawnSingleBoss();
+                }
+                this.queueBossSpawn = false;
+            }
+
+            spawnPairBoss() {
+                let commonP = 2;
+                if (this.activePrimes.length > 1) {
+                    commonP = this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
+                }
+
+                let val1, val2;
+                let retry = 0;
+
+                do {
+                    val1 = commonP * this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
+                    val2 = commonP * this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
+                    if (Math.random() < 0.6) val1 *= (Math.random() < 0.5 ? 2 : 3);
+                    if (Math.random() < 0.6) val2 *= (Math.random() < 0.5 ? 2 : 3);
+                    if (val1 > 300) val1 = 100 + Math.floor(Math.random() * 100);
+                    if (val2 > 300) val2 = 100 + Math.floor(Math.random() * 100);
+                    if (this.gcd(val1, val2) === 1) {
+                        val1 *= commonP; val2 *= commonP;
+                    }
+                    retry++;
+                } while (val1 === val2 && retry < 10);
+
+                if (val1 === val2) { val2 += commonP; }
+
+                const x = this.width / 2;
+                const radius = 40;
+
+                this.showBossWarning();
+
+                this.enemies.push({
+                    id: Math.random(),
+                    x: x, y: -100,
+                    type: 'pair',
+                    val1: val1, val2: val2,
+                    maxVal: val1 + val2,
+                    radius: radius,
+                    speed: 0.7,
+                    hitFlash: 0,
+                    isBoss: true
+                });
+            }
+
+            spawnSingleBoss() {
+                let val = 100;
+                for (let k = 0; k < 20; k++) {
+                    let tempVal = 1;
+                    let count = 3 + Math.floor(Math.random() * 3);
+                    if (this.activePrimes.length === 0) this.activePrimes = [2, 3];
+                    for (let i = 0; i < count; i++) tempVal *= this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
+                    if (tempVal >= 100 && tempVal <= 300) { val = tempVal; break; }
+                }
+                if (val < 100 || val > 300) {
+                    val = 2 * 2 * 3 * 3 * 3;
+                    if (this.activePrimes.includes(5)) val = 2 * 2 * 5 * 5;
+                }
+
+                const radius = 60;
+                const x = this.width / 2;
+
+                this.showBossWarning();
+
+                this.enemies.push({
+                    id: Math.random(),
+                    x: x, y: -100,
+                    type: 'single',
+                    value: val, maxVal: val,
+                    radius: radius,
+                    speed: 0.8,
+                    hitFlash: 0,
+                    isBoss: true
+                });
+            }
+
+            showBossWarning() {
+                this.bossWarningEl.classList.remove('boss-anim');
+                void this.bossWarningEl.offsetWidth;
+                this.bossWarningEl.classList.add('boss-anim');
+                this.sound.playTone(150, 'sawtooth', 0.5, 0.3, -50);
+                setTimeout(() => this.sound.playTone(150, 'sawtooth', 0.5, 0.3, -50), 500);
+            }
+
+            spawnEnemy() {
+                // BOSS_RUSHでは雑魚敵スポーン処理は使わない（ボスのみ）
+                if (this.currentMode === 'boss_rush') {
+                    if (!this.enemies.some(e => e.isBoss)) {
+                        this.spawnBoss();
+                    }
+                    return;
+                }
+
+                if (this.enemies.some(e => e.isBoss)) return;
+                if (this.queueBossSpawn) { this.spawnBoss(); return; }
+
+                let val = 1;
+                let retry = 0;
+                if (this.activePrimes.length === 0) this.activePrimes = [2, 3];
+
+                while (retry < 10) {
+                    val = 1;
+                    let factorCount;
+                    if (this.score < 10) factorCount = Math.random() < 0.5 ? 1 : 2;
+                    else factorCount = 2 + Math.floor(Math.random() * 2);
+                    for (let i = 0; i < factorCount; i++) val *= this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
+                    if (val < 100) break;
+                    retry++;
+                }
+                if (val >= 100) val = 2 * 3;
+
+                const radius = 30 + (val.toString().length * 2);
+                const x = Math.random() * (this.width - radius * 2) + radius;
+
+                let enemySpeed = 0.6 + (this.score * 0.03);
+                if (enemySpeed > 2.5) enemySpeed = 2.5;
+
+                this.enemies.push({
+                    id: Math.random(),
+                    x: x, y: -50,
+                    type: 'single',
+                    value: val, maxVal: val,
+                    radius: radius,
+                    speed: enemySpeed,
+                    hitFlash: 0,
+                    isBoss: false
+                });
+            }
+
+            // --- 追加: 星(背景)処理 ---
+            initStars() {
+                this.stars = [];
+                for (let i = 0; i < 50; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 0.5 + 0.1,
+                        color: Math.random() > 0.8 ? '#0f0' : '#fff'
+                    });
+                }
+            }
+
+            updateStars(dt) {
+                // スコアやコンボ数に応じて背景の流れる速度をあげる
+                let speedMulti = 1.0;
+                if (this.combo >= 5) speedMulti = 1.5;
+                if (this.combo >= 10) speedMulti = 2.5;
+                if (this.enemies.some(e => e.isBoss)) speedMulti = 3.0; // ボス出現中は高速移動
+
+                this.stars.forEach(s => {
+                    s.y += s.speed * speedMulti * (dt / 16);
+                    if (s.y > this.height) {
+                        s.y = 0;
+                        s.x = Math.random() * this.width;
+                    }
+                });
+            }
+
+            drawStars() {
+                this.bgCtx.clearRect(0, 0, this.width, this.height);
+                // 黒地の背景描画はCSSまたはdraw()で行う
+                this.stars.forEach(s => {
+                    this.bgCtx.fillStyle = s.color;
+                    this.bgCtx.globalAlpha = Math.random() > 0.9 ? 0.3 : (this.combo > 5 ? 1.0 : 0.6); // またたき効果
+                    this.bgCtx.fillRect(s.x, s.y, s.size, s.size);
+                });
+                this.bgCtx.globalAlpha = 1.0;
+            }
+
+            update(timestamp) {
+                const dt = timestamp - this.lastTime;
+                this.lastTime = timestamp;
+
+                this.spawnTimer += dt;
+                if (this.spawnTimer > this.spawnInterval) {
+                    this.spawnEnemy();
+                    this.spawnTimer = 0;
+
+                    // NORMAL と FULL_OPEN で速度上昇
+                    if (this.currentMode !== 'boss_rush') {
+                        if (!this.enemies.some(e => e.isBoss)) {
+                            if (this.spawnInterval > 800) this.spawnInterval -= 30;
+                        }
+                    } else {
+                        // BOSS RUSH用
+                        this.spawnInterval = 1000; // ボス撃破後のインターバル
+                    }
+                }
+
+                // コンボタイマーの減少
+                if (this.comboTimer > 0) {
+                    this.comboTimer -= dt;
+                    if (this.comboTimer <= 0) {
+                        this.resetCombo();
+                        this.sound.setBGMSpeed(150); // BGM速度を戻す
+                    }
+                }
+
+                this.updateStars(dt);
+
+                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                    const b = this.bullets[i];
+
+                    if (b.state && b.state.startsWith('merging')) {
+                        const dx = b.mergeTarget.x - b.x;
+                        const dy = b.mergeTarget.y - b.y;
+                        const dist = Math.hypot(dx, dy);
+
+                        if (dist < 10) {
+                            if (b.state === 'merging_left') {
+                                this.sound.playShoot();
+                                this.bullets.push({
+                                    x: b.mergeTarget.x, y: b.mergeTarget.y,
+                                    value: b.finalValue,
+                                    radius: 20, speed: 18, color: b.finalColor,
+                                    target: b.target, state: 'active'
+                                });
+                                this.createParticles(b.mergeTarget.x, b.mergeTarget.y, 10, '#fff');
+                            }
+                            this.bullets.splice(i, 1);
+                            continue;
+                        } else {
+                            b.x += (dx / dist) * b.speed;
+                            b.y += (dy / dist) * b.speed;
+                            continue;
+                        }
+                    }
+
+                    if (b.target && this.enemies.includes(b.target)) {
+                        const dx = b.target.x - b.x;
+                        const dy = b.target.y - b.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < b.speed) { b.x = b.target.x; b.y = b.target.y; }
+                        else { b.x += (dx / dist) * b.speed; b.y += (dy / dist) * b.speed; }
+                    } else {
+                        b.y -= b.speed;
+                    }
+
+                    if (b.y < -50 || b.y > this.height + 50) {
+                        this.bullets.splice(i, 1);
+                        continue;
+                    }
+
+                    const e = b.target;
+                    if (e && this.enemies.includes(e)) {
+                        let hitRadius = e.radius;
+                        if (e.type === 'pair') hitRadius += 30;
+
+                        const dist = Math.hypot(b.x - e.x, b.y - e.y);
+                        if (dist < b.radius + hitRadius) {
+                            this.sound.playHit();
+
+                            if (e.type === 'single') {
+                                if (e.value % b.value === 0) {
+                                    // Pop Up テキスト
+                                    this.createFloatingText(`÷${b.value}`, e.x, e.y, b.color);
+
+                                    e.value = e.value / b.value;
+                                    e.hitFlash = 10;
+                                    e.y -= e.isBoss ? 5 : 25;
+                                    this.createParticles(e.x, e.y, 8, b.color);
+
+                                    if (e.value === 1) {
+                                        this.addCombo();
+
+                                        // コンボ倍率計算
+                                        let multiplier = 1.0;
+                                        if (this.combo >= 2) multiplier = 1.2;
+                                        if (this.combo >= 5) multiplier = 1.5;
+                                        if (this.combo >= 10) multiplier = 2.0;
+
+                                        let pts = e.isBoss ? 5 : 1;
+
+                                        // パーフェクトキルボーナス（合成数などで一撃の場合）
+                                        const isPerfectKill = e.maxVal === b.value;
+                                        if (isPerfectKill) {
+                                            pts *= 2;
+                                            this.createFloatingText(`PERFECT!`, e.x, e.y - 20, '#ffeb3b', true);
+                                        }
+
+                                        pts = Math.floor(pts * multiplier);
+                                        this.score += pts;
+                                        this.scoreEl.innerText = this.score;
+
+                                        if (e.isBoss) {
+                                            this.sound.playBossExplosion();
+                                            // ボス撃破のハードシェイク
+                                            this.gameArea.classList.remove('shake-hard', 'shake');
+                                            void this.gameArea.offsetWidth;
+                                            this.gameArea.classList.add('shake-hard');
+                                            setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
+                                        } else {
+                                            this.sound.playExplosion();
+                                        }
+
+                                        this.createParticles(e.x, e.y, e.isBoss ? 60 : 30, '#fff');
+                                        this.checkLevelProgression();
+                                        const idx = this.enemies.indexOf(e);
+                                        if (idx > -1) this.enemies.splice(idx, 1);
+                                    }
+                                } else {
+                                    this.createParticles(b.x, b.y, 5, '#aaa');
+                                }
+                            } else if (e.type === 'pair') {
+                                if (e.val1 % b.value === 0 && e.val2 % b.value === 0) {
+                                    // Pop Up テキスト
+                                    this.createFloatingText(`÷${b.value}`, e.x, e.y, b.color);
+
+                                    e.val1 /= b.value;
+                                    e.val2 /= b.value;
+                                    e.hitFlash = 10;
+                                    e.y -= 5;
+                                    this.createParticles(e.x, e.y, 10, b.color);
+
+                                    if (this.gcd(e.val1, e.val2) === 1) {
+                                        this.createParticles(e.x, e.y, 20, '#fff');
+                                        this.sound.playExplosion();
+
+                                        // Pairは割れた瞬間にコンボ加算
+                                        this.addCombo();
+
+                                        if (e.val1 === 1 && e.val2 === 1) {
+                                            let multiplier = 1.0;
+                                            if (this.combo >= 2) multiplier = 1.2;
+                                            if (this.combo >= 5) multiplier = 1.5;
+                                            if (this.combo >= 10) multiplier = 2.0;
+
+                                            this.score += Math.floor(10 * multiplier);
+                                            this.scoreEl.innerText = this.score;
+                                            this.sound.playBossExplosion();
+
+                                            this.gameArea.classList.remove('shake-hard', 'shake');
+                                            void this.gameArea.offsetWidth;
+                                            this.gameArea.classList.add('shake-hard');
+                                            setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
+
+                                            this.createParticles(e.x, e.y, 50, '#fff');
+                                            this.checkLevelProgression();
+                                        } else {
+                                            if (e.val1 > 1) {
+                                                this.enemies.push({
+                                                    id: Math.random(),
+                                                    x: e.x - 40, y: e.y - 20,
+                                                    type: 'single', value: e.val1, maxVal: e.val1,
+                                                    radius: 40, speed: 1.0, hitFlash: 0, isBoss: false
+                                                });
+                                            } else {
+                                                this.createParticles(e.x - 40, e.y - 20, 20, '#fff');
+                                            }
+                                            if (e.val2 > 1) {
+                                                this.enemies.push({
+                                                    id: Math.random(),
+                                                    x: e.x + 40, y: e.y + 20,
+                                                    type: 'single', value: e.val2, maxVal: e.val2,
+                                                    radius: 40, speed: 1.0, hitFlash: 0, isBoss: false
+                                                });
+                                            } else {
+                                                this.createParticles(e.x + 40, e.y + 20, 20, '#fff');
+                                            }
+                                        }
+                                        const idx = this.enemies.indexOf(e);
+                                        if (idx > -1) this.enemies.splice(idx, 1);
+                                    }
+                                } else {
+                                    this.createParticles(b.x, b.y, 5, '#aaa');
+                                }
+                            }
+
+                            this.bullets.splice(i, 1);
+                            continue;
+                        }
+                    }
+                }
+
+                for (let i = this.enemies.length - 1; i >= 0; i--) {
+                    const e = this.enemies[i];
+                    e.y += e.speed * (dt / 16);
+                    if (e.hitFlash > 0) e.hitFlash--;
+
+                    if (e.y > this.height + e.radius) {
+                        this.takeDamage();
+                        this.enemies.splice(i, 1);
+                    }
+                }
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.04;
+                    if (p.life <= 0) this.particles.splice(i, 1);
+                }
+
+                // Pop Up テキストの更新
+                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+                    const text = this.floatingTexts[i];
+                    text.y -= text.speed;
+                    text.life -= 0.02;
+                    if (text.life <= 0) this.floatingTexts.splice(i, 1);
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                this.ctx.fillStyle = this.isPaused ? 'rgba(0,0,0,0.5)' : '#000';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+
+                this.ctx.fillStyle = '#0f0';
+                this.drawPlayer(this.player.x, this.player.y);
+
+                this.bullets.forEach(b => {
+                    this.ctx.fillStyle = b.color;
+                    this.ctx.fillRect(b.x - b.radius / 2, b.y - b.radius / 2, b.radius, b.radius);
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.font = '10px "Press Start 2P"';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    if (b.radius > 10) this.ctx.fillText(b.value, b.x, b.y);
+                });
+
+                this.enemies.forEach(e => {
+                    if (e.type === 'single') {
+                        this.drawInvader(e.x, e.y, e.radius, e.value, e.hitFlash > 0, e.isBoss);
+                    } else if (e.type === 'pair') {
+                        const gap = 35;
+                        this.ctx.strokeStyle = (Math.random() > 0.5) ? '#0ff' : '#f0f';
+                        this.ctx.lineWidth = 4;
+                        this.ctx.setLineDash([5, 5]);
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(e.x - gap, e.y);
+                        this.ctx.lineTo(e.x + gap, e.y);
+                        this.ctx.stroke();
+                        this.ctx.setLineDash([]);
+
+                        this.drawInvader(e.x - gap, e.y, e.radius, e.val1, e.hitFlash > 0, true, true); // true = hide BOSS text
+                        this.drawInvader(e.x + gap, e.y, e.radius, e.val2, e.hitFlash > 0, true, true);
+
+                        this.ctx.font = '10px "Press Start 2P"';
+                        this.ctx.fillStyle = '#f0f';
+                        this.ctx.fillText("PAIR", e.x, e.y - e.radius - 15);
+                    }
+                });
+
+                this.particles.forEach(p => {
+                    this.ctx.globalAlpha = p.life;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.fillRect(p.x, p.y, p.radius, p.radius);
+                    this.ctx.globalAlpha = 1.0;
+                });
+
+                // Pop Up テキストの描画
+                this.floatingTexts.forEach(t => {
+                    this.ctx.globalAlpha = Math.max(0, t.life);
+                    this.ctx.fillStyle = t.color;
+                    this.ctx.font = t.isBig ? '24px "Press Start 2P"' : '14px "Press Start 2P"';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+
+                    // 黒いフチドリ効果
+                    this.ctx.strokeStyle = '#000';
+                    this.ctx.lineWidth = 4;
+                    this.ctx.strokeText(t.text, t.x, t.y);
+
+                    this.ctx.fillText(t.text, t.x, t.y);
+                    this.ctx.globalAlpha = 1.0;
+                });
+            }
+
+            drawPlayer(x, y) {
+                const size = 4;
+                const shape = [
+                    "   X   ",
+                    "  XXX  ",
+                    " XXXXX ",
+                    "XXXXXXX"
+                ];
+                this.ctx.fillStyle = '#0f0';
+                for (let row = 0; row < shape.length; row++) {
+                    for (let col = 0; col < shape[row].length; col++) {
+                        if (shape[row][col] === 'X') {
+                            this.ctx.fillRect(x - 14 + col * size, y - 20 + row * size, size, size);
+                        }
+                    }
+                }
+            }
+
+            drawInvader(x, y, r, val, isHit, isBoss, hideBossText) {
+                const size = r * 2;
+                const half = size / 2;
+
+                let color = isBoss ? '#f00' : '#0f0';
+
+                this.ctx.strokeStyle = isHit ? '#fff' : color;
+                this.ctx.lineWidth = isBoss ? 4 : 2;
+                this.ctx.strokeRect(x - half, y - half, size, size);
+
+                this.ctx.fillStyle = isHit ? '#fff' : (isBoss ? 'rgba(255,0,0,0.2)' : 'rgba(0,255,0,0.1)');
+                this.ctx.fillRect(x - half, y - half, size, size);
+
+                this.ctx.fillStyle = isHit ? '#fff' : color;
+                const d = 4;
+                this.ctx.fillRect(x - half, y - half, d, d);
+                this.ctx.fillRect(x + half - d, y - half, d, d);
+                this.ctx.fillRect(x - half, y + half - d, d, d);
+                this.ctx.fillRect(x + half - d, y + half - d, d, d);
+
+                this.ctx.fillStyle = isHit ? '#000' : '#fff';
+                const fontSize = isBoss ? r * 0.5 : r * 0.6;
+                this.ctx.font = `${fontSize}px "Press Start 2P"`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(val, x, y + 2);
+
+                if (isBoss && !hideBossText) {
+                    this.ctx.font = '10px "Press Start 2P"';
+                    this.ctx.fillStyle = '#f00';
+                    this.ctx.fillText("BOSS", x, y - r - 10);
+                }
+            }
+
+            loop(timestamp) {
+                if (!this.isRunning) return;
+                if (this.isPaused) return;
+
+                this.update(timestamp);
+                this.drawStars();
+                this.draw();
+                this.animationId = requestAnimationFrame(t => this.loop(t));
+            }
+
+            createParticles(x, y, count, color) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    this.particles.push({
+                        x: x, y: y,
+                        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                        life: 1.0, color: color, radius: Math.random() * 6 + 2
+                    });
+                }
+            }
+
+            // --- 追加: ポップアップテキストの生成 ---
+            createFloatingText(text, x, y, color, isBig = false) {
+                this.floatingTexts.push({
+                    text: text,
+                    x: x + (Math.random() * 20 - 10), // 少し左右にばらけさせる
+                    y: y,
+                    color: color,
+                    life: 1.0,
+                    speed: 1.5,
+                    isBig: isBig
+                });
+            }
+
+            getBtnColor(val) {
+                const colors = {
+                    2: '#e53935', 3: '#1e88e5', 5: '#fdd835', 7: '#d000f0', 11: '#00e5ff', 13: '#ff9100',
+                    4: '#3f51b5', 6: '#00acc1', 8: '#673ab7', 9: '#e91e63', 10: '#4caf50', 12: '#ff9800'
+                };
+                return colors[val] || '#fff';
+            }
+        }
+
+        const game = new Game();
+    </script>
+</body>
+
+</html>
