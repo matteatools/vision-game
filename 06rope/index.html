@@ -9,9 +9,9 @@
     body {
         margin: 0;
         padding: 0;
-        background-color: #e0f2f1;
-        color: #333;
-        font-family: "M PLUS Rounded 1c", sans-serif;
+        background: linear-gradient(135deg, #f0fdfa, #cbf4ee);
+        color: #263238;
+        font-family: "M PLUS Rounded 1c", "Helvetica Rounded", Arial, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -27,39 +27,53 @@
         width: 360px;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 8px;
-        font-weight: bold;
+        margin-bottom: 12px;
+        font-weight: 800;
         pointer-events: none;
     }
     .badge {
-        background: #fff;
-        padding: 6px 12px;
-        border-radius: 15px;
-        border: 2px solid #333;
-        font-size: 0.9rem;
-        box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.08), inset 0 -2px 0 rgba(0,0,0,0.05);
+        color: #455a64;
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
-    .t-val { color: #f57c00; }
-    .m-val { color: #d32f2f; }
+    .t-val { color: #e65100; }
+    .m-val { color: #c62828; }
 
     /* ゲーム枠 */
     #game-wrapper {
         position: relative;
         width: 360px;
         height: 480px;
-        background-color: #263238;
-        border: 8px solid #5d4037;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        background-color: #1a202c;
+        border: 10px solid #3e2723;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.6);
         overflow: hidden;
+        transition: transform 0.1s;
+    }
+    #game-wrapper.shake {
+        animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shake {
+        10%, 90% { transform: translate3d(-2px, 0, 0); }
+        20%, 80% { transform: translate3d(4px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+        40%, 60% { transform: translate3d(8px, 0, 0); }
     }
 
     /* キャンバス */
     canvas {
         display: block;
         background-image: 
-            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
         background-size: 40px 40px;
         position: absolute;
         top: 0; left: 0;
@@ -72,10 +86,11 @@
         position: absolute;
         top: 0; left: 0;
         height: 8px;
-        background: #ff1744;
+        background: #00e676; /* fallback */
         width: 0%;
         z-index: 10;
-        transition: width 0.1s linear;
+        transition: width 0.1s linear, background-color 0.1s linear;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
     /* 画面切り替え */
@@ -83,13 +98,15 @@
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(255, 255, 255, 0.96);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 100;
-        transition: opacity 0.2s;
+        transition: opacity 0.3s ease;
     }
     .hidden {
         opacity: 0;
@@ -97,79 +114,91 @@
     }
 
     h1 {
-        font-size: 2.8rem;
-        color: #ff9800;
-        text-shadow: 3px 3px 0 #fff;
-        -webkit-text-stroke: 1.5px #333;
-        margin-bottom: 15px;
+        font-size: 3rem;
+        color: #fff;
+        text-shadow: 0 4px 0 #e65100, 0 6px 15px rgba(0,0,0,0.3);
+        -webkit-text-stroke: 1.5px #bf360c;
+        margin-bottom: 20px;
         font-weight: 900;
         letter-spacing: 2px;
     }
 
     .btn {
-        width: 240px;
-        padding: 14px;
-        margin: 8px;
-        border: 2px solid rgba(0,0,0,0.1);
+        width: 260px;
+        padding: 16px;
+        margin: 10px;
+        border: none;
         border-radius: 30px;
-        font-size: 1.2rem;
-        font-weight: bold;
+        font-size: 1.3rem;
+        font-weight: 800;
         color: white;
         cursor: pointer;
-        box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+        box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 15px 20px rgba(0,0,0,0.1);
         font-family: inherit;
+        text-shadow: 0 2px 2px rgba(0,0,0,0.2);
+        transition: transform 0.1s, box-shadow 0.1s, filter 0.2s;
     }
-    .btn:active { transform: translateY(4px); box-shadow: none; }
+    .btn:hover { filter: brightness(1.1); }
+    .btn:active { transform: translateY(8px); box-shadow: 0 0 0 rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.1); }
     
-    .btn-green { background: #43a047; }
-    .btn-orange { background: #fb8c00; }
-    .btn-blue { background: #1e88e5; }
-    .btn-gray { background: #78909c; width: 120px; font-size: 1rem; margin-top: 20px; padding: 10px;}
+    .btn-green { background: linear-gradient(180deg, #66bb6a, #43a047); box-shadow: 0 8px 0 #2e7d32, 0 15px 20px rgba(0,0,0,0.1); }
+    .btn-green:active { box-shadow: 0 0 0 #2e7d32; }
+    
+    .btn-orange { background: linear-gradient(180deg, #ffb74d, #f57c00); box-shadow: 0 8px 0 #e65100, 0 15px 20px rgba(0,0,0,0.1); }
+    .btn-orange:active { box-shadow: 0 0 0 #e65100; }
+    
+    .btn-blue { background: linear-gradient(180deg, #42a5f5, #1e88e5); box-shadow: 0 8px 0 #1565c0, 0 15px 20px rgba(0,0,0,0.1); }
+    .btn-blue:active { box-shadow: 0 0 0 #1565c0; }
+    
+    .btn-gray { background: linear-gradient(180deg, #b0bec5, #78909c); box-shadow: 0 6px 0 #546e7a, 0 10px 15px rgba(0,0,0,0.1); width: 140px; font-size: 1.1rem; margin-top: 25px; padding: 12px;}
+    .btn-gray:active { transform: translateY(6px); box-shadow: 0 0 0 #546e7a; }
 
     /* 結果表示 */
     .result-box {
-        border: 4px solid #ff9800;
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 20px;
-        background: #fff;
+        border: none;
+        border-radius: 24px;
+        padding: 25px;
+        margin-bottom: 25px;
+        background: linear-gradient(180deg, #ffffff, #f5f5f5);
         text-align: center;
-        width: 80%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 85%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.05);
     }
-    .big-score { font-size: 2.8rem; font-weight: 900; color: #333; }
-    .label { color: #888; font-size: 0.9rem; }
-    .new-record { color: #d32f2f; font-weight: bold; font-size: 1.4rem; animation: pop 0.6s infinite alternate; display: none; }
-    @keyframes pop { to { transform: scale(1.1); } }
+    .big-score { font-size: 3.2rem; font-weight: 900; color: #37474f; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+    .label { color: #78909c; font-size: 1rem; font-weight: bold; margin-bottom: -5px; }
+    .new-record { color: #d32f2f; font-weight: 900; font-size: 1.5rem; animation: pop 0.6s infinite alternate; display: none; margin-bottom: 10px; text-shadow: 1px 1px 0 #ffcdd2;}
+    @keyframes pop { to { transform: scale(1.15) rotate(2deg); } }
 
     /* ポップアップ */
     #popup {
         position: absolute;
         top: 50%; left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        padding: 15px 40px;
-        background: #fff;
-        border: 5px solid #333;
+        transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+        padding: 18px 45px;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(4px);
         border-radius: 50px;
-        font-size: 2rem;
-        font-weight: bold;
+        font-size: 2.2rem;
+        font-weight: 900;
         z-index: 50;
         pointer-events: none;
         white-space: nowrap;
-        transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
     }
-    #popup.show { transform: translate(-50%, -50%) scale(1); }
-    .ok { color: #43a047; border-color: #43a047 !important; }
-    .ng { color: #d32f2f; border-color: #d32f2f !important; }
+    #popup.show { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    .ok { color: #2e7d32; border: 6px solid #4caf50; }
+    .ng { color: #c62828; border: 6px solid #ef5350; }
 
 </style>
 </head>
 <body>
 
     <div class="ui-panel">
-        <div class="badge">レベル <span id="ui-level">1</span></div>
-        <div class="badge t-val">じかん <span id="ui-time">00:00</span></div>
-        <div class="badge m-val">ミス <span id="ui-miss">0</span></div>
+        <div class="badge">⭐ レベル <span id="ui-level">1</span></div>
+        <div class="badge t-val">⏱️ <span id="ui-time">00:00</span></div>
+        <div class="badge m-val">❌ <span id="ui-miss">0</span></div>
     </div>
 
     <div id="game-wrapper">
@@ -187,14 +216,14 @@
         </div>
 
         <div id="screen-result" class="screen hidden">
-            <h1 style="color:#1e88e5">クリア！</h1>
+            <h1 style="color:#fff; text-shadow: 0 4px 0 #1565c0, 0 6px 15px rgba(0,0,0,0.3); -webkit-text-stroke: 1.5px #0d47a1;">クリア！</h1>
             <div class="result-box">
                 <div id="rec-msg" class="new-record">★ しんきろく！ ★</div>
-                <div class="label">かかった じかん</div>
+                <div class="label">⏱️ かかった じかん</div>
                 <div id="res-time" class="big-score">00:00</div>
                 <div style="height:15px"></div>
-                <div class="label">まちがえた かず</div>
-                <div id="res-miss" class="big-score">0</div>
+                <div class="label">❌ まちがえた かず</div>
+                <div id="res-miss" class="big-score" style="color:#c62828">0</div>
             </div>
             <button class="btn btn-blue" onclick="app.toTitle()">もういちど</button>
         </div>
@@ -352,13 +381,20 @@ class App {
         if (this.mode === 'quick' && this.inputOk) {
             const remain = CONFIG.quickMs - (now - this.levelStart);
             const pct = Math.max(0, remain / CONFIG.quickMs * 100);
-            document.getElementById('time-bar').style.width = pct + "%";
+            const timeBar = document.getElementById('time-bar');
+            timeBar.style.width = pct + "%";
+            
+            // Dynamic color
+            if (pct > 60) timeBar.style.backgroundColor = '#00e676';
+            else if (pct > 30) timeBar.style.backgroundColor = '#ffea00';
+            else timeBar.style.backgroundColor = '#ff1744';
             
             if (remain <= 0) {
                 this.handleMiss(true);
             }
         } else {
             document.getElementById('time-bar').style.width = this.mode === 'quick' ? "100%" : "0%";
+            document.getElementById('time-bar').style.backgroundColor = '#00e676';
         }
 
         if (this.particles.length > 0) this.updateConfetti();
@@ -444,11 +480,18 @@ class App {
         this.miss++;
         document.getElementById('ui-miss').innerText = this.miss;
         
+        // Shake screen
+        const wrapper = document.getElementById('game-wrapper');
+        wrapper.classList.remove('shake');
+        void wrapper.offsetWidth; // trigger reflow
+        wrapper.classList.add('shake');
+        
         this.showPopup(isTimeout ? "じかんぎれ！" : "ちがうよ！", "ng");
         
         this.ropes.forEach(r => { if(r.isCorrect) r.state = 'good'; });
 
         setTimeout(() => {
+            wrapper.classList.remove('shake');
             this.nextLevel();
         }, 1500);
     }
@@ -586,45 +629,98 @@ class App {
         this.ctx.clearRect(0, 0, 360, 480);
         if (this.ropes.length === 0) return;
 
-        this.ropes.forEach(r => {
-            this.drawSocket(r.sx, r.sy);
-            this.drawSocket(r.ex, r.ey);
-        });
+        // Draw connections / wires
         this.ropes.forEach(r => {
             const p = r.pathObj;
             this.ctx.lineCap = 'round'; this.ctx.lineJoin = 'round';
+            
+            // Drop shadow pass
+            this.ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            this.ctx.shadowBlur = 8;
+            this.ctx.shadowOffsetY = 5;
             this.ctx.lineWidth = CONFIG.ropeW + CONFIG.outlineW*2;
+            this.ctx.strokeStyle = 'transparent';
+            this.ctx.stroke(p);
+            
+            // Reset shadow
+            this.ctx.shadowColor = 'transparent';
+            this.ctx.shadowBlur = 0;
+            this.ctx.shadowOffsetY = 0;
+            
+            // Outer casing
             this.ctx.strokeStyle = '#263238';
             this.ctx.stroke(p);
+            
+            // Inner color
             this.ctx.lineWidth = CONFIG.ropeW;
             if (r.state === 'good') this.ctx.strokeStyle = '#43a047';
             else if (r.state === 'bad') this.ctx.strokeStyle = '#e53935';
-            else this.ctx.strokeStyle = '#cfd8dc';
+            else this.ctx.strokeStyle = '#b0bec5'; // slightly lighter neutral
             this.ctx.stroke(p);
+            
+            // Texture
             this.ctx.lineWidth = 2;
             this.ctx.strokeStyle = 'rgba(0,0,0,0.2)';
             this.ctx.setLineDash([3, 5]);
             this.ctx.stroke(p);
             this.ctx.setLineDash([]);
+            
+            // Highlight
+            this.ctx.lineWidth = 1.5;
             this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
             this.ctx.stroke(p);
         });
+
+        // Draw sockets
         this.ropes.forEach(r => {
-            this.drawLight(r.sx, r.sy, r.sc);
-            this.drawLight(r.ex, r.ey, r.ec);
+            this.drawSocket(r.sx, r.sy);
+            this.drawSocket(r.ex, r.ey);
+        });
+        
+        // Draw Lights on top
+        this.ropes.forEach(r => {
+            const glowMulti = r.state === 'good' ? 2 : 1;
+            this.drawLight(r.sx, r.sy, r.sc, glowMulti);
+            this.drawLight(r.ex, r.ey, r.ec, glowMulti);
         });
     }
 
     drawSocket(x, y) {
-        this.ctx.fillStyle = '#546e7a';
-        this.ctx.beginPath(); this.ctx.arc(x,y,14,0,Math.PI*2); this.ctx.fill();
-        this.ctx.strokeStyle='#222'; this.ctx.lineWidth=2; this.ctx.stroke();
+        // Metallic base
+        const grad = this.ctx.createRadialGradient(x-3, y-3, 2, x, y, 16);
+        grad.addColorStop(0, '#78909c');
+        grad.addColorStop(1, '#37474f');
+        this.ctx.fillStyle = grad;
+        
+        this.ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.shadowOffsetY = 3;
+        
+        this.ctx.beginPath(); this.ctx.arc(x,y,16,0,Math.PI*2); this.ctx.fill();
+        
+        this.ctx.shadowColor = 'transparent';
+        
+        // Inner hole
+        this.ctx.fillStyle = '#111';
+        this.ctx.beginPath(); this.ctx.arc(x,y,12,0,Math.PI*2); this.ctx.fill();
+        
+        this.ctx.strokeStyle='#263238'; this.ctx.lineWidth=2; this.ctx.stroke();
     }
-    drawLight(x, y, c) {
+    
+    drawLight(x, y, c, glowMult = 1) {
+        this.ctx.shadowColor = c;
+        this.ctx.shadowBlur = 10 * glowMult;
+        
         this.ctx.fillStyle = c;
-        this.ctx.beginPath(); this.ctx.arc(x,y,9,0,Math.PI*2); this.ctx.fill();
-        this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        this.ctx.beginPath(); this.ctx.arc(x-3,y-3,3,0,Math.PI*2); this.ctx.fill();
+        this.ctx.beginPath(); this.ctx.arc(x,y,10,0,Math.PI*2); this.ctx.fill();
+        
+        this.ctx.shadowColor = 'transparent';
+        
+        const grad = this.ctx.createRadialGradient(x-3,y-3,1, x,y,10);
+        grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath(); this.ctx.arc(x,y,10,0,Math.PI*2); this.ctx.fill();
     }
 
     shuffle(arr) {
@@ -637,13 +733,15 @@ class App {
     spawnConfetti() {
         this.sound.pop();
         this.particles = [];
-        for(let i=0; i<80; i++) {
+        for(let i=0; i<100; i++) {
             this.particles.push({
                 x: 180, y: 240,
-                vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15 - 5,
+                vx: (Math.random()-0.5)*18, vy: (Math.random()-0.5)*18 - 8,
                 c: CONFIG.colors[Math.floor(Math.random()*5)],
-                s: Math.random()*8+4,
-                life: 100 + Math.random()*50
+                s: Math.random()*8+6,
+                rot: Math.random()*Math.PI*2,
+                rotSpd: (Math.random()-0.5)*0.2,
+                life: 120 + Math.random()*80
             });
         }
     }
@@ -652,10 +750,19 @@ class App {
         this.cfCtx.clearRect(0,0,360,480);
         for(let i=this.particles.length-1; i>=0; i--) {
             const p = this.particles[i];
-            p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life--;
+            p.x += p.vx; p.y += p.vy; p.vy += 0.35; p.rot += p.rotSpd; p.life--;
+            
+            // Add air resistance
+            p.vx *= 0.98;
+            
             if(p.life > 0 && p.y < 480) {
+                this.cfCtx.save();
+                this.cfCtx.translate(p.x, p.y);
+                this.cfCtx.rotate(p.rot);
                 this.cfCtx.fillStyle = p.c;
-                this.cfCtx.fillRect(p.x, p.y, p.s, p.s);
+                // Draw slightly elongated rectangles for confetti
+                this.cfCtx.fillRect(-p.s/2, -p.s, p.s, p.s*1.5);
+                this.cfCtx.restore();
             } else {
                 this.particles.splice(i, 1);
             }
