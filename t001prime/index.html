@@ -1543,11 +1543,7 @@
                             return e.value % val === 0;
                         }
                     })
-                    .sort((a, b) => {
-                        if (a.isBoss && !b.isBoss) return -1;
-                        if (!a.isBoss && b.isBoss) return 1;
-                        return b.y - a.y; // それ以外は低い位置を優先
-                    });
+                    .sort((a, b) => b.y - a.y); // 画面手前（y大）の敵を優先
 
                 if (targets.length > 0) {
                     const target = targets[0];
@@ -1884,7 +1880,7 @@
                     // NORMAL と FULL_OPEN で速度上昇
                     if (this.currentMode !== 'boss_rush') {
                         if (!this.enemies.some(e => e.isBoss)) {
-                            if (this.spawnInterval > 800) this.spawnInterval -= 30;
+                            if (this.spawnInterval > 1200) this.spawnInterval -= 15;
                         }
                     } else {
                         // BOSS RUSH用
