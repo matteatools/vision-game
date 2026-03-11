@@ -33,14 +33,15 @@
 
         #app {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px; /* 少しだけ広げてデスクトップでも見栄え良く */
             height: 100%;
-            max-height: 850px;
             background-color: white;
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 30px rgba(0,0,0,0.15); /* 影を強化 */
+            /* iOSサファリ対応で高さをビューポート100%に固定 */
+            height: 100dvh; 
         }
 
         /* 画面切り替えクラス */
@@ -56,25 +57,31 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            box-sizing: border-box;
+            background-image: radial-gradient(circle at center, #ffd166 0%, var(--bg-color) 70%); /* タイトル等にほんのりグラデ */
         }
         .screen.active {
             opacity: 1;
             pointer-events: auto;
         }
 
-        /* ゲーム画面は要素を横幅いっぱいに広げる */
+        /* ゲーム画面は背景を変える */
         #game-screen {
             align-items: stretch;
+            background-image: none;
+            background-color: #fdfaf6;
         }
 
         h1 {
-            font-size: 32px;
+            font-size: clamp(32px, 8vw, 42px); /* 画面サイズに追従 */
             color: var(--primary);
             text-align: center;
             margin-bottom: 20px;
             line-height: 1.4;
-            text-shadow: 2px 2px 0px #ffe0b2;
+            text-shadow: 2px 2px 0px #fff, 4px 4px 0px #ffe0b2;
             width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
         }
 
         p { font-size: 20px; margin: 10px; font-weight: bold; text-align: center; width: 100%; }
@@ -83,7 +90,7 @@
             background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 30px;
+            border-radius: 40px; /* より丸く */
             padding: 15px 30px;
             font-size: 20px;
             font-weight: bold;
@@ -91,14 +98,15 @@
             width: 80%;
             max-width: 300px;
             cursor: pointer;
-            box-shadow: 0 6px 0 #d68011;
+            box-shadow: 0 6px 0 #d68011, 0 10px 15px rgba(0,0,0,0.1); /* 立体感プラス */
             transition: transform 0.1s, box-shadow 0.1s;
             font-family: 'M PLUS Rounded 1c', sans-serif;
             display: block;
+            touch-action: manipulation;
         }
         .btn:active {
             transform: translateY(6px);
-            box-shadow: 0 0 0 #d68011;
+            box-shadow: 0 0 0 #d68011, 0 0 0 rgba(0,0,0,0.1);
         }
         .btn-easy { background-color: #2ec4b6; box-shadow: 0 6px 0 #20998e; }
         .btn-normal { background-color: #ff9f1c; box-shadow: 0 6px 0 #d68011; }
@@ -109,12 +117,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background-color: #ffbf69;
+            padding: 10px 15px;
+            background-color: var(--primary);
             color: white;
-            font-size: 20px;
+            font-size: clamp(16px, 4.5vw, 22px);
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 5;
             width: 100%;
             box-sizing: border-box;
@@ -122,18 +130,20 @@
 
         #sum-display {
             text-align: center;
-            font-size: 28px;
+            font-size: clamp(20px, 6vw, 28px);
             font-weight: bold;
-            padding: 10px;
-            height: 40px;
+            padding: 8px;
+            height: clamp(35px, 10vw, 45px);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-color);
             background-color: white;
-            border-bottom: 2px solid #eee;
+            border-bottom: 3px solid #eee;
             width: 100%;
             box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 4;
         }
 
         /* 盤面 */
@@ -142,12 +152,17 @@
             position: relative;
             background-color: var(--board-bg);
             margin: 10px;
+            /* 常に8:10の比率に近づける。スマホでもPCでも崩れない */
+            width: calc(100% - 20px);
+            max-height: calc(100% - 150px);
+            aspect-ratio: 8 / 10;
             border-radius: 12px;
             overflow: hidden;
             touch-action: none;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            width: calc(100% - 20px);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.08); /* 枠をくっきり */
+            border: 4px solid #fff;
             align-self: center;
+            box-sizing: border-box;
         }
 
         .block {
@@ -157,8 +172,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 26px;
-            font-weight: bold;
+            font-size: clamp(20px, 6vw, 32px); /* 画面サイズでフォント伸縮 */
+            font-weight: 900;
             color: #fff;
             border-radius: 10px;
             box-sizing: border-box;
@@ -166,6 +181,8 @@
             transition: top 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.2s ease, transform 0.1s;
             user-select: none;
             pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* 文字をくっきり */
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15); /* ブロックの立体感 */
         }
 
         .block.selected {
@@ -203,6 +220,34 @@
             100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
         }
 
+        /* 警告エフェクト用 */
+        .warning-effect {
+            position: absolute;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            background-color: var(--danger);
+            padding: 10px 20px;
+            border-radius: 15px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.2;
+            animation: popOut 1.2s ease-out forwards;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            white-space: pre-wrap;
+        }
+
+        @keyframes popOut {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+        }
+
         /* 画面揺れエフェクト */
         @keyframes shake {
             0% { transform: translateX(0); }
@@ -235,12 +280,53 @@
             100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
 
+        /* コンボ・特殊消しテキストエフェクト用 */
+        .combo-text {
+            position: absolute;
+            font-size: 36px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--danger), 2px 2px 0 #000;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 40;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.2;
+            animation: zoomPop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes zoomPop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; filter: brightness(1.5); }
+            40% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
+            80% { transform: translate(-50%, -50%) scale(1) translateY(-20px); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5) translateY(-50px); opacity: 0; }
+        }
+
+        /* 画面フラッシュエフェクト */
+        #flash-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease-out;
+        }
+        .flash-active {
+            opacity: 0.8 !important;
+        }
+
         #footer {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             background-color: white;
             width: 100%;
             box-sizing: border-box;
+            border-top: 1px solid #eee;
         }
         #footer .btn {
             font-size: 16px;
@@ -248,13 +334,79 @@
             margin: 0 auto;
             width: auto;
             box-shadow: 0 4px 0 #ccc;
-            background-color: #ddd;
+            background-color: #f1f1f1;
             color: #555;
             display: inline-block;
+            border-radius: 20px;
         }
         #footer .btn:active {
             box-shadow: 0 0 0 #ccc;
             transform: translateY(4px);
+        }
+
+        /* 遊び方モーダル */
+        #help-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        #help-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .help-content {
+            background-color: #fff;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80%;
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        .help-content h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px dashed #ffbf69;
+            padding-bottom: 10px;
+        }
+        .help-content p, .help-content li {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            text-align: left;
+        }
+        .help-content ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        .help-content .close-btn {
+            background-color: #ccc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto 0;
+            box-shadow: 0 4px 0 #aaa;
+            cursor: pointer;
+        }
+        .help-content .close-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #aaa;
         }
     </style>
 </head>
@@ -263,32 +415,55 @@
 <div id="app">
     <!-- タイトル画面 -->
     <div id="title-screen" class="screen active">
-        <h1>あわせて10！<br>すうじブロック</h1>
-        <p>ハイスコア: <span id="high-score" style="color: var(--danger); font-size: 28px;">0</span></p>
-        <button class="btn btn-easy" onclick="startGame('easy')">🌱 かんたん</button>
-        <button class="btn btn-normal" onclick="startGame('normal')">⭐ ふつう</button>
-        <button class="btn btn-hard" onclick="startGame('hard')">🔥 むずかしい</button>
+        <h1 style="font-size: clamp(36px, 10vw, 48px);">あわせて10！<br>すうじブロック</h1>
+        <p style="margin: 10px 0;">ハイスコア: <span id="high-score" style="color: var(--danger); font-size: 36px;">0</span></p>
+        <button class="btn btn-normal" style="max-width: 250px; font-size: clamp(20px, 6vw, 24px); padding: 20px; width: 90%; margin-bottom:10px;" onclick="startGame()">▶ スタート</button>
+        <button class="btn" style="background-color:#2ec4b6; box-shadow: 0 6px 0 #20998e; max-width: 200px; font-size: 16px; padding: 12px;" onclick="showHelp()">📖 あそびかた</button>
+        <p style="font-size: clamp(14px, 4vw, 16px); color: #777; font-weight: normal; margin-top: 15px;">〜 スコアアタックモード 〜<br>スコアが上がるとスピードアップ！</p>
     </div>
 
     <!-- ゲーム画面 -->
     <div id="game-screen" class="screen">
         <div id="game-header">
             <div>スコア: <span id="score">0</span></div>
-            <div>せりあがり: <span id="time">0</span>秒</div>
+            <div>⏳ <span id="time">0</span>秒</div>
         </div>
         <div id="sum-display">なぞって 10 か 20 にしよう！</div>
         <div id="board-container"></div>
         <div id="footer">
-            <button class="btn" onclick="showTitle()">やめる</button>
+            <button class="btn" onclick="showTitle()">◀ やめる</button>
         </div>
     </div>
 
     <!-- 結果画面 -->
     <div id="result-screen" class="screen">
-        <h1 style="font-size: 40px;">ゲームオーバー！</h1>
-        <p>あなたのスコア</p>
-        <p style="font-size: 60px; color: var(--danger); margin: 10px 0 30px 0;" id="result-score">0</p>
-        <button class="btn btn-normal" onclick="showTitle()">タイトルへもどる</button>
+        <h1 style="font-size: clamp(36px, 10vw, 48px); margin-top: 20px;">ゲームオーバー！</h1>
+        <p style="font-size: 24px;">あなたのスコア</p>
+        <p style="font-size: clamp(60px, 15vw, 80px); font-weight: 900; color: var(--danger); margin: 0 0 30px 0; text-shadow: 2px 2px 0px #000;" id="result-score">0</p>
+        <button class="btn btn-normal" style="width: 90%; max-width: 300px;" onclick="showTitle()">タイトルへもどる</button>
+    </div>
+    
+    <!-- フラッシュ用オーバーレイ -->
+    <div id="flash-overlay"></div>
+    
+    <!-- 遊び方モーダル -->
+    <div id="help-modal">
+        <div class="help-content">
+            <h2>📖 あそびかた</h2>
+            <p>数字のブロックを上下左右になぞって繋げましょう。</p>
+            <ul>
+                <li>✨ 合計が**「10」**か**「20」**になるとブロックが消えてスコアが入ります！<br>（20を作るとボーナス+50点！）</li>
+                <li>⚠️ 合計が10を超えたり(11〜19)、21以上になった状態で指を離すと「ミス」になり、ブロックがせり上がってしまいます。（なぞった道を戻ればキャンセル可能です）</li>
+            </ul>
+            <h3 style="color:var(--danger); margin-bottom:5px;">💥 スペシャルボム消し</h3>
+            <p style="margin-top:0;">特定の形でなぞって消すと大爆発！</p>
+            <ul>
+                <li>**2×2の正方形**<br>→ 周囲のブロックを巻き込んで爆発！</li>
+                <li>**横に4個以上一直線**<br>→ 横3列のブロックをすべて一掃！</li>
+                <li>**縦に4個以上一直線**<br>→ 縦3列のブロックをすべて一掃！</li>
+            </ul>
+            <button class="close-btn" onclick="hideHelp()">とじる</button>
+        </div>
     </div>
 </div>
 
@@ -309,7 +484,6 @@
     let timeUntilPenalty = 0;
     let penaltyInterval = 0;
     let timerInterval = null;
-    let difficulty = 'normal';
     
     // DOM要素
     const boardEl = document.getElementById('board-container');
@@ -361,17 +535,34 @@
     
     function playExplosionSound() {
         if(!audioCtx) return;
+        
+        // メインの爆発音
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.5);
+        osc.stop(audioCtx.currentTime + 0.6);
+        
+        // ピューンという高音アクセント
+        setTimeout(() => {
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.3);
+            gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start();
+            osc2.stop(audioCtx.currentTime + 0.3);
+        }, 50);
     }
 
     // --- ゲームの進行管理 ---
@@ -396,10 +587,17 @@
         document.getElementById('high-score').innerText = getHighScore();
         switchScreen('title-screen');
     }
+    
+    function showHelp() {
+        document.getElementById('help-modal').classList.add('show');
+    }
+    
+    function hideHelp() {
+        document.getElementById('help-modal').classList.remove('show');
+    }
 
-    function startGame(diff) {
+    function startGame() {
         initAudio(); // 音声再生の許可を取得
-        difficulty = diff;
         score = 0;
         scoreEl.innerText = score;
         selectedPath = [];
@@ -407,10 +605,8 @@
         isDragging = false;
         updateSumDisplay();
         
-        // 難易度別のせり上がり時間設定
-        if (difficulty === 'easy') penaltyInterval = 30;
-        if (difficulty === 'normal') penaltyInterval = 20;
-        if (difficulty === 'hard') penaltyInterval = 10;
+        // スコアアタック: 最初は15秒からスタート
+        penaltyInterval = 15;
         
         timeUntilPenalty = penaltyInterval;
         timeEl.innerText = timeUntilPenalty;
@@ -585,6 +781,8 @@
         if (currentSum > 10) {
             playMistakeSound();
             
+            showWarningEffect("オーバー！\nペナルティ！");
+            
             // 画面を揺らす
             boardEl.classList.add('shake-animation');
             setTimeout(() => boardEl.classList.remove('shake-animation'), 300);
@@ -663,13 +861,45 @@
         return path.every(b => b.c === c); // 全て同じ列なら縦一直線
     }
 
-    function createExplosion(cx, cy) {
+    function createExplosion(cx, cy, scale = 1) {
+        // メインの爆発光
         const el = document.createElement('div');
         el.className = 'explosion';
         el.style.left = `${cx}%`;
         el.style.top = `${cy}%`;
+        // スケールを少し大きくする
+        el.style.transform = `translate(-50%, -50%) scale(${scale})`;
         boardEl.appendChild(el);
-        setTimeout(() => el.remove(), 500);
+        
+        // 飛び散る小さな光のパーティクル
+        for (let i = 0; i < 4; i++) {
+            const p = document.createElement('div');
+            p.className = 'explosion';
+            p.style.width = '30%'; // 小さめ
+            p.style.left = `${cx + (Math.random() * 20 - 10)}%`;
+            p.style.top = `${cy + (Math.random() * 20 - 10)}%`;
+            p.style.animationDuration = `${0.3 + Math.random() * 0.3}s`;
+            boardEl.appendChild(p);
+            setTimeout(() => p.remove(), 600);
+        }
+
+        setTimeout(() => el.remove(), 600);
+    }
+
+    function showComboText(text) {
+        const el = document.createElement('div');
+        el.className = 'combo-text';
+        el.innerHTML = text;
+        boardEl.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
+    }
+
+    function screenFlash() {
+        const flash = document.getElementById('flash-overlay');
+        flash.classList.add('flash-active');
+        setTimeout(() => {
+            flash.classList.remove('flash-active');
+        }, 50);
     }
 
     function checkSumResult() {
@@ -685,15 +915,37 @@
             let isVLine = isVerticalLine(selectedPath);
             let bonusPts = 0;
             
-            // スペシャル消しのいずれかが発動した場合
-            if (isSquare || isHLine || isVLine) {
-                playExplosionSound(); // 爆発音
-                
-                // 画面を揺らす
+            // 20ピッタリで作った場合の特別なエフェクト
+            if (currentSum === 20) {
+                playExplosionSound(); // ボムと同じ音
+                screenFlash();
                 boardEl.classList.add('shake-animation');
                 setTimeout(() => boardEl.classList.remove('shake-animation'), 300);
                 
+                showComboText("PERFECT 20!<br><span style='font-size:20px;color:magenta;'>ボーナス +50</span>");
+                bonusPts += 50; // 20を作っただけでも50点ボーナス
+                
+                // 真ん中で爆発
+                let targetBlock = selectedPath[Math.floor(selectedPath.length / 2)];
+                if (targetBlock) {
+                    let cx = targetBlock.c * (100/8) + 6;
+                    let cy = targetBlock.r * 10 + 5;
+                    createExplosion(cx, cy, 1.5);
+                }
+            }
+            
+            // スペシャル消しのいずれかが発動した場合
+            if (isSquare || isHLine || isVLine) {
+                playExplosionSound(); // 爆発音
+                screenFlash(); // 画面全体フラッシュ
+                
+                // 画面を大きく揺らす（回数と時間を増やす）
+                boardEl.classList.add('shake-animation');
+                setTimeout(() => boardEl.classList.remove('shake-animation'), 400);
+                
                 if (isSquare) {
+                    showComboText("BOMB!!<br><span style='font-size:20px;color:gold;'>2x2 まきこみ!</span>");
+                    
                     let minC = Math.min(...selectedPath.map(b => b.c));
                     let maxC = Math.max(...selectedPath.map(b => b.c));
                     let minR = Math.min(...selectedPath.map(b => b.r));
@@ -702,7 +954,15 @@
                     // エフェクト中心座標の計算
                     let cx = (minC + maxC + 1) / 2 * (100/8);
                     let cy = (minR + maxR + 1) / 2 * 10;
-                    createExplosion(cx, cy);
+                    
+                    // メインの大きな爆発
+                    createExplosion(cx, cy, 1.5);
+                    
+                    // 四隅にも小爆発
+                    createExplosion((minC) * (100/8), (minR) * 10, 0.8);
+                    createExplosion((maxC+1) * (100/8), (minR) * 10, 0.8);
+                    createExplosion((minC) * (100/8), (maxR+1) * 10, 0.8);
+                    createExplosion((maxC+1) * (100/8), (maxR+1) * 10, 0.8);
                     
                     // 4x4の巻き込み処理 (周囲1マスをすべて消去対象に追加)
                     for(let c = minC - 1; c <= maxC + 1; c++) {
@@ -711,19 +971,27 @@
                                 let b = board[c][r];
                                 if (b && !blocksToRemove.includes(b)) {
                                     blocksToRemove.push(b);
-                                    bonusPts += 10; // 巻き込んだブロック1つにつき10点ボーナス
+                                    bonusPts += 15; // ボーナス増量
+                                    
+                                    // 巻き込んだブロックの場所で小爆発
+                                    setTimeout(() => {
+                                        createExplosion(c * (100/8) + 6, r * 10 + 5, 0.5);
+                                    }, Math.random() * 200);
                                 }
                             }
                         }
                     }
                 } else if (isHLine) {
+                    showComboText("LINE BOMB!!<br><span style='font-size:20px;color:cyan;'>よこ ぜんぶ!</span>");
                     // 横一列の巻き込み処理
                     const targetR = selectedPath[0].r;
                     
-                    // 横に広がるようにエフェクトを複数出す
-                    createExplosion(20, targetR * 10 + 5);
-                    createExplosion(50, targetR * 10 + 5);
-                    createExplosion(80, targetR * 10 + 5);
+                    // 横に広がるようにエフェクトを順番に出す
+                    for (let i = 0; i <= 100; i += 15) {
+                        setTimeout(() => {
+                            createExplosion(i, targetR * 10 + 5, 1.2);
+                        }, i * 2);
+                    }
 
                     // 上下を含めた横3行をすべて消去対象に追加
                     for (let c = 0; c < COLS; c++) {
@@ -738,14 +1006,17 @@
                         }
                     }
                 } else if (isVLine) {
+                    showComboText("LINE BOMB!!<br><span style='font-size:20px;color:lime;'>たて ぜんぶ!</span>");
                     // 縦一列の巻き込み処理
                     const targetC = selectedPath[0].c;
                     const cx = targetC * (100/8) + (100/16);
                     
-                    // 縦に広がるようにエフェクトを複数出す
-                    createExplosion(cx, 20);
-                    createExplosion(cx, 50);
-                    createExplosion(cx, 80);
+                    // 縦に広がるようにエフェクトを順番に出す
+                    for (let i = 0; i <= 100; i += 10) {
+                        setTimeout(() => {
+                            createExplosion(cx, i, 1.2);
+                        }, i * 2);
+                    }
 
                     // 左右を含めた縦3列をすべて消去対象に追加
                     for (let c = targetC - 1; c <= targetC + 1; c++) {
@@ -760,14 +1031,26 @@
                         }
                     }
                 }
-            } else {
-                playClearSound(); // 通常の成功音
+            } else if (currentSum !== 20) {
+                playClearSound(); // 通常の10成功音（20の時はすでに鳴らしている）
             }
             
             // スコア加算
             const pts = selectedPath.length * 10 + bonusPts;
             score += pts;
             scoreEl.innerText = score;
+            
+            // スピードアップ判定（スコア300点ごとに1秒短縮、最短5秒）
+            let newInterval = Math.max(5, 15 - Math.floor(score / 300));
+            if (newInterval < penaltyInterval) {
+                penaltyInterval = newInterval;
+                showWarningEffect(`スピードUP!\n残り ${penaltyInterval}秒`);
+                // 現在の残り時間が新しいスピードより長い場合は切り詰める
+                if (timeUntilPenalty > penaltyInterval) {
+                    timeUntilPenalty = penaltyInterval;
+                    timeEl.innerText = timeUntilPenalty;
+                }
+            }
             
             // エフェクト表示
             showScoreEffect(selectedPath[selectedPath.length-1], pts);
@@ -787,8 +1070,37 @@
             // 浮いているブロックを下に落とす（上からの補充はしない）
             applyGravity();
             
+            // 盤面のブロックが少なすぎる場合の自動補充
+            setTimeout(() => {
+                let remainingBlocks = 0;
+                for (let c = 0; c < COLS; c++) {
+                    for (let r = 0; r < ROWS; r++) {
+                        if (board[c][r] !== null) remainingBlocks++;
+                    }
+                }
+                // ブロックが少ない場合は自動でせり上がる
+                if (remainingBlocks <= 15 && document.getElementById('game-screen').classList.contains('active')) {
+                    // ボム発動時など、特殊消しと被る場合は文字を出さない（補充だけこっそり行う）
+                    if (!isSquare && !isHLine && !isVLine) {
+                        showWarningEffect("ピンチ！\nブロック追加！");
+                    }
+                    applyPenalty();
+                    // タイマーリセット
+                    timeUntilPenalty = penaltyInterval;
+                    timeEl.innerText = timeUntilPenalty;
+                }
+            }, 300); // 落ちた直後くらいに判定
+            
         }
         // ※「20を超えた瞬間にミス」とする処理を削除しました
+    }
+
+    function showWarningEffect(text) {
+        const el = document.createElement('div');
+        el.className = 'warning-effect';
+        el.innerText = text;
+        boardEl.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
     }
 
     function showScoreEffect(block, pts) {
