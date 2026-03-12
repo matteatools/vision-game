@@ -1064,32 +1064,89 @@ body {
 @media (max-width: 700px) {
   .game-body {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "char"
+      "cone"
+      "history"
+      "palette";
+    gap: 16px;
   }
 
   .char-area {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
   }
 
   .char-area .speech-bubble {
     flex: 1;
+    min-width: unset;
+  }
+
+  .speech-bubble::after {
+    bottom: 50%;
+    left: auto;
+    right: -14px;
+    transform: translateY(50%);
+    border-color: transparent transparent transparent var(--pink);
+  }
+
+  .speech-bubble::before {
+    bottom: 50%;
+    left: auto;
+    right: -12px;
+    transform: translateY(50%);
+    border-color: transparent transparent transparent white;
   }
 
   .char-area .char-wrap {
     flex-shrink: 0;
+    margin-top: 0;
   }
 
-  #char-svg {
+  .char-figure {
     width: 80px;
+    height: 106px;
+  }
+
+  .history-area {
+    grid-row: auto;
+    grid-column: 1;
+    max-height: none;
+    padding: 10px 12px;
+  }
+
+  .history-title {
+    margin-bottom: 6px;
+  }
+
+  .history-list {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 8px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .history-row {
+    flex: 0 0 85%;
+    scroll-snap-align: center;
   }
 
   .flavor-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
   }
 
   .title-logo {
     font-size: 2rem;
+  }
+
+  .cone-area {
+    padding: 10px;
   }
 }
 
