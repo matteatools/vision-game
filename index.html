@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ビジョントレーニングゲーム</title>
+    
+    <!-- SEO用のメタタグ -->
+    <title>めとあたまのゲームパーク | ビジョントレーニングで「見る力」「考える力」を育てる</title>
+    <meta name="description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニングに基づいた無料の知育ゲームパークです。">
+    <meta name="keywords" content="ビジョントレーニング,知育ゲーム,見る力,考える力,無料ゲーム,めとあたまのゲームパーク">
+    
+    <!-- SNSなどでシェアされた時の設定（OGP） -->
+    <meta property="og:title" content="めとあたまのゲームパーク">
+    <meta property="og:description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニングに基づいた無料の知育ゲームパークです。">
+    <meta property="og:type" content="website">
+    
     <style>
         /* サイト全体の基本設定 */
         body {
             font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Yu Gothic", sans-serif;
             
-            /* 明るい黄色の背景に変更 */
+            /* 明るい黄色の背景 */
             background-color: #fff9c4; 
-            
-            /* 目の絵文字を背景画像として設定 */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='40'%3E%F0%9F%91%80%3C/text%3E%3C/svg%3E");
-            
-            /* 背景を斜めに動かすアニメーション */
-            animation: bg-scroll 20s linear infinite;
             
             color: #333;
             text-align: center;
@@ -24,57 +28,41 @@
             padding: 20px;
         }
 
-        /* 背景を動かすキーフレーム */
-        @keyframes bg-scroll {
-            0% { background-position: 0 0; }
-            100% { background-position: 80px 80px; }
-        }
-
-        /* ヘッダーエリア（吹き出しとタイトル） */
+        /* ヘッダーエリア */
         header {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             margin-top: 20px;
-            position: relative; /* 背景の上に浮き上がらせるため */
+            position: relative;
             z-index: 1;
         }
 
-        /* 吹き出しのデザイン */
-        .fukidashi {
-            display: inline-block;
-            background-color: #ff3d00; /* 元気なオレンジ赤 */
-            color: white;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 30px;
-            position: relative;
-            margin-bottom: 15px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            animation: fuwa 2s infinite ease-in-out;
-            border: 2px solid white;
-        }
-        
-        /* 吹き出しのしっぽ */
-        .fukidashi::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-style: solid;
-            border-width: 10px 10px 0 10px;
-            border-color: #ff3d00 transparent transparent transparent;
-        }
-
-        @keyframes fuwa {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        h1 {
-            color: #0d47a1; /* 濃い青で見やすく */
+        /* サイトのメインタイトル */
+        .main-title {
+            color: #0d47a1;
             margin: 0;
-            font-size: 28px;
-            text-shadow: 3px 3px 0px #fff; /* 文字の周りを白く縁取り */
+            font-size: 32px;
+            text-shadow: 3px 3px 0px #fff;
+        }
+
+        /* サイトコピーのデザイン */
+        .site-copy {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e65100;
+            margin-top: 10px;
+            text-shadow: 1px 1px 0px #fff;
+        }
+
+        /* 各カテゴリーの見出し */
+        .category-title {
+            color: #0d47a1;
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            border-radius: 10px;
         }
 
         /* ゲームリストのグリッドレイアウト */
@@ -92,12 +80,12 @@
         /* 各ゲームのカードデザイン */
         .game-card {
             background: white;
-            border: 4px solid #ffca28; /* 枠線を黄色系に */
+            border: 4px solid #ffca28;
             border-radius: 20px;
             padding: 20px;
             text-decoration: none;
             color: #333;
-            box-shadow: 0 6px 0 #ff6f00; /* 影をオレンジに */
+            box-shadow: 0 6px 0 #ff6f00;
             transition: all 0.1s;
             display: flex;
             flex-direction: column;
@@ -149,32 +137,65 @@
             line-height: 1.4;
         }
 
+        /* フッターのデザイン */
         footer {
-            margin-top: 20px;
+            margin-top: 40px;
+            padding: 20px;
             font-size: 12px;
             color: #555;
             position: relative;
             z-index: 1;
-            background-color: rgba(255,255,255,0.7); /* 文字が見やすいように背景を少し白く */
+            background-color: rgba(255,255,255,0.8);
             display: inline-block;
-            padding: 5px 20px;
             border-radius: 20px;
+            max-width: 90%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .copyright {
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        .instructor-info {
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        /* 「00」商標マークのスタイル */
+        .mark-00 {
+            display: inline-block;
+            border: 1.5px solid #555;
+            padding: 0 4px;
+            margin-right: 6px;
+            font-size: 11px;
+            vertical-align: middle;
+            line-height: 1.2;
+            font-weight: bold;
+            border-radius: 3px;
         }
 
         /* スマホ向けの調整 */
         @media (max-width: 600px) {
-            h1 { font-size: 24px; }
+            .main-title { font-size: 26px; }
+            .site-copy { font-size: 14px; }
+            .category-title { font-size: 20px; }
             .game-grid { grid-template-columns: 1fr; }
             .game-card { height: auto; padding: 25px 20px; }
+            footer { font-size: 11px; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="fukidashi">サクッとあそべる！</div>
-        <h1>ビジョントレーニングゲーム</h1>
+        <h1 class="main-title">めとあたまのゲームパーク</h1>
+        <p class="site-copy">ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！</p>
     </header>
+
+    <h2 class="category-title">見るゲーム</h2>
 
     <div class="game-grid">
         <!-- 01 -->
@@ -283,9 +304,7 @@
         </a>
     </div>
 
-    <header>
-        <h1>シンキングゲーム</h1>
-    </header>
+    <h2 class="category-title">考えるゲーム</h2>
 
     <div class="game-grid">
         <!-- シンキング 01 -->
@@ -311,7 +330,11 @@
     </div>
 
     <footer>
-        <p>© 2026 Vision Training Games</p>
+        <div class="copyright">© 2026 めとあたまのゲームパーク</div>
+        <div class="instructor-info">
+            <span class="mark-00">00</span>一般社団法人　ビジョントレーニング®協会<br>
+            ビジョントレーニング®インストラクターPRO　登録番号Ø260214013V
+        </div>
     </footer>
 
 </body>
