@@ -4,31 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO用のメタタグ -->
-    <title>めとあたまのゲームパーク | ビジョントレーニングで「見る力」「考える力」を育てる</title>
-    <meta name="description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニングに基づいた無料の知育ゲームパークです。">
-    <meta name="keywords" content="ビジョントレーニング,知育ゲーム,見る力,考える力,無料ゲーム,めとあたまのゲームパーク">
+    <title>めとあたまのゲームパーク | ビジョントレーニング®で「見る力」「考える力」を育てる</title>
+    <meta name="description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
+    <meta name="keywords" content="ビジョントレーニング®,知育ゲーム,見る力,考える力,無料ゲーム,めとあたまのゲームパーク">
     
-    <!-- SNSなどでシェアされた時の設定（OGP） -->
     <meta property="og:title" content="めとあたまのゲームパーク">
-    <meta property="og:description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニングに基づいた無料の知育ゲームパークです。">
+    <meta property="og:description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
     <meta property="og:type" content="website">
     
     <style>
         /* サイト全体の基本設定 */
         body {
             font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Yu Gothic", sans-serif;
-            
-            /* 明るい黄色の背景 */
             background-color: #fff9c4; 
-            
             color: #333;
             text-align: center;
             margin: 0;
             padding: 20px;
         }
 
-        /* ヘッダーエリア */
         header {
             margin-bottom: 30px;
             margin-top: 20px;
@@ -36,7 +30,6 @@
             z-index: 1;
         }
 
-        /* サイトのメインタイトル */
         .main-title {
             color: #0d47a1;
             margin: 0;
@@ -44,7 +37,6 @@
             text-shadow: 3px 3px 0px #fff;
         }
 
-        /* サイトコピーのデザイン */
         .site-copy {
             font-size: 18px;
             font-weight: bold;
@@ -53,7 +45,6 @@
             text-shadow: 1px 1px 0px #fff;
         }
 
-        /* 各カテゴリーの見出し */
         .category-title {
             color: #0d47a1;
             font-size: 24px;
@@ -65,7 +56,6 @@
             border-radius: 10px;
         }
 
-        /* ゲームリストのグリッドレイアウト */
         .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -77,7 +67,6 @@
             z-index: 1;
         }
 
-        /* 各ゲームのカードデザイン */
         .game-card {
             background: white;
             border: 4px solid #ffca28;
@@ -97,7 +86,6 @@
             cursor: pointer;
         }
 
-        /* ホバー時・タップ時の動き */
         .game-card:hover {
             transform: translateY(4px);
             box-shadow: 0 2px 0 #ff6f00;
@@ -110,7 +98,6 @@
             box-shadow: none;
         }
 
-        /* カード内のテキストデザイン */
         .game-number {
             position: absolute;
             top: 10px;
@@ -137,7 +124,7 @@
             line-height: 1.4;
         }
 
-        /* フッターのデザイン */
+        /* フッター：会則遵守のためのスタイル */
         footer {
             margin-top: 40px;
             padding: 20px;
@@ -164,17 +151,12 @@
             text-align: center;
         }
 
-        /* 「00」商標マークのスタイル */
-        .mark-00 {
-            display: inline-block;
-            border: 1.5px solid #555;
-            padding: 0 4px;
+        /* 指定ロゴ画像用の調整 */
+        .trademark-logo {
+            height: 1.2em; /* 文字の高さに合わせる */
+            vertical-align: middle; 
             margin-right: 6px;
-            font-size: 11px;
-            vertical-align: middle;
-            line-height: 1.2;
-            font-weight: bold;
-            border-radius: 3px;
+            display: inline-block;
         }
 
         /* スマホ向けの調整 */
@@ -198,105 +180,76 @@
     <h2 class="category-title">見るゲーム</h2>
 
     <div class="game-grid">
-        <!-- 01 -->
         <a href="01dabu/index.html" class="game-card">
             <span class="game-number">No.01</span>
             <div class="game-title">おなじマークをさがせ！</div>
             <div class="game-desc">おなじマークをさがそう</div>
         </a>
-
-        <!-- 02 -->
         <a href="02socks/index.html" class="game-card">
             <span class="game-number">No.02</span>
             <div class="game-title">くつしたあわせ</div>
             <div class="game-desc">くつしたをそろえておかたづけ♪</div>
         </a>
-
-        <!-- 03 -->
         <a href="03speed/index.html" class="game-card">
             <span class="game-number">No.03</span>
             <div class="game-title">SPEED ATTACK</div>
             <div class="game-desc">ひかるボタンをすばやくおせ！</div>
         </a>
-
-        <!-- 04 -->
         <a href="04count/index.html" class="game-card">
             <span class="game-number">No.04</span>
             <div class="game-title">SPEED COUNT</div>
             <div class="game-desc">すうじをじゅんにすばやくおせ！</div>
         </a>
-
-        <!-- 05 -->
         <a href="05siryoku/index.html" class="game-card">
             <span class="game-number">No.05</span>
             <div class="game-title">すーぱーしりょくてすと</div>
             <div class="game-desc">すごい「しりょく」てすと！？</div>
         </a>
-
-        <!-- 06 -->
         <a href="06rope/index.html" class="game-card">
             <span class="game-number">No.06</span>
             <div class="game-title">このいっぽん</div>
             <div class="game-desc">おなじいろのつながるロープはどれ？</div>
         </a>
-
-        <!-- 07 -->
         <a href="07colormemo/index.html" class="game-card">
             <span class="game-number">No.07</span>
             <div class="game-title">いろあわせきおく</div>
             <div class="game-desc">いろのはいちをおぼえよう</div>
         </a>
-
-        <!-- 08 -->
         <a href="08ooi/index.html" class="game-card">
             <span class="game-number">No.08</span>
             <div class="game-title">いちばんおおいのどれだ？</div>
             <div class="game-desc">いちばんおおいのはかたち？いろ？</div>
         </a>
-
-        <!-- 09 -->
         <a href="09word/index.html" class="game-card">
             <span class="game-number">No.09</span>
             <div class="game-title">どうぶつもじさがし</div>
             <div class="game-desc">もじのなかのどうぶつみつかる？</div>
         </a>
-
-        <!-- 10 -->
         <a href="10obake/index.html" class="game-card">
             <span class="game-number">No.10</span>
             <div class="game-title">げんじゅうをつかまえろ</div>
             <div class="game-desc">げんじゅうをつかまえよう！</div>
         </a>
-
-        <!-- 11 -->
         <a href="11narabe/index.html" class="game-card">
             <span class="game-number">No.11</span>
             <div class="game-title">もじならべ</div>
             <div class="game-desc">ただしくもじをならべよう</div>
         </a>
-
-        <!-- 12 -->
         <a href="12block/index.html" class="game-card">
             <span class="game-number">No.12</span>
             <div class="game-title">ぴたっとパズル</div>
             <div class="game-desc">ピースをぴたっとおこう</div>
         </a>
-
-        <!-- 13 -->
         <a href="13nakama/index.html" class="game-card">
             <span class="game-number">No.13</span>
             <div class="game-title">なかまえらび</div>
             <div class="game-desc">おなじなかまをえらぼう</div>
         </a>
-
-        <!-- 14 -->
         <a href="14ookisaawase/index.html" class="game-card">
             <span class="game-number">No.14</span>
             <div class="game-title">おおきさあわせ</div>
             <div class="game-desc">おおきさをぴったりにしよう</div>
         </a>
-
-        <!-- 15 -->
         <a href="15totalten/index.html" class="game-card">
             <span class="game-number">No.15</span>
             <div class="game-title">あわせて１０</div>
@@ -307,21 +260,16 @@
     <h2 class="category-title">考えるゲーム</h2>
 
     <div class="game-grid">
-        <!-- シンキング 01 -->
         <a href="t001prime/index.html" class="game-card">
             <span class="game-number">No.01</span>
             <div class="game-title">約分シュート</div>
             <div class="game-desc">割れる数でどんどん撃て！</div>
         </a>
-
-        <!-- シンキング 02 -->
         <a href="t002qqp/index.html" class="game-card">
             <span class="game-number">No.02</span>
             <div class="game-title">qqp</div>
             <div class="game-desc">九九のポーカーで勝負！</div>
         </a>
-
-        <!-- シンキング 03 -->
         <a href="t003ice/index.html" class="game-card">
             <span class="game-number">No.03</span>
             <div class="game-title">わがままアイスクリーム</div>
@@ -332,7 +280,7 @@
     <footer>
         <div class="copyright">© 2026 めとあたまのゲームパーク</div>
         <div class="instructor-info">
-            <span class="mark-00">00</span>一般社団法人　ビジョントレーニング®協会<br>
+            <img src="00.png" alt="商標マーク" class="trademark-logo">一般社団法人　ビジョントレーニング®協会<br>
             ビジョントレーニング®インストラクターPRO　登録番号Ø260214013V
         </div>
     </footer>
