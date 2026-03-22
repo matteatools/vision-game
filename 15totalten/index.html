@@ -462,6 +462,8 @@
                 <li>**横に4個以上一直線**<br>→ 横3列のブロックをすべて一掃！</li>
                 <li>**縦に4個以上一直線**<br>→ 縦3列のブロックをすべて一掃！</li>
             </ul>
+            <h3 style="color:var(--secondary); margin-bottom:5px;">⌛ ブロックの砂崩れ</h3>
+            <p style="margin-top:0;">ブロックが1列だけ高く積まれると、隣の空いたスペースへ**斜めに滑り落ちます**。孤立したブロックも自動で崩れて繋がるようになるので、うまく活用してピンチを脱出しましょう！</p>
             <button class="close-btn" onclick="hideHelp()">とじる</button>
         </div>
     </div>
@@ -1114,25 +1116,52 @@
         setTimeout(() => el.remove(), 600);
     }
 
-    // 浮いているブロックを下に落とすだけ（補充はしない）
+    // 浮いているブロックを下に落とす＆斜めに崩す（砂崩れ）
     function applyGravity() {
-        for (let c = 0; c < COLS; c++) {
-            let writeR = ROWS - 1;
-            
-            // 下から上にスキャンし、今あるブロックを下に詰める
-            for (let r = ROWS - 1; r >= 0; r--) {
-                if (board[c][r] !== null) {
-                    if (writeR !== r) {
-                        const b = board[c][r];
-                        board[c][writeR] = b;
-                        board[c][r] = null;
-                        b.r = writeR;
-                        updateBlockPosition(b);
+        let moved = true;
+        // 安定するまでループ
+        while (moved) {
+            moved = false;
+            // 下から上にスキャンして落下・滑り判定
+            for (let r = ROWS - 2; r >= 0; r--) {
+                for (let c = 0; c < COLS; c++) {
+                    if (board[c][r] !== null) {
+                        let b = board[c][r];
+                        // 真下が空いているか
+                        if (board[c][r + 1] === null) {
+                            board[c][r + 1] = b;
+                            board[c][r] = null;
+                            b.r = r + 1;
+                            moved = true;
+                        } else {
+                            // 真下が塞がっている場合、斜め下をチェック
+                            // 左右のどちらに行くかの優先順位をランダムにする
+                            let dirs = Math.random() < 0.5 ? [1, -1] : [-1, 1];
+                            for (let currentDir of dirs) {
+                                let slideC = c + currentDir;
+                                // 横と斜め下が両方空いているか
+                                if (slideC >= 0 && slideC < COLS && board[slideC][r] === null && board[slideC][r + 1] === null) {
+                                    board[slideC][r + 1] = b;
+                                    board[c][r] = null;
+                                    b.c = slideC;
+                                    b.r = r + 1;
+                                    moved = true;
+                                    break; // スライドしたらもう片方はチェックしない
+                                }
+                            }
+                        }
                     }
-                    writeR--;
                 }
             }
-            // 上からの補充は行わない
+        }
+
+        // 全ての位置が確定したらDOMのCSSを更新（アニメーション）
+        for (let c = 0; c < COLS; c++) {
+            for (let r = 0; r < ROWS; r++) {
+                if (board[c][r] !== null) {
+                    updateBlockPosition(board[c][r]);
+                }
+            }
         }
     }
 
