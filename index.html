@@ -4,78 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>めとあたまのゲームパーク | ビジョントレーニング®で「見る力」「考える力」を育てる</title>
-    <meta name="description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
+    <title>めとあたまのゲームパーク | ビジョントレーニング®で「みる力」「考える力」を育てる</title>
+    <meta name="description" content="ゲーム感覚で「みる力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
     <meta name="keywords" content="ビジョントレーニング®,知育ゲーム,見る力,考える力,無料ゲーム,めとあたまのゲームパーク">
     
-    <meta property="og:title" content="めとあたまのゲームパーク">
-    <meta property="og:description" content="ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
-    <meta property="og:type" content="website">
+    <!-- 追加: 柔らかく温かみのある「Zen Maru Gothic」フォント -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
     
     <style>
         /* サイト全体の基本設定 */
         body {
-            font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Yu Gothic", sans-serif;
-            background-color: #fff9c4; 
-            color: #333;
+            font-family: 'Zen Maru Gothic', "Hiragino Maru Gothic ProN", "Meiryo", sans-serif;
+            /* 背景をフラットな黄色から、上品で温かみのあるアイボリー・クリーム色に */
+            background-color: #faf7f2; 
+            background-image: radial-gradient(#f3e9d2 2px, transparent 2px); /* うっすらとしたドット柄で楽しさを */
+            background-size: 30px 30px;
+            color: #5c4b43; /* 真っ黒ではなく、柔らかいブラウングレーで目に優しく */
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 30px 20px;
         }
 
         header {
-            margin-bottom: 30px;
-            margin-top: 20px;
+            margin-bottom: 50px;
+            margin-top: 10px;
             position: relative;
             z-index: 1;
         }
 
         .main-title {
-            color: #0d47a1;
+            color: #d97757; /* 温かみのあるテラコッタオレンジ */
             margin: 0;
-            font-size: 32px;
-            text-shadow: 3px 3px 0px #fff;
+            font-size: clamp(28px, 6vw, 38px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 2px 4px 10px rgba(217, 119, 87, 0.2);
         }
 
         .site-copy {
-            font-size: 18px;
-            font-weight: bold;
-            color: #e65100;
-            margin-top: 10px;
-            text-shadow: 1px 1px 0px #fff;
+            font-size: clamp(14px, 3vw, 17px);
+            font-weight: 700;
+            color: #7b9e87; /* 落ち着いたセージグリーン */
+            margin-top: 15px;
+            letter-spacing: 1px;
         }
 
+        /* 大見出し（みるゲーム・かんがえるゲーム） */
         .category-title {
-            color: #0d47a1;
-            font-size: 24px;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 60px;
+            margin-bottom: 30px;
+            padding: 12px 40px;
+            background: #e8a598; /* 優しいコーラルピンクのふんわりバッジ */
+            display: inline-block;
+            border-radius: 50px;
+            box-shadow: 0 6px 15px rgba(232, 165, 152, 0.3);
+            letter-spacing: 2px;
+        }
+
+        /* 小見出し（① めでおう ちから等） */
+        .sub-category-title {
+            color: #6d5b53;
+            font-size: 19px;
             margin-top: 40px;
             margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            display: inline-block;
-            border-radius: 10px;
+            padding-left: 16px;
+            /* 攻撃的な太い線ではなく、丸みのある優しい線に */
+            border-left: 6px solid #f2c94c;
+            border-radius: 4px;
+            text-align: left;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 700;
         }
 
         .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
             max-width: 1000px;
             margin: 0 auto;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
             position: relative;
             z-index: 1;
         }
 
+        /* 洗練されたカードデザイン */
         .game-card {
-            background: white;
-            border: 4px solid #ffca28;
+            background: #ffffff;
             border-radius: 20px;
-            padding: 20px;
+            padding: 25px 20px;
             text-decoration: none;
-            color: #333;
-            box-shadow: 0 6px 0 #ff6f00;
-            transition: all 0.1s;
+            color: #5c4b43;
+            /* ボックスの境界線をなくし、影で浮かんでいるような上品さを演出 */
+            box-shadow: 0 10px 25px rgba(180, 170, 160, 0.15);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -83,67 +109,78 @@
             height: 140px;
             position: relative;
             overflow: hidden;
-            cursor: pointer;
+            border: 2px solid transparent; 
         }
 
         .game-card:hover {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #ff6f00;
-            background-color: #fffde7;
-            border-color: #ff6f00;
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(180, 170, 160, 0.25);
+            border-color: #fce8cd; /* ホバー時にうっすら枠線 */
+            background-color: #fffcf8;
         }
 
         .game-card:active {
-            transform: translateY(6px);
-            box-shadow: none;
+            transform: translateY(2px);
+            box-shadow: 0 5px 15px rgba(180, 170, 160, 0.15);
         }
 
+        /* 番号バッジ */
         .game-number {
             position: absolute;
-            top: 10px;
+            top: 15px;
             left: 15px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ff6f00;
-            background: #fff8e1;
-            padding: 2px 8px;
-            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #fff;
+            background: #eebb6c; /* 温かみのあるマスタードイエロー */
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 8px rgba(238, 187, 108, 0.3);
         }
 
         .game-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
+            font-size: 20px;
+            font-weight: 900;
+            color: #5c4b43;
             margin-bottom: 8px;
             margin-top: 15px;
         }
 
         .game-desc {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.4;
+            font-size: 13px;
+            color: #8c7e77;
+            line-height: 1.5;
+            font-weight: 500;
+            background: #fcfaf8;
+            padding: 4px 12px;
+            border-radius: 30px;
         }
 
-        /* フッター：会則遵守のためのスタイル */
+        /* フッター */
         footer {
             margin-top: 40px;
-            padding: 20px;
+            padding: 25px;
             font-size: 12px;
-            color: #555;
+            color: #8c7e77;
             position: relative;
             z-index: 1;
-            background-color: rgba(255,255,255,0.8);
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
             display: inline-block;
             border-radius: 20px;
             max-width: 90%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            font-weight: 500;
         }
 
         .copyright {
-            font-weight: bold;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 8px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #d9d1cb;
+            padding-bottom: 10px;
+            color: #6d5b53;
         }
 
         .instructor-info {
@@ -151,22 +188,22 @@
             text-align: center;
         }
 
-        /* 指定ロゴ画像用の調整 */
         .trademark-logo {
-            height: 1.2em; /* 文字の高さに合わせる */
+            height: 1.2em; 
             vertical-align: middle; 
             margin-right: 6px;
             display: inline-block;
+            opacity: 0.8;
         }
 
         /* スマホ向けの調整 */
         @media (max-width: 600px) {
-            .main-title { font-size: 26px; }
-            .site-copy { font-size: 14px; }
-            .category-title { font-size: 20px; }
-            .game-grid { grid-template-columns: 1fr; }
-            .game-card { height: auto; padding: 25px 20px; }
-            footer { font-size: 11px; }
+            body { padding: 20px 15px; }
+            .category-title { font-size: 18px; padding: 10px 30px; margin-top: 40px;}
+            .sub-category-title { font-size: 16px; margin-top: 30px; }
+            .game-grid { grid-template-columns: 1fr; gap: 15px; }
+            .game-card { height: auto; padding: 35px 20px 25px; }
+            footer { font-size: 11px; padding: 20px; }
         }
     </style>
 </head>
@@ -174,11 +211,31 @@
 
     <header>
         <h1 class="main-title">めとあたまのゲームパーク</h1>
-        <p class="site-copy">ゲーム感覚で「見る力」と「考える力」がぐんぐん育つ！</p>
+        <p class="site-copy">ゲームかんかくで「みる ちから」と「かんがえる ちから」が ぐんぐん そだつ！</p>
     </header>
 
-    <h2 class="category-title">見るゲーム</h2>
+    <h2 class="category-title">みる ゲーム</h2>
 
+    <h3 class="sub-category-title">① めでおう ちから（すばやく めを うごかす）</h3>
+    <div class="game-grid">
+        <a href="03speed/index.html" class="game-card">
+            <span class="game-number">No.03</span>
+            <div class="game-title">SPEED ATTACK</div>
+            <div class="game-desc">ひかるボタンをすばやくおせ！</div>
+        </a>
+        <a href="04count/index.html" class="game-card">
+            <span class="game-number">No.04</span>
+            <div class="game-title">SPEED COUNT</div>
+            <div class="game-desc">すうじをじゅんにすばやくおせ！</div>
+        </a>
+        <a href="06rope/index.html" class="game-card">
+            <span class="game-number">No.06</span>
+            <div class="game-title">このいっぽん</div>
+            <div class="game-desc">おなじいろのつながるロープはどれ？</div>
+        </a>
+    </div>
+
+    <h3 class="sub-category-title">② みわける ちから（ちがいを みつける）</h3>
     <div class="game-grid">
         <a href="01dabu/index.html" class="game-card">
             <span class="game-number">No.01</span>
@@ -190,26 +247,34 @@
             <div class="game-title">くつしたあわせ</div>
             <div class="game-desc">くつしたをそろえておかたづけ♪</div>
         </a>
-        <a href="03speed/index.html" class="game-card">
-            <span class="game-number">No.03</span>
-            <div class="game-title">SPEED ATTACK</div>
-            <div class="game-desc">ひかるボタンをすばやくおせ！</div>
-        </a>
-        <a href="04count/index.html" class="game-card">
-            <span class="game-number">No.04</span>
-            <div class="game-title">SPEED COUNT</div>
-            <div class="game-desc">すうじをじゅんにすばやくおせ！</div>
-        </a>
         <a href="05siryoku/index.html" class="game-card">
             <span class="game-number">No.05</span>
             <div class="game-title">すーぱーしりょくてすと</div>
             <div class="game-desc">すごい「しりょく」てすと！？</div>
         </a>
-        <a href="06rope/index.html" class="game-card">
-            <span class="game-number">No.06</span>
-            <div class="game-title">このいっぽん</div>
-            <div class="game-desc">おなじいろのつながるロープはどれ？</div>
+    </div>
+
+    <h3 class="sub-category-title">③ かたち・くうかんの ちから（むきや おおきさを しる）</h3>
+    <div class="game-grid">
+        <a href="11narabe/index.html" class="game-card">
+            <span class="game-number">No.11</span>
+            <div class="game-title">もじならべ</div>
+            <div class="game-desc">ただしくもじをならべよう</div>
         </a>
+        <a href="12block/index.html" class="game-card">
+            <span class="game-number">No.12</span>
+            <div class="game-title">ぴたっとパズル</div>
+            <div class="game-desc">ピースをぴたっとおこう</div>
+        </a>
+        <a href="14ookisaawase/index.html" class="game-card">
+            <span class="game-number">No.14</span>
+            <div class="game-title">おおきさあわせ</div>
+            <div class="game-desc">おおきさをぴったりにしよう</div>
+        </a>
+    </div>
+
+    <h3 class="sub-category-title">④ さがす・おぼえる ちから（みつけて おぼえる）</h3>
+    <div class="game-grid">
         <a href="07colormemo/index.html" class="game-card">
             <span class="game-number">No.07</span>
             <div class="game-title">いろあわせきおく</div>
@@ -225,30 +290,19 @@
             <div class="game-title">どうぶつもじさがし</div>
             <div class="game-desc">もじのなかのどうぶつみつかる？</div>
         </a>
+    </div>
+
+    <h3 class="sub-category-title">⑤ みて かんがえる ちから（みて あたまを つかう）</h3>
+    <div class="game-grid">
         <a href="10obake/index.html" class="game-card">
             <span class="game-number">No.10</span>
             <div class="game-title">げんじゅうをつかまえろ</div>
             <div class="game-desc">げんじゅうをつかまえよう！</div>
         </a>
-        <a href="11narabe/index.html" class="game-card">
-            <span class="game-number">No.11</span>
-            <div class="game-title">もじならべ</div>
-            <div class="game-desc">ただしくもじをならべよう</div>
-        </a>
-        <a href="12block/index.html" class="game-card">
-            <span class="game-number">No.12</span>
-            <div class="game-title">ぴたっとパズル</div>
-            <div class="game-desc">ピースをぴたっとおこう</div>
-        </a>
         <a href="13nakama/index.html" class="game-card">
             <span class="game-number">No.13</span>
             <div class="game-title">なかまえらび</div>
             <div class="game-desc">おなじなかまをえらぼう</div>
-        </a>
-        <a href="14ookisaawase/index.html" class="game-card">
-            <span class="game-number">No.14</span>
-            <div class="game-title">おおきさあわせ</div>
-            <div class="game-desc">おおきさをぴったりにしよう</div>
         </a>
         <a href="15totalten/index.html" class="game-card">
             <span class="game-number">No.15</span>
@@ -257,23 +311,23 @@
         </a>
     </div>
 
-    <h2 class="category-title">考えるゲーム</h2>
+    <h2 class="category-title">かんがえる ゲーム</h2>
 
     <div class="game-grid">
         <a href="t001prime/index.html" class="game-card">
             <span class="game-number">No.01</span>
-            <div class="game-title">約分シュート</div>
-            <div class="game-desc">割れる数でどんどん撃て！</div>
+            <div class="game-title">やくぶんシュート</div>
+            <div class="game-desc">われる かずで どんどん うて！</div>
         </a>
         <a href="t002qqp/index.html" class="game-card">
             <span class="game-number">No.02</span>
             <div class="game-title">qqp</div>
-            <div class="game-desc">九九のポーカーで勝負！</div>
+            <div class="game-desc">くくの ポーカーで しょうぶ！</div>
         </a>
         <a href="t003ice/index.html" class="game-card">
             <span class="game-number">No.03</span>
             <div class="game-title">わがままアイスクリーム</div>
-            <div class="game-desc">おじょうさまのほしいアイスは？</div>
+            <div class="game-desc">おじょうさまの ほしいアイスは？</div>
         </a>
     </div>
 
