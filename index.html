@@ -3,346 +3,988 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>めとあたまのゲームパーク | ビジョントレーニング®で「みる力」「考える力」を育てる</title>
-    <meta name="description" content="ゲーム感覚で「みる力」と「考える力」がぐんぐん育つ！ビジョントレーニング®に基づいた無料の知育ゲームパークです。">
+    <meta name="theme-color" content="#5b4bdb">
+    <title>めとあたまのゲームパーク | きょうはどれであそぶ？</title>
+    <meta name="description" content="ゲームかんかくで「みる ちから」と「かんがえる ちから」が ぐんぐん そだつ！21この むりょうゲームから、きょうの きぶんに ぴったりの ゲームを みつけよう。">
     <meta name="keywords" content="ビジョントレーニング®,知育ゲーム,見る力,考える力,無料ゲーム,めとあたまのゲームパーク">
-    
-    <!-- 追加: 柔らかく温かみのある「Zen Maru Gothic」フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
-    
+
     <style>
-        /* サイト全体の基本設定 */
-        body {
-            font-family: 'Zen Maru Gothic', "Hiragino Maru Gothic ProN", "Meiryo", sans-serif;
-            /* 背景をフラットな黄色から、上品で温かみのあるアイボリー・クリーム色に */
-            background-color: #faf7f2; 
-            background-image: radial-gradient(#f3e9d2 2px, transparent 2px); /* うっすらとしたドット柄で楽しさを */
-            background-size: 30px 30px;
-            color: #5c4b43; /* 真っ黒ではなく、柔らかいブラウングレーで目に優しく */
-            text-align: center;
-            margin: 0;
-            padding: 30px 20px;
+        :root {
+            --ink: #24213f;
+            --muted: #68637f;
+            --paper: #fffdf8;
+            --purple: #5b4bdb;
+            --purple-dark: #4336b8;
+            --coral: #ff6f61;
+            --yellow: #ffd84d;
+            --mint: #42d3a5;
+            --sky: #5cc8ff;
+            --pink: #ff91c8;
+            --line: #e9e5f4;
+            --shadow: 0 16px 40px rgba(52, 43, 111, 0.12);
         }
 
-        header {
-            margin-bottom: 50px;
-            margin-top: 10px;
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(255, 216, 77, 0.24) 0 95px, transparent 96px),
+                radial-gradient(circle at 92% 18%, rgba(92, 200, 255, 0.18) 0 130px, transparent 131px),
+                linear-gradient(180deg, #f5f1ff 0, #fffdf8 520px, #fffaf2 100%);
+            font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', Meiryo, sans-serif;
+            font-weight: 500;
+        }
+
+        a,
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            padding: 10px 16px;
+            color: #fff;
+            background: var(--ink);
+            border-radius: 12px;
+            transform: translateY(-150%);
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        .hero {
             position: relative;
-            z-index: 1;
+            max-width: 1180px;
+            min-height: 560px;
+            margin: 20px auto 0;
+            padding: 78px 60px 64px;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 40px;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.98), rgba(249,246,255,0.93)),
+                var(--paper);
+            box-shadow: 0 24px 70px rgba(70, 56, 143, 0.15);
+        }
+
+        .hero::before,
+        .hero::after {
+            position: absolute;
+            z-index: -1;
+            content: '';
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+
+        .hero::before {
+            width: 390px;
+            height: 390px;
+            top: -190px;
+            right: -95px;
+            background: linear-gradient(145deg, var(--yellow), #ff9f6e);
+            opacity: 0.82;
+        }
+
+        .hero::after {
+            width: 260px;
+            height: 260px;
+            bottom: -160px;
+            left: 38%;
+            background: linear-gradient(145deg, var(--sky), var(--mint));
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 18px;
+            padding: 8px 14px;
+            color: var(--purple-dark);
+            background: #eeeaff;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .eyebrow::before {
+            content: '●';
+            color: var(--coral);
+            font-size: 10px;
         }
 
         .main-title {
-            color: #d97757; /* 温かみのあるテラコッタオレンジ */
             margin: 0;
-            font-size: clamp(28px, 6vw, 38px);
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-shadow: 2px 4px 10px rgba(217, 119, 87, 0.2);
+            font-size: clamp(42px, 7vw, 82px);
+            line-height: 1.02;
+            letter-spacing: -0.055em;
+        }
+
+        .main-title .small-line {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--purple);
+            font-size: 0.55em;
+            letter-spacing: 0.01em;
+        }
+
+        .main-title .fun-line {
+            position: relative;
+            display: inline-block;
+            color: var(--ink);
+        }
+
+        .main-title .fun-line::after {
+            position: absolute;
+            z-index: -1;
+            right: -5px;
+            bottom: 5px;
+            left: -5px;
+            height: 16px;
+            content: '';
+            background: var(--yellow);
+            border-radius: 20px 6px 18px 8px;
+            transform: rotate(-1.5deg);
         }
 
         .site-copy {
-            font-size: clamp(14px, 3vw, 17px);
+            max-width: 570px;
+            margin: 28px 0 30px;
+            color: var(--muted);
+            font-size: clamp(16px, 2vw, 19px);
             font-weight: 700;
-            color: #7b9e87; /* 落ち着いたセージグリーン */
-            margin-top: 15px;
-            letter-spacing: 1px;
+            line-height: 1.9;
         }
 
-        /* 大見出し（みるゲーム・かんがえるゲーム） */
-        .category-title {
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .primary-button,
+        .secondary-button {
+            display: inline-flex;
+            min-height: 56px;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 0 24px;
+            border-radius: 18px;
+            font-weight: 900;
+            text-decoration: none;
+            transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+            cursor: pointer;
+        }
+
+        .primary-button {
             color: #fff;
-            font-size: 22px;
-            font-weight: 700;
-            margin-top: 60px;
-            margin-bottom: 30px;
-            padding: 12px 40px;
-            background: #e8a598; /* 優しいコーラルピンクのふんわりバッジ */
-            display: inline-block;
-            border-radius: 50px;
-            box-shadow: 0 6px 15px rgba(232, 165, 152, 0.3);
-            letter-spacing: 2px;
+            background: var(--purple);
+            border: 0;
+            box-shadow: 0 9px 0 var(--purple-dark), 0 16px 28px rgba(91, 75, 219, 0.24);
         }
 
-        /* 小見出し（① めでおう ちから等） */
-        .sub-category-title {
-            color: #6d5b53;
-            font-size: 19px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            padding-left: 16px;
-            /* 攻撃的な太い線ではなく、丸みのある優しい線に */
-            border-left: 6px solid #f2c94c;
-            border-radius: 4px;
+        .secondary-button {
+            color: var(--ink);
+            background: #fff;
+            border: 2px solid var(--line);
+        }
+
+        .primary-button:hover,
+        .secondary-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .primary-button:active {
+            box-shadow: 0 4px 0 var(--purple-dark);
+            transform: translateY(5px);
+        }
+
+        .park-character {
+            position: absolute;
+            top: 105px;
+            right: 70px;
+            width: 330px;
+            height: 330px;
+            border: 18px solid #fff;
+            border-radius: 46% 54% 50% 50% / 48% 45% 55% 52%;
+            background: linear-gradient(150deg, var(--purple) 0 55%, #7768ed 56% 100%);
+            box-shadow: 0 24px 45px rgba(62, 48, 148, 0.28);
+            transform: rotate(5deg);
+        }
+
+        .park-character::before,
+        .park-character::after {
+            position: absolute;
+            top: 110px;
+            width: 66px;
+            height: 82px;
+            content: '';
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: inset 0 -8px 0 rgba(91,75,219,0.08);
+        }
+
+        .park-character::before {
+            left: 72px;
+        }
+
+        .park-character::after {
+            right: 72px;
+        }
+
+        .pupil {
+            position: absolute;
+            z-index: 2;
+            top: 141px;
+            width: 25px;
+            height: 32px;
+            background: var(--ink);
+            border-radius: 50%;
+        }
+
+        .pupil.left { left: 95px; }
+        .pupil.right { right: 95px; }
+
+        .smile {
+            position: absolute;
+            left: 50%;
+            bottom: 74px;
+            width: 88px;
+            height: 42px;
+            border-bottom: 9px solid #fff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .spark {
+            position: absolute;
+            z-index: 3;
+            display: grid;
+            width: 62px;
+            height: 62px;
+            place-items: center;
+            color: var(--ink);
+            background: var(--yellow);
+            border: 7px solid #fff;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            font-size: 28px;
+            font-weight: 900;
+            animation: float 3.2s ease-in-out infinite;
+        }
+
+        .spark.one { top: 65px; right: 360px; transform: rotate(-10deg); }
+        .spark.two { right: 34px; bottom: 45px; background: var(--mint); animation-delay: -1.2s; }
+        .spark.three { right: 390px; bottom: 30px; background: var(--pink); animation-delay: -2s; }
+
+        @keyframes float {
+            0%, 100% { translate: 0 0; }
+            50% { translate: 0 -10px; }
+        }
+
+        main {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 76px 0 40px;
+        }
+
+        .picker-intro {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding: 0 10px;
+        }
+
+        .picker-intro h2 {
+            margin: 0 0 8px;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: -0.04em;
+        }
+
+        .picker-intro p {
+            margin: 0;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .game-count {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            color: var(--purple-dark);
+            background: #eeeaff;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .filter-bar {
+            position: sticky;
+            z-index: 20;
+            top: 10px;
+            display: flex;
+            gap: 9px;
+            margin: 0 0 50px;
+            padding: 12px;
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(233,229,244,0.9);
+            border-radius: 22px;
+            box-shadow: 0 10px 35px rgba(52,43,111,0.1);
+            backdrop-filter: blur(16px);
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            flex: 0 0 auto;
+            padding: 11px 16px;
+            color: var(--muted);
+            background: transparent;
+            border: 0;
+            border-radius: 13px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .filter-chip:hover { background: #f4f1ff; }
+
+        .filter-chip[aria-pressed="true"] {
+            color: #fff;
+            background: var(--purple);
+            box-shadow: 0 6px 16px rgba(91,75,219,0.22);
+        }
+
+        .game-section {
+            --accent: var(--coral);
+            margin-bottom: 66px;
+        }
+
+        .game-section[data-section="look"] { --accent: var(--sky); }
+        .game-section[data-section="puzzle"] { --accent: var(--yellow); }
+        .game-section[data-section="memory"] { --accent: var(--mint); }
+        .game-section[data-section="think"] { --accent: var(--pink); }
+        .game-section[hidden] { display: none; }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 0 0 22px;
+            padding: 0 10px;
             text-align: left;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
+        }
+
+        .section-icon {
+            display: grid;
+            flex: 0 0 48px;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            background: var(--accent);
+            border: 5px solid #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 34%, transparent);
+            font-size: 23px;
+            transform: rotate(-5deg);
+        }
+
+        .section-heading h3 {
+            margin: 0;
+            font-size: clamp(20px, 3vw, 27px);
+            line-height: 1.35;
+        }
+
+        .section-heading p {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 14px;
             font-weight: 700;
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding-bottom: 50px;
-            position: relative;
-            z-index: 1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
         }
 
-        /* 洗練されたカードデザイン */
         .game-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 25px 20px;
-            text-decoration: none;
-            color: #5c4b43;
-            /* ボックスの境界線をなくし、影で浮かんでいるような上品さを演出 */
-            box-shadow: 0 10px 25px rgba(180, 170, 160, 0.15);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
             display: flex;
+            min-width: 0;
+            min-height: 328px;
+            overflow: hidden;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 140px;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 25px;
+            box-shadow: 0 10px 28px rgba(52, 43, 111, 0.08);
+            text-decoration: none;
+            transition: transform 220ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms ease, border-color 220ms ease;
+        }
+
+        .game-card[hidden] { display: none; }
+
+        .game-card::after {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            content: '';
+            border: 3px solid transparent;
+            border-radius: inherit;
+            transition: border-color 180ms ease;
+        }
+
+        .game-card:hover,
+        .game-card:focus-visible {
+            border-color: transparent;
+            box-shadow: 0 22px 42px rgba(52, 43, 111, 0.18);
+            outline: 0;
+            transform: translateY(-8px) rotate(-0.6deg);
+        }
+
+        .game-card:hover::after,
+        .game-card:focus-visible::after {
+            border-color: var(--accent);
+        }
+
+        .game-card.is-picked {
+            z-index: 3;
+            box-shadow: 0 0 0 9px color-mix(in srgb, var(--yellow) 58%, transparent), 0 26px 50px rgba(52,43,111,.23);
+            transform: translateY(-10px) rotate(1deg) scale(1.035);
+        }
+
+        .thumb-wrap {
             position: relative;
             overflow: hidden;
-            border: 2px solid transparent; 
+            background: #181a31;
         }
 
-        .game-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 35px rgba(180, 170, 160, 0.25);
-            border-color: #fce8cd; /* ホバー時にうっすら枠線 */
-            background-color: #fffcf8;
+        .game-thumb {
+            display: block;
+            width: 100%;
+            aspect-ratio: 8 / 5;
+            object-fit: cover;
+            transition: transform 400ms cubic-bezier(.2,.8,.2,1), filter 300ms ease;
         }
 
-        .game-card:active {
-            transform: translateY(2px);
-            box-shadow: 0 5px 15px rgba(180, 170, 160, 0.15);
+        .game-card:hover .game-thumb,
+        .game-card:focus-visible .game-thumb {
+            filter: saturate(1.13);
+            transform: scale(1.055);
         }
 
-        /* 番号バッジ */
         .game-number {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 13px;
-            font-weight: 900;
+            top: 12px;
+            left: 12px;
+            padding: 6px 10px;
             color: #fff;
-            background: #eebb6c; /* 温かみのあるマスタードイエロー */
-            padding: 4px 12px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            box-shadow: 0 3px 8px rgba(238, 187, 108, 0.3);
+            background: rgba(31, 27, 66, 0.74);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 999px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.16);
+            backdrop-filter: blur(9px);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+        }
+
+        .card-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 18px 18px 16px;
+            text-align: left;
+        }
+
+        .game-tag {
+            display: inline-flex;
+            margin-bottom: 8px;
+            padding: 4px 9px;
+            color: var(--ink);
+            background: color-mix(in srgb, var(--accent) 32%, white);
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
         }
 
         .game-title {
-            font-size: 20px;
+            margin: 0;
+            font-size: 18px;
             font-weight: 900;
-            color: #5c4b43;
-            margin-bottom: 8px;
-            margin-top: 15px;
+            line-height: 1.35;
         }
 
         .game-desc {
-            font-size: 13px;
-            color: #8c7e77;
-            line-height: 1.5;
-            font-weight: 500;
-            background: #fcfaf8;
-            padding: 4px 12px;
-            border-radius: 30px;
-        }
-
-        /* フッター */
-        footer {
-            margin-top: 40px;
-            padding: 25px;
+            margin: 6px 0 17px;
+            color: var(--muted);
             font-size: 12px;
-            color: #8c7e77;
-            position: relative;
-            z-index: 1;
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(8px);
-            display: inline-block;
-            border-radius: 20px;
-            max-width: 90%;
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            font-weight: 500;
-        }
-
-        .copyright {
             font-weight: 700;
-            margin-bottom: 12px;
-            border-bottom: 1px dashed #d9d1cb;
-            padding-bottom: 10px;
-            color: #6d5b53;
+            line-height: 1.6;
         }
 
-        .instructor-info {
-            line-height: 1.8;
+        .play-label {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            color: var(--purple-dark);
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .play-label span:last-child {
+            display: grid;
+            width: 30px;
+            height: 30px;
+            place-items: center;
+            color: #fff;
+            background: var(--purple);
+            border-radius: 10px;
+            transition: transform 180ms ease;
+        }
+
+        .game-card:hover .play-label span:last-child { transform: translateX(3px); }
+
+        .empty-message {
+            display: none;
+            padding: 45px 20px;
+            color: var(--muted);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        footer {
+            max-width: 1180px;
+            margin: 20px auto 28px;
+            padding: 38px;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 15%, rgba(255,216,77,.32), transparent 30%),
+                linear-gradient(135deg, #fff9df, #ffffff 56%, #eef8ff);
+            border: 2px solid #eee5c8;
+            border-radius: 28px;
+            box-shadow: 0 16px 44px rgba(52, 43, 111, 0.1);
             text-align: center;
         }
 
-        .trademark-logo {
-            height: 1.2em; 
-            vertical-align: middle; 
-            margin-right: 6px;
-            display: inline-block;
-            opacity: 0.8;
+        .footer-title {
+            margin: 0 0 8px;
+            font-size: 19px;
+            font-weight: 900;
         }
 
-        /* スマホ向けの調整 */
-        @media (max-width: 600px) {
-            body { padding: 20px 15px; }
-            .category-title { font-size: 18px; padding: 10px 30px; margin-top: 40px;}
-            .sub-category-title { font-size: 16px; margin-top: 30px; }
-            .game-grid { grid-template-columns: 1fr; gap: 15px; }
-            .game-card { height: auto; padding: 35px 20px 25px; }
-            footer { font-size: 11px; padding: 20px; }
+        .association-panel {
+            display: flex;
+            max-width: 460px;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 22px auto 0;
+            padding: 12px 14px;
+            background: #fff;
+            border: 2px solid #e7e2ef;
+            border-radius: 18px;
+            box-shadow: 0 10px 28px rgba(52, 43, 111, 0.08);
+        }
+
+        .association-logo {
+            display: block;
+            width: clamp(140px, 18vw, 180px);
+            height: auto;
+            flex: 0 1 180px;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .instructor-info {
+            color: #514c69;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .instructor-info strong {
+            color: var(--purple-dark);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .copyright {
+            color: #746f87;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .copyright { margin-top: 18px; }
+
+        :focus-visible {
+            outline: 4px solid var(--yellow);
+            outline-offset: 4px;
+        }
+
+        @media (max-width: 1000px) {
+            .hero { margin-inline: 16px; padding: 64px 42px; }
+            .hero-content { max-width: 58%; }
+            .park-character { right: 35px; width: 300px; height: 300px; }
+            .park-character::before { left: 61px; }
+            .park-character::after { right: 61px; }
+            .pupil.left { left: 84px; }
+            .pupil.right { right: 84px; }
+            main { padding-inline: 16px; }
+            .game-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 760px) {
+            .hero {
+                min-height: 660px;
+                padding: 46px 28px 260px;
+                border-radius: 30px;
+            }
+            .hero-content { max-width: none; }
+            .main-title { font-size: clamp(38px, 13vw, 62px); }
+            .park-character {
+                top: auto;
+                right: 50%;
+                bottom: -110px;
+                width: 280px;
+                height: 280px;
+                border-width: 14px;
+                transform: translateX(50%) rotate(4deg);
+            }
+            .park-character::before { top: 90px; left: 59px; width: 58px; height: 70px; }
+            .park-character::after { top: 90px; right: 59px; width: 58px; height: 70px; }
+            .pupil { top: 116px; }
+            .pupil.left { left: 79px; }
+            .pupil.right { right: 79px; }
+            .spark.one { top: auto; right: 18px; bottom: 200px; }
+            .spark.two { right: auto; bottom: 25px; left: 30px; }
+            .spark.three { right: 38px; bottom: 20px; }
+            main { padding-top: 58px; }
+            .picker-intro { align-items: flex-start; flex-direction: column; }
+            .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 520px) {
+            .hero { margin: 10px 10px 0; padding: 36px 20px 250px; }
+            .eyebrow { font-size: 11px; }
+            .site-copy { margin-block: 22px; font-size: 15px; }
+            .hero-actions { flex-direction: column; }
+            .primary-button,
+            .secondary-button { width: 100%; }
+            main { padding-inline: 10px; }
+            .filter-bar { top: 6px; margin-bottom: 38px; border-radius: 18px; }
+            .section-heading { align-items: flex-start; }
+            .section-heading p { font-size: 12px; }
+            .game-grid { grid-template-columns: 1fr; gap: 16px; }
+            .game-card { min-height: 0; }
+            .game-thumb { aspect-ratio: 16 / 8.5; }
+            .game-section { margin-bottom: 52px; }
+            footer { margin-inline: 10px; padding: 28px 16px; }
+            .association-panel {
+                gap: 8px;
+                padding: 10px;
+            }
+            .association-logo {
+                width: min(45%, 150px);
+                flex-basis: 150px;
+            }
+            .instructor-info {
+                font-size: 9px;
+                text-align: left;
+            }
+            .instructor-info strong { font-size: 10px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#games">ゲームを えらぶ</a>
 
-    <header>
-        <h1 class="main-title">めとあたまのゲームパーク</h1>
-        <p class="site-copy">ゲームかんかくで「みる ちから」と「かんがえる ちから」が ぐんぐん そだつ！</p>
+    <header class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">ぜんぶ むりょう・21こ の ミニゲーム</p>
+            <h1 class="main-title">
+                <span class="small-line">めとあたまの</span>
+                <span class="fun-line">ゲームパーク</span>
+            </h1>
+            <p class="site-copy">みる、みつける、ひらめく！<br>きょうの きぶんに ぴったりの ゲームを みつけて、めと あたまの ぼうけんへ しゅっぱつしよう。</p>
+            <div class="hero-actions">
+                <button class="primary-button" id="random-game" type="button">🎲 おまかせであそぶ</button>
+                <a class="secondary-button" href="#games">ゲームをえらぶ ↓</a>
+            </div>
+        </div>
+        <div class="park-character" aria-hidden="true">
+            <span class="pupil left"></span>
+            <span class="pupil right"></span>
+            <span class="smile"></span>
+        </div>
+        <span class="spark one" aria-hidden="true">★</span>
+        <span class="spark two" aria-hidden="true">!</span>
+        <span class="spark three" aria-hidden="true">?</span>
     </header>
 
-    <h2 class="category-title">みる ゲーム</h2>
+    <main id="games">
+        <div class="picker-intro">
+            <div>
+                <h2>きょうは、どれであそぶ？</h2>
+                <p>やってみたい きぶんを えらぶと、おすすめが みつかるよ。</p>
+            </div>
+            <span class="game-count" id="game-count" aria-live="polite">21こ のゲーム</span>
+        </div>
 
-    <h3 class="sub-category-title">① めでおう ちから（すばやく めを うごかす）</h3>
-    <div class="game-grid">
-        <a href="03speed/index.html" class="game-card">
-            <span class="game-number">No.03</span>
-            <div class="game-title">SPEED ATTACK</div>
-            <div class="game-desc">ひかるボタンをすばやくおせ！</div>
-        </a>
-        <a href="04count/index.html" class="game-card">
-            <span class="game-number">No.04</span>
-            <div class="game-title">SPEED COUNT</div>
-            <div class="game-desc">すうじをじゅんにすばやくおせ！</div>
-        </a>
-        <a href="06rope/index.html" class="game-card">
-            <span class="game-number">No.06</span>
-            <div class="game-title">このいっぽん</div>
-            <div class="game-desc">おなじいろのつながるロープはどれ？</div>
-        </a>
-    </div>
+        <nav class="filter-bar" aria-label="ゲームを気分で絞り込む">
+            <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">🎡 ぜんぶ</button>
+            <button class="filter-chip" type="button" data-filter="speed" aria-pressed="false">⚡ すばやく</button>
+            <button class="filter-chip" type="button" data-filter="look" aria-pressed="false">👀 みわける</button>
+            <button class="filter-chip" type="button" data-filter="puzzle" aria-pressed="false">🧩 パズル</button>
+            <button class="filter-chip" type="button" data-filter="memory" aria-pressed="false">💡 おぼえる</button>
+            <button class="filter-chip" type="button" data-filter="think" aria-pressed="false">🧠 かんがえる</button>
+        </nav>
 
-    <h3 class="sub-category-title">② みわける ちから（ちがいを みつける）</h3>
-    <div class="game-grid">
-        <a href="01dabu/index.html" class="game-card">
-            <span class="game-number">No.01</span>
-            <div class="game-title">おなじマークをさがせ！</div>
-            <div class="game-desc">おなじマークをさがそう</div>
-        </a>
-        <a href="02socks/index.html" class="game-card">
-            <span class="game-number">No.02</span>
-            <div class="game-title">くつしたあわせ</div>
-            <div class="game-desc">くつしたをそろえておかたづけ♪</div>
-        </a>
-        <a href="05siryoku/index.html" class="game-card">
-            <span class="game-number">No.05</span>
-            <div class="game-title">すーぱーしりょくてすと</div>
-            <div class="game-desc">すごい「しりょく」てすと！？</div>
-        </a>
-    </div>
+        <section class="game-section" data-section="speed">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">⚡</span>
+                <div><h3>めでおう ちから</h3><p>すばやく めを うごかそう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="03speed/index.html" class="game-card" data-filter="speed">
+                    <div class="thumb-wrap"><img src="thumbnails/03speed.png" alt="スピード アタックの ゲームがめん" class="game-thumb"><span class="game-number">ゲーム 03</span></div>
+                    <div class="card-body"><span class="game-tag">スピード</span><h4 class="game-title">スピード アタック</h4><p class="game-desc">ひかるボタンを すばやく おせ！</p><span class="play-label"><span>このゲームで あそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="04count/index.html" class="game-card" data-filter="speed">
+                    <div class="thumb-wrap"><img src="thumbnails/04count.png" alt="スピード カウントの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 04</span></div>
+                    <div class="card-body"><span class="game-tag">スピード</span><h4 class="game-title">スピード カウント</h4><p class="game-desc">すうじを じゅんに すばやく おせ！</p><span class="play-label"><span>このゲームで あそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="06rope/index.html" class="game-card" data-filter="speed">
+                    <div class="thumb-wrap"><img src="thumbnails/06rope.png" alt="このいっぽんの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 06</span></div>
+                    <div class="card-body"><span class="game-tag">めでおう</span><h4 class="game-title">このいっぽん</h4><p class="game-desc">おなじいろのつながるロープはどれ？</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="17star/index.html" class="game-card" data-filter="speed">
+                    <div class="thumb-wrap"><img src="thumbnails/17star.png" alt="ほしぞら キャッチ！の ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 17</span></div>
+                    <div class="card-body"><span class="game-tag">タッチ</span><h4 class="game-title">ほしぞら キャッチ！</h4><p class="game-desc">ながれぼしをゆびでおいかけよう！</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
 
-    <h3 class="sub-category-title">③ かたち・くうかんの ちから（むきや おおきさを しる）</h3>
-    <div class="game-grid">
-        <a href="11narabe/index.html" class="game-card">
-            <span class="game-number">No.11</span>
-            <div class="game-title">もじならべ</div>
-            <div class="game-desc">ただしくもじをならべよう</div>
-        </a>
-        <a href="12block/index.html" class="game-card">
-            <span class="game-number">No.12</span>
-            <div class="game-title">ぴたっとパズル</div>
-            <div class="game-desc">ピースをぴたっとおこう</div>
-        </a>
-        <a href="14ookisaawase/index.html" class="game-card">
-            <span class="game-number">No.14</span>
-            <div class="game-title">おおきさあわせ</div>
-            <div class="game-desc">おおきさをぴったりにしよう</div>
-        </a>
-    </div>
+        <section class="game-section" data-section="look">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">👀</span>
+                <div><h3>みわける ちから</h3><p>ちがいや おなじを みつけよう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="01dabu/index.html" class="game-card" data-filter="look">
+                    <div class="thumb-wrap"><img src="thumbnails/01dabu.png" alt="おなじマークを さがせ！の ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 01</span></div>
+                    <div class="card-body"><span class="game-tag">みつける</span><h4 class="game-title">おなじマークをさがせ！</h4><p class="game-desc">おなじマークをさがそう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="02socks/index.html" class="game-card" data-filter="look">
+                    <div class="thumb-wrap"><img src="thumbnails/02socks.png" alt="くつしたあわせの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 02</span></div>
+                    <div class="card-body"><span class="game-tag">そろえる</span><h4 class="game-title">くつしたあわせ</h4><p class="game-desc">くつしたをそろえておかたづけ♪</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="05siryoku/index.html" class="game-card" data-filter="look">
+                    <div class="thumb-wrap"><img src="thumbnails/05siryoku.png" alt="すーぱーしりょくてすとの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 05</span></div>
+                    <div class="card-body"><span class="game-tag">みわける</span><h4 class="game-title">すーぱーしりょくてすと</h4><p class="game-desc">すごい「しりょく」てすと！？</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
 
-    <h3 class="sub-category-title">④ さがす・おぼえる ちから（みつけて おぼえる）</h3>
-    <div class="game-grid">
-        <a href="07colormemo/index.html" class="game-card">
-            <span class="game-number">No.07</span>
-            <div class="game-title">いろあわせきおく</div>
-            <div class="game-desc">いろのはいちをおぼえよう</div>
-        </a>
-        <a href="08ooi/index.html" class="game-card">
-            <span class="game-number">No.08</span>
-            <div class="game-title">いちばんおおいのどれだ？</div>
-            <div class="game-desc">いちばんおおいのはかたち？いろ？</div>
-        </a>
-        <a href="09word/index.html" class="game-card">
-            <span class="game-number">No.09</span>
-            <div class="game-title">どうぶつもじさがし</div>
-            <div class="game-desc">もじのなかのどうぶつみつかる？</div>
-        </a>
-    </div>
+        <section class="game-section" data-section="puzzle">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">🧩</span>
+                <div><h3>かたち・くうかんの ちから</h3><p>むきや おおきさを たしかめよう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="11narabe/index.html" class="game-card" data-filter="puzzle">
+                    <div class="thumb-wrap"><img src="thumbnails/11narabe.png" alt="もじならべの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 11</span></div>
+                    <div class="card-body"><span class="game-tag">ならべる</span><h4 class="game-title">もじならべ</h4><p class="game-desc">ただしくもじをならべよう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="12block/index.html" class="game-card" data-filter="puzzle">
+                    <div class="thumb-wrap"><img src="thumbnails/12block.png" alt="ぴたっとパズルの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 12</span></div>
+                    <div class="card-body"><span class="game-tag">パズル</span><h4 class="game-title">ぴたっとパズル</h4><p class="game-desc">ピースをぴたっとおこう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="14ookisaawase/index.html" class="game-card" data-filter="puzzle">
+                    <div class="thumb-wrap"><img src="thumbnails/14ookisaawase.png" alt="おおきさあわせの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 14</span></div>
+                    <div class="card-body"><span class="game-tag">おおきさ</span><h4 class="game-title">おおきさあわせ</h4><p class="game-desc">おおきさをぴったりにしよう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="16ironarabe/index.html" class="game-card" data-filter="puzzle">
+                    <div class="thumb-wrap"><img src="thumbnails/16ironarabe.png" alt="にじいろ ぴったんこ パズルの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 16</span></div>
+                    <div class="card-body"><span class="game-tag">いろ・パズル</span><h4 class="game-title">にじいろ ぴったんこ パズル</h4><p class="game-desc">にじのじゅんばんでマスをぬろう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
 
-    <h3 class="sub-category-title">⑤ みて かんがえる ちから（みて あたまを つかう）</h3>
-    <div class="game-grid">
-        <a href="10obake/index.html" class="game-card">
-            <span class="game-number">No.10</span>
-            <div class="game-title">げんじゅうをつかまえろ</div>
-            <div class="game-desc">げんじゅうをつかまえよう！</div>
-        </a>
-        <a href="13nakama/index.html" class="game-card">
-            <span class="game-number">No.13</span>
-            <div class="game-title">なかまえらび</div>
-            <div class="game-desc">おなじなかまをえらぼう</div>
-        </a>
-        <a href="15totalten/index.html" class="game-card">
-            <span class="game-number">No.15</span>
-            <div class="game-title">あわせて１０</div>
-            <div class="game-desc">１０をつくってブロックをけそう</div>
-        </a>
-    </div>
+        <section class="game-section" data-section="memory">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">💡</span>
+                <div><h3>さがす・おぼえる ちから</h3><p>みつけて しっかり おぼえよう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="07colormemo/index.html" class="game-card" data-filter="memory">
+                    <div class="thumb-wrap"><img src="thumbnails/07colormemo.png" alt="いろあわせきおくの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 07</span></div>
+                    <div class="card-body"><span class="game-tag">きおく</span><h4 class="game-title">いろあわせきおく</h4><p class="game-desc">いろのはいちをおぼえよう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="08ooi/index.html" class="game-card" data-filter="memory">
+                    <div class="thumb-wrap"><img src="thumbnails/08ooi.png" alt="いちばんおおいの どれだ？の ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 08</span></div>
+                    <div class="card-body"><span class="game-tag">みつける</span><h4 class="game-title">いちばんおおいのどれだ？</h4><p class="game-desc">いちばんおおいのはかたち？いろ？</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="09word/index.html" class="game-card" data-filter="memory">
+                    <div class="thumb-wrap"><img src="thumbnails/09word.png" alt="どうぶつもじさがしの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 09</span></div>
+                    <div class="card-body"><span class="game-tag">もじさがし</span><h4 class="game-title">どうぶつもじさがし</h4><p class="game-desc">もじのなかのどうぶつみつかる？</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
 
-    <h2 class="category-title">かんがえる ゲーム</h2>
+        <section class="game-section" data-section="think">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">🧠</span>
+                <div><h3>みて かんがえる ちから</h3><p>よくみて あたまを つかおう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="10obake/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/10obake.png" alt="げんじゅうを つかまえろの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 10</span></div>
+                    <div class="card-body"><span class="game-tag">すいり</span><h4 class="game-title">げんじゅうをつかまえろ</h4><p class="game-desc">げんじゅうをつかまえよう！</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="13nakama/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/13nakama.png" alt="なかまえらびの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 13</span></div>
+                    <div class="card-body"><span class="game-tag">グループ</span><h4 class="game-title">なかまえらび</h4><p class="game-desc">おなじなかまをえらぼう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="15totalten/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/15totalten.png" alt="あわせて 10の ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 15</span></div>
+                    <div class="card-body"><span class="game-tag">けいさん</span><h4 class="game-title">あわせて１０</h4><p class="game-desc">１０をつくってブロックをけそう</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
 
-    <div class="game-grid">
-        <a href="t001prime/index.html" class="game-card">
-            <span class="game-number">No.01</span>
-            <div class="game-title">やくぶんシュート</div>
-            <div class="game-desc">われる かずで どんどん うて！</div>
-        </a>
-        <a href="t002qqp/index.html" class="game-card">
-            <span class="game-number">No.02</span>
-            <div class="game-title">qqp</div>
-            <div class="game-desc">くくの ポーカーで しょうぶ！</div>
-        </a>
-        <a href="t003ice/index.html" class="game-card">
-            <span class="game-number">No.03</span>
-            <div class="game-title">わがままアイスクリーム</div>
-            <div class="game-desc">おじょうさまの ほしいアイスは？</div>
-        </a>
-        <a href="t004takoika/index.html" class="game-card">
-            <span class="game-number">No.04</span>
-            <div class="game-title">たこいかバトル</div>
-            <div class="game-desc">タコでイカをはさめ！</div>
-        </a>
-    </div>
+        <section class="game-section" data-section="think">
+            <div class="section-heading">
+                <span class="section-icon" aria-hidden="true">🚀</span>
+                <div><h3>もっと かんがえる ゲーム</h3><p>ひらめきパワーで ちょうせんしよう</p></div>
+            </div>
+            <div class="game-grid">
+                <a href="t001prime/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/t001prime.png" alt="やくぶんシュートの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 01</span></div>
+                    <div class="card-body"><span class="game-tag">すうじ</span><h4 class="game-title">やくぶんシュート</h4><p class="game-desc">われる かずで どんどん うて！</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="t002qqp/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/t002qqp.png" alt="キューキューピーの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 02</span></div>
+                    <div class="card-body"><span class="game-tag">くく</span><h4 class="game-title">キューキューピー</h4><p class="game-desc">くくの ポーカーで しょうぶ！</p><span class="play-label"><span>このゲームで あそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="t003ice/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/t003ice.png" alt="わがままアイスクリームの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 03</span></div>
+                    <div class="card-body"><span class="game-tag">ロジック</span><h4 class="game-title">わがままアイスクリーム</h4><p class="game-desc">おじょうさまの ほしいアイスは？</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+                <a href="t004takoika/index.html" class="game-card" data-filter="think">
+                    <div class="thumb-wrap"><img src="thumbnails/t004takoika.png" alt="たこいかバトルの ゲームがめん" class="game-thumb" loading="lazy"><span class="game-number">ゲーム 04</span></div>
+                    <div class="card-body"><span class="game-tag">せんりゃく</span><h4 class="game-title">たこいかバトル</h4><p class="game-desc">タコでイカをはさめ！</p><span class="play-label"><span>このゲームであそぶ</span><span>›</span></span></div>
+                </a>
+            </div>
+        </section>
+
+        <p class="empty-message" id="empty-message">この きぶんの ゲームは、ただいま じゅんびちゅうです。</p>
+    </main>
 
     <footer>
-        <div class="copyright">© 2026 めとあたまのゲームパーク</div>
-        <div class="instructor-info">
-            <img src="00.png" alt="商標マーク" class="trademark-logo">一般社団法人　ビジョントレーニング®協会<br>
-            ビジョントレーニング®インストラクターPRO　登録番号Ø260214013V
+        <p class="footer-title">また あそびにきてね！</p>
+        <div class="association-panel">
+            <img src="00.png" alt="ビジョントレーニングの ロゴ" class="association-logo">
+            <div class="instructor-info">
+                いっぱんしゃだんほうじん<br>
+                <strong>ビジョントレーニング®きょうかい</strong><br><br>
+                ビジョントレーニング®インストラクター プロ<br>
+                とうろくばんごう Ø260214013V
+            </div>
         </div>
+        <div class="copyright">© 2026 めとあたまのゲームパーク</div>
     </footer>
 
+    <script>
+        const chips = [...document.querySelectorAll('.filter-chip')];
+        const cards = [...document.querySelectorAll('.game-card')];
+        const sections = [...document.querySelectorAll('.game-section')];
+        const countLabel = document.querySelector('#game-count');
+        const emptyMessage = document.querySelector('#empty-message');
+        const randomButton = document.querySelector('#random-game');
+
+        function visibleCards() {
+            return cards.filter((card) => !card.hidden);
+        }
+
+        function applyFilter(filter) {
+            cards.forEach((card) => {
+                card.hidden = filter !== 'all' && card.dataset.filter !== filter;
+            });
+
+            sections.forEach((section) => {
+                section.hidden = ![...section.querySelectorAll('.game-card')].some((card) => !card.hidden);
+            });
+
+            chips.forEach((chip) => {
+                chip.setAttribute('aria-pressed', String(chip.dataset.filter === filter));
+            });
+
+            const total = visibleCards().length;
+            countLabel.textContent = `${total}こ のゲーム`;
+            emptyMessage.style.display = total ? 'none' : 'block';
+        }
+
+        chips.forEach((chip) => {
+            chip.addEventListener('click', () => applyFilter(chip.dataset.filter));
+        });
+
+        randomButton.addEventListener('click', () => {
+            const choices = visibleCards().length ? visibleCards() : cards;
+            const picked = choices[Math.floor(Math.random() * choices.length)];
+            picked.classList.add('is-picked');
+            picked.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            window.setTimeout(() => window.location.assign(picked.href), 850);
+        });
+    </script>
 </body>
 </html>
