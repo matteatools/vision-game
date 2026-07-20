@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ほしぞら キャッチ！</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060c1f;
+            --bg-mid: #0d1a3a;
+            --primary-gold: #ffe066;
+            --accent-cyan: #00e5ff;
+            --accent-pink: #ff4fc8;
+            --accent-purple: #a855f7;
+            --glass-bg: rgba(13, 26, 60, 0.55);
+            --glass-border: rgba(0, 229, 255, 0.18);
+            --text-color: #e8f0ff;
+            --text-dim: rgba(232, 240, 255, 0.65);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, #1a2a6c 0%, #0d1a3a 40%, #060c1f 100%);
+            color: var(--text-color);
+            user-select: none;
+            touch-action: none;
+            /* safe area for iPhone notch/home bar */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Animated starfield overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.8) 0%, transparent 100%),
+                radial-gradient(1px 1px at 75% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.7) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
+                radial-gradient(2px 2px at 25% 55%, rgba(0,229,255,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 60% 35%, rgba(255,255,255,0.6) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #app {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            /* cover full screen – no rounded corners */
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Glassmorphism card with gradient border */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            padding: 36px 32px;
+            border-radius: 32px;
+            text-align: center;
+            pointer-events: auto;
+            box-shadow:
+                0 0 0 1px rgba(0, 229, 255, 0.08),
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            max-width: 88%;
+            width: 360px;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            animation: cardAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Title with Orbitron font + rainbow shimmer */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 900;
+            margin: 0 0 10px 0;
+            background: linear-gradient(120deg, var(--accent-cyan) 0%, #fff 40%, var(--primary-gold) 70%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.4));
+            line-height: 1.3;
+            letter-spacing: 0.03em;
+        }
+
+        .phrase { display: inline-block; }
+
+        /* Subtitle / description text */
+        p {
+            font-size: 0.95rem;
+            margin: 8px 0 16px 0;
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        /* High score badge */
+        .high-score-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+            background: rgba(255, 224, 102, 0.1);
+            border: 1px solid rgba(255, 224, 102, 0.3);
+            padding: 6px 18px;
+            border-radius: 100px;
+            margin-bottom: 22px;
+        }
+        .high-score-label::before { content: '★'; font-size: 0.8rem; }
+
+        /* Difficulty buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 230px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            padding: 13px 20px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 60%);
+            border-radius: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .btn:active { transform: translateY(1px) scale(0.98); }
+
+        .btn-easy {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.35);
+        }
+        .btn-normal {
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            box-shadow: 0 4px 20px rgba(9, 132, 227, 0.35);
+        }
+        .btn-hard {
+            background: linear-gradient(135deg, #d63031, #fd79a8);
+            box-shadow: 0 4px 20px rgba(214, 48, 49, 0.35);
+        }
+        .btn-retry {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+            margin-top: 10px;
+        }
+
+        /* In-game HUD */
+        .stats-bar {
+            position: absolute;
+            top: 18px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            background: rgba(6, 12, 31, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 24px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            letter-spacing: 0.03em;
+        }
+
+        .stats-bar .stat-label { color: var(--text-dim); font-size: 0.8rem; margin-right: 2px; }
+        .stats-bar .stat-time { color: var(--accent-cyan); }
+        .stats-bar .stat-score { color: var(--primary-gold); }
+
+        /* Result legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 10px 0 16px;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.06);
+            padding: 3px 10px;
+            border-radius: 100px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        /* Result message */
+        #result-msg {
+            color: var(--text-color);
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-top: 8px;
+            min-height: 4.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            padding: 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        /* Score display on result */
+        .result-score-row {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        .result-score-row .score-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            filter: drop-shadow(0 0 8px rgba(255, 224, 102, 0.4));
+            display: block;
+            margin: 4px 0;
+        }
+
+        .result-high-score {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+
+        /* Glowing new record badge */
+        .new-record {
+            display: inline-block;
+            color: #fff;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 3px 14px;
+            border-radius: 100px;
+            margin-top: 6px;
+            letter-spacing: 0.08em;
+            animation: glow-pulse 1.4s ease-in-out infinite;
+            box-shadow: 0 0 16px rgba(255, 79, 200, 0.5);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 16px rgba(255, 79, 200, 0.5); }
+            50% { opacity: 0.8; box-shadow: 0 0 28px rgba(255, 79, 200, 0.9); }
+        }
+
+        /* Divider */
+        .divider {
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--glass-border), transparent);
+            margin: 14px auto;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="game-ui" class="stats-bar hidden">
+        <div><span class="stat-label">のこり</span><span class="stat-time"><span id="timer">20</span>びょう</span></div>
+        <div><span class="stat-label">スコア</span><span class="stat-score"><span id="score">0</span></span></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Title Screen -->
+    <div id="screen-title" class="overlay">
+        <div class="card">
+            <h1><span class="phrase">ほしぞら</span> <span class="phrase">キャッチ！</span></h1>
+            <p>
+                <span class="phrase">ながれぼしを</span> 
+                <span class="phrase">ゆびで</span> 
+                <span class="phrase">おいかけよう！</span>
+            </p>
+            <div class="high-score-label">さいこうスコア: <span id="title-high-score">0</span></div>
+            <div class="btn-group">
+                <button class="btn btn-easy" onclick="game.start('easy')">かんたん</button>
+                <button class="btn btn-normal" onclick="game.start('normal')">ふつう</button>
+                <button class="btn btn-hard" onclick="game.start('hard')">むずかしい</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="screen-result" class="overlay hidden">
+        <div class="card">
+            <h1 style="font-size: 1.4rem;"><span class="phrase">ふりかえり</span> <span class="phrase">マップ</span></h1>
+            <div class="legend">
+                <span class="legend-item"><span class="dot" style="background: var(--accent-cyan)"></span>ながれぼし</span>
+                <span class="legend-item"><span class="dot" style="background: var(--accent-pink)"></span>キミのうごき</span>
+            </div>
+            <div class="result-score-row">
+                今回のスコア
+                <span class="score-val"><span id="final-score">0</span> <small style="font-size:1rem;">てん</small></span>
+            </div>
+            <div class="result-high-score" id="best-score-container">
+                さいこうスコア: <span id="result-high-score">0</span>
+                <br><span id="new-record-badge" class="new-record hidden">★ さいこうきろく こうしん！ ★</span>
+            </div>
+            <div class="divider"></div>
+            <div id="result-msg"></div>
+            <button class="btn btn-retry" onclick="game.toTitle()">もういちど あそぶ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function beep(freq, dur, vol = 0.1) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+    }
+
+    window.game = {
+        state: 'title',
+        difficulty: 'normal',
+        score: 0,
+        highScore: 0,
+        timer: 20,
+        t: 0,
+        target: { x: 0, y: 0, size: 40 },
+        input: { x: 0, y: 0, active: false },
+        targetPath: [],
+        userPath: [],
+        stars: [],
+        user: null,
+
+        async init() {
+            window.addEventListener('resize', () => this.resize());
+            this.resize();
+            this.createBackgroundStars();
+            
+            canvas.addEventListener('mousemove', (e) => this.handleInput(e));
+            canvas.addEventListener('touchmove', (e) => { this.handleInput(e); e.preventDefault(); }, { passive: false });
+            canvas.addEventListener('touchstart', (e) => this.handleInput(e));
+            window.addEventListener('mouseup', () => this.input.active = false);
+            window.addEventListener('touchend', () => this.input.active = false);
+            
+            this.syncHighScore();
+
+            this.animate();
+        },
+
+        syncHighScore() {
+            this.highScore = Number(localStorage.getItem('starry-catch-high-score') || 0);
+            document.getElementById('title-high-score').innerText = Math.floor(this.highScore);
+            document.getElementById('result-high-score').innerText = Math.floor(this.highScore);
+        },
+
+        async saveScore(newScore) {
+            if (newScore <= this.highScore) return false;
+            this.highScore = newScore;
+            localStorage.setItem('starry-catch-high-score', String(newScore));
+            return true;
+        },
+
+        resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            this.createBackgroundStars();
+        },
+
+        createBackgroundStars() {
+            this.stars = [];
+            for(let i=0; i<80; i++) {
+                this.stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random()
+                });
+            }
+        },
+
+        start(diff) {
+            this.difficulty = diff;
+            this.state = 'playing';
+            this.score = 0;
+            this.timer = 20;
+            this.t = 0;
+            this.targetPath = [];
+            this.userPath = [];
+            this.target.size = (diff === 'easy' ? 45 : diff === 'normal' ? 35 : 25);
+            
+            document.getElementById('screen-title').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('hidden');
+            document.getElementById('timer').innerText = this.timer;
+            document.getElementById('score').innerText = "0";
+
+            this.countdown = setInterval(() => {
+                this.timer--;
+                document.getElementById('timer').innerText = this.timer;
+                if(this.timer <= 0) this.end();
+            }, 1000);
+            
+            beep(440, 0.2);
+        },
+
+        async end() {
+            clearInterval(this.countdown);
+            this.state = 'result';
+            document.getElementById('game-ui').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            
+            const finalScore = Math.floor(this.score);
+            document.getElementById('final-score').innerText = finalScore;
+            
+            const isNewRecord = await this.saveScore(finalScore);
+            const recordBadge = document.getElementById('new-record-badge');
+            if (isNewRecord) recordBadge.classList.remove('hidden');
+            else recordBadge.classList.add('hidden');
+            
+            const msgEl = document.getElementById('result-msg');
+            msgEl.style.color = "white";
+
+            if (finalScore < 150) {
+                msgEl.innerText = "じっくり 見る練習を\nはじめよう！\nつぎは もっと 長く おいかけられるよ。";
+                beep(523, 0.4);
+            } else if (finalScore < 400) {
+                msgEl.innerText = "すごい！\n星のうごきに なれてきたね。\nいっしょに おさんぽ 楽しかったよ！";
+                beep(523, 0.2); beep(659, 0.4);
+            } else if (finalScore < 700) {
+                msgEl.innerText = "すばらしい 集中力だね！\nキミの目は どんどん\nパワーアップ しているよ！";
+                beep(523, 0.1); beep(659, 0.1); beep(783, 0.4);
+            } else if (finalScore < 1000) {
+                msgEl.innerText = "もうすぐ にじいろ！\nあとすこしで 伝説の\nスターマスターに なれるよ！";
+                msgEl.style.color = "var(--primary-gold)";
+                beep(523, 0.1); beep(659, 0.1); beep(783, 0.1); beep(880, 0.4);
+            } else {
+                msgEl.innerText = "★ おめでとう！ ★\nにじいろの かがやきを 手に入れた\n最強の スターキャッチャーだ！";
+                msgEl.style.color = "#ffeb3b";
+                msgEl.style.textShadow = "0 0 10px rgba(255, 255, 255, 0.5)";
+                beep(523, 0.1); beep(659, 0.1); beep(783, 0.1); beep(1046, 0.6);
+            }
+        },
+
+        toTitle() {
+            this.state = 'title';
+            document.getElementById('screen-title').classList.remove('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+        },
+
+        handleInput(e) {
+            const rect = canvas.getBoundingClientRect();
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            this.input.x = cx - rect.left;
+            this.input.y = cy - rect.top;
+            this.input.active = true;
+        },
+
+        // 改良版：星の色とはっきりした変化の計算
+        getStarColor(score, time) {
+            if (score >= 1000) {
+                return `hsl(${(time * 180) % 360}, 100%, 70%)`; // にじいろ（鮮やか）
+            } else if (score >= 700) {
+                return `#ffcc00`; // 黄金
+            } else if (score >= 300) {
+                return `#fff176`; // レモンイエロー
+            } else {
+                return `#e0f2f1`; // シルバーホワイト
+            }
+        },
+
+        // 星を描く関数（グローサイズも連動）
+        drawStar(x, y, size, color, glow = false, currentScore = 0) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            if(glow) {
+                // スコアに合わせて光を強くする
+                const glowIntensity = 15 + Math.min(30, currentScore / 20);
+                ctx.shadowBlur = glowIntensity;
+                ctx.shadowColor = color;
+            }
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * size,
+                           Math.sin((18 + i * 72) * Math.PI / 180) * size);
+                ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (size/2.2),
+                           Math.sin((54 + i * 72) * Math.PI / 180) * (size/2.2));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        },
+
+        animate() {
+            requestAnimationFrame(() => this.animate());
+            
+            if (this.state === 'playing') {
+                this.updatePlaying();
+            } else if (this.state === 'result') {
+                this.drawResult();
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                this.drawBackground();
+            }
+        },
+
+        updatePlaying() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            this.drawBackground();
+
+            const spd = this.difficulty === 'easy' ? 0.015 : this.difficulty === 'normal' ? 0.03 : 0.045;
+            this.t += spd;
+            
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const rx = canvas.width * 0.35;
+            const ry = canvas.height * 0.3;
+
+            if (this.difficulty === 'easy') {
+                this.target.x = cx + Math.cos(this.t) * rx;
+                this.target.y = cy + Math.sin(this.t) * ry;
+            } else {
+                this.target.x = cx + (rx * Math.cos(this.t)) / (1 + Math.pow(Math.sin(this.t), 2));
+                this.target.y = cy + (rx * Math.sin(this.t) * Math.cos(this.t)) / (1 + Math.pow(Math.sin(this.t), 2));
+            }
+
+            this.targetPath.push({x: this.target.x, y: this.target.y, score: this.score});
+            
+            const dist = Math.hypot(this.input.x - this.target.x, this.input.y - this.target.y);
+            const isCatching = this.input.active && dist < this.target.size * 2;
+            
+            if (isCatching) {
+                this.score += 1.8; // 20秒でも1000点を狙いやすいよう微調整
+                document.getElementById('score').innerText = Math.floor(this.score);
+                this.userPath.push({x: this.input.x, y: this.input.y});
+                if(Math.floor(this.score) % 30 === 0) beep(800 + Math.random()*200, 0.05, 0.03);
+            } else {
+                this.userPath.push(null);
+            }
+
+            const currentColor = this.getStarColor(this.score, this.t);
+
+            // しっぽの描画
+            ctx.save();
+            const trailLen = 15;
+            for(let i=0; i<trailLen; i++) {
+                const idx = this.targetPath.length - 1 - i;
+                const p = this.targetPath[idx];
+                if(!p) continue;
+                const s = this.target.size * (1 - i/trailLen);
+                // 過去の軌跡も現在のスコアに応じた色にする
+                const trailColor = this.getStarColor(p.score, this.t - i * 0.01);
+                ctx.globalAlpha = (1 - i/trailLen) * 0.6;
+                this.drawStar(p.x, p.y, s, trailColor, false, p.score);
+            }
+            ctx.restore();
+
+            // 本体を描画
+            this.drawStar(this.target.x, this.target.y, this.target.size, isCatching ? "#ffffff" : currentColor, true, this.score);
+        },
+
+        drawBackground() {
+            this.stars.forEach(s => {
+                s.opacity += (Math.random() - 0.5) * 0.05;
+                s.opacity = Math.max(0.1, Math.min(1, s.opacity));
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+        },
+
+        drawResult() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            this.drawBackground();
+
+            ctx.strokeStyle = "rgba(0, 210, 255, 0.3)";
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.setLineDash([5, 10]);
+            ctx.beginPath();
+            this.targetPath.forEach((p, i) => {
+                if(i===0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            });
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#ff4081";
+            ctx.strokeStyle = "#ff4081";
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            let drawing = false;
+            this.userPath.forEach((p, i) => {
+                if(p) {
+                    if(!drawing) { ctx.moveTo(p.x, p.y); drawing = true; }
+                    else ctx.lineTo(p.x, p.y);
+                } else {
+                    drawing = false;
+                }
+            });
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+    };
+
+    game.init();
+</script>
+</body>
+</html>
