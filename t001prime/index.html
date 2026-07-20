@@ -3,2268 +3,2343 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>約分シューティング: RETRO</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap"
-        rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#10194a">
+    <title>やくぶん シュート！</title>
     <style>
         :root {
-            --bg-color: #050505;
-            --main-color: #0f0;
-            --max-width: 600px;
-            /* ゲームの最大幅を制限してPCでも遊びやすく */
+            --ink: #17204f;
+            --muted: #65709b;
+            --paper: #fffdf7;
+            --panel: #f3f5ff;
+            --blue: #5068ee;
+            --blue-dark: #3348bd;
+            --yellow: #ffd84d;
+            --pink: #ff6687;
+            --green: #35bd87;
+            --shadow: 0 14px 36px rgba(19, 28, 79, 0.18);
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
             margin: 0;
+            width: 100%;
+            min-height: 100%;
             overflow: hidden;
-            background-color: #111;
-            /* 余白部分の色 */
-            color: var(--main-color);
-            font-family: 'DotGothic16', monospace;
-            touch-action: none;
-            display: flex;
-            justify-content: center;
-            /* 画面中央寄せ */
-            height: 100vh;
-            height: 100dvh;
-            user-select: none;
-            -webkit-user-select: none;
+            background: #dfe8ff;
+            color: var(--ink);
+            font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
         }
 
-        /* アプリ全体のコンテナ */
-        #app-container {
-            width: 100%;
-            max-width: var(--max-width);
-            height: 100%;
-            background-color: var(--bg-color);
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(255, 226, 99, 0.55), transparent 24%),
+                radial-gradient(circle at 100% 100%, rgba(255, 130, 164, 0.38), transparent 26%),
+                #e8efff;
         }
 
-        #game-area {
-            position: relative;
+        .topbar {
+            min-height: 68px;
+            padding: 9px clamp(10px, 2vw, 24px);
+            padding-top: max(9px, env(safe-area-inset-top));
+            display: grid;
+            grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 3px solid #c9d4ff;
+            z-index: 20;
+        }
+
+        .home-link,
+        .icon-btn {
+            min-height: 46px;
+            border: 2px solid #c9d2f7;
+            border-radius: 15px;
+            background: #fff;
+            color: var(--ink);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            text-decoration: none;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #c9d2f7;
+        }
+
+        .home-link {
+            justify-self: start;
+        }
+
+        .top-title {
+            text-align: center;
+            line-height: 1.05;
+            font-weight: 900;
+            font-size: clamp(1.1rem, 2.4vw, 1.65rem);
+            letter-spacing: 0.04em;
+        }
+
+        .top-title small {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 0.65em;
+            letter-spacing: 0;
+        }
+
+        .top-actions {
+            justify-self: end;
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            min-width: 48px;
+            padding-inline: 10px;
+        }
+
+        .icon-btn[hidden] {
+            display: none;
+        }
+
+        .home-link:active,
+        .icon-btn:active,
+        .factor-btn:active,
+        .main-btn:active,
+        .sub-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        .play-layout {
             flex: 1;
             min-height: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #000;
-            overflow: hidden;
-            border-bottom: 2px solid #333;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) clamp(310px, 30vw, 390px);
+            gap: clamp(10px, 1.5vw, 18px);
+            padding: clamp(10px, 1.5vw, 18px);
         }
 
-        #scanline-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-            z-index: 50;
+        .arena {
+            min-width: 0;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            background:
+                linear-gradient(180deg, rgba(74, 101, 215, 0.16), transparent 30%),
+                linear-gradient(180deg, #10194a 0%, #202c72 58%, #344995 100%);
+            border: 5px solid #fff;
+            box-shadow: var(--shadow);
         }
 
         canvas {
-            background-color: #000;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
             width: 100%;
             height: 100%;
             display: block;
-            /* pixelatedはJS側で制御するがCSSでも念のため */
-            image-rendering: pixelated;
         }
 
-        #ui-layer {
+        .hud {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            inset: 13px 13px auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
             pointer-events: none;
-            font-size: clamp(16px, 4vw, 24px);
-            /* 画面サイズに合わせて文字サイズ調整 */
-            font-weight: bold;
-            z-index: 10;
-            text-shadow: 2px 2px 0 #000;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            color: #fff;
-            font-family: 'Press Start 2P', cursive;
+            z-index: 4;
         }
 
-        #pause-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 30;
-            background-color: #000;
-            border: 2px solid #0f0;
-            color: #0f0;
-            padding: 8px 12px;
-            font-family: 'DotGothic16', monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 0 5px #0f0;
-            display: none;
-            touch-action: manipulation;
-        }
-
-        #pause-btn:active {
-            background-color: #0f0;
-            color: #000;
-        }
-
-        #bomb-btn {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            z-index: 40;
-            background-color: #000;
-            border: 3px solid #ff9800;
-            color: #ff9800;
-            padding: 8px 12px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(0.7rem, 3vw, 1rem);
-            cursor: pointer;
-            box-shadow: 0 0 10px #ff9800;
-            display: none;
-            touch-action: manipulation;
-            border-radius: 8px;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        #bomb-btn:active {
-            transform: scale(0.95);
-            background-color: #ff9800;
-            color: #000;
-        }
-
-        #bomb-btn.bomb-ready {
-            display: block;
-            animation: bombPulse 2s infinite;
-        }
-
-        @keyframes bombPulse {
-            0% {
-                box-shadow: 0 0 10px #ff9800;
-            }
-
-            50% {
-                box-shadow: 0 0 20px #ff9800, inset 0 0 10px #ff9800;
-            }
-
-            100% {
-                box-shadow: 0 0 10px #ff9800;
-            }
-        }
-
-        #life-container {
-            position: absolute;
-            top: 50px;
-            right: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            z-index: 10;
-        }
-
-        .life-heart {
-            width: 20px;
-            height: 20px;
-            background-color: #f0f;
-            box-shadow: 0 0 8px #f0f;
-            clip-path: polygon(20% 0%, 40% 0%, 50% 20%, 60% 0%, 80% 0%, 100% 20%, 100% 50%, 50% 100%, 0% 50%, 0% 20%);
-            transition: opacity 0.2s;
-        }
-
-        .life-lost {
-            background-color: #333;
-            box-shadow: none;
-            opacity: 0.3;
-        }
-
-        #level-notify {
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            color: #ffeb3b;
-            opacity: 0;
-            transition: opacity 0.1s;
-            text-shadow: 2px 2px 0 #000;
-            text-align: center;
-            font-family: 'DotGothic16', monospace;
-            margin-top: 10px;
-        }
-
-        .show-notify {
-            opacity: 1 !important;
-            animation: blink 0.2s infinite;
-        }
-
-        @keyframes blink {
-            0% {
-                opacity: 1
-            }
-
-            50% {
-                opacity: 0
-            }
-
-            100% {
-                opacity: 1
-            }
-        }
-
-        #boss-warning {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(2rem, 8vw, 3rem);
-            color: #f00;
-            text-shadow: 4px 4px 0 #500;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 25;
-            white-space: nowrap;
-        }
-
-        .boss-anim {
-            animation: bossFlash 2s steps(4);
-        }
-
-        @keyframes bossFlash {
-            0% {
-                opacity: 0;
-                visibility: hidden;
-            }
-
-            10% {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            20% {
-                opacity: 0;
-                visibility: hidden;
-            }
-
-            30% {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            40% {
-                opacity: 0;
-                visibility: hidden;
-            }
-
-            50% {
-                opacity: 1;
-                visibility: visible;
-                transform: translate(-50%, -50%) scale(1.2);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1.5);
-            }
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .hud-chip {
+            min-height: 38px;
+            display: inline-flex;
             align-items: center;
-            z-index: 20;
-            transition: opacity 0.3s;
-            padding: 20px;
-            box-sizing: border-box;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 14px;
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.94);
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+            font-weight: 900;
+            font-size: clamp(0.78rem, 1.5vw, 1rem);
         }
 
-        .screen::before {
+        .hud-chip strong {
+            color: var(--blue-dark);
+        }
+
+        .lives-chip {
+            margin-left: auto;
+            letter-spacing: 0.08em;
+            color: var(--pink);
+        }
+
+        .target-note {
+            position: absolute;
+            top: 64px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(10, 18, 62, 0.78);
+            color: #fff;
+            font-size: clamp(0.72rem, 1.7vw, 0.95rem);
+            font-weight: 800;
+            white-space: nowrap;
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .target-note.show {
+            opacity: 1;
+        }
+
+        .battle-callout {
+            position: absolute;
+            right: clamp(10px, 2vw, 22px);
+            bottom: clamp(12px, 2vw, 22px);
+            z-index: 7;
+            min-width: min(58%, 260px);
+            max-width: calc(100% - 24px);
+            padding: 9px 22px;
+            border: 4px solid #fff;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ff6687, #8b5bd7);
+            color: #fff;
+            box-shadow: 0 10px 28px rgba(26, 32, 86, 0.32);
+            text-align: center;
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 900;
+            opacity: 0;
+            transform: translateY(18px) scale(0.65) rotate(-3deg);
+            transform-origin: right bottom;
+            pointer-events: none;
+        }
+
+        .battle-callout small {
+            display: block;
+            margin-top: 2px;
+            color: #fff3a8;
+            font-size: 0.58em;
+        }
+
+        .battle-callout.show {
+            animation: calloutPop 1.15s ease-out forwards;
+        }
+
+        @keyframes calloutPop {
+            0% { opacity: 0; transform: translateY(22px) scale(0.55) rotate(-4deg); }
+            18%, 70% { opacity: 1; transform: translateY(0) scale(1.06) rotate(0); }
+            100% { opacity: 0; transform: translateY(-18px) scale(0.92); }
+        }
+
+        .announcement {
+            position: absolute;
+            left: 50%;
+            top: 42%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: min(88%, 520px);
+            padding: 22px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.96);
+            color: var(--ink);
+            border: 5px solid var(--yellow);
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+            text-align: center;
+            font-weight: 900;
+            font-size: clamp(1.3rem, 4vw, 2.1rem);
+            z-index: 8;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s, transform 0.18s;
+        }
+
+        .announcement small {
+            display: block;
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 0.55em;
+        }
+
+        .announcement.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .arena.hit-warn {
+            animation: warn 0.3s ease-out;
+        }
+
+        @keyframes warn {
+            0%, 100% { box-shadow: var(--shadow); }
+            50% { box-shadow: 0 0 0 9px rgba(255, 94, 123, 0.6), var(--shadow); }
+        }
+
+        .arena.boss-active {
+            border-color: #ff819c;
+            animation: bossGlow 1.4s ease-in-out infinite;
+        }
+
+        .arena.boss-active::after {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(rgba(0, 50, 0, 0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 50, 0, 0.5) 1px, transparent 1px);
-            background-size: 20px 20px;
-            z-index: -1;
-        }
-
-        .hidden {
-            opacity: 0;
+            inset: 0;
+            z-index: 3;
             pointer-events: none;
+            box-shadow: inset 0 0 70px rgba(255, 40, 85, 0.3);
         }
 
-        .penalty-flash {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 0, 0, 0.5);
-            pointer-events: none;
-            z-index: 15;
-            display: none;
+        @keyframes bossGlow {
+            0%, 100% { box-shadow: 0 0 0 rgba(255, 70, 108, 0), var(--shadow); }
+            50% { box-shadow: 0 0 30px rgba(255, 70, 108, 0.55), var(--shadow); }
         }
 
-        .penalty-active {
-            display: block;
-            animation: flash 0.2s steps(2);
+        .announcement.boss-warning {
+            color: #fff;
+            background: rgba(117, 18, 50, 0.96);
+            border-color: #ffcf4a;
+            box-shadow: 0 0 0 7px rgba(255, 72, 105, 0.28), 0 20px 50px rgba(0, 0, 0, 0.36);
         }
 
-        @keyframes flash {
-            0% {
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.5;
-            }
+        .announcement.boss-warning small {
+            color: #ffe7ad;
         }
 
-        h1 {
-            margin: 0 0 20px 0;
-            font-size: clamp(2rem, 8vw, 3rem);
-            color: #0f0;
-            text-shadow: 4px 4px 0 #050;
-            text-align: center;
-            line-height: 1.2;
-            font-family: 'DotGothic16', sans-serif;
-            letter-spacing: 5px;
+        .arena.boss-defeat {
+            animation: bossDefeatShake 0.72s ease-out;
         }
 
-        .sub-text {
-            font-size: clamp(0.8rem, 3.5vw, 1rem);
-            margin-bottom: 30px;
-            text-align: center;
-            color: #ccc;
-            padding: 0 10px;
-            line-height: 1.6;
-            max-width: 100%;
+        @keyframes bossDefeatShake {
+            0%, 100% { transform: translate(0, 0); }
+            12% { transform: translate(-9px, 5px); }
+            25% { transform: translate(10px, -6px); }
+            38% { transform: translate(-8px, -4px); }
+            52% { transform: translate(7px, 5px); }
+            68% { transform: translate(-4px, 2px); }
+            82% { transform: translate(3px, -2px); }
         }
 
-        .mode-select-container {
+        .control-panel {
+            min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: 100%;
-            max-width: 350px;
-            align-items: stretch;
+            padding: clamp(14px, 2vw, 20px);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 4px solid #fff;
+            box-shadow: var(--shadow);
+            overflow: auto;
         }
 
-        .mode-btn-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .big-btn {
-            padding: 15px 10px;
-            font-size: clamp(0.9rem, 4vw, 1.2rem);
-            font-family: 'Press Start 2P', cursive;
-            background-color: #000;
-            color: #0f0;
-            border: 4px solid #0f0;
-            box-shadow: 0 0 10px #0f0, inset 0 0 10px #0f0;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.1s;
-            width: 100%;
-            touch-action: manipulation;
-        }
-
-        .big-btn:hover {
-            background-color: #0f0;
-            color: #000;
-        }
-
-        .big-btn:active {
-            transform: scale(0.98);
-        }
-
-        .score-label {
-            font-size: 0.7rem;
-            color: #ffeb3b;
+        .mission-card {
+            flex: 0 0 auto;
+            border-radius: 21px;
+            padding: 15px;
+            background: #eef1ff;
+            border: 3px solid #d6ddff;
             text-align: center;
-            font-family: 'Press Start 2P', cursive;
         }
 
-        .title-btn {
-            border-color: #fff !important;
-            color: #fff !important;
-            box-shadow: 0 0 10px #fff, inset 0 0 10px #fff !important;
-            margin-top: 10px;
-        }
-
-        .title-btn:hover {
-            background-color: #fff !important;
-            color: #000 !important;
-        }
-
-        /* Control Panel Layout */
-        #controls-container {
-            width: 100%;
-            background-color: #111;
-            border-top: 4px solid #333;
-            display: flex;
-            flex-direction: row;
-            padding: 6px;
-            /* iPhone Home Bar対応 */
-            padding-bottom: max(6px, env(safe-area-inset-bottom));
-            box-sizing: border-box;
-            z-index: 30;
-            touch-action: manipulation;
-            flex-shrink: 0;
-            gap: 6px;
-            height: auto;
-            min-height: 160px;
-            /* 少し高さを確保 */
-        }
-
-        .side-panel {
-            display: flex;
-            flex-direction: column;
-            width: 24%;
-            gap: 6px;
-        }
-
-        #panel-center {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            gap: 6px;
-        }
-
-        .center-row {
-            display: flex;
-            flex: 1;
-            gap: 6px;
-            width: 100%;
-        }
-
-        .ctrl-btn {
-            border: 2px dashed #444;
-            background-color: #0a0a0a;
-            color: #fff;
-            font-family: 'Press Start 2P', cursive;
-            border-radius: 6px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            user-select: none;
-            -webkit-user-select: none;
-            /* iOS Safariでの選択防止 */
-            transition: transform 0.05s, box-shadow 0.05s, opacity 0.5s;
-            flex: 1;
-            min-width: 0;
+        .prompt {
+            min-height: 1.5em;
             margin: 0;
-            height: auto;
-            padding: 2px 0;
+            color: var(--muted);
+            font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+            font-weight: 800;
+        }
+
+        .factor-label {
+            margin: 0;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 900;
+        }
+
+        .factor-grid {
+            flex: 1;
+            min-height: 230px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-rows: minmax(68px, 1fr);
+            gap: 10px;
+        }
+
+        .factor-btn {
+            position: relative;
+            min-height: 68px;
+            border: 3px solid var(--button-color);
+            border-radius: 20px;
+            background: #fff;
+            color: var(--button-color);
+            cursor: pointer;
+            font-size: clamp(1.7rem, 4.5vw, 2.7rem);
+            font-weight: 900;
+            box-shadow: 0 6px 0 color-mix(in srgb, var(--button-color) 35%, #bcc5e9);
+            transition: transform 0.12s, opacity 0.18s, background 0.18s;
             touch-action: manipulation;
-
-            opacity: 0.15;
-            pointer-events: none;
-            filter: grayscale(100%);
-            -webkit-tap-highlight-color: transparent;
-            /* タップ時のハイライト削除 */
         }
 
-        .ctrl-btn.unlocked {
-            border-style: solid;
-            background-color: #222;
-            opacity: 1;
-            pointer-events: auto;
-            filter: none;
-            box-shadow: 0 4px 0 #000;
-            animation: lightUp 0.5s ease-out;
+        .factor-btn small {
+            position: absolute;
+            right: 8px;
+            top: 7px;
+            font-size: 0.68rem;
+            opacity: 0.55;
         }
 
-        @keyframes lightUp {
-            0% {
-                opacity: 0.2;
-                transform: scale(0.9);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-                background-color: #fff;
-            }
-
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .factor-btn:disabled {
+            opacity: 0.18;
+            filter: grayscale(1);
+            cursor: default;
+            box-shadow: none;
         }
 
-        .ctrl-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #000;
+        .factor-btn.hint:not(:disabled) {
+            background: #fff7c7;
+            animation: hintPulse 0.7s ease-in-out 2;
         }
 
-        .btn-num {
-            font-size: clamp(1.2rem, 5vw, 1.8rem);
-            line-height: 1.1;
-            pointer-events: none;
+        @keyframes hintPulse {
+            50% { transform: scale(1.06); box-shadow: 0 0 0 6px rgba(255, 216, 77, 0.35); }
         }
 
-        .btn-sub {
-            font-size: clamp(0.5rem, 2.5vw, 0.7rem);
-            opacity: 0.8;
-            font-family: 'DotGothic16', monospace;
-            margin-top: 2px;
-            pointer-events: none;
-            white-space: nowrap;
+        .factor-btn.wrong:not(:disabled) {
+            animation: wrongButton 0.28s ease-out;
         }
 
-        @media (max-width: 600px) {
-            #controls-container {
-                padding: 4px;
-                padding-bottom: max(4px, env(safe-area-inset-bottom));
-                gap: 4px;
-                min-height: 140px;
-                /* スマホでは少しコンパクトに */
-            }
-
-            .side-panel,
-            #panel-center,
-            .center-row {
-                gap: 4px;
-            }
+        @keyframes wrongButton {
+            25% { transform: translateX(-7px); }
+            75% { transform: translateX(7px); }
         }
 
-        /* 画面高さが非常に低い場合（横持ちスマホなど）の調整 */
-        @media (max-height: 500px) {
-            #controls-container {
-                min-height: 100px;
+        .control-help {
+            margin: 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 68px 0 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: clamp(18px, 4vw, 42px);
+            background:
+                radial-gradient(circle at 20% 10%, rgba(255, 218, 77, 0.55), transparent 28%),
+                radial-gradient(circle at 90% 90%, rgba(255, 103, 140, 0.45), transparent 28%),
+                rgba(232, 239, 255, 0.97);
+        }
+
+        .overlay[hidden] {
+            display: none;
+        }
+
+        .overlay-card {
+            width: min(940px, 100%);
+            margin: auto;
+            padding: clamp(20px, 4vw, 38px);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 5px solid #fff;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .overlay-card h1,
+        .overlay-card h2 {
+            margin: 0;
+            color: var(--ink);
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            line-height: 1.15;
+        }
+
+        .lead {
+            margin: 10px auto 22px;
+            color: var(--muted);
+            font-size: clamp(0.95rem, 2.3vw, 1.25rem);
+            font-weight: 800;
+            line-height: 1.7;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mode-card {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 9px;
+            padding: 15px;
+            border-radius: 22px;
+            background: var(--panel);
+            border: 3px solid #d8defb;
+        }
+
+        .mode-icon {
+            font-size: 2rem;
+        }
+
+        .mode-card h3 {
+            margin: 0;
+            font-size: clamp(1.1rem, 2.3vw, 1.35rem);
+        }
+
+        .mode-card p {
+            min-height: 3.1em;
+            margin: 0;
+            color: var(--muted);
+            font-weight: 700;
+            line-height: 1.55;
+            font-size: 0.9rem;
+        }
+
+        .main-btn,
+        .sub-btn {
+            min-height: 54px;
+            border-radius: 17px;
+            border: 3px solid var(--blue-dark);
+            background: var(--blue);
+            color: #fff;
+            padding: 10px 18px;
+            font-size: 1.02rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--blue-dark);
+            touch-action: manipulation;
+        }
+
+        .sub-btn {
+            background: #fff;
+            color: var(--blue-dark);
+            border-color: #c5cff9;
+            box-shadow: 0 5px 0 #c5cff9;
+        }
+
+        .mode-card:nth-child(1) .main-btn {
+            background: var(--green);
+            border-color: #1f8d65;
+            box-shadow: 0 6px 0 #1f8d65;
+        }
+
+        .mode-card:nth-child(2) .main-btn {
+            background: #8b5bd7;
+            border-color: #6035a4;
+            box-shadow: 0 6px 0 #6035a4;
+        }
+
+        .result-stats {
+            width: min(560px, 100%);
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .stat-box {
+            padding: 13px 8px;
+            border-radius: 18px;
+            background: var(--panel);
+            border: 2px solid #d8defb;
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .stat-box strong {
+            display: block;
+            color: var(--blue-dark);
+            font-size: clamp(1.35rem, 4vw, 2rem);
+        }
+
+        .stars-result {
+            min-height: 1.3em;
+            margin-top: 9px;
+            color: #f2b500;
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            letter-spacing: 0.1em;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .small-note {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        @media (max-width: 820px), (orientation: portrait) {
+            .topbar {
+                min-height: 60px;
+                grid-template-columns: auto 1fr auto;
+                padding-block: 6px;
             }
 
-            .btn-num {
-                font-size: 1rem;
+            .home-link {
+                min-width: 46px;
+                width: 46px;
+                padding: 7px;
+                font-size: 0;
             }
 
-            .btn-sub {
+            .home-link::before {
+                content: "←";
+                font-size: 1.25rem;
+            }
+
+            .top-title small {
                 display: none;
             }
 
-            /* サブテキストを隠してスペース確保 */
-        }
-
-        /* Standard Primes */
-        .btn-2 {
-            border-color: #e53935;
-            color: #e53935;
-            text-shadow: 0 0 5px #e53935;
-        }
-
-        .btn-3 {
-            border-color: #1e88e5;
-            color: #1e88e5;
-            text-shadow: 0 0 5px #1e88e5;
-        }
-
-        .btn-5 {
-            border-color: #fdd835;
-            color: #fdd835;
-            text-shadow: 0 0 5px #fdd835;
-        }
-
-        .btn-7 {
-            border-color: #d000f0;
-            color: #d000f0;
-            text-shadow: 0 0 5px #d000f0;
-        }
-
-        .btn-11 {
-            border-color: #00e5ff;
-            color: #00e5ff;
-            text-shadow: 0 0 5px #00e5ff;
-        }
-
-        .btn-13 {
-            border-color: #ff9100;
-            color: #ff9100;
-            text-shadow: 0 0 5px #ff9100;
-        }
-
-        /* Special Buttons */
-        .btn-power {
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-            border-width: 3px;
-        }
-
-        .btn-power .btn-sub::before {
-            content: "■";
-            font-size: 0.8em;
-            margin-right: 3px;
-            vertical-align: 1px;
-        }
-
-        .btn-mix {
-            background: linear-gradient(to bottom, #111, #222);
-            border-style: double;
-            border-width: 5px;
-        }
-
-        .btn-mix .btn-sub::before {
-            content: "×";
-            font-size: 1.1em;
-            margin-right: 1px;
-            font-weight: bold;
-        }
-
-        .btn-4 {
-            border-color: #536dfe;
-            color: #8c9eff;
-        }
-
-        .btn-6 {
-            border-color: #00bcd4;
-            color: #4dd0e1;
-        }
-
-        .btn-8 {
-            border-color: #7c4dff;
-            color: #b388ff;
-        }
-
-        .btn-9 {
-            border-color: #f06292;
-            color: #f48fb1;
-        }
-
-        .btn-10 {
-            border-color: #66bb6a;
-            color: #a5d6a7;
-        }
-
-        .btn-12 {
-            border-color: #ffa726;
-            color: #ffcc80;
-        }
-
-        .key-hint {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 0.5rem;
-            color: #fff;
-            opacity: 0.5;
-            font-family: sans-serif;
-        }
-
-        .guide-text {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0;
-            pointer-events: none;
-            font-size: clamp(0.7rem, 3vw, 1rem);
-            opacity: 0.7;
-        }
-
-        #miss-feedback {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(60px, 15vw, 100px);
-            color: #f00;
-            text-shadow: 4px 4px 0 #500;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 12;
-        }
-
-        .show-miss {
-            animation: popMiss 0.2s ease-out;
-        }
-
-        @keyframes popMiss {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 1;
+            .play-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: minmax(0, 1fr) auto;
+                gap: 7px;
+                padding: 7px;
             }
 
-            50% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 1;
+            .arena,
+            .control-panel {
+                border-radius: 20px;
             }
 
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0;
+            .control-panel {
+                padding: 8px;
+                gap: 7px;
+                overflow: visible;
+            }
+
+            .mission-card {
+                padding: 7px 10px;
+                border-radius: 15px;
+            }
+
+            .prompt {
+                font-size: 0.78rem;
+                min-height: 1.2em;
+            }
+
+            .factor-label,
+            .control-help {
+                display: none;
+            }
+
+            .factor-grid {
+                min-height: 0;
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                grid-auto-rows: 62px;
+                gap: 6px;
+            }
+
+            .factor-btn {
+                min-height: 58px;
+                border-radius: 14px;
+                font-size: clamp(1.25rem, 6vw, 1.8rem);
+                box-shadow: 0 4px 0 color-mix(in srgb, var(--button-color) 35%, #bcc5e9);
+            }
+
+            .factor-btn small {
+                display: none;
+            }
+
+            .overlay {
+                top: 60px;
+                padding: 12px;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-card {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                align-items: center;
+                text-align: left;
+                padding: 10px;
+            }
+
+            .mode-card p {
+                display: none;
+            }
+
+            .mode-card .main-btn {
+                min-height: 48px;
+            }
+
+        }
+
+        @media (max-height: 610px) and (orientation: landscape) {
+            .topbar {
+                min-height: 54px;
+                padding-block: 4px;
+            }
+
+            .top-title small,
+            .control-help {
+                display: none;
+            }
+
+            .play-layout {
+                padding: 6px;
+                gap: 6px;
+                grid-template-columns: minmax(0, 1fr) 300px;
+            }
+
+            .control-panel {
+                padding: 8px;
+                gap: 7px;
+            }
+
+            .mission-card {
+                padding: 7px;
+            }
+
+            .factor-grid {
+                min-height: 0;
+                gap: 6px;
+            }
+
+            .factor-btn {
+                min-height: 54px;
+            }
+
+            .overlay {
+                top: 54px;
+                align-items: flex-start;
+                padding: 10px;
+            }
+
+            .overlay-card {
+                padding: 15px;
+            }
+
+            .lead {
+                margin-bottom: 10px;
+            }
+
+            .mode-card {
+                padding: 9px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <div id="app-container">
-        <div id="game-area">
-            <!-- 走査線オーバーレイ -->
-            <div id="scanline-overlay"></div>
-
-            <!-- 動的背景 (星) 用キャンバス -->
-            <canvas id="bgCanvas"
-                style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1; pointer-events: none;"></canvas>
-
-            <div id="ui-layer">
-                <div>SCORE: <span id="score">0</span></div>
-                <div style="font-size: 0.6em; color: #ffeb3b; margin-top: 2px;">HI: <span id="high-score">0</span></div>
-                <div id="level-notify">NEW BUTTON!</div>
+    <main id="app">
+        <header class="topbar">
+            <a class="home-link" href="../index.html" aria-label="ゲームをえらぶ がめんに もどる">← ゲームをえらぶ</a>
+            <div class="top-title">やくぶん シュート！<small>おおきな すうじで まとめて わろう</small></div>
+            <div class="top-actions">
+                <button id="sound-btn" class="icon-btn" type="button" aria-label="おとを きる">♪</button>
+                <button id="pause-btn" class="icon-btn" type="button" aria-label="ちょっと やすむ" hidden>Ⅱ</button>
             </div>
+        </header>
 
-            <button id="pause-btn" onclick="game.togglePause()">PAUSE</button>
-            <button id="bomb-btn" onclick="game.useBomb()">BOMB<br>★★★</button>
-
-            <div id="life-container">
-                <div class="life-heart" id="life-1"></div>
-                <div class="life-heart" id="life-2"></div>
-                <div class="life-heart" id="life-3"></div>
-                <div class="life-heart" id="life-4"></div>
-                <div class="life-heart" id="life-5"></div>
-            </div>
-
-            <div id="boss-warning">WARNING!</div>
-            <div id="penalty-overlay" class="penalty-flash"></div>
-            <div id="miss-feedback">MISS</div>
-
-            <canvas id="gameCanvas" style="position: relative; z-index: 5; background: transparent;"></canvas>
-
-            <div class="guide-text" style="z-index: 10;">SHOOT THE NUMBERS WITH DIVISORS</div>
-
-            <div id="start-screen" class="screen">
-                <h1>PRIME<br>SHOOTER</h1>
-                <div class="mode-select-container">
-                    <div class="mode-btn-wrapper">
-                        <button class="big-btn" onclick="game.start('normal')">NORMAL MODE</button>
-                        <div class="score-label">HI: <span id="hi-normal">0</span></div>
-                    </div>
-                    <div class="mode-btn-wrapper">
-                        <button class="big-btn" onclick="game.start('boss_rush')"
-                            style="border-color: #f00; color: #f00; box-shadow: 0 0 10px #f00, inset 0 0 10px #f00;">BOSS
-                            RUSH</button>
-                        <div class="score-label" style="color: #f00;">HI: <span id="hi-boss">0</span></div>
-                    </div>
-                    <div class="mode-btn-wrapper">
-                        <button class="big-btn" onclick="game.start('full_open')"
-                            style="border-color: #0ff; color: #0ff; box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;">FULL
-                            OPEN</button>
-                        <div class="score-label" style="color: #0ff;">HI: <span id="hi-full">0</span></div>
-                    </div>
+        <div class="play-layout">
+            <section id="arena" class="arena" aria-label="ゲームの がめん">
+                <canvas id="game-canvas"></canvas>
+                <div class="hud" aria-label="ゲームの じょうほう">
+                    <div class="hud-chip"><span id="mode-name">6ステージ</span></div>
+                    <div class="hud-chip">スコア <strong id="score">0</strong></div>
+                    <div class="hud-chip"><span id="progress-label">ステージ 1</span></div>
+                    <div id="lives-chip" class="hud-chip lives-chip" aria-label="のこりの ライフ">♥♥♥</div>
                 </div>
-            </div>
+                <div id="target-note" class="target-note">きいろの わくを ねらうよ</div>
+                <div id="battle-callout" class="battle-callout" role="status" aria-live="polite"></div>
+                <div id="announcement" class="announcement"></div>
+                <div id="equation" hidden></div>
+                <div id="feedback" role="status" aria-live="polite" hidden></div>
+            </section>
 
-            <div id="pause-screen" class="screen hidden">
-                <h1>PAUSED</h1>
-                <button class="big-btn" onclick="game.togglePause()">RESUME</button>
-                <button class="big-btn title-btn" onclick="game.quitToTitle()">TITLE</button>
-            </div>
-
-            <div id="game-over-screen" class="screen hidden">
-                <h1 style="color: #f00;">GAME OVER</h1>
-                <p class="sub-text">
-                    SCORE: <span id="final-score"
-                        style="font-size: 1.5em; font-family: 'Press Start 2P'; color: #ffeb3b;">0</span><br>
-                </p>
-                <button class="big-btn" onclick="game.retry()">RETRY</button>
-                <button class="big-btn title-btn" onclick="game.quitToTitle()">TITLE</button>
-            </div>
+            <aside class="control-panel" aria-label="すうじを えらぶ ところ">
+                <div class="mission-card">
+                    <p id="prompt" class="prompt">したの すうじを おして はじめよう</p>
+                </div>
+                <p class="factor-label">てきの すうじを われる すうじは？</p>
+                <div class="factor-grid">
+                    <button class="factor-btn" style="--button-color:#e84f5f" data-factor="2" type="button" aria-label="2で わる">2<small>2</small></button>
+                    <button class="factor-btn" style="--button-color:#3f72df" data-factor="3" type="button" aria-label="3で わる">3<small>3</small></button>
+                    <button class="factor-btn" style="--button-color:#5467d8" data-factor="4" type="button" aria-label="4で わる">4<small>4</small></button>
+                    <button class="factor-btn" style="--button-color:#c49300" data-factor="5" type="button" aria-label="5で わる">5<small>5</small></button>
+                    <button class="factor-btn" style="--button-color:#00a1a8" data-factor="6" type="button" aria-label="6で わる">6<small>6</small></button>
+                    <button class="factor-btn" style="--button-color:#8b50d2" data-factor="7" type="button" aria-label="7で わる">7<small>7</small></button>
+                    <button class="factor-btn" style="--button-color:#6a4ed0" data-factor="8" type="button" aria-label="8で わる">8<small>8</small></button>
+                    <button class="factor-btn" style="--button-color:#d64f90" data-factor="9" type="button" aria-label="9で わる">9<small>9</small></button>
+                    <button class="factor-btn" style="--button-color:#3b9b55" data-factor="10" type="button" aria-label="10で わる">10<small>0</small></button>
+                    <button class="factor-btn" style="--button-color:#008d9c" data-factor="11" type="button" aria-label="11で わる">11<small>Q</small></button>
+                    <button class="factor-btn" style="--button-color:#e07a1f" data-factor="12" type="button" aria-label="12で わる">12<small>A</small></button>
+                    <button class="factor-btn" style="--button-color:#dd5f15" data-factor="13" type="button" aria-label="13で わる">13<small>W</small></button>
+                </div>
+                <p class="control-help">パソコンでは 2〜9・0・Q・A・W キーでも あそべます</p>
+            </aside>
         </div>
 
-        <div id="controls-container">
-            <!-- LEFT PANEL -->
-            <div id="panel-left" class="side-panel">
-                <button id="btn-4" class="ctrl-btn btn-power btn-4" onpointerdown="game.handleButtonPress(4, event)">
-                    <span class="btn-num">4</span>
-                    <span class="btn-sub">2×2</span>
-                </button>
-                <button id="btn-8" class="ctrl-btn btn-power btn-8" onpointerdown="game.handleButtonPress(8, event)">
-                    <span class="btn-num">8</span>
-                    <span class="btn-sub">2×2×2</span>
-                </button>
-                <button id="btn-9" class="ctrl-btn btn-power btn-9" onpointerdown="game.handleButtonPress(9, event)">
-                    <span class="btn-num">9</span>
-                    <span class="btn-sub">3×3</span>
-                </button>
-            </div>
-
-            <!-- CENTER PANEL -->
-            <div id="panel-center">
-                <!-- ROW 1 -->
-                <div class="center-row">
-                    <button id="btn-2" class="ctrl-btn btn-2" onpointerdown="game.handleButtonPress(2, event)">
-                        <span class="btn-num">2</span>
-                    </button>
-                    <button id="btn-3" class="ctrl-btn btn-3" onpointerdown="game.handleButtonPress(3, event)">
-                        <span class="btn-num">3</span>
-                    </button>
-                    <button id="btn-5" class="ctrl-btn btn-5" onpointerdown="game.handleButtonPress(5, event)">
-                        <span class="btn-num">5</span>
-                    </button>
-                </div>
-                <!-- ROW 2 -->
-                <div class="center-row">
-                    <button id="btn-7" class="ctrl-btn btn-7" onpointerdown="game.handleButtonPress(7, event)">
-                        <span class="btn-num">7</span>
-                    </button>
-                    <button id="btn-11" class="ctrl-btn btn-11" onpointerdown="game.handleButtonPress(11, event)">
-                        <span class="btn-num">11</span>
-                        <span class="key-hint">Q</span>
-                    </button>
-                    <button id="btn-13" class="ctrl-btn btn-13" onpointerdown="game.handleButtonPress(13, event)">
-                        <span class="btn-num">13</span>
-                        <span class="key-hint">W</span>
-                    </button>
+        <section id="start-overlay" class="overlay">
+            <div class="overlay-card">
+                <h1>やくぶん シュート！</h1>
+                <div class="mode-grid">
+                    <article class="mode-card">
+                        <div class="mode-icon" aria-hidden="true">🌱</div>
+                        <div><h3>6ステージ れんしゅう</h3><p>2・3から はじめよう。ファイナルは 2つの すうじを いっしょに わるよ。</p></div>
+                        <button class="main-btn" type="button" data-start="stage">あそぶ</button>
+                    </article>
+                    <article class="mode-card">
+                        <div class="mode-icon" aria-hidden="true">⭐</div>
+                        <div><h3>エンドレス</h3><p>ぜんぶの ボタンが つかえるよ。20たいごとに ボスが とうじょう！</p></div>
+                        <button class="main-btn" type="button" data-start="endless">あそぶ</button>
+                    </article>
                 </div>
             </div>
+        </section>
 
-            <!-- RIGHT PANEL -->
-            <div id="panel-right" class="side-panel">
-                <button id="btn-6" class="ctrl-btn btn-mix btn-6" onpointerdown="game.handleButtonPress(6, event)">
-                    <span class="btn-num">6</span>
-                    <span class="btn-sub">2×3</span>
-                </button>
-                <button id="btn-10" class="ctrl-btn btn-mix btn-10" onpointerdown="game.handleButtonPress(10, event)">
-                    <span class="btn-num">10</span>
-                    <span class="btn-sub">2×5</span>
-                </button>
-                <button id="btn-12" class="ctrl-btn btn-mix btn-12" onpointerdown="game.handleButtonPress(12, event)">
-                    <span class="btn-num">12</span>
-                    <span class="btn-sub">6×2</span>
-                </button>
+        <section id="pause-overlay" class="overlay" hidden>
+            <div class="overlay-card" style="max-width:520px">
+                <h2>ちょっと やすもう</h2>
+                <p class="lead">じゅんびが できたら つづけよう。</p>
+                <div class="result-actions">
+                    <button id="resume-btn" class="main-btn" type="button">つづける</button>
+                    <button class="sub-btn" type="button" data-title>モードを えらぶ</button>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <style>
-        /* 画面揺れ用アニメーション */
-        .shake {
-            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
-        }
-
-        .shake-hard {
-            animation: shake-hard 0.6s cubic-bezier(.36, .07, .19, .97) both;
-        }
-
-        @keyframes shake {
-
-            10%,
-            90% {
-                transform: translate3d(-2px, 0, 0);
-            }
-
-            20%,
-            80% {
-                transform: translate3d(4px, 0, 0);
-            }
-
-            30%,
-            50%,
-            70% {
-                transform: translate3d(-6px, 0, 0);
-            }
-
-            40%,
-            60% {
-                transform: translate3d(6px, 0, 0);
-            }
-        }
-
-        @keyframes shake-hard {
-
-            10%,
-            90% {
-                transform: translate3d(-5px, -5px, 0);
-            }
-
-            20%,
-            80% {
-                transform: translate3d(10px, 5px, 0);
-            }
-
-            30%,
-            50%,
-            70% {
-                transform: translate3d(-15px, -10px, 0);
-            }
-
-            40%,
-            60% {
-                transform: translate3d(15px, 10px, 0);
-            }
-        }
-
-        /* コンボ表示用UI */
-        #combo-display {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Press Start 2P', cursive;
-            font-size: clamp(2rem, 6vw, 3rem);
-            color: #ffeb3b;
-            text-shadow: 2px 2px 0 #d32f2f, 4px 4px 0 #000;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 15;
-            white-space: nowrap;
-            text-align: center;
-            transition: transform 0.1s;
-        }
-
-        .show-combo {
-            animation: comboPop 1.5s ease-out forwards;
-        }
-
-        @keyframes comboPop {
-            0% {
-                transform: translate(-50%, -30%) scale(0.5);
-                opacity: 0;
-            }
-
-            10% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 1;
-            }
-
-            20% {
-                transform: translate(-50%, -50%) scale(1.0);
-                opacity: 1;
-            }
-
-            80% {
-                transform: translate(-50%, -60%) scale(1.0);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translate(-50%, -70%) scale(0.8);
-                opacity: 0;
-            }
-        }
-
-        #combo-multiplier {
-            font-size: 0.5em;
-            color: #fff;
-            display: block;
-            margin-top: 5px;
-            text-shadow: 1px 1px 0 #000;
-        }
-    </style>
-
-    <!-- 追加のUI要素: コンボ表示 -->
-    <div id="combo-display">
-        <span id="combo-count">2 CHAIN!</span>
-        <span id="combo-multiplier">SCORE x1.5</span>
-    </div>
+        <section id="result-overlay" class="overlay" hidden>
+            <div class="overlay-card" style="max-width:700px">
+                <h2 id="result-title">クリア！</h2>
+                <div id="result-stars" class="stars-result" aria-label="ほしの かず">★★★</div>
+                <p id="result-message" class="lead">よく できました！</p>
+                <div class="result-stats">
+                    <div class="stat-box">スコア<strong id="result-score">0</strong></div>
+                    <div class="stat-box">せいかい<strong id="result-accuracy">0%</strong></div>
+                    <div class="stat-box">さいたん<strong id="result-combo">0</strong></div>
+                </div>
+                <div class="result-actions">
+                    <button id="retry-btn" class="main-btn" type="button">もういちど</button>
+                    <button class="sub-btn" type="button" data-title>モードを えらぶ</button>
+                    <a class="sub-btn" href="../index.html" style="display:inline-flex;align-items:center;text-decoration:none">ゲームを えらぶ</a>
+                </div>
+                <p id="high-score-note" class="small-note"></p>
+            </div>
+        </section>
+    </main>
 
     <script>
-        class SoundManager {
+        class TinySound {
             constructor() {
+                this.enabled = true;
                 this.ctx = null;
-                this.isMuted = false;
-
-                // BGM用
-                this.bgmOsc = null;
-                this.bgmGain = null;
-                this.bgmInterval = null;
-                this.bgmStep = 0;
-                this.bgmSequence = [
-                    220, 220, 330, 330, 293, 293, 220, null,
-                    196, 196, 293, 293, 261, 261, 196, null,
-                    164, 164, 246, 246, 220, 220, 164, null,
-                    261, 261, 392, 392, 329, 329, 261, null
-                ];
-                this.bgmSpeed = 150; // ms per step
+                try {
+                    this.enabled = localStorage.getItem('wariSound') !== 'off';
+                } catch (_) { }
             }
 
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+            setEnabled(enabled) {
+                this.enabled = enabled;
+                try { localStorage.setItem('wariSound', enabled ? 'on' : 'off'); } catch (_) { }
             }
 
-            startBGM() {
-                if (!this.ctx || this.isMuted || this.bgmInterval) return;
-                this.bgmStep = 0;
-
-                this.bgmInterval = setInterval(() => {
-                    if (this.isMuted) return;
-                    const freq = this.bgmSequence[this.bgmStep % this.bgmSequence.length];
-                    if (freq) {
-                        this.playTone(freq, 'square', 0.1, 0.05); // BGMは音量控えめに
-                    }
-                    this.bgmStep++;
-
-                    // ゲーム進行に応じてBGM速度アップ
-                    if (this.bgmStep % 32 === 0 && this.bgmSpeed > 80) {
-                        // BGMスピード変更時に再設定する部分は複雑化を避けるため今回は固定間隔
-                    }
-                }, this.bgmSpeed);
+            tone(freq, duration = 0.09, type = 'sine', volume = 0.08, delay = 0) {
+                if (!this.enabled) return;
+                try {
+                    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+                    const start = this.ctx.currentTime + delay;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, start);
+                    gain.gain.setValueAtTime(0.001, start);
+                    gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                    osc.connect(gain).connect(this.ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + duration + 0.02);
+                } catch (_) { }
             }
 
-            stopBGM() {
-                if (this.bgmInterval) {
-                    clearInterval(this.bgmInterval);
-                    this.bgmInterval = null;
-                }
+            correct() {
+                this.tone(520, 0.08, 'sine', 0.07);
+                this.tone(720, 0.1, 'sine', 0.06, 0.07);
             }
 
-            setBGMSpeed(speed) {
-                if (this.bgmSpeed === speed) return;
-                this.bgmSpeed = speed;
-                if (this.bgmInterval) {
-                    this.stopBGM();
-                    this.startBGM();
-                }
+            wrong() { this.tone(150, 0.12, 'triangle', 0.07); }
+            escape() { this.tone(120, 0.18, 'sawtooth', 0.06); }
+            bossAppear() {
+                this.tone(95, 0.28, 'sawtooth', 0.09);
+                this.tone(78, 0.34, 'square', 0.07, 0.3);
+                this.tone(62, 0.42, 'sawtooth', 0.08, 0.66);
             }
-
-            playTone(freq, type, duration, vol = 0.1, slide = 0) {
-                if (!this.ctx || this.isMuted) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                if (slide !== 0) {
-                    osc.frequency.exponentialRampToValueAtTime(freq + slide, this.ctx.currentTime + duration);
-                }
-
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + duration);
+            bossDefeat() {
+                this.tone(150, 0.36, 'sawtooth', 0.1);
+                this.tone(95, 0.5, 'square', 0.08, 0.08);
+                this.tone(520, 0.16, 'sine', 0.08, 0.34);
+                this.tone(720, 0.22, 'sine', 0.08, 0.49);
             }
-
-            playNoise(duration, vol = 0.2) {
-                if (!this.ctx || this.isMuted) return;
-                const bufferSize = this.ctx.sampleRate * duration;
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-
-                const noise = this.ctx.createBufferSource();
-                noise.buffer = buffer;
-                const gain = this.ctx.createGain();
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 1000;
-
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                noise.start();
+            clear() {
+                this.tone(523, 0.12, 'sine', 0.07);
+                this.tone(659, 0.12, 'sine', 0.07, 0.12);
+                this.tone(784, 0.2, 'sine', 0.07, 0.24);
             }
-
-            playShoot() { this.playTone(800, 'square', 0.1, 0.1, -400); }
-            playSpecialShoot() { this.playTone(400, 'sawtooth', 0.3, 0.1, 400); }
-            playHit() { this.playTone(200, 'square', 0.05, 0.1); }
-            playExplosion() { this.playNoise(0.3, 0.3); }
-            playBossExplosion() { this.playNoise(0.8, 0.5); }
-            playLevelUp() {
-                this.playTone(440, 'square', 0.1, 0.1);
-                setTimeout(() => this.playTone(554, 'square', 0.1, 0.1), 100);
-                setTimeout(() => this.playTone(659, 'square', 0.2, 0.1), 200);
-            }
-            playDamage() { this.playTone(100, 'sawtooth', 0.3, 0.3, -50); }
-            playError() { this.playTone(80, 'square', 0.1, 0.2); }
         }
 
-        class Game {
+        class WariGame {
             constructor() {
-                this.canvas = document.getElementById('gameCanvas');
-                this.bgCanvas = document.getElementById('bgCanvas');
-                this.gameArea = document.getElementById('game-area');
+                this.canvas = document.getElementById('game-canvas');
                 this.ctx = this.canvas.getContext('2d');
-                this.bgCtx = this.bgCanvas.getContext('2d');
-                this.scoreEl = document.getElementById('score');
-                this.highScoreEl = document.getElementById('high-score');
-                this.finalScoreEl = document.getElementById('final-score');
+                this.arena = document.getElementById('arena');
+                this.sound = new TinySound();
+                this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-                this.hiNormalEl = document.getElementById('hi-normal');
-                this.hiBossEl = document.getElementById('hi-boss');
-                this.hiFullEl = document.getElementById('hi-full');
+                this.els = {
+                    start: document.getElementById('start-overlay'),
+                    pause: document.getElementById('pause-overlay'),
+                    result: document.getElementById('result-overlay'),
+                    pauseBtn: document.getElementById('pause-btn'),
+                    soundBtn: document.getElementById('sound-btn'),
+                    mode: document.getElementById('mode-name'),
+                    score: document.getElementById('score'),
+                    progress: document.getElementById('progress-label'),
+                    lives: document.getElementById('lives-chip'),
+                    targetNote: document.getElementById('target-note'),
+                    battleCallout: document.getElementById('battle-callout'),
+                    announcement: document.getElementById('announcement'),
+                    prompt: document.getElementById('prompt'),
+                    equation: document.getElementById('equation'),
+                    feedback: document.getElementById('feedback'),
+                    resultTitle: document.getElementById('result-title'),
+                    resultStars: document.getElementById('result-stars'),
+                    resultMessage: document.getElementById('result-message'),
+                    resultScore: document.getElementById('result-score'),
+                    resultAccuracy: document.getElementById('result-accuracy'),
+                    resultCombo: document.getElementById('result-combo'),
+                    highScore: document.getElementById('high-score-note')
+                };
 
-                this.levelNotifyEl = document.getElementById('level-notify');
-                this.bossWarningEl = document.getElementById('boss-warning');
-                this.startScreen = document.getElementById('start-screen');
-                this.pauseScreen = document.getElementById('pause-screen');
-                this.gameOverScreen = document.getElementById('game-over-screen');
-                this.penaltyOverlay = document.getElementById('penalty-overlay');
-                this.controlsContainer = document.getElementById('controls-container');
-                this.missFeedback = document.getElementById('miss-feedback');
-                this.pauseBtn = document.getElementById('pause-btn');
-                this.bombBtn = document.getElementById('bomb-btn');
-
-                this.sound = new SoundManager();
+                this.factorButtons = [...document.querySelectorAll('.factor-btn')];
+                this.factorColors = {
+                    2: '#e84f5f', 3: '#3f72df', 4: '#5467d8', 5: '#c49300',
+                    6: '#00a1a8', 7: '#8b50d2', 8: '#6a4ed0', 9: '#d64f90',
+                    10: '#3b9b55', 11: '#008d9c', 12: '#e07a1f', 13: '#dd5f15'
+                };
+                this.allFactors = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+                this.lastStage = 6;
+                this.stageNormalGoals = Object.fromEntries(
+                    Array.from({ length: this.lastStage }, (_, index) => [index + 1, 12])
+                );
+                this.stageNormalGoals[6] = 6;
+                this.stageConfig = {
+                    1: {
+                        activeFactors: [2, 3],
+                        normalFactors: [2, 3],
+                        normalFactorCount: [2, 4],
+                        normalMax: 99,
+                        bossFactors: [2, 3],
+                        bossRange: [100, 200],
+                        guide: '2・3で 小さくしよう'
+                    },
+                    2: {
+                        activeFactors: [2, 3, 5, 7],
+                        normalFactors: [2, 3, 5, 7],
+                        normalFactorCount: [2, 4],
+                        normalMax: 99,
+                        bossFactors: [2, 3, 5, 7],
+                        bossRange: [100, 200],
+                        guide: '5・7も つかって 小さくしよう'
+                    },
+                    3: {
+                        activeFactors: [2, 3, 4, 5, 6, 7, 9],
+                        normalFactors: [4, 6, 9],
+                        normalFactorCount: [1, 3],
+                        normalMax: 99,
+                        bossFactors: [4, 6, 9],
+                        bossRange: [100, 200],
+                        guide: '4・6・9も つかって はやく 小さくしよう'
+                    },
+                    4: {
+                        activeFactors: [2, 3, 4, 5, 6, 7, 9, 11, 13],
+                        normalFactors: [2, 3, 5, 7, 11, 13],
+                        normalFactorCount: [2, 4],
+                        normalMax: 99,
+                        bossFactors: [7, 11, 13, 6, 9, 4, 8],
+                        bossRange: [100, 200],
+                        guide: '7・11・13も つかって 小さくしよう'
+                    },
+                    5: {
+                        activeFactors: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        normalFactors: [2, 3, 5, 7, 11, 13],
+                        normalFactorCount: [3, 6],
+                        normalMax: 149,
+                        bossFactors: [2, 3, 5, 7, 11, 13],
+                        bossRange: [150, 200],
+                        guide: '8・10・12も つかって いろいろ わろう'
+                    }
+                };
+                this.stageConfig[6] = {
+                    activeFactors: [...this.allFactors],
+                    pairMode: true,
+                    pairMax: 50,
+                    bossRange: [100, 200],
+                    guide: 'ファイナル！ りょうほうを われる すうじで たおせ！'
+                };
+                this.productPoolCache = new Map();
 
                 this.width = 0;
                 this.height = 0;
-                this.score = 0;
-                this.currentMode = 'normal';
-                this.highScores = {
-                    normal: parseInt(localStorage.getItem('primeShooterHS_normal')) || 0,
-                    boss_rush: parseInt(localStorage.getItem('primeShooterHS_boss_rush')) || 0,
-                    full_open: parseInt(localStorage.getItem('primeShooterHS_full_open')) || 0
-                };
-
-                this.lives = 5;
-                this.isRunning = false;
-                this.isPaused = false;
+                this.dpr = 1;
+                this.running = false;
+                this.paused = false;
+                this.mode = null;
+                this.lastMode = 'stage';
                 this.animationId = null;
                 this.lastTime = 0;
+                this.announcementTimer = null;
+                this.calloutTimer = null;
+                this.transitionTimer = null;
+                this.inputLocked = false;
+                this.recoveryUntil = 0;
+                this.tutorial = false;
+                this.tutorialStep = 0;
+                this.tutorialDoneThisPage = false;
 
-                this.spawnTimer = 0;
-                this.spawnInterval = 2500;
-
-                this.player = { x: 0, y: 0, w: 40, h: 40 };
-                this.bullets = [];
-                this.enemies = [];
-                this.particles = [];
-                this.stars = [];
-
-                // 初期の星を生成
-                this.initStars();
-
-                // UI用ポップアップテキスト管理
-                this.floatingTexts = [];
-
-                // ボムシステム
-                this.bombs = 0;
-                this.maxBombs = 3;
-
-                // コンボシステム用
-                this.combo = 0;
-                this.comboTimer = 0;
-                this.comboDisplay = document.getElementById('combo-display');
-                this.comboCountEl = document.getElementById('combo-count');
-                this.comboMultiEl = document.getElementById('combo-multiplier');
-
-                this.activePrimes = [];
-                this.unlockedButtons = new Set();
-
-                // 全ボタンと全素数
-                this.allButtons = [2, 3, 5, 7, 11, 13, 4, 6, 8, 9, 10, 12];
-                this.allPrimes = [2, 3, 5, 7, 11, 13];
-
-                this.progression = [
-                    { score: 0, type: 'prime', value: 2 },
-                    { score: 0, type: 'prime', value: 3 },
-                    { score: 10, type: 'prime', value: 5 },
-                    { score: 25, type: 'special', value: 6 },
-                    { score: 25, type: 'special', value: 4 },
-                    { score: 25, type: 'special', value: 9 },
-                    { score: 45, type: 'prime', value: 7 },
-                    { score: 65, type: 'special', value: 10 },
-                    { score: 85, type: 'prime', value: 11 },
-                    { score: 105, type: 'special', value: 12 },
-                    { score: 125, type: 'prime', value: 13 },
-                    { score: 145, type: 'special', value: 8 }
-                ];
-
-                this.combinations = {
-                    4: [2, 2], 6: [2, 3], 8: [4, 2], 9: [3, 3], 10: [2, 5], 12: [6, 2]
-                };
-
-                this.queueBossSpawn = false;
-
-                window.addEventListener('resize', () => this.resize());
-                window.addEventListener('keydown', (e) => this.handleInput(e));
-
+                this.bindEvents();
                 this.resize();
-                this.updateButtonsUI();
-                this.updateHighScoreDisplay();
+                this.resetScene();
+                this.activeFactors = [];
+                this.updateButtons();
+                this.updateSoundButton();
+                this.draw();
+            }
+
+            bindEvents() {
+                window.addEventListener('resize', () => this.resize());
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden && this.running && !this.paused) this.pause();
+                });
+                document.querySelectorAll('[data-start]').forEach(btn => {
+                    btn.addEventListener('click', () => this.start(btn.dataset.start));
+                });
+                document.querySelectorAll('[data-title]').forEach(btn => {
+                    btn.addEventListener('click', () => this.toTitle());
+                });
+                this.factorButtons.forEach(btn => {
+                    btn.addEventListener('pointerdown', event => {
+                        event.preventDefault();
+                        this.chooseFactor(Number(btn.dataset.factor), btn);
+                    });
+                });
+                this.els.pauseBtn.addEventListener('click', () => this.pause());
+                document.getElementById('resume-btn').addEventListener('click', () => this.resume());
+                document.getElementById('retry-btn').addEventListener('click', () => this.start(this.lastMode, true));
+                this.els.soundBtn.addEventListener('click', () => {
+                    this.sound.setEnabled(!this.sound.enabled);
+                    this.updateSoundButton();
+                    if (this.sound.enabled) this.sound.tone(620, 0.08);
+                });
+                window.addEventListener('keydown', event => this.handleKey(event));
+            }
+
+            handleKey(event) {
+                if (event.key === 'Escape' && this.running) {
+                    this.paused ? this.resume() : this.pause();
+                    return;
+                }
+                const map = {
+                    '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+                    '0': 10, q: 11, Q: 11, a: 12, A: 12, w: 13, W: 13
+                };
+                const factor = map[event.key];
+                if (factor) {
+                    event.preventDefault();
+                    this.chooseFactor(factor, this.factorButtons.find(btn => Number(btn.dataset.factor) === factor));
+                }
+            }
+
+            updateSoundButton() {
+                this.els.soundBtn.textContent = this.sound.enabled ? '♪' : '×';
+                this.els.soundBtn.setAttribute('aria-label', this.sound.enabled ? 'おとを きる' : 'おとを だす');
             }
 
             resize() {
-                const container = document.getElementById('game-area');
-                this.width = container.clientWidth;
-                this.height = container.clientHeight;
-
-                // 高解像度対応
-                const dpr = window.devicePixelRatio || 1;
-                this.canvas.width = this.width * dpr;
-                this.canvas.height = this.height * dpr;
-                this.ctx.scale(dpr, dpr);
-
-                // CSSサイズ設定
-                this.canvas.style.width = this.width + 'px';
-                this.canvas.style.height = this.height + 'px';
-
-                this.bgCanvas.width = this.width * dpr;
-                this.bgCanvas.height = this.height * dpr;
-                this.bgCtx.scale(dpr, dpr);
-                this.bgCanvas.style.width = this.width + 'px';
-                this.bgCanvas.style.height = this.height + 'px';
-
-                // Canvasコンテキストのピクセル化設定（リサイズでリセットされるため再設定）
-                this.ctx.imageSmoothingEnabled = false;
-                this.bgCtx.imageSmoothingEnabled = false;
-
-                this.player.x = this.width / 2;
-                this.player.y = this.height - 60;
-            }
-
-            updateHighScoreDisplay() {
-                this.hiNormalEl.innerText = this.highScores.normal;
-                this.hiBossEl.innerText = this.highScores.boss_rush;
-                this.hiFullEl.innerText = this.highScores.full_open;
-
-                if (this.currentMode) {
-                    this.highScoreEl.innerText = this.highScores[this.currentMode];
+                const rect = this.arena.getBoundingClientRect();
+                this.width = Math.max(300, rect.width);
+                this.height = Math.max(260, rect.height);
+                this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+                this.canvas.width = Math.floor(this.width * this.dpr);
+                this.canvas.height = Math.floor(this.height * this.dpr);
+                this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+                this.makeStars();
+                for (const enemy of this.enemies || []) {
+                    const sideSpace = enemy.kind === 'pair'
+                        ? enemy.radius + (enemy.boss ? 76 : 58)
+                        : enemy.radius + 8;
+                    enemy.x = Math.min(Math.max(sideSpace, enemy.x), this.width - sideSpace);
                 }
+                this.player = { x: this.width / 2, y: this.height - 38 };
+                this.draw();
             }
 
-            checkHighScore() {
-                if (this.score > this.highScores[this.currentMode]) {
-                    this.highScores[this.currentMode] = this.score;
-                    localStorage.setItem(`primeShooterHS_${this.currentMode}`, this.score);
-                    this.updateHighScoreDisplay();
-                }
+            makeStars() {
+                const count = this.reducedMotion ? 22 : 48;
+                this.stars = Array.from({ length: count }, () => ({
+                    x: Math.random() * this.width,
+                    y: Math.random() * this.height,
+                    r: 1 + Math.random() * 2,
+                    speed: 0.08 + Math.random() * 0.18,
+                    alpha: 0.25 + Math.random() * 0.55
+                }));
             }
 
-            start(mode) {
-                this.sound.init();
-                this.currentMode = mode || 'normal';
-                this.score = 0;
-                this.lives = 5;
-                this.scoreEl.innerText = 0;
-                this.updateLivesUI();
-                this.updateHighScoreDisplay();
-
-                this.isRunning = true;
-                this.isPaused = false;
-                this.spawnInterval = 2500;
-                this.spawnTimer = 0;
-                this.queueBossSpawn = false;
-
-                this.bullets = [];
+            resetScene() {
                 this.enemies = [];
+                this.bullets = [];
                 this.particles = [];
-                this.floatingTexts = [];
+                this.shockwaves = [];
+                this.flashAlpha = 0;
+                this.currentTarget = null;
+                this.els.battleCallout.classList.remove('show');
+                this.els.battleCallout.textContent = '';
+                this.arena.classList.remove('boss-active', 'boss-defeat');
+                this.player = { x: this.width / 2, y: this.height - 38 };
+            }
 
-                this.bombs = 0;
-                this.updateBombUI();
+            start(mode, retry = false) {
+                clearTimeout(this.transitionTimer);
+                clearTimeout(this.announcementTimer);
+                clearTimeout(this.calloutTimer);
+                cancelAnimationFrame(this.animationId);
+                this.mode = mode;
+                this.lastMode = mode;
+                this.running = true;
+                this.paused = false;
+                this.score = 0;
+                this.lives = 3;
+                this.stage = 1;
+                this.stageKills = 0;
+                this.totalKills = 0;
+                this.correct = 0;
+                this.wrong = 0;
+                this.streak = 0;
+                this.bestStreak = 0;
+                this.efficientKills = 0;
+                this.timeLeft = 60000;
+                this.elapsed = 0;
+                this.spawnTimer = 0;
+                this.bossSpawned = false;
+                this.endlessKillsSinceBoss = 0;
+                this.endlessBossActive = false;
+                this.endlessBossesDefeated = 0;
+                this.inputLocked = false;
+                this.recoveryUntil = 0;
+                this.tutorial = false;
+                this.resetScene();
+                this.hideAllOverlays();
+                this.els.pauseBtn.hidden = false;
+                this.els.feedback.className = 'feedback';
+                this.els.feedback.innerHTML = '&nbsp;';
+                this.els.equation.textContent = '？ ÷ ？';
 
-                this.combo = 0;
-                this.comboTimer = 0;
-
-                this.activePrimes = [];
-                this.unlockedButtons = new Set();
-                this.penaltyOverlay.classList.remove('penalty-active');
-
-                if (this.currentMode === 'normal') {
-                    this.checkLevelProgression();
+                if (mode === 'endless') {
+                    this.activeFactors = [...this.allFactors];
+                    this.els.mode.textContent = 'エンドレス';
+                    this.els.prompt.textContent = 'いろいろな すうじで まとめて わろう';
+                    this.showAnnouncement('エンドレス！', 'ライフは 3つ。どこまで いけるかな？', 1300);
                 } else {
-                    // BOSS_RUSH と FULL_OPEN は最初から全開放
-                    this.allButtons.forEach(v => this.unlockedButtons.add(v));
-                    this.activePrimes = [...this.allPrimes];
-                    this.updateButtonsUI();
-
-                    if (this.currentMode === 'boss_rush') {
-                        // 即座にボスを出す準備
-                        this.spawnTimer = this.spawnInterval;
-                    }
+                    this.mode = 'stage';
+                    this.lastMode = 'stage';
+                    this.els.mode.textContent = '6ステージ';
+                    this.beginStage(1);
                 }
 
-                this.startScreen.classList.add('hidden');
-                this.pauseScreen.classList.add('hidden');
-                this.gameOverScreen.classList.add('hidden');
-                this.pauseBtn.style.display = 'block';
-
-                this.sound.startBGM();
-
+                this.updateButtons();
+                this.updateHUD();
                 this.lastTime = performance.now();
                 this.loop(this.lastTime);
             }
 
-            retry() {
-                this.start(this.currentMode);
+            beginTutorial() {
+                this.tutorial = true;
+                this.tutorialStep = 0;
+                this.activeFactors = [2, 3, 6];
+                this.resetScene();
+                this.enemies.push(this.makeSingleEnemy(18, true, false));
+                const enemy = this.enemies[0];
+                enemy.y = Math.max(145, this.height * 0.35);
+                enemy.speed = 0;
+                this.els.prompt.textContent = '「6」を おして まとめて わろう';
+                this.els.feedback.textContent = '18は 2でも 6でも われるよ';
+                this.els.equation.textContent = '18 ÷ 6 = ？';
+                this.showAnnouncement('まとめて われる！', '2から はじめるより、6なら はやいよ', 1500);
             }
 
-            togglePause() {
-                if (!this.isRunning) return;
-                this.isPaused = !this.isPaused;
-
-                if (this.isPaused) {
-                    this.pauseScreen.classList.remove('hidden');
-                    this.sound.stopBGM();
-                } else {
-                    this.pauseScreen.classList.add('hidden');
-                    this.sound.startBGM();
-                    this.lastTime = performance.now();
-                    this.loop(this.lastTime);
-                }
+            beginStage(stage) {
+                clearTimeout(this.transitionTimer);
+                this.tutorial = false;
+                this.stage = stage;
+                this.stageKills = 0;
+                this.bossSpawned = false;
+                this.activeFactors = [...this.stageConfig[stage].activeFactors];
+                this.resetScene();
+                this.spawnTimer = 0;
+                this.inputLocked = false;
+                this.els.equation.textContent = '？ ÷ ？';
+                this.els.feedback.innerHTML = '&nbsp;';
+                this.els.prompt.textContent = 'てきの すうじを われる すうじは？';
+                this.showAnnouncement(`ステージ ${stage}`, this.stageConfig[stage].guide, 1550);
+                this.updateButtons();
+                this.updateHUD();
             }
 
-            quitToTitle() {
-                this.isRunning = false;
-                this.isPaused = false;
+            hideAllOverlays() {
+                this.els.start.hidden = true;
+                this.els.pause.hidden = true;
+                this.els.result.hidden = true;
+            }
+
+            toTitle() {
+                clearTimeout(this.transitionTimer);
+                clearTimeout(this.announcementTimer);
+                this.running = false;
+                this.paused = false;
                 cancelAnimationFrame(this.animationId);
-                this.sound.stopBGM();
-
-                this.checkHighScore();
-
-                this.pauseScreen.classList.add('hidden');
-                this.gameOverScreen.classList.add('hidden');
-                this.startScreen.classList.remove('hidden');
-                this.pauseBtn.style.display = 'none';
-                this.levelNotifyEl.classList.remove('show-notify');
-                this.penaltyOverlay.classList.remove('penalty-active');
-                this.bossWarningEl.classList.remove('boss-anim');
-                this.missFeedback.classList.remove('show-miss');
-
-                this.ctx.clearRect(0, 0, this.width, this.height);
-                this.drawPlayer(this.width / 2, this.height - 60);
-                this.player.x = this.width / 2;
+                this.resetScene();
+                this.els.start.hidden = false;
+                this.els.pause.hidden = true;
+                this.els.result.hidden = true;
+                this.els.pauseBtn.hidden = true;
+                this.els.targetNote.classList.remove('show');
+                this.activeFactors = [];
+                this.updateButtons();
+                this.draw();
             }
 
-            updateBombUI() {
-                if (!this.bombBtn) return;
-                if (this.bombs > 0) {
-                    this.bombBtn.classList.add('bomb-ready');
-                    const stars = '★'.repeat(this.bombs) + '☆'.repeat(this.maxBombs - this.bombs);
-                    this.bombBtn.innerHTML = `BOMB<br><span style="font-size: 0.8em">${stars}</span>`;
-                } else {
-                    this.bombBtn.classList.remove('bomb-ready');
-                    const stars = '☆'.repeat(this.maxBombs);
-                    this.bombBtn.innerHTML = `BOMB<br><span style="font-size: 0.8em; opacity: 0.5;">${stars}</span>`;
-                }
+            pause() {
+                if (!this.running || this.paused) return;
+                this.paused = true;
+                this.els.pause.hidden = false;
             }
 
-            useBomb() {
-                if (!this.isRunning || this.isPaused || this.bombs <= 0) return;
-
-                this.bombs--;
-                this.updateBombUI();
-
-                this.sound.playBossExplosion();
-
-                // 派手な画面揺れ
-                this.gameArea.classList.remove('shake-hard', 'shake');
-                void this.gameArea.offsetWidth;
-                this.gameArea.classList.add('shake-hard');
-                setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
-
-                // 画面フラッシュ
-                this.bgCtx.fillStyle = 'rgba(255, 150, 0, 0.6)';
-                this.bgCtx.fillRect(0, 0, this.width, this.height);
-
-                this.createFloatingText(`BOMB BOMBER!`, this.player.x, this.player.y - 60, '#ff9800', true);
-
-                let pointsEarned = 0;
-
-                // 全敵破壊
-                for (let i = this.enemies.length - 1; i >= 0; i--) {
-                    const e = this.enemies[i];
-                    this.createParticles(e.x, e.y, e.isBoss ? 60 : 30, '#ff9800');
-
-                    let pts = e.isBoss ? 10 : 2;
-                    pointsEarned += pts;
-                }
-
-                if (pointsEarned > 0) {
-                    this.score += pointsEarned;
-                    this.scoreEl.innerText = this.score;
-                    this.checkLevelProgression();
-                }
-
-                this.enemies = []; // 全クリア
+            resume() {
+                if (!this.running || !this.paused) return;
+                this.paused = false;
+                this.els.pause.hidden = true;
+                this.lastTime = performance.now();
             }
 
-            updateLivesUI() {
-                for (let i = 1; i <= 5; i++) {
-                    const heart = document.getElementById(`life-${i}`);
-                    if (i <= this.lives) {
-                        heart.classList.remove('life-lost');
-                    } else {
-                        heart.classList.add('life-lost');
-                    }
-                }
-            }
-
-            takeDamage() {
-                this.lives--;
-                this.updateLivesUI();
-                this.sound.playDamage();
-                this.resetCombo();
-
-                // 画面揺れ(Shake)
-                this.gameArea.classList.remove('shake', 'shake-hard');
-                void this.gameArea.offsetWidth;
-                this.gameArea.classList.add('shake');
-                setTimeout(() => this.gameArea.classList.remove('shake'), 400);
-
-                this.penaltyOverlay.classList.remove('penalty-active');
-                void this.penaltyOverlay.offsetWidth;
-                this.penaltyOverlay.classList.add('penalty-active');
-                setTimeout(() => {
-                    this.penaltyOverlay.classList.remove('penalty-active');
-                }, 200);
-
-                this.enemies = [];
-                this.bullets = [];
-
-                this.spawnTimer = -2000;
-
-                if (this.lives <= 0) {
-                    this.stop();
-                }
-            }
-
-            checkLevelProgression() {
-                if (this.currentMode !== 'normal') return;
-
-                let updated = false;
-                let newButtonTexts = [];
-
-                this.progression.forEach(step => {
-                    if (this.score >= step.score) {
-                        if (!this.unlockedButtons.has(step.value)) {
-                            this.unlockedButtons.add(step.value);
-                            if (step.type === 'prime') {
-                                if (!this.activePrimes.includes(step.value)) {
-                                    this.activePrimes.push(step.value);
-                                }
-                            }
-                            updated = true;
-                            newButtonTexts.push(step.value);
-                        }
-                    }
-                });
-
-                if (updated) {
-                    this.updateButtonsUI();
-                    if (this.score > 0) {
-                        this.sound.playLevelUp();
-                        this.queueBossSpawn = true;
-                        const text = newButtonTexts.length > 1 ?
-                            `UNLOCKED: [${newButtonTexts.join(', ')}]` :
-                            `UNLOCKED: [${newButtonTexts[0]}]`;
-                        this.showLevelNotify(text);
-                    }
-                }
-            }
-
-            updateButtonsUI() {
-                this.allButtons.forEach(val => {
-                    const btn = document.getElementById(`btn-${val}`);
-                    if (this.unlockedButtons.has(val)) {
-                        btn.classList.add('unlocked');
-                    } else {
-                        btn.classList.remove('unlocked');
-                    }
+            updateButtons() {
+                this.factorButtons.forEach(btn => {
+                    const factor = Number(btn.dataset.factor);
+                    btn.disabled = !this.running || !this.activeFactors?.includes(factor);
+                    btn.classList.remove('hint', 'wrong');
                 });
             }
 
-            showLevelNotify(text) {
-                this.levelNotifyEl.innerText = text;
-                this.levelNotifyEl.classList.add('show-notify');
-                setTimeout(() => {
-                    this.levelNotifyEl.classList.remove('show-notify');
-                }, 2000);
-            }
-
-            stop() {
-                this.isRunning = false;
-                cancelAnimationFrame(this.animationId);
-                this.sound.stopBGM();
-                this.finalScoreEl.innerText = this.score;
-                this.checkHighScore();
-                this.gameOverScreen.classList.remove('hidden');
-                this.pauseBtn.style.display = 'none';
-            }
-
-            handleButtonPress(val, event) {
-                if (event) {
-                    event.preventDefault(); // ダブルタップズーム等の防止
-                    // pointerdownなのでフォーカスは奪わないが念のため
-                }
-                this.shoot(val);
-            }
-
-            shoot(val) {
-                if (!this.isRunning || this.isPaused) return;
-                if (!this.unlockedButtons.has(val)) return;
-
-                // ターゲットになるようにソート順を調整
-                const targets = this.enemies
-                    .filter(e => {
-                        if (e.type === 'pair') {
-                            return (e.val1 % val === 0 && e.val2 % val === 0);
-                        } else {
-                            return e.value % val === 0;
-                        }
-                    })
-                    .sort((a, b) => b.y - a.y); // 画面手前（y大）の敵を優先
-
-                if (targets.length > 0) {
-                    const target = targets[0];
-                    if (this.combinations[val]) {
-                        this.shootSpecial(val, target);
-                        this.sound.playSpecialShoot();
-                    } else {
-                        this.sound.playShoot();
-                        this.bullets.push({
-                            x: this.player.x,
-                            y: this.player.y - 20,
-                            value: val,
-                            radius: 12,
-                            speed: 20,
-                            color: this.getBtnColor(val),
-                            target: target,
-                            state: 'active'
-                        });
-                    }
-                } else {
-                    this.triggerPenalty();
-                }
-            }
-
-            shootSpecial(val, target) {
-                const parts = this.combinations[val];
-                const mergeY = this.player.y - 100;
-                const mergeX = this.player.x;
-
-                this.bullets.push({
-                    x: this.player.x - 60, y: this.player.y, value: parts[0],
-                    radius: 8, speed: 10, color: this.getBtnColor(parts[0]),
-                    target: target, mergeTarget: { x: mergeX, y: mergeY },
-                    state: 'merging_left', finalValue: val, finalColor: this.getBtnColor(val)
-                });
-
-                this.bullets.push({
-                    x: this.player.x + 60, y: this.player.y, value: parts[1],
-                    radius: 8, speed: 10, color: this.getBtnColor(parts[1]),
-                    target: target, mergeTarget: { x: mergeX, y: mergeY },
-                    state: 'merging_right', finalValue: val, finalColor: this.getBtnColor(val)
-                });
-            }
-
-            triggerPenalty() {
-                this.score -= 5;
-                this.scoreEl.innerText = this.score;
-
-                if (this.score < 0) {
-                    this.stop();
+            chooseFactor(factor, button) {
+                if (!this.running || this.paused || this.inputLocked || !this.activeFactors.includes(factor)) return;
+                const target = this.getTarget();
+                if (!target) {
+                    this.setFeedback('すうじが でてくるのを まってね', false);
                     return;
                 }
 
-                this.sound.playError();
-                this.resetCombo();
-
-                // 画面揺れ(Shake)
-                this.gameArea.classList.remove('shake');
-                void this.gameArea.offsetWidth;
-                this.gameArea.classList.add('shake');
-                setTimeout(() => this.gameArea.classList.remove('shake'), 400);
-
-                this.penaltyOverlay.classList.remove('penalty-active');
-                void this.penaltyOverlay.offsetWidth;
-                this.penaltyOverlay.classList.add('penalty-active');
-                setTimeout(() => {
-                    this.penaltyOverlay.classList.remove('penalty-active');
-                }, 200);
-
-                this.missFeedback.classList.remove('show-miss');
-                void this.missFeedback.offsetWidth;
-                this.missFeedback.classList.add('show-miss');
-
-                if (navigator.vibrate) navigator.vibrate(200);
-            }
-
-            // --- 追加: コンボ処理 ---
-            addCombo() {
-                this.combo++;
-                this.comboTimer = 3000; // コンボ継続時間 3秒
-
-                // 10コンボごとにボムを追加
-                if (this.combo > 0 && this.combo % 10 === 0) {
-                    if (this.bombs < this.maxBombs) {
-                        this.bombs++;
-                        this.updateBombUI();
-                        this.createFloatingText('BOMB GET!', this.player.x, this.player.y - 40, '#ff9800', true);
-                        this.sound.playLevelUp(); // 音を追加
+                if (this.tutorial) {
+                    const expected = this.tutorialStep === 0 ? 6 : 3;
+                    if (factor !== expected) {
+                        this.wrongAnswer(button, `${expected}を おしてみよう`);
+                        return;
                     }
                 }
 
-                if (this.combo >= 2) {
-                    let multiplier = 1.0;
-                    if (this.combo >= 2) multiplier = 1.2;
-                    if (this.combo >= 5) multiplier = 1.5;
-                    if (this.combo >= 10) multiplier = 2.0;
-
-                    this.comboCountEl.innerText = `${this.combo} CHAIN!`;
-                    this.comboMultiEl.innerText = `SCORE x${multiplier.toFixed(1)}`;
-
-                    this.comboDisplay.classList.remove('show-combo');
-                    void this.comboDisplay.offsetWidth;
-                    this.comboDisplay.classList.add('show-combo');
-
-                    // 少しだけ画面を揺らす（プチシェイク）
-                    if (this.combo % 5 === 0) {
-                        this.gameArea.classList.remove('shake');
-                        void this.gameArea.offsetWidth;
-                        this.gameArea.classList.add('shake');
-                        setTimeout(() => this.gameArea.classList.remove('shake'), 400);
-                    }
-
-                    // コンボ中はBGMスピードを上げる
-                    if (this.combo >= 10) this.sound.setBGMSpeed(90);
-                    else if (this.combo >= 5) this.sound.setBGMSpeed(110);
-                    else this.sound.setBGMSpeed(130);
-                }
-            }
-
-            resetCombo() {
-                this.combo = 0;
-                this.comboTimer = 0;
-            }
-
-            handleInput(e) {
-                if (!this.isRunning || this.isPaused) return;
-                let val = 0;
-                switch (e.key) {
-                    case '2': val = 2; break;
-                    case '3': val = 3; break;
-                    case '5': val = 5; break;
-                    case '7': val = 7; break;
-                    case 'q': case 'Q': val = 11; break;
-                    case 'w': case 'W': val = 13; break;
-                    case '4': val = 4; break;
-                    case '6': val = 6; break;
-                    case '8': val = 8; break;
-                    case '9': val = 9; break;
-                }
-                if (val > 0) this.shoot(val);
-            }
-
-            gcd(a, b) {
-                if (b === 0) return a;
-                return this.gcd(b, a % b);
-            }
-
-            spawnBoss() {
-                const isPairBoss = Math.random() < 0.5;
-                if (isPairBoss) {
-                    this.spawnPairBoss();
-                } else {
-                    this.spawnSingleBoss();
-                }
-                this.queueBossSpawn = false;
-            }
-
-            spawnPairBoss() {
-                let commonP = 2;
-                if (this.activePrimes.length > 1) {
-                    commonP = this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
-                }
-
-                let val1, val2;
-                let retry = 0;
-
-                do {
-                    val1 = commonP * this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
-                    val2 = commonP * this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
-                    if (Math.random() < 0.6) val1 *= (Math.random() < 0.5 ? 2 : 3);
-                    if (Math.random() < 0.6) val2 *= (Math.random() < 0.5 ? 2 : 3);
-                    if (val1 > 300) val1 = 100 + Math.floor(Math.random() * 100);
-                    if (val2 > 300) val2 = 100 + Math.floor(Math.random() * 100);
-                    if (this.gcd(val1, val2) === 1) {
-                        val1 *= commonP; val2 *= commonP;
-                    }
-                    retry++;
-                } while (val1 === val2 && retry < 10);
-
-                if (val1 === val2) { val2 += commonP; }
-
-                const x = this.width / 2;
-                const radius = 40;
-
-                this.showBossWarning();
-
-                this.enemies.push({
-                    id: Math.random(),
-                    x: x, y: -100,
-                    type: 'pair',
-                    val1: val1, val2: val2,
-                    maxVal: val1 + val2,
-                    radius: radius,
-                    speed: 0.7,
-                    hitFlash: 0,
-                    isBoss: true
-                });
-            }
-
-            spawnSingleBoss() {
-                let val = 100;
-                for (let k = 0; k < 20; k++) {
-                    let tempVal = 1;
-                    let count = 3 + Math.floor(Math.random() * 3);
-                    if (this.activePrimes.length === 0) this.activePrimes = [2, 3];
-                    for (let i = 0; i < count; i++) tempVal *= this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
-                    if (tempVal >= 100 && tempVal <= 300) { val = tempVal; break; }
-                }
-                if (val < 100 || val > 300) {
-                    val = 2 * 2 * 3 * 3 * 3;
-                    if (this.activePrimes.includes(5)) val = 2 * 2 * 5 * 5;
-                }
-
-                const radius = 60;
-                const x = this.width / 2;
-
-                this.showBossWarning();
-
-                this.enemies.push({
-                    id: Math.random(),
-                    x: x, y: -100,
-                    type: 'single',
-                    value: val, maxVal: val,
-                    radius: radius,
-                    speed: 0.8,
-                    hitFlash: 0,
-                    isBoss: true
-                });
-            }
-
-            showBossWarning() {
-                this.bossWarningEl.classList.remove('boss-anim');
-                void this.bossWarningEl.offsetWidth;
-                this.bossWarningEl.classList.add('boss-anim');
-                this.sound.playTone(150, 'sawtooth', 0.5, 0.3, -50);
-                setTimeout(() => this.sound.playTone(150, 'sawtooth', 0.5, 0.3, -50), 500);
-            }
-
-            spawnEnemy() {
-                // BOSS_RUSHでは雑魚敵スポーン処理は使わない（ボスのみ）
-                if (this.currentMode === 'boss_rush') {
-                    if (!this.enemies.some(e => e.isBoss)) {
-                        this.spawnBoss();
-                    }
+                if (!this.canDivide(target, factor)) {
+                    const message = target.kind === 'pair'
+                        ? `${target.val1}と${target.val2}は、どちらも ${factor}では われないよ`
+                        : `${target.value}は ${factor}で われないよ`;
+                    this.wrongAnswer(button, message);
                     return;
                 }
 
-                if (this.enemies.some(e => e.isBoss)) return;
-                if (this.queueBossSpawn) { this.spawnBoss(); return; }
-
-                let val = 1;
-                let retry = 0;
-                if (this.activePrimes.length === 0) this.activePrimes = [2, 3];
-
-                while (retry < 10) {
-                    val = 1;
-                    let factorCount;
-                    if (this.score < 10) factorCount = Math.random() < 0.5 ? 1 : 2;
-                    else factorCount = 2 + Math.floor(Math.random() * 2);
-                    for (let i = 0; i < factorCount; i++) val *= this.activePrimes[Math.floor(Math.random() * this.activePrimes.length)];
-                    if (val < 100) break;
-                    retry++;
-                }
-                if (val >= 100) val = 2 * 3;
-
-                const radius = 30 + (val.toString().length * 2);
-                const x = Math.random() * (this.width - radius * 2) + radius;
-
-                let enemySpeed = 0.6 + (this.score * 0.03);
-                if (enemySpeed > 2.5) enemySpeed = 2.5;
-
-                this.enemies.push({
-                    id: Math.random(),
-                    x: x, y: -50,
-                    type: 'single',
-                    value: val, maxVal: val,
-                    radius: radius,
-                    speed: enemySpeed,
-                    hitFlash: 0,
-                    isBoss: false
+                this.inputLocked = true;
+                if (!this.tutorial) this.correct++;
+                this.sound.correct();
+                this.clearHints();
+                this.bullets.push({
+                    x: this.player.x,
+                    y: this.player.y - 17,
+                    factor,
+                    target,
+                    speed: 0.95,
+                    color: this.factorColors[factor]
                 });
             }
 
-            // --- 追加: 星(背景)処理 ---
-            initStars() {
-                this.stars = [];
-                for (let i = 0; i < 50; i++) {
-                    this.stars.push({
-                        x: Math.random() * this.width,
-                        y: Math.random() * this.height,
-                        size: Math.random() * 2 + 1,
-                        speed: Math.random() * 0.5 + 0.1,
-                        color: Math.random() > 0.8 ? '#0f0' : '#fff'
+            wrongAnswer(button, message) {
+                if (!this.tutorial) this.wrong++;
+                this.streak = 0;
+                this.sound.wrong();
+                this.setFeedback(message, true);
+                if (button) {
+                    button.classList.remove('wrong');
+                    void button.offsetWidth;
+                    button.classList.add('wrong');
+                }
+                const target = this.getTarget();
+                if (target) {
+                    this.factorButtons.forEach(btn => {
+                        const factor = Number(btn.dataset.factor);
+                        btn.classList.toggle('hint', !btn.disabled && this.canDivide(target, factor));
                     });
                 }
             }
 
-            updateStars(dt) {
-                // スコアやコンボ数に応じて背景の流れる速度をあげる
-                let speedMulti = 1.0;
-                if (this.combo >= 5) speedMulti = 1.5;
-                if (this.combo >= 10) speedMulti = 2.5;
-                if (this.enemies.some(e => e.isBoss)) speedMulti = 3.0; // ボス出現中は高速移動
-
-                this.stars.forEach(s => {
-                    s.y += s.speed * speedMulti * (dt / 16);
-                    if (s.y > this.height) {
-                        s.y = 0;
-                        s.x = Math.random() * this.width;
-                    }
-                });
+            gcd(a, b) {
+                while (b) [a, b] = [b, a % b];
+                return Math.abs(a);
             }
 
-            drawStars() {
-                this.bgCtx.clearRect(0, 0, this.width, this.height);
-                // 黒地の背景描画はCSSまたはdraw()で行う
-                this.stars.forEach(s => {
-                    this.bgCtx.fillStyle = s.color;
-                    this.bgCtx.globalAlpha = Math.random() > 0.9 ? 0.3 : (this.combo > 5 ? 1.0 : 0.6); // またたき効果
-                    this.bgCtx.fillRect(s.x, s.y, s.size, s.size);
-                });
-                this.bgCtx.globalAlpha = 1.0;
+            canDivide(enemy, factor) {
+                if (enemy.kind === 'pair') return enemy.val1 % factor === 0 && enemy.val2 % factor === 0;
+                return enemy.value % factor === 0;
             }
 
-            update(timestamp) {
-                const dt = timestamp - this.lastTime;
-                this.lastTime = timestamp;
+            isDefeated(enemy) {
+                if (enemy.kind === 'pair') return this.gcd(enemy.val1, enemy.val2) === 1;
+                return enemy.value === 1;
+            }
 
-                this.spawnTimer += dt;
-                if (this.spawnTimer > this.spawnInterval) {
-                    this.spawnEnemy();
-                    this.spawnTimer = 0;
+            enemyText(enemy) {
+                return enemy.kind === 'pair' ? `${enemy.val1}と${enemy.val2}` : String(enemy.value);
+            }
 
-                    // NORMAL と FULL_OPEN で速度上昇
-                    if (this.currentMode !== 'boss_rush') {
-                        if (!this.enemies.some(e => e.isBoss)) {
-                            if (this.spawnInterval > 1200) this.spawnInterval -= 15;
-                        }
+            minimumSingleSteps(value, factors, memo = new Map()) {
+                if (value === 1) return 0;
+                if (memo.has(value)) return memo.get(value);
+                let best = Infinity;
+                for (const factor of factors) {
+                    if (value % factor !== 0) continue;
+                    const next = this.minimumSingleSteps(value / factor, factors, memo);
+                    if (Number.isFinite(next)) best = Math.min(best, 1 + next);
+                }
+                memo.set(value, best);
+                return best;
+            }
+
+            minimumSplitPairSteps(val1, val2, factors, memo = new Map()) {
+                const key = `${val1}:${val2}`;
+                if (memo.has(key)) return memo.get(key);
+
+                // 共通して割れる数がなくなったら手を離し、残った2体を通常どおり倒す。
+                if (this.gcd(val1, val2) === 1) {
+                    const total = this.minimumSingleSteps(val1, factors)
+                        + this.minimumSingleSteps(val2, factors);
+                    memo.set(key, total);
+                    return total;
+                }
+
+                let best = Infinity;
+                for (const factor of factors) {
+                    if (val1 % factor !== 0 || val2 % factor !== 0) continue;
+                    const next = this.minimumSplitPairSteps(val1 / factor, val2 / factor, factors, memo);
+                    if (Number.isFinite(next)) best = Math.min(best, 1 + next);
+                }
+                memo.set(key, best);
+                return best;
+            }
+
+            clearHints() {
+                this.factorButtons.forEach(btn => btn.classList.remove('hint', 'wrong'));
+            }
+
+            setFeedback(message, bad) {
+                this.els.feedback.textContent = message;
+                this.els.feedback.classList.toggle('bad', Boolean(bad));
+            }
+
+            splitPairEnemy(enemy) {
+                const group = {
+                    id: Math.random(),
+                    boss: enemy.boss,
+                    steps: enemy.steps,
+                    optimalSteps: enemy.optimalSteps,
+                    x: enemy.x,
+                    y: enemy.y,
+                    radius: enemy.radius
+                };
+                const childValues = [enemy.val1, enemy.val2].filter(value => value > 1);
+                const gap = Math.min(72, Math.max(48, this.width * 0.12));
+                const childY = Math.max(105, enemy.y - 8);
+
+                this.removeEnemy(enemy);
+                childValues.forEach((value, index) => {
+                    const child = this.makeSingleEnemy(value, false, false);
+                    const direction = childValues.length === 1 ? 0 : index === 0 ? -1 : 1;
+                    child.x = Math.min(
+                        Math.max(child.radius + 10, enemy.x + direction * gap),
+                        this.width - child.radius - 10
+                    );
+                    child.y = childY;
+                    child.speed = this.enemySpeed() * 0.82;
+                    child.entranceWait = 0;
+                    child.flash = 9;
+                    child.splitGroup = group;
+                    this.enemies.push(child);
+                    this.makeParticles(child.x, child.y, '#79e2ff');
+                });
+
+                this.inputLocked = false;
+                this.setFeedback(
+                    childValues.length === 2
+                        ? `手を はなした！ ${enemy.val1}と${enemy.val2}を 1にしよう`
+                        : `手を はなした！ のこりの ${childValues[0]}を 1にしよう`,
+                    false
+                );
+            }
+
+            resolveHit(enemy, factor) {
+                if (!this.enemies.includes(enemy)) {
+                    this.inputLocked = false;
+                    return;
+                }
+                const firstHitPraise = enemy.steps === 0 ? this.openingPraise(factor) : '';
+                if (enemy.kind === 'pair') {
+                    const before1 = enemy.val1;
+                    const before2 = enemy.val2;
+                    enemy.val1 /= factor;
+                    enemy.val2 /= factor;
+                    this.els.equation.textContent = `${before1}と${before2} ÷ ${factor} = ${enemy.val1}と${enemy.val2}`;
+                } else {
+                    const before = enemy.value;
+                    enemy.value /= factor;
+                    this.els.equation.textContent = `${before} ÷ ${factor} = ${enemy.value}`;
+                }
+                enemy.steps++;
+                if (enemy.splitGroup) enemy.splitGroup.steps++;
+                enemy.flash = 12;
+                this.setFeedback(factor >= 4 ? 'まとめて われた！' : 'せいかい！', false);
+                this.makeParticles(enemy.x, enemy.y, this.factorColors[factor]);
+
+                if (this.tutorial) {
+                    this.tutorialStep++;
+                    if (this.isDefeated(enemy)) {
+                        this.removeEnemy(enemy);
+                        this.tutorialDoneThisPage = true;
+                        this.tutorial = false;
+                        this.inputLocked = true;
+                        this.setFeedback('できた！ 18を 2かいで 1に したね', false);
+                        this.showAnnouncement('まとめわり せいこう！', '2からなら 3かい。6からなら 2かい！', 1450);
+                        this.transitionTimer = setTimeout(() => this.beginStage(1), 1500);
                     } else {
-                        // BOSS RUSH用
-                        this.spawnInterval = 1000; // ボス撃破後のインターバル
+                        this.inputLocked = false;
+                        this.els.prompt.textContent = 'つぎは「3」を おして 1に しよう';
+                        this.els.equation.textContent = '3 ÷ 3 = ？';
+                        this.els.feedback.textContent = '6で まとめて わったから、あと 1かい！';
                     }
+                    this.updateHUD();
+                    return;
                 }
 
-                // コンボタイマーの減少
-                if (this.comboTimer > 0) {
-                    this.comboTimer -= dt;
-                    if (this.comboTimer <= 0) {
-                        this.resetCombo();
-                        this.sound.setBGMSpeed(150); // BGM速度を戻す
-                    }
+                // 2つに共通して使える数がなくなったところで、手を離して分かれる。
+                if (enemy.kind === 'pair' && this.isDefeated(enemy)) {
+                    this.showBattleCallout(firstHitPraise, '');
+                    this.splitPairEnemy(enemy);
+                    this.updateHUD();
+                    return;
                 }
 
-                this.updateStars(dt);
+                if (this.isDefeated(enemy)) {
+                    let defeatedEnemy = enemy;
+                    if (enemy.splitGroup) {
+                        const group = enemy.splitGroup;
+                        this.removeEnemy(enemy);
+                        const groupStillFighting = this.enemies.some(other => other.splitGroup === group);
+                        if (groupStillFighting) {
+                            this.setFeedback('1たい たおした！ あと 1たい！', false);
+                            this.showBattleCallout(firstHitPraise, '');
+                            this.inputLocked = false;
+                            this.updateHUD();
+                            return;
+                        }
+                        defeatedEnemy = {
+                            kind: 'pair',
+                            boss: group.boss,
+                            steps: group.steps,
+                            optimalSteps: group.optimalSteps,
+                            x: group.x,
+                            y: enemy.y,
+                            radius: group.radius
+                        };
+                        if (defeatedEnemy.boss) this.makeBossExplosion(defeatedEnemy);
+                    } else {
+                        if (enemy.boss) this.makeBossExplosion(enemy);
+                        this.removeEnemy(enemy);
+                    }
+                    this.totalKills++;
+                    this.stageKills++;
+                    if (this.mode === 'endless') {
+                        if (defeatedEnemy.boss) {
+                            this.endlessKillsSinceBoss = 0;
+                            this.endlessBossActive = false;
+                            this.endlessBossesDefeated++;
+                        } else {
+                            this.endlessKillsSinceBoss++;
+                        }
+                    }
+                    this.streak++;
+                    this.bestStreak = Math.max(this.bestStreak, this.streak);
+                    this.showBattleCallout(
+                        firstHitPraise,
+                        this.streak % 5 === 0 ? `${this.streak}コンボ！` : ''
+                    );
+                    const shortest = defeatedEnemy.steps === defeatedEnemy.optimalSteps;
+                    if (shortest) this.efficientKills++;
+                    const base = defeatedEnemy.boss ? 220 : 100;
+                    this.score += base + (shortest ? 50 : 0) + Math.min(this.streak, 10) * 3;
+                    const action = defeatedEnemy.kind === 'pair' ? '2たいとも たおした！' : 'たおした！';
+                    this.setFeedback(
+                        shortest
+                            ? `さいたん！ ${defeatedEnemy.steps}かいで ${action}`
+                            : `${action} さいたんは ${defeatedEnemy.optimalSteps}かい`,
+                        false
+                    );
+                    this.inputLocked = false;
+                    this.afterDefeat(defeatedEnemy);
+                } else {
+                    enemy.y = Math.max(105, enemy.y - 20);
+                    if (enemy.kind === 'pair') {
+                        this.setFeedback('まだ 手をつないでいるよ。もういちど りょうほうを わろう！', false);
+                    }
+                    this.showBattleCallout(firstHitPraise, '');
+                    this.inputLocked = false;
+                }
+                this.updateHUD();
+            }
+
+            afterDefeat(enemy) {
+                if (this.mode !== 'stage' || !enemy.boss) return;
+
+                this.inputLocked = true;
+                this.recoveryUntil = performance.now() + 1300;
+                if (this.stage < this.lastStage) {
+                    this.showAnnouncement(`ステージ ${this.stage} クリア！`, 'つぎへ すすもう', 1200);
+                    this.transitionTimer = setTimeout(() => this.beginStage(this.stage + 1), 1250);
+                } else {
+                    this.sound.clear();
+                    this.transitionTimer = setTimeout(() => this.finish('clear'), 550);
+                }
+            }
+
+            handleEscape(enemy) {
+                const escapedGroup = enemy.splitGroup || null;
+                const escapedBoss = enemy.boss || Boolean(escapedGroup?.boss);
+                if (escapedGroup) {
+                    for (const member of [...this.enemies]) {
+                        if (member.splitGroup === escapedGroup) this.removeEnemy(member);
+                    }
+                } else {
+                    this.removeEnemy(enemy);
+                }
+                if (escapedBoss && this.mode === 'stage') this.bossSpawned = false;
+                if (escapedBoss && this.mode === 'endless') this.endlessBossActive = false;
+                this.streak = 0;
+                this.inputLocked = false;
+                this.sound.escape();
+                this.clearHints();
+                this.recoveryUntil = performance.now() + 650;
+                this.arena.classList.remove('hit-warn');
+                void this.arena.offsetWidth;
+                this.arena.classList.add('hit-warn');
+
+                this.lives--;
+                this.setFeedback('ライフが 1つ へったよ', true);
+                this.updateHUD();
+                if (this.lives <= 0) this.finish('gameover');
+            }
+
+            finish(reason) {
+                if (!this.running) return;
+                this.running = false;
+                this.paused = false;
+                cancelAnimationFrame(this.animationId);
+                clearTimeout(this.transitionTimer);
+                this.els.pauseBtn.hidden = true;
+                this.els.targetNote.classList.remove('show');
+
+                const attempts = this.correct + this.wrong;
+                const accuracy = attempts ? Math.round((this.correct / attempts) * 100) : 0;
+                const efficiency = this.totalKills ? Math.round((this.efficientKills / this.totalKills) * 100) : 0;
+                let stars = 1;
+                if (accuracy >= 75) stars = 2;
+                if (accuracy >= 90 && efficiency >= 60) stars = 3;
+
+                if (reason === 'clear') {
+                    this.els.resultTitle.textContent = 'ぜんぶ クリア！';
+                    this.els.resultMessage.textContent = '6つの ステージの ボスを ぜんぶ たおしたよ！';
+                } else {
+                    this.els.resultTitle.textContent = 'よく がんばったね！';
+                    this.els.resultMessage.textContent = `${this.totalKills}たい たおしたよ。つぎは もっと まとめて われそう！`;
+                }
+
+                this.els.resultStars.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+                this.els.resultStars.setAttribute('aria-label', `ほし ${stars}こ`);
+                this.els.resultScore.textContent = this.score;
+                this.els.resultAccuracy.textContent = `${accuracy}%`;
+                this.els.resultCombo.textContent = this.efficientKills;
+
+                const key = `wariHigh_${this.mode}`;
+                let previous = 0;
+                try { previous = Number(localStorage.getItem(key)) || 0; } catch (_) { }
+                if (this.score > previous) {
+                    try { localStorage.setItem(key, String(this.score)); } catch (_) { }
+                    this.els.highScore.textContent = previous > 0 ? 'ハイスコア こうしん！' : 'はじめての きろくが できたよ！';
+                } else {
+                    this.els.highScore.textContent = `ハイスコア ${previous}`;
+                }
+                this.els.result.hidden = false;
+                this.updateButtons();
+            }
+
+            updateHUD() {
+                this.els.score.textContent = this.score || 0;
+                if (this.mode === 'endless') {
+                    this.els.progress.textContent = this.endlessBossActive
+                        ? 'ボス！'
+                        : `ボスまで ${Math.min(this.endlessKillsSinceBoss, 20)}/20`;
+                    this.els.lives.textContent = '♥'.repeat(Math.max(0, this.lives)) + '♡'.repeat(Math.max(0, 3 - this.lives));
+                    this.els.lives.setAttribute('aria-label', `のこりの ライフ ${this.lives}こ`);
+                } else {
+                    const normalGoal = this.stageNormalGoals[this.stage] || 0;
+                    this.els.progress.textContent = this.bossSpawned
+                        ? `ステージ ${this.stage}　ボス！`
+                        : `ステージ ${this.stage}　${Math.min(this.stageKills, normalGoal)}/${normalGoal}`;
+                    this.els.lives.textContent = '♥'.repeat(Math.max(0, this.lives)) + '♡'.repeat(Math.max(0, 3 - this.lives));
+                    this.els.lives.setAttribute('aria-label', `のこりの ライフ ${this.lives}こ`);
+                }
+            }
+
+            showAnnouncement(title, detail, duration = 1200) {
+                clearTimeout(this.announcementTimer);
+                this.els.announcement.classList.remove('boss-warning');
+                this.els.announcement.innerHTML = `${title}<small>${detail}</small>`;
+                this.els.announcement.classList.add('show');
+                this.announcementTimer = setTimeout(() => this.els.announcement.classList.remove('show'), duration);
+            }
+
+            showBossAnnouncement(title, detail, duration = 1500) {
+                clearTimeout(this.announcementTimer);
+                this.els.announcement.innerHTML = `${title}<small>${detail}</small>`;
+                this.els.announcement.classList.add('boss-warning', 'show');
+                this.sound.bossAppear();
+                this.announcementTimer = setTimeout(() => {
+                    this.els.announcement.classList.remove('boss-warning', 'show');
+                }, duration);
+            }
+
+            openingPraise(factor) {
+                if ([4, 6, 9, 10].includes(factor)) return 'ナイス！';
+                if ([11, 13].includes(factor)) return 'やるねー！';
+                if ([8, 12].includes(factor)) return 'サイコー！';
+                return '';
+            }
+
+            showBattleCallout(praise, combo) {
+                if (!praise && !combo) return;
+                clearTimeout(this.calloutTimer);
+                this.els.battleCallout.classList.remove('show');
+                this.els.battleCallout.innerHTML = praise
+                    ? `${praise}${combo ? `<small>${combo}</small>` : ''}`
+                    : combo;
+                void this.els.battleCallout.offsetWidth;
+                this.els.battleCallout.classList.add('show');
+                this.calloutTimer = setTimeout(() => {
+                    this.els.battleCallout.classList.remove('show');
+                }, 1150);
+            }
+
+            getTarget() {
+                if (!this.enemies?.length) return null;
+                if (this.currentTarget && this.enemies.includes(this.currentTarget)) {
+                    return this.currentTarget;
+                }
+                this.currentTarget = [...this.enemies].sort((a, b) => b.y - a.y)[0];
+                return this.currentTarget;
+            }
+
+            makeSingleEnemy(value, tutorial = false, boss = false) {
+                const radius = boss ? 78 : 38 + Math.max(0, String(value).length - 2) * 4;
+                return {
+                    id: Math.random(),
+                    kind: 'single',
+                    value,
+                    steps: 0,
+                    optimalSteps: this.minimumSingleSteps(value, this.activeFactors),
+                    x: tutorial || boss ? this.width / 2 : radius + 12 + Math.random() * Math.max(1, this.width - radius * 2 - 24),
+                    y: -radius - 10,
+                    radius,
+                    speed: tutorial ? 0 : this.enemySpeed() * (boss ? 0.46 : 1),
+                    entranceWait: boss ? 1450 : 0,
+                    boss,
+                    flash: 0
+                };
+            }
+
+            makePairEnemy(val1, val2, boss = true) {
+                const radius = boss ? 64 : 46;
+                const sideSpace = radius + (boss ? 76 : 58);
+                return {
+                    id: Math.random(),
+                    kind: 'pair',
+                    val1,
+                    val2,
+                    steps: 0,
+                    optimalSteps: this.minimumSplitPairSteps(val1, val2, this.activeFactors),
+                    x: Math.min(Math.max(sideSpace, this.width / 2), this.width - sideSpace),
+                    y: -radius - 20,
+                    radius,
+                    speed: this.enemySpeed() * (boss ? 0.38 : 0.82),
+                    entranceWait: boss ? 1550 : 0,
+                    boss,
+                    flash: 0
+                };
+            }
+
+            enemySpeed() {
+                if (this.mode === 'stage') return Math.min(1.35, 0.54 + (this.stage - 1) * 0.035);
+                const clearedBosses = this.endlessBossesDefeated || 0;
+                return Math.min(2.4, 0.42 + clearedBosses * 0.1);
+            }
+
+            spawnInterval() {
+                if (this.mode === 'stage') return Math.max(1150, 2050 - (this.stage - 1) * 30);
+                const clearedBosses = this.endlessBossesDefeated || 0;
+                return Math.max(800, 2400 - clearedBosses * 180);
+            }
+
+            maxEnemiesOnScreen() {
+                if (this.mode === 'stage') return 2;
+                const clearedBosses = this.endlessBossesDefeated || 0;
+                return Math.min(4, 1 + Math.ceil(clearedBosses / 2));
+            }
+
+            spawnEnemy() {
+                if (this.tutorial) return false;
+                if (this.mode === 'stage') {
+                    const config = this.stageConfig[this.stage];
+                    const normalGoal = this.stageNormalGoals[this.stage];
+                    const livingNormals = this.enemies.filter(enemy => !enemy.boss).length;
+
+                    // 規定数を倒したあと、画面が完全に空いてからボスだけを出す。
+                    if (this.stageKills >= normalGoal) {
+                        if (this.bossSpawned || this.enemies.length > 0 || this.bullets.length > 0) return false;
+                        this.bossSpawned = true;
+                        if (config.pairMode) {
+                            const [val1, val2] = this.makePairValues(this.stage, true);
+                            this.showBossAnnouncement(
+                                `⚠ ステージ ${this.stage}の 手つなぎボス！`,
+                                `${val1}と${val2}が ゆっくり せまってくる！`,
+                                1600
+                            );
+                            this.enemies.push(this.makePairEnemy(val1, val2, true));
+                        } else {
+                            const value = this.makeStageBossValue(this.stage);
+                            this.showBossAnnouncement(
+                                `⚠ ステージ ${this.stage}の ボス！`,
+                                `${value}が ゆっくり せまってくる！`,
+                                1600
+                            );
+                            this.enemies.push(this.makeSingleEnemy(value, false, true));
+                        }
+                        this.updateHUD();
+                        return true;
+                    }
+
+                    // 画面にいる通常敵も数え、ボス前に余分な敵を出さない。
+                    if (this.stageKills + livingNormals >= normalGoal) return false;
+                    if (config.pairMode) {
+                        const [val1, val2] = this.makePairValues(this.stage, false);
+                        this.enemies.push(this.makePairEnemy(val1, val2, false));
+                    } else {
+                        this.enemies.push(this.makeSingleEnemy(this.makeStageValue(this.stage), false, false));
+                    }
+                    return true;
+                }
+
+                const livingNormals = this.enemies.filter(enemy => !enemy.boss).length;
+                if (this.endlessKillsSinceBoss >= 20) {
+                    if (this.endlessBossActive || this.enemies.length > 0 || this.bullets.length > 0) return false;
+                    this.endlessBossActive = true;
+                    if (Math.random() < 0.5) {
+                        const value = this.makeEndlessBossValue();
+                        this.showBossAnnouncement('⚠ 大きなボス！', `${value}が ゆっくり せまってくる！`, 1600);
+                        this.enemies.push(this.makeSingleEnemy(value, false, true));
+                    } else {
+                        const [val1, val2] = this.makePairValues(50, true);
+                        this.showBossAnnouncement('⚠ 手つなぎボス！', `${val1}と${val2}を いっしょに わろう！`, 1600);
+                        this.enemies.push(this.makePairEnemy(val1, val2, true));
+                    }
+                    this.updateHUD();
+                    return true;
+                }
+
+                // 20体目より先の通常敵が、ボス前に入り込まないようにする。
+                if (this.endlessKillsSinceBoss + livingNormals >= 20) return false;
+                this.enemies.push(this.makeSingleEnemy(this.makeEndlessValue(), false, false));
+                return true;
+            }
+
+            buildProductPool(factors, minCount, maxCount, maxValue) {
+                const key = `${factors.join('-')}|${minCount}|${maxCount}|${maxValue}`;
+                if (this.productPoolCache.has(key)) return this.productPoolCache.get(key);
+
+                const uniqueFactors = [...new Set(factors)].sort((a, b) => a - b);
+                const values = new Set();
+                const grow = (value, depth, startIndex) => {
+                    if (depth >= minCount && value >= 4) values.add(value);
+                    if (depth >= maxCount) return;
+                    for (let i = startIndex; i < uniqueFactors.length; i++) {
+                        const next = value * uniqueFactors[i];
+                        if (next <= maxValue) grow(next, depth + 1, i);
+                    }
+                };
+                grow(1, 0, 0);
+                const pool = [...values].sort((a, b) => a - b);
+                this.productPoolCache.set(key, pool);
+                return pool;
+            }
+
+            makeStageValue(stage) {
+                const config = this.stageConfig[stage];
+                const [minCount, maxCount] = config.normalFactorCount;
+                const pool = this.buildProductPool(
+                    config.normalFactors,
+                    minCount,
+                    maxCount,
+                    config.normalMax
+                );
+                return this.pick(pool);
+            }
+
+            makeStageBossValue(stage) {
+                const config = this.stageConfig[stage];
+                const [minValue, maxValue] = config.bossRange;
+                const pool = this.buildProductPool(config.bossFactors, 1, 8, maxValue)
+                    .filter(value => value >= minValue && value <= maxValue);
+                return this.pick(pool);
+            }
+
+            makePairValues(stage, boss = false) {
+                const config = this.stageConfig[stage]?.pairMode
+                    ? this.stageConfig[stage]
+                    : this.stageConfig[6];
+                const maxValue = boss ? 200 : config.pairMax;
+                const minValue = boss ? 70 : 8;
+                const commonFactors = [...this.allFactors];
+
+                for (let attempt = 0; attempt < 160; attempt++) {
+                    const common = this.pick(commonFactors);
+                    const maxMultiplier = Math.floor(maxValue / common);
+                    if (maxMultiplier < 2) continue;
+                    const leftMultiplier = 2 + Math.floor(Math.random() * (maxMultiplier - 1));
+                    const rightMultiplier = 2 + Math.floor(Math.random() * (maxMultiplier - 1));
+                    const val1 = common * leftMultiplier;
+                    const val2 = common * rightMultiplier;
+                    if (val1 === val2 || val1 < minValue || val2 < minValue) continue;
+                    if (boss && Math.max(val1, val2) < 100) continue;
+                    if (!Number.isFinite(this.minimumSplitPairSteps(val1, val2, this.activeFactors))) continue;
+                    return [val1, val2];
+                }
+                return boss ? [120, 180] : [24, 36];
+            }
+
+            makeEndlessBossValue() {
+                const pool = this.buildProductPool([2, 3, 5, 7, 11, 13], 2, 8, 200)
+                    .filter(value => value >= 100 && value <= 200);
+                return this.pick(pool);
+            }
+
+            makeEndlessValue() {
+                for (let attempt = 0; attempt < 40; attempt++) {
+                    const factorCount = this.totalKills < 6 ? 2 : 2 + Math.floor(Math.random() * 2);
+                    let value = 1;
+                    for (let i = 0; i < factorCount; i++) value *= this.pick(this.activeFactors);
+                    if (value >= 4 && value <= 360) return value;
+                }
+                return 36;
+            }
+
+            pick(list) {
+                return list[Math.floor(Math.random() * list.length)];
+            }
+
+            removeEnemy(enemy) {
+                const index = this.enemies.indexOf(enemy);
+                if (index >= 0) this.enemies.splice(index, 1);
+                if (this.currentTarget === enemy) this.currentTarget = null;
+            }
+
+            makeParticles(x, y, color, requestedCount = null, power = 1) {
+                const count = requestedCount ?? (this.reducedMotion ? 5 : 14);
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = (0.7 + Math.random() * 2.2) * power;
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        color,
+                        size: 4 + Math.random() * (power > 1 ? 7 : 3)
+                    });
+                }
+            }
+
+            makeBossExplosion(enemy) {
+                const count = this.reducedMotion ? 12 : 38;
+                const spread = enemy.kind === 'pair' ? 62 : 0;
+                this.makeParticles(enemy.x, enemy.y, '#ffd84d', count, 2.25);
+                this.makeParticles(enemy.x - spread, enemy.y, '#ff557d', count, 1.8);
+                if (spread) this.makeParticles(enemy.x + spread, enemy.y, '#79e2ff', count, 1.8);
+
+                this.shockwaves.push(
+                    { x: enemy.x, y: enemy.y, radius: 12, maxRadius: 172, life: 1, delay: 0, color: '#ffffff' },
+                    { x: enemy.x, y: enemy.y, radius: 12, maxRadius: 205, life: 1, delay: 110, color: '#ffd84d' },
+                    { x: enemy.x, y: enemy.y, radius: 12, maxRadius: 238, life: 1, delay: 220, color: '#ff6687' }
+                );
+                this.flashAlpha = this.reducedMotion ? 0.35 : 0.86;
+                this.arena.classList.remove('boss-defeat');
+                void this.arena.offsetWidth;
+                this.arena.classList.add('boss-defeat');
+                setTimeout(() => this.arena.classList.remove('boss-defeat'), 760);
+                this.sound.bossDefeat();
+            }
+
+            loop(time) {
+                if (!this.running) return;
+                const dt = Math.min(40, time - this.lastTime || 16);
+                this.lastTime = time;
+                if (!this.paused) {
+                    if (time >= this.recoveryUntil) this.update(dt);
+                    this.updateVisualEffects(dt);
+                }
+                this.draw();
+                this.animationId = requestAnimationFrame(next => this.loop(next));
+            }
+
+            update(dt) {
+                this.elapsed += dt;
+
+                if (!this.tutorial) {
+                    this.spawnTimer += dt;
+                    const maxEnemies = this.maxEnemiesOnScreen();
+                    if (this.enemies.length < maxEnemies && this.spawnTimer >= this.spawnInterval()) {
+                        if (this.spawnEnemy()) this.spawnTimer = 0;
+                    }
+                }
 
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
-                    const b = this.bullets[i];
-
-                    if (b.state && b.state.startsWith('merging')) {
-                        const dx = b.mergeTarget.x - b.x;
-                        const dy = b.mergeTarget.y - b.y;
-                        const dist = Math.hypot(dx, dy);
-
-                        if (dist < 10) {
-                            if (b.state === 'merging_left') {
-                                this.sound.playShoot();
-                                this.bullets.push({
-                                    x: b.mergeTarget.x, y: b.mergeTarget.y,
-                                    value: b.finalValue,
-                                    radius: 20, speed: 18, color: b.finalColor,
-                                    target: b.target, state: 'active'
-                                });
-                                this.createParticles(b.mergeTarget.x, b.mergeTarget.y, 10, '#fff');
-                            }
-                            this.bullets.splice(i, 1);
-                            continue;
-                        } else {
-                            b.x += (dx / dist) * b.speed;
-                            b.y += (dy / dist) * b.speed;
-                            continue;
-                        }
-                    }
-
-                    if (b.target && this.enemies.includes(b.target)) {
-                        const dx = b.target.x - b.x;
-                        const dy = b.target.y - b.y;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < b.speed) { b.x = b.target.x; b.y = b.target.y; }
-                        else { b.x += (dx / dist) * b.speed; b.y += (dy / dist) * b.speed; }
-                    } else {
-                        b.y -= b.speed;
-                    }
-
-                    if (b.y < -50 || b.y > this.height + 50) {
+                    const bullet = this.bullets[i];
+                    if (!this.enemies.includes(bullet.target)) {
                         this.bullets.splice(i, 1);
+                        this.inputLocked = false;
                         continue;
                     }
-
-                    const e = b.target;
-                    if (e && this.enemies.includes(e)) {
-                        let hitRadius = e.radius;
-                        if (e.type === 'pair') hitRadius += 30;
-
-                        const dist = Math.hypot(b.x - e.x, b.y - e.y);
-                        if (dist < b.radius + hitRadius) {
-                            this.sound.playHit();
-
-                            if (e.type === 'single') {
-                                if (e.value % b.value === 0) {
-                                    // Pop Up テキスト
-                                    this.createFloatingText(`÷${b.value}`, e.x, e.y, b.color);
-
-                                    e.value = e.value / b.value;
-                                    e.hitFlash = 10;
-                                    e.y -= e.isBoss ? 5 : 25;
-                                    this.createParticles(e.x, e.y, 8, b.color);
-
-                                    if (e.value === 1) {
-                                        this.addCombo();
-
-                                        // コンボ倍率計算
-                                        let multiplier = 1.0;
-                                        if (this.combo >= 2) multiplier = 1.2;
-                                        if (this.combo >= 5) multiplier = 1.5;
-                                        if (this.combo >= 10) multiplier = 2.0;
-
-                                        let pts = e.isBoss ? 5 : 1;
-
-                                        // パーフェクトキルボーナス（合成数などで一撃の場合）
-                                        const isPerfectKill = e.maxVal === b.value;
-                                        if (isPerfectKill) {
-                                            pts *= 2;
-                                            this.createFloatingText(`PERFECT!`, e.x, e.y - 20, '#ffeb3b', true);
-                                        }
-
-                                        pts = Math.floor(pts * multiplier);
-                                        this.score += pts;
-                                        this.scoreEl.innerText = this.score;
-
-                                        if (e.isBoss) {
-                                            this.sound.playBossExplosion();
-                                            // ボス撃破のハードシェイク
-                                            this.gameArea.classList.remove('shake-hard', 'shake');
-                                            void this.gameArea.offsetWidth;
-                                            this.gameArea.classList.add('shake-hard');
-                                            setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
-                                        } else {
-                                            this.sound.playExplosion();
-                                        }
-
-                                        this.createParticles(e.x, e.y, e.isBoss ? 60 : 30, '#fff');
-                                        this.checkLevelProgression();
-                                        const idx = this.enemies.indexOf(e);
-                                        if (idx > -1) this.enemies.splice(idx, 1);
-                                    }
-                                } else {
-                                    this.createParticles(b.x, b.y, 5, '#aaa');
-                                }
-                            } else if (e.type === 'pair') {
-                                if (e.val1 % b.value === 0 && e.val2 % b.value === 0) {
-                                    // Pop Up テキスト
-                                    this.createFloatingText(`÷${b.value}`, e.x, e.y, b.color);
-
-                                    e.val1 /= b.value;
-                                    e.val2 /= b.value;
-                                    e.hitFlash = 10;
-                                    e.y -= 5;
-                                    this.createParticles(e.x, e.y, 10, b.color);
-
-                                    if (this.gcd(e.val1, e.val2) === 1) {
-                                        this.createParticles(e.x, e.y, 20, '#fff');
-                                        this.sound.playExplosion();
-
-                                        // Pairは割れた瞬間にコンボ加算
-                                        this.addCombo();
-
-                                        if (e.val1 === 1 && e.val2 === 1) {
-                                            let multiplier = 1.0;
-                                            if (this.combo >= 2) multiplier = 1.2;
-                                            if (this.combo >= 5) multiplier = 1.5;
-                                            if (this.combo >= 10) multiplier = 2.0;
-
-                                            this.score += Math.floor(10 * multiplier);
-                                            this.scoreEl.innerText = this.score;
-                                            this.sound.playBossExplosion();
-
-                                            this.gameArea.classList.remove('shake-hard', 'shake');
-                                            void this.gameArea.offsetWidth;
-                                            this.gameArea.classList.add('shake-hard');
-                                            setTimeout(() => this.gameArea.classList.remove('shake-hard'), 600);
-
-                                            this.createParticles(e.x, e.y, 50, '#fff');
-                                            this.checkLevelProgression();
-                                        } else {
-                                            if (e.val1 > 1) {
-                                                this.enemies.push({
-                                                    id: Math.random(),
-                                                    x: e.x - 40, y: e.y - 20,
-                                                    type: 'single', value: e.val1, maxVal: e.val1,
-                                                    radius: 40, speed: 1.0, hitFlash: 0, isBoss: false
-                                                });
-                                            } else {
-                                                this.createParticles(e.x - 40, e.y - 20, 20, '#fff');
-                                            }
-                                            if (e.val2 > 1) {
-                                                this.enemies.push({
-                                                    id: Math.random(),
-                                                    x: e.x + 40, y: e.y + 20,
-                                                    type: 'single', value: e.val2, maxVal: e.val2,
-                                                    radius: 40, speed: 1.0, hitFlash: 0, isBoss: false
-                                                });
-                                            } else {
-                                                this.createParticles(e.x + 40, e.y + 20, 20, '#fff');
-                                            }
-                                        }
-                                        const idx = this.enemies.indexOf(e);
-                                        if (idx > -1) this.enemies.splice(idx, 1);
-                                    }
-                                } else {
-                                    this.createParticles(b.x, b.y, 5, '#aaa');
-                                }
-                            }
-
-                            this.bullets.splice(i, 1);
-                            continue;
-                        }
+                    const dx = bullet.target.x - bullet.x;
+                    const dy = bullet.target.y - bullet.y;
+                    const distance = Math.hypot(dx, dy);
+                    const step = Math.max(12, distance * bullet.speed * 0.14);
+                    if (distance <= step + bullet.target.radius * 0.25) {
+                        this.bullets.splice(i, 1);
+                        this.resolveHit(bullet.target, bullet.factor);
+                    } else {
+                        bullet.x += dx / distance * step;
+                        bullet.y += dy / distance * step;
                     }
                 }
 
                 for (let i = this.enemies.length - 1; i >= 0; i--) {
-                    const e = this.enemies[i];
-                    e.y += e.speed * (dt / 16);
-                    if (e.hitFlash > 0) e.hitFlash--;
-
-                    if (e.y > this.height + e.radius) {
-                        this.takeDamage();
-                        this.enemies.splice(i, 1);
+                    const enemy = this.enemies[i];
+                    if (enemy.entranceWait > 0) {
+                        enemy.entranceWait = Math.max(0, enemy.entranceWait - dt);
+                    } else {
+                        enemy.y += enemy.speed * dt / 16;
                     }
+                    if (enemy.flash > 0) enemy.flash--;
+                    if (enemy.y - enemy.radius > this.height) this.handleEscape(enemy);
                 }
 
+                const target = this.getTarget();
+                this.arena.classList.toggle(
+                    'boss-active',
+                    this.enemies.some(enemy => enemy.boss || enemy.splitGroup?.boss)
+                );
+                this.els.targetNote.classList.toggle('show', Boolean(target) && !this.tutorial);
+                if (target && !this.tutorial) {
+                    this.els.prompt.textContent = target.kind === 'pair'
+                        ? '手つなぎ中は、2つとも われる すうじだけ！'
+                        : 'きいろの わくの すうじを 1に しよう';
+                }
+                this.updateHUD();
+            }
+
+            updateVisualEffects(dt) {
                 for (let i = this.particles.length - 1; i >= 0; i--) {
-                    const p = this.particles[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.life -= 0.04;
-                    if (p.life <= 0) this.particles.splice(i, 1);
+                    const particle = this.particles[i];
+                    particle.x += particle.vx * dt / 16;
+                    particle.y += particle.vy * dt / 16;
+                    particle.vx *= 0.985;
+                    particle.vy = particle.vy * 0.985 + 0.035 * dt / 16;
+                    particle.life -= 0.035 * dt / 16;
+                    if (particle.life <= 0) this.particles.splice(i, 1);
                 }
 
-                // Pop Up テキストの更新
-                for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
-                    const text = this.floatingTexts[i];
-                    text.y -= text.speed;
-                    text.life -= 0.02;
-                    if (text.life <= 0) this.floatingTexts.splice(i, 1);
+                for (let i = this.shockwaves.length - 1; i >= 0; i--) {
+                    const wave = this.shockwaves[i];
+                    if (wave.delay > 0) {
+                        wave.delay -= dt;
+                        continue;
+                    }
+                    wave.radius += (wave.maxRadius - wave.radius) * 0.075 * dt / 16;
+                    wave.life -= 0.034 * dt / 16;
+                    if (wave.life <= 0) this.shockwaves.splice(i, 1);
+                }
+
+                this.flashAlpha = Math.max(0, this.flashAlpha - 0.052 * dt / 16);
+                for (const star of this.stars) {
+                    star.y += star.speed * dt / 16;
+                    if (star.y > this.height) {
+                        star.y = -3;
+                        star.x = Math.random() * this.width;
+                    }
                 }
             }
 
             draw() {
-                this.ctx.clearRect(0, 0, this.width, this.height);
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.width, this.height);
 
-                this.ctx.fillStyle = this.isPaused ? 'rgba(0,0,0,0.5)' : '#000';
-                this.ctx.fillRect(0, 0, this.width, this.height);
+                for (const star of this.stars || []) {
+                    ctx.globalAlpha = star.alpha;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
 
-                this.ctx.fillStyle = '#0f0';
-                this.drawPlayer(this.player.x, this.player.y);
-
-                this.bullets.forEach(b => {
-                    this.ctx.fillStyle = b.color;
-                    this.ctx.fillRect(b.x - b.radius / 2, b.y - b.radius / 2, b.radius, b.radius);
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.font = '10px "Press Start 2P"';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.textBaseline = 'middle';
-                    if (b.radius > 10) this.ctx.fillText(b.value, b.x, b.y);
-                });
-
-                this.enemies.forEach(e => {
-                    if (e.type === 'single') {
-                        this.drawInvader(e.x, e.y, e.radius, e.value, e.hitFlash > 0, e.isBoss);
-                    } else if (e.type === 'pair') {
-                        const gap = 35;
-                        this.ctx.strokeStyle = (Math.random() > 0.5) ? '#0ff' : '#f0f';
-                        this.ctx.lineWidth = 4;
-                        this.ctx.setLineDash([5, 5]);
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(e.x - gap, e.y);
-                        this.ctx.lineTo(e.x + gap, e.y);
-                        this.ctx.stroke();
-                        this.ctx.setLineDash([]);
-
-                        this.drawInvader(e.x - gap, e.y, e.radius, e.val1, e.hitFlash > 0, true, true); // true = hide BOSS text
-                        this.drawInvader(e.x + gap, e.y, e.radius, e.val2, e.hitFlash > 0, true, true);
-
-                        this.ctx.font = '10px "Press Start 2P"';
-                        this.ctx.fillStyle = '#f0f';
-                        this.ctx.fillText("PAIR", e.x, e.y - e.radius - 15);
-                    }
-                });
-
-                this.particles.forEach(p => {
-                    this.ctx.globalAlpha = p.life;
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.fillRect(p.x, p.y, p.radius, p.radius);
-                    this.ctx.globalAlpha = 1.0;
-                });
-
-                // Pop Up テキストの描画
-                this.floatingTexts.forEach(t => {
-                    this.ctx.globalAlpha = Math.max(0, t.life);
-                    this.ctx.fillStyle = t.color;
-                    this.ctx.font = t.isBig ? '24px "Press Start 2P"' : '14px "Press Start 2P"';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.textBaseline = 'middle';
-
-                    // 黒いフチドリ効果
-                    this.ctx.strokeStyle = '#000';
-                    this.ctx.lineWidth = 4;
-                    this.ctx.strokeText(t.text, t.x, t.y);
-
-                    this.ctx.fillText(t.text, t.x, t.y);
-                    this.ctx.globalAlpha = 1.0;
-                });
+                const target = this.getTarget();
+                // ほかの敵を先に描き、いま解いている敵を必ず最後＝最前面に描く。
+                for (const enemy of this.enemies || []) {
+                    if (enemy !== target) this.drawEnemy(enemy, false);
+                }
+                for (const bullet of this.bullets || []) this.drawBullet(bullet);
+                if (target) this.drawEnemy(target, true);
+                for (const wave of this.shockwaves || []) {
+                    if (wave.delay > 0) continue;
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, wave.life);
+                    ctx.strokeStyle = wave.color;
+                    ctx.lineWidth = 5 + wave.life * 8;
+                    ctx.shadowColor = wave.color;
+                    ctx.shadowBlur = 22;
+                    ctx.beginPath();
+                    ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                for (const particle of this.particles || []) {
+                    ctx.globalAlpha = Math.max(0, particle.life);
+                    ctx.fillStyle = particle.color;
+                    const size = particle.size || 6;
+                    ctx.fillRect(particle.x - size / 2, particle.y - size / 2, size, size);
+                }
+                ctx.globalAlpha = 1;
+                this.drawPlayer();
+                if (this.flashAlpha > 0) {
+                    ctx.globalAlpha = this.flashAlpha;
+                    ctx.fillStyle = '#fff4c7';
+                    ctx.fillRect(0, 0, this.width, this.height);
+                    ctx.globalAlpha = 1;
+                }
             }
 
-            drawPlayer(x, y) {
-                const size = 4;
-                const shape = [
-                    "   X   ",
-                    "  XXX  ",
-                    " XXXXX ",
-                    "XXXXXXX"
-                ];
-                this.ctx.fillStyle = '#0f0';
-                for (let row = 0; row < shape.length; row++) {
-                    for (let col = 0; col < shape[row].length; col++) {
-                        if (shape[row][col] === 'X') {
-                            this.ctx.fillRect(x - 14 + col * size, y - 20 + row * size, size, size);
+            drawEnemy(enemy, isTarget) {
+                const ctx = this.ctx;
+                const r = enemy.radius;
+                if (isTarget) {
+                    ctx.save();
+                    ctx.strokeStyle = '#ffd84d';
+                    ctx.lineWidth = 5;
+                    ctx.setLineDash([10, 7]);
+                    ctx.beginPath();
+                    if (enemy.kind === 'pair') {
+                        ctx.ellipse(
+                            enemy.x,
+                            enemy.y,
+                            r + (enemy.boss ? 76 : 58),
+                            r + (enemy.boss ? 32 : 22),
+                            0,
+                            0,
+                            Math.PI * 2
+                        );
+                    }
+                    else ctx.arc(enemy.x, enemy.y, r + (enemy.boss ? 22 : 12), 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                ctx.save();
+                ctx.translate(enemy.x, enemy.y);
+                const color = enemy.boss ? '#ff6687' : '#79e2ff';
+                ctx.shadowColor = color;
+                ctx.shadowBlur = enemy.flash ? 28 : 15;
+                if (enemy.kind === 'pair') {
+                    const gap = enemy.boss ? 64 : 47;
+                    const boxW = enemy.boss ? 86 : 62;
+                    const boxH = enemy.boss ? 82 : 58;
+
+                    // 2体を結ぶ、ほどける前の太い「手」。
+                    ctx.strokeStyle = enemy.boss ? '#7c2141' : '#326f9d';
+                    ctx.lineWidth = enemy.boss ? 23 : 15;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(enemy.boss ? -28 : -19, 2);
+                    ctx.lineTo(enemy.boss ? 28 : 19, 2);
+                    ctx.stroke();
+                    ctx.strokeStyle = '#ffd84d';
+                    ctx.lineWidth = enemy.boss ? 13 : 8;
+                    ctx.beginPath();
+                    ctx.moveTo(enemy.boss ? -28 : -19, 2);
+                    ctx.lineTo(enemy.boss ? 28 : 19, 2);
+                    ctx.stroke();
+
+                    for (const [centerX, value] of [[-gap, enemy.val1], [gap, enemy.val2]]) {
+                        // 角と横のトゲを先に描き、ボスらしいシルエットにする。
+                        if (enemy.boss) {
+                            ctx.fillStyle = '#7c2141';
+                            ctx.beginPath();
+                            ctx.moveTo(centerX - 29, -boxH / 2 + 4);
+                            ctx.lineTo(centerX - 43, -boxH / 2 - 24);
+                            ctx.lineTo(centerX - 9, -boxH / 2 - 5);
+                            ctx.lineTo(centerX + 9, -boxH / 2 - 5);
+                            ctx.lineTo(centerX + 43, -boxH / 2 - 24);
+                            ctx.lineTo(centerX + 29, -boxH / 2 + 4);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(centerX - boxW / 2 + 3, -13);
+                            ctx.lineTo(centerX - boxW / 2 - 18, 0);
+                            ctx.lineTo(centerX - boxW / 2 + 3, 13);
+                            ctx.moveTo(centerX + boxW / 2 - 3, -13);
+                            ctx.lineTo(centerX + boxW / 2 + 18, 0);
+                            ctx.lineTo(centerX + boxW / 2 - 3, 13);
+                            ctx.fill();
                         }
+
+                        ctx.fillStyle = enemy.flash ? '#fff9c9' : color;
+                        ctx.strokeStyle = enemy.boss ? '#7c2141' : '#ffffff';
+                        ctx.lineWidth = enemy.boss ? 8 : 4;
+                        ctx.beginPath();
+                        ctx.roundRect(centerX - boxW / 2, -boxH / 2, boxW, boxH, enemy.boss ? 20 : 15);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        if (enemy.boss) {
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 3;
+                            ctx.stroke();
+                            ctx.shadowBlur = 0;
+                            ctx.fillStyle = '#ffe35c';
+                            ctx.beginPath();
+                            ctx.moveTo(centerX - 27, -20);
+                            ctx.lineTo(centerX - 8, -15);
+                            ctx.lineTo(centerX - 25, -10);
+                            ctx.closePath();
+                            ctx.moveTo(centerX + 27, -20);
+                            ctx.lineTo(centerX + 8, -15);
+                            ctx.lineTo(centerX + 25, -10);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                        ctx.fillStyle = '#17204f';
+                        ctx.font = `900 ${String(value).length >= 3 ? (enemy.boss ? 23 : 19) : (enemy.boss ? 29 : 24)}px "Yu Gothic", sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(value, centerX, enemy.boss ? 14 : 2);
+                    }
+                    if (enemy.boss) {
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = '#7c2141';
+                        ctx.beginPath();
+                        ctx.roundRect(-59, -r - 30, 118, 27, 13);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '900 13px "Yu Gothic", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('手つなぎボス', 0, -r - 16);
+                    }
+                } else {
+                    if (enemy.boss) {
+                        // 大きな角、横のトゲ、重い装甲で通常の敵と区別する。
+                        ctx.fillStyle = '#7c2141';
+                        ctx.beginPath();
+                        ctx.moveTo(-r * 0.62, -r * 0.52);
+                        ctx.lineTo(-r * 0.82, -r * 0.97);
+                        ctx.lineTo(-r * 0.26, -r * 0.61);
+                        ctx.lineTo(r * 0.26, -r * 0.61);
+                        ctx.lineTo(r * 0.82, -r * 0.97);
+                        ctx.lineTo(r * 0.62, -r * 0.52);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.moveTo(-r * 0.9, -r * 0.27);
+                        ctx.lineTo(-r * 1.17, 0);
+                        ctx.lineTo(-r * 0.9, r * 0.27);
+                        ctx.moveTo(r * 0.9, -r * 0.27);
+                        ctx.lineTo(r * 1.17, 0);
+                        ctx.lineTo(r * 0.9, r * 0.27);
+                        ctx.fill();
+                    }
+
+                    ctx.fillStyle = enemy.flash ? '#fff9c9' : color;
+                    ctx.strokeStyle = enemy.boss ? '#7c2141' : '#ffffff';
+                    ctx.lineWidth = enemy.boss ? 10 : 3;
+                    ctx.beginPath();
+                    ctx.roundRect(-r, -r * 0.72, r * 2, r * 1.44, enemy.boss ? 26 : 17);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    if (enemy.boss) {
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = '#ffe35c';
+                        ctx.beginPath();
+                        ctx.moveTo(-r * 0.57, -r * 0.28);
+                        ctx.lineTo(-r * 0.14, -r * 0.18);
+                        ctx.lineTo(-r * 0.5, -r * 0.06);
+                        ctx.closePath();
+                        ctx.moveTo(r * 0.57, -r * 0.28);
+                        ctx.lineTo(r * 0.14, -r * 0.18);
+                        ctx.lineTo(r * 0.5, -r * 0.06);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#17204f';
+                    ctx.font = `900 ${enemy.boss ? Math.max(26, r * 0.62) : Math.max(23, r * 0.72)}px "Yu Gothic", sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(enemy.value, 0, enemy.boss ? r * 0.22 : 1);
+                    if (enemy.boss) {
+                        ctx.fillStyle = '#7c2141';
+                        ctx.beginPath();
+                        ctx.roundRect(-51, -r - 29, 102, 27, 13);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '900 13px "Yu Gothic", sans-serif';
+                        ctx.fillText('大きなボス', 0, -r - 15);
                     }
                 }
+                ctx.restore();
             }
 
-            drawInvader(x, y, r, val, isHit, isBoss, hideBossText) {
-                const size = r * 2;
-                const half = size / 2;
-
-                let color = isBoss ? '#f00' : '#0f0';
-
-                this.ctx.strokeStyle = isHit ? '#fff' : color;
-                this.ctx.lineWidth = isBoss ? 4 : 2;
-                this.ctx.strokeRect(x - half, y - half, size, size);
-
-                this.ctx.fillStyle = isHit ? '#fff' : (isBoss ? 'rgba(255,0,0,0.2)' : 'rgba(0,255,0,0.1)');
-                this.ctx.fillRect(x - half, y - half, size, size);
-
-                this.ctx.fillStyle = isHit ? '#fff' : color;
-                const d = 4;
-                this.ctx.fillRect(x - half, y - half, d, d);
-                this.ctx.fillRect(x + half - d, y - half, d, d);
-                this.ctx.fillRect(x - half, y + half - d, d, d);
-                this.ctx.fillRect(x + half - d, y + half - d, d, d);
-
-                this.ctx.fillStyle = isHit ? '#000' : '#fff';
-                const fontSize = isBoss ? r * 0.5 : r * 0.6;
-                this.ctx.font = `${fontSize}px "Press Start 2P"`;
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(val, x, y + 2);
-
-                if (isBoss && !hideBossText) {
-                    this.ctx.font = '10px "Press Start 2P"';
-                    this.ctx.fillStyle = '#f00';
-                    this.ctx.fillText("BOSS", x, y - r - 10);
-                }
+            drawBullet(bullet) {
+                const ctx = this.ctx;
+                ctx.save();
+                ctx.shadowColor = bullet.color;
+                ctx.shadowBlur = 14;
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = '900 14px "Yu Gothic", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(bullet.factor, bullet.x, bullet.y + 1);
+                ctx.restore();
             }
 
-            loop(timestamp) {
-                if (!this.isRunning) return;
-                if (this.isPaused) return;
-
-                this.update(timestamp);
-                this.drawStars();
-                this.draw();
-                this.animationId = requestAnimationFrame(t => this.loop(t));
-            }
-
-            createParticles(x, y, count, color) {
-                for (let i = 0; i < count; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 5 + 2;
-                    this.particles.push({
-                        x: x, y: y,
-                        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-                        life: 1.0, color: color, radius: Math.random() * 6 + 2
-                    });
-                }
-            }
-
-            // --- 追加: ポップアップテキストの生成 ---
-            createFloatingText(text, x, y, color, isBig = false) {
-                this.floatingTexts.push({
-                    text: text,
-                    x: x + (Math.random() * 20 - 10), // 少し左右にばらけさせる
-                    y: y,
-                    color: color,
-                    life: 1.0,
-                    speed: 1.5,
-                    isBig: isBig
-                });
-            }
-
-            getBtnColor(val) {
-                const colors = {
-                    2: '#e53935', 3: '#1e88e5', 5: '#fdd835', 7: '#d000f0', 11: '#00e5ff', 13: '#ff9100',
-                    4: '#3f51b5', 6: '#00acc1', 8: '#673ab7', 9: '#e91e63', 10: '#4caf50', 12: '#ff9800'
-                };
-                return colors[val] || '#fff';
+            drawPlayer() {
+                const ctx = this.ctx;
+                const x = this.player.x;
+                const y = this.player.y;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.fillStyle = '#ffd84d';
+                ctx.shadowColor = '#ffd84d';
+                ctx.shadowBlur = 18;
+                ctx.beginPath();
+                ctx.moveTo(0, -25);
+                ctx.lineTo(23, 19);
+                ctx.lineTo(8, 13);
+                ctx.lineTo(0, 23);
+                ctx.lineTo(-8, 13);
+                ctx.lineTo(-23, 19);
+                ctx.closePath();
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#5068ee';
+                ctx.beginPath();
+                ctx.arc(0, 2, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
         }
 
-        const game = new Game();
+        const game = new WariGame();
     </script>
 </body>
 
