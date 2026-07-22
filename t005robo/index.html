@@ -16,67 +16,8 @@
     <meta name="theme-color" content="#061d26" />
     <link rel="icon" href="./assets/parts/star_yellow.png" />
     <title>ロボット工場</title>
-    <script type="module" crossorigin src="./assets/index-CssSGbBg.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-B5iJTvrJ.css">
-    <style>
-      /* Mobile fallback: older browsers ignore dvh, which can collapse the game board. */
-      .game-shell {
-        min-height: 100vh;
-        height: 100vh;
-      }
-
-      .game-board,
-      .game-titlebar {
-        width: 96vw;
-        width: min(96vw, 163.484vh);
-      }
-
-      @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
-        .game-board {
-          width: 100%;
-          width: min(100%, 177.7vh);
-        }
-      }
-
-      @supports (height: 100dvh) {
-        .game-shell {
-          min-height: 0;
-          height: 100dvh;
-        }
-
-        .game-board,
-        .game-titlebar {
-          width: min(96vw, 163.48dvh);
-        }
-
-        @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
-          .game-board {
-            width: min(100%, 177.7dvh);
-          }
-        }
-      }
-
-      /* Keep the landscape game anchored to the visible screen on mobile Chrome. */
-      @media (orientation: landscape) and (pointer: coarse) {
-        .game-shell {
-          position: fixed;
-          inset: 0;
-          width: 100vw;
-          min-width: 0;
-          height: 100vh;
-          height: 100dvh;
-          min-height: 0;
-          margin: 0;
-          overflow: hidden;
-        }
-
-        .game-board {
-          align-self: center;
-          justify-self: center;
-          margin: 0;
-        }
-      }
-    </style>
+    <script type="module" crossorigin src="./assets/index-CSR14hhm.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DvIj4Eyu.css">
   </head>
   <body>
     <div id="root"></div>
