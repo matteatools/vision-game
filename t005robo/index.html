@@ -18,6 +18,44 @@
     <title>ロボット工場</title>
     <script type="module" crossorigin src="./assets/index-CssSGbBg.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-B5iJTvrJ.css">
+    <style>
+      /* Mobile fallback: older browsers ignore dvh, which can collapse the game board. */
+      .game-shell {
+        min-height: 100vh;
+        height: 100vh;
+      }
+
+      .game-board,
+      .game-titlebar {
+        width: 96vw;
+        width: min(96vw, 163.484vh);
+      }
+
+      @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
+        .game-board {
+          width: 100%;
+          width: min(100%, 177.7vh);
+        }
+      }
+
+      @supports (height: 100dvh) {
+        .game-shell {
+          min-height: 0;
+          height: 100dvh;
+        }
+
+        .game-board,
+        .game-titlebar {
+          width: min(96vw, 163.48dvh);
+        }
+
+        @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
+          .game-board {
+            width: min(100%, 177.7dvh);
+          }
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
