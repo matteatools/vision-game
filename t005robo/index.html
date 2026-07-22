@@ -2,7 +2,13 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta
       name="description"
       content="パーツを組み合わせて生きものロボを開発し、荒廃した工場を復興させるゲームです。"
@@ -10,10 +16,16 @@
     <meta name="theme-color" content="#061d26" />
     <link rel="icon" href="./assets/parts/star_yellow.png" />
     <title>ロボット工場</title>
-    <script type="module" crossorigin src="./assets/index-CVWBUUPd.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CPpfrtK5.css">
+    <script type="module" crossorigin src="./assets/index-CssSGbBg.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-B5iJTvrJ.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if (window.location.protocol === "file:") {
+        document.getElementById("root").innerHTML =
+          '<main style="min-height:100vh;display:grid;place-items:center;padding:32px;background:#061d26;color:white;font-family:Meiryo,sans-serif;text-align:center"><section><h1 style="color:#fff2a7">ロボット工場</h1><p style="line-height:1.8">この公開用HTMLは、直接ダブルクリックでは起動できません。<br>ひとつ上のフォルダにある「GitHub公開版を確認.bat」を使ってください。</p></section></main>';
+      }
+    </script>
   </body>
 </html>
