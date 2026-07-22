@@ -55,7 +55,64 @@
           }
         }
       }
+
+      /* Chrome on Android can report a stale dvh while entering fullscreen and rotating. */
+      .game-shell {
+        height: var(--game-viewport-height, 100vh);
+      }
+
+      .game-board,
+      .game-titlebar {
+        width: min(96vw, var(--game-board-width, 163.484vh));
+      }
+
+      @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
+        .game-board {
+          width: min(100%, var(--game-landscape-board-width, 177.7vh));
+        }
+      }
     </style>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var frameId = 0;
+
+        function updateGameViewport() {
+          var viewport = window.visualViewport;
+          var height = viewport && viewport.height ? viewport.height : window.innerHeight;
+
+          if (!height || height < 1) return;
+
+          root.style.setProperty('--game-viewport-height', height + 'px');
+          root.style.setProperty('--game-board-width', height * 1.63484 + 'px');
+          root.style.setProperty('--game-landscape-board-width', height * 1.777 + 'px');
+        }
+
+        function scheduleGameViewportUpdate() {
+          if (frameId) window.cancelAnimationFrame(frameId);
+          frameId = window.requestAnimationFrame(updateGameViewport);
+          window.setTimeout(updateGameViewport, 120);
+          window.setTimeout(updateGameViewport, 500);
+        }
+
+        updateGameViewport();
+        window.addEventListener('resize', scheduleGameViewportUpdate, { passive: true });
+        window.addEventListener('orientationchange', scheduleGameViewportUpdate, { passive: true });
+        document.addEventListener('fullscreenchange', scheduleGameViewportUpdate);
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', scheduleGameViewportUpdate, { passive: true });
+        }
+
+        if (
+          window.screen &&
+          window.screen.orientation &&
+          typeof window.screen.orientation.addEventListener === 'function'
+        ) {
+          window.screen.orientation.addEventListener('change', scheduleGameViewportUpdate);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
