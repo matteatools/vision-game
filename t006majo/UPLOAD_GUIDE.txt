@@ -1,0 +1,11 @@
+WITCH COMBO - GitHub Pages 公開用フォルダ
+
+1. このフォルダ内のファイルをGitHubリポジトリのルートへアップロードします。
+2. GitHubの Settings > Pages を開きます。
+3. Deploy from a branch を選び、アップロードしたブランチの /(root) を指定します。
+4. Save後、表示された公開URLを開きます。
+
+ユーザーサイト（username.github.io）とプロジェクトサイト
+（username.github.io/repository）の両方で動く相対パス構成です。
+
+アップロード対象は、このフォルダの中身だけです。
