@@ -739,8 +739,86 @@
             font-weight: 800;
         }
 
+        .game-groups {
+            margin-top: 30px;
+            display: grid;
+            gap: 58px;
+        }
+
+        .game-group {
+            min-width: 0;
+            --group-color: var(--coral);
+            --group-soft: rgba(235, 111, 91, 0.3);
+            --group-shadow: rgba(235, 111, 91, 0.22);
+        }
+
+        .game-group[hidden] {
+            display: none;
+        }
+
+        .game-group[data-game-group="remember"] {
+            --group-color: #8f78d6;
+            --group-soft: rgba(143, 120, 214, 0.3);
+            --group-shadow: rgba(143, 120, 214, 0.22);
+        }
+
+        .game-group[data-game-group="follow"] {
+            --group-color: #47a9c6;
+            --group-soft: rgba(71, 169, 198, 0.3);
+            --group-shadow: rgba(71, 169, 198, 0.22);
+        }
+
+        .game-group[data-game-group="compare"] {
+            --group-color: #e7a52f;
+            --group-soft: rgba(231, 165, 47, 0.32);
+            --group-shadow: rgba(231, 165, 47, 0.22);
+        }
+
+        .game-group[data-game-group="think"] {
+            --group-color: #61a96f;
+            --group-soft: rgba(97, 169, 111, 0.3);
+            --group-shadow: rgba(97, 169, 111, 0.22);
+        }
+
+        .game-group-heading {
+            margin-bottom: 18px;
+            padding-bottom: 13px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            border-bottom: 3px solid var(--group-soft);
+        }
+
+        .game-group-number {
+            width: 39px;
+            height: 39px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: var(--group-color);
+            border-radius: 50%;
+            box-shadow: 0 6px 13px var(--group-shadow);
+            font-size: 13px;
+            font-weight: 1000;
+        }
+
+        .game-group-title {
+            margin: 0;
+            color: var(--ink);
+            font-size: clamp(21px, 2.4vw, 29px);
+            font-weight: 1000;
+            letter-spacing: 0.03em;
+        }
+
+        .game-group-note {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
         .game-grid {
-            margin-top: 26px;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 25px;
@@ -1402,6 +1480,24 @@
                 gap: 19px;
             }
 
+            .game-groups {
+                gap: 48px;
+            }
+
+            .game-group-heading {
+                margin-bottom: 15px;
+                align-items: flex-start;
+            }
+
+            .game-group-number {
+                width: 35px;
+                height: 35px;
+            }
+
+            .game-group-title {
+                font-size: 21px;
+            }
+
             .game-title {
                 font-size: 22px;
             }
@@ -1612,7 +1708,7 @@
             </div>
             <p class="filter-status" id="filter-status" aria-live="polite">すべての ゲームを ひょうじしています</p>
 
-            <div class="game-grid" id="game-grid"></div>
+            <div class="game-groups" id="game-grid"></div>
         </section>
 
         <section class="creator" aria-labelledby="creator-title">
@@ -1757,6 +1853,39 @@
             playImage: `assets/home/play-${game.slug}.webp`
         }));
 
+        const gameGroups = [
+            {
+                id: "find",
+                title: "さがして みつける",
+                note: "よくみて、かくれたものを みつけよう",
+                slugs: ["magic-gems", "pyoko-harvest", "alien-search"]
+            },
+            {
+                id: "remember",
+                title: "おぼえて みわける",
+                note: "おぼえたことや ちがいを みわけよう",
+                slugs: ["chameleon-catch", "color-ghosts", "jiwa-fushigi"]
+            },
+            {
+                id: "follow",
+                title: "めで おいかける・たどる",
+                note: "うごきや みちを めで おいかけよう",
+                slugs: ["number-bubbles", "yarn-path", "star-walk"]
+            },
+            {
+                id: "compare",
+                title: "くらべて ぴったり",
+                note: "おおきさや かたちを くらべよう",
+                slugs: ["most-candy", "post-office", "waterworks"]
+            },
+            {
+                id: "think",
+                title: "つないで かんがえる",
+                note: "つなぎかたを かんがえて ひらめこう",
+                slugs: ["light-window", "total-ten", "robot-factory"]
+            }
+        ];
+
         const quickGameGrid = document.querySelector("#quick-game-grid");
         const quickPickerTitle = document.querySelector("#quick-picker-title");
         const quickPickerNote = document.querySelector(".quick-picker-note");
@@ -1825,9 +1954,8 @@
             `).join("");
         }
 
-        function renderGames() {
-            renderQuickGames();
-            gameGrid.innerHTML = games.map((game) => `
+        function gameCardMarkup(game) {
+            return `
                 <article class="game-card" data-slug="${game.slug}" data-skills="${game.skills.join(" ")}">
                     <button
                         class="game-card-button"
@@ -1857,6 +1985,32 @@
                         </span>
                     </button>
                 </article>
+            `;
+        }
+
+        function renderGames() {
+            renderQuickGames();
+            gameGrid.innerHTML = gameGroups.map((group, index) => `
+                <section
+                    class="game-group"
+                    data-game-group="${group.id}"
+                    aria-labelledby="game-group-${group.id}"
+                >
+                    <div class="game-group-heading">
+                        <span class="game-group-number" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+                        <div>
+                            <h3 class="game-group-title" id="game-group-${group.id}">${group.title}</h3>
+                            <p class="game-group-note">${group.note}</p>
+                        </div>
+                    </div>
+                    <div class="game-grid">
+                        ${group.slugs
+                            .map((slug) => games.find((game) => game.slug === slug))
+                            .filter(Boolean)
+                            .map(gameCardMarkup)
+                            .join("")}
+                    </div>
+                </section>
             `).join("");
         }
 
@@ -1867,6 +2021,10 @@
 
             document.querySelectorAll(".game-card").forEach((card) => {
                 card.hidden = filter !== "all" && !card.dataset.skills.split(" ").includes(filter);
+            });
+
+            document.querySelectorAll(".game-group").forEach((group) => {
+                group.hidden = !group.querySelector(".game-card:not([hidden])");
             });
 
             filterStatus.textContent = filter === "all"
