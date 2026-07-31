@@ -124,6 +124,17 @@
             object-position: center 50%;
         }
 
+        .title-art-frame {
+            position: absolute;
+            z-index: -3;
+            inset: 0;
+            display: block;
+        }
+
+        .title-art-frame .title-art {
+            position: static;
+        }
+
         .title-shade {
             position: absolute;
             z-index: -2;
@@ -446,7 +457,9 @@
             z-index: 40;
             top: 49%;
             left: 50%;
+            width: max-content;
             min-width: 180px;
+            max-width: calc(100% - 24px);
             padding: 11px 22px;
             color: #fff;
             background: #eb7167;
@@ -458,6 +471,7 @@
             text-align: center;
             font-size: clamp(21px, 6vw, 31px);
             font-weight: 1000;
+            white-space: nowrap;
             pointer-events: none;
         }
 
@@ -640,6 +654,47 @@
             box-shadow: 0 6px 0 #d3c9ba;
         }
 
+        @media (orientation: portrait) {
+            .title-logo {
+                top: max(4.5vh, calc(env(safe-area-inset-top) + 25px));
+                width: min(96vw, 520px);
+            }
+
+            .title-logo-art {
+                max-height: 22vh;
+            }
+
+            .title-best {
+                top: max(17vh, calc(env(safe-area-inset-top) + 120px));
+                right: max(10px, env(safe-area-inset-right));
+                min-width: 96px;
+                padding: 5px 9px;
+                font-size: 9px;
+            }
+
+            .title-best strong {
+                font-size: 18px;
+            }
+
+            .title-menu {
+                bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                width: min(94vw, 430px);
+                gap: 8px;
+            }
+
+            .title-button,
+            .title-link,
+            .start-button {
+                min-height: 48px;
+                font-size: 14px;
+            }
+
+            .start-button small {
+                font-size: 9px;
+            }
+        }
+
         @media (orientation: landscape) and (max-height: 620px) {
             .title-logo {
                 top: max(24vh, calc(env(safe-area-inset-top) + 60px));
@@ -767,7 +822,10 @@
     <img id="pom-sprite" src="assets/pom-pom-white-v1.png" alt="" hidden>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
-        <img class="title-art" src="assets/koneko-yarn-title-v2.png" alt="">
+        <picture class="title-art-frame">
+            <source media="(orientation: portrait)" srcset="assets/koneko-yarn-title-portrait-v1.webp">
+            <img class="title-art" src="assets/koneko-yarn-title-v2.png" alt="">
+        </picture>
         <div class="title-shade" aria-hidden="true"></div>
 
         <div class="title-best">

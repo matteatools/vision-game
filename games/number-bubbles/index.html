@@ -137,6 +137,17 @@
             pointer-events: none;
         }
 
+        .title-art-frame {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            display: block;
+        }
+
+        .title-art-frame .title-art {
+            position: static;
+        }
+
         .title-scrim {
             position: absolute;
             z-index: 1;
@@ -667,6 +678,8 @@
             z-index: 40;
             top: 50%;
             left: 50%;
+            width: max-content;
+            max-width: calc(100% - 24px);
             color: #ff4c74;
             font-size: clamp(30px, 9vw, 56px);
             font-weight: 900;
@@ -878,6 +891,27 @@
             box-shadow: 0 5px 0 #cdd8db;
         }
 
+        @media (orientation: portrait) {
+            .title-logo {
+                top: max(7px, env(safe-area-inset-top));
+                width: min(112vw, 560px);
+            }
+
+            .title-actions {
+                top: clamp(205px, 30vh, 260px);
+                left: 50%;
+                width: min(92vw, 360px);
+                transform: translateX(-50%);
+            }
+
+            .sound-credit {
+                max-width: 78vw;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
         @media (orientation: landscape) {
             .title-logo {
                 top: max(6px, env(safe-area-inset-top));
@@ -1069,6 +1103,47 @@
             }
         }
 
+        @media (max-width: 360px) and (orientation: portrait) {
+            .title-logo {
+                width: min(104vw, 480px);
+            }
+
+            .title-actions {
+                top: clamp(195px, 29vh, 250px);
+                left: 50%;
+                width: min(94vw, 360px);
+                gap: 3px;
+                padding: 4px;
+            }
+
+            .main-choice {
+                min-height: 36px;
+                padding: 2px;
+            }
+
+            .choice-icon {
+                font-size: 14px;
+            }
+
+            .choice-copy strong {
+                font-size: 14px;
+            }
+
+            .choice-copy small {
+                display: none;
+            }
+
+            .title-links {
+                gap: 4px;
+            }
+
+            .title-link {
+                min-height: 27px;
+                padding: 2px 4px;
+                font-size: 8px;
+            }
+        }
+
         @media (max-height: 620px) and (orientation: portrait) {
             .title-logo {
                 top: 4px;
@@ -1122,7 +1197,10 @@
     <audio id="pop-sound" src="assets/audio/Onoma-Pop04-1(High-Dry).mp3" preload="auto" hidden></audio>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
-        <img class="title-art" src="assets/keropon-title-v1.jpg" alt="">
+        <picture class="title-art-frame">
+            <source media="(orientation: portrait)" srcset="assets/keropon-title-portrait-v1.webp">
+            <img class="title-art" src="assets/keropon-title-v1.jpg" alt="">
+        </picture>
         <div class="title-scrim" aria-hidden="true"></div>
 
         <div class="title-logo">

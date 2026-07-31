@@ -546,6 +546,10 @@
             filter: drop-shadow(0 4px 0 #8b532d) drop-shadow(0 6px 7px rgba(50, 31, 19, 0.22));
         }
 
+        .postmaster-card .whistle-button-right {
+            display: none;
+        }
+
         .postmaster-message {
             grid-column: 2;
             grid-row: 1 / span 2;
@@ -1734,6 +1738,37 @@
             }
         }
 
+        @media (orientation: portrait) and (max-width: 700px) {
+            .postmaster-card {
+                grid-template-columns: 54px minmax(0, 1fr) 54px;
+                gap: 3px 7px;
+                padding-right: 5px;
+            }
+
+            .postmaster-message {
+                grid-column: 2;
+            }
+
+            .postmaster-card .whistle-button-right {
+                display: block;
+                grid-column: 3;
+                grid-row: 1 / span 2;
+                align-self: center;
+                width: 56px;
+            }
+        }
+
+        @media (orientation: portrait) and (max-width: 370px) {
+            .postmaster-card {
+                grid-template-columns: 47px minmax(0, 1fr) 47px;
+                gap: 3px 5px;
+            }
+
+            .postmaster-card .whistle-button-right {
+                width: 49px;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .mail {
                 transition-duration: 0.18s;
@@ -1868,13 +1903,16 @@
             <div class="game-body">
                 <aside class="postmaster-card">
                     <img id="guide-character" class="guide-character" src="./assets/postmaster-v1.jpg" alt="">
-                    <button id="whistle-button" class="whistle-button" type="button" aria-label="ふえを ふく">
+                    <button id="whistle-button" class="whistle-button" type="button" data-whistle aria-label="ひだりの ふえを ふく">
                         <img src="./assets/whistle-button-v1.png" alt="">
                     </button>
                     <div class="postmaster-message">
                         <strong>しんじん はりまる</strong>
                         <span id="postmaster-speech">おなじいろが 5つで ふえを ふこう！</span>
                     </div>
+                    <button id="whistle-button-right" class="whistle-button whistle-button-right" type="button" data-whistle aria-label="みぎの ふえを ふく">
+                        <img src="./assets/whistle-button-v1.png" alt="">
+                    </button>
                 </aside>
 
                 <div class="sorting-machine">
@@ -2088,6 +2126,7 @@
                 pauseSign: document.getElementById("pause-sign"),
                 pauseButton: document.getElementById("pause-button"),
                 whistle: document.getElementById("whistle-button"),
+                whistles: [...document.querySelectorAll("[data-whistle]")],
                 delivered: document.getElementById("delivered-count"),
                 workTime: document.getElementById("work-time"),
                 angerMarks: document.getElementById("anger-marks"),
@@ -2391,8 +2430,18 @@
             }
 
             function nextPatternGap() {
-                // 3行の仕込み5回＋通常4～6回で、完成はおよそ9～11回に1度。
+                // みならい・しんじんでは、合計5を見つける機会を意図的に増やす。
+                if (currentSpeed >= 4000) return Math.floor(Math.random() * 2);
+                if (currentSpeed >= 2000) return 1 + Math.floor(Math.random() * 2);
+
+                // せんぱい・ベテランは従来どおり、完成がおよそ9～11回に1度。
                 return 4 + Math.floor(Math.random() * 3);
+            }
+
+            function initialPatternGap() {
+                if (currentSpeed >= 4000) return 0;
+                if (currentSpeed >= 2000) return Math.floor(Math.random() * 2);
+                return 2 + Math.floor(Math.random() * 3);
             }
 
             function makeGuidedPattern(stayingMails) {
@@ -2412,13 +2461,28 @@
                     [amounts[index], amounts[swapIndex]] = [amounts[swapIndex], amounts[index]];
                 }
 
-                guidedPatternQueue = [
-                    { color: target, amount: amounts[0], guided: true },
-                    { fillerFor: target },
-                    { color: target, amount: amounts[1], guided: true },
-                    { fillerFor: target },
-                    { color: target, amount: amounts[2], guided: true }
-                ];
+                if (currentSpeed >= 4000) {
+                    guidedPatternQueue = amounts.map((amount) => ({
+                        color: target,
+                        amount,
+                        guided: true
+                    }));
+                } else if (currentSpeed >= 2000) {
+                    guidedPatternQueue = [
+                        { color: target, amount: amounts[0], guided: true },
+                        { fillerFor: target },
+                        { color: target, amount: amounts[1], guided: true },
+                        { color: target, amount: amounts[2], guided: true }
+                    ];
+                } else {
+                    guidedPatternQueue = [
+                        { color: target, amount: amounts[0], guided: true },
+                        { fillerFor: target },
+                        { color: target, amount: amounts[1], guided: true },
+                        { fillerFor: target },
+                        { color: target, amount: amounts[2], guided: true }
+                    ];
+                }
                 ordinaryRoundsUntilPattern = nextPatternGap();
                 return true;
             }
@@ -2663,7 +2727,7 @@
                 claimableColors = [];
                 inputLocked = true;
                 cancelTimer();
-                elements.whistle.classList.add("blowing");
+                elements.whistles.forEach((button) => button.classList.add("blowing"));
                 playWhistle();
                 vibrate([18, 24, 34]);
                 showEffect(targets.length > 1 ? `${targets.length}しょ まとめて はいたつ！` : "ピッ！ はいたつ！");
@@ -2680,7 +2744,7 @@
                 updateHud();
                 await removeColoredMails(targets, "delivered");
 
-                elements.whistle.classList.remove("blowing");
+                elements.whistles.forEach((button) => button.classList.remove("blowing"));
                 inputLocked = false;
 
                 if (mode === "practice") {
@@ -2837,7 +2901,7 @@
                 roundTimerRemaining = currentSpeed;
                 incomingDeck = [];
                 guidedPatternQueue = [];
-                ordinaryRoundsUntilPattern = 2 + Math.floor(Math.random() * 3);
+                ordinaryRoundsUntilPattern = initialPatternGap();
                 workRemaining = WORK_DURATION;
                 elements.debugPause.textContent = "とめる";
                 updatePauseUi();
@@ -2924,7 +2988,7 @@
                 cancelWorkTimer();
                 clearTimeout(practiceWaitTimer);
                 inputLocked = true;
-                elements.whistle.classList.remove("blowing");
+                elements.whistles.forEach((button) => button.classList.remove("blowing"));
                 saveBest(deliveredCount);
                 elements.resultTitle.textContent = reason === "anger"
                     ? "おこられちゃった！"
@@ -3010,7 +3074,7 @@
             });
 
             elements.retry.addEventListener("click", () => startGame(lastSpeed, lastIncomingStyle));
-            elements.whistle.addEventListener("click", whistle);
+            elements.whistles.forEach((button) => button.addEventListener("click", whistle));
             elements.pauseButton.addEventListener("click", togglePause);
 
             document.addEventListener("keydown", (event) => {
