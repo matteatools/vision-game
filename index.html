@@ -1008,6 +1008,47 @@
             border-radius: 27px;
         }
 
+        .creator-mark .eye-growth {
+            margin-bottom: 54px;
+        }
+
+        .creator-detail-link {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            z-index: 3;
+            min-height: 45px;
+            max-width: calc(100% - 36px);
+            padding: 9px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ink);
+            background: #fff;
+            border-radius: 999px;
+            box-shadow: 0 7px 16px rgba(5, 18, 28, 0.22);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 1000;
+            line-height: 1.45;
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .creator-detail-link::after {
+            content: "→";
+            font-size: 17px;
+        }
+
+        .creator-detail-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 11px 22px rgba(5, 18, 28, 0.28);
+        }
+
+        .creator-detail-link:focus-visible {
+            outline: 4px solid var(--yellow);
+            outline-offset: 4px;
+        }
+
         .eye-growth {
             position: relative;
             width: 175px;
@@ -1044,6 +1085,14 @@
             position: relative;
             z-index: 2;
             color: #fff;
+        }
+
+        .creator-overline {
+            margin: 0 0 9px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            font-weight: 950;
+            letter-spacing: 0.12em;
         }
 
         .creator-copy .section-kicker {
@@ -1088,6 +1137,35 @@
 
         footer p {
             margin: 5px 0;
+        }
+
+        .footer-links {
+            margin: 21px 0 18px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 9px;
+        }
+
+        .footer-links a {
+            min-height: 42px;
+            padding: 9px 15px;
+            display: inline-flex;
+            align-items: center;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 900;
+        }
+
+        .footer-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-links a:focus-visible {
+            outline: 3px solid var(--yellow);
+            outline-offset: 3px;
         }
 
         dialog {
@@ -1523,12 +1601,19 @@
             }
 
             .creator-mark {
-                min-height: 190px;
+                min-height: 245px;
             }
 
             .eye-growth {
                 width: 145px;
                 height: 92px;
+            }
+
+            .creator-detail-link {
+                right: 16px;
+                left: 16px;
+                justify-content: center;
+                text-align: center;
             }
 
             dialog {
@@ -1712,10 +1797,12 @@
         </section>
 
         <section class="creator" aria-labelledby="creator-title">
-            <div class="creator-mark" aria-hidden="true">
-                <span class="eye-growth"></span>
+            <div class="creator-mark">
+                <span class="eye-growth" aria-hidden="true"></span>
+                <a class="creator-detail-link" href="about/">このサイトについて もっとくわしく</a>
             </div>
             <div class="creator-copy">
+                <p class="creator-overline">このサイトについて</p>
                 <p class="section-kicker">ゲームを つくった もと</p>
                 <h2 class="section-title" id="creator-title">あそびの なかで、<br>めと あたまが うごきだす。</h2>
                 <div class="creator-body">
@@ -1730,6 +1817,10 @@
     <footer>
         <img class="footer-logo" src="site-logo-cool.svg" alt="めとあたまのゲームパーク">
         <p>すぐに あそべる。おとなも ほんきになる。</p>
+        <nav class="footer-links" aria-label="サイトの あんない">
+            <a href="about/">このサイトについて</a>
+            <a href="mailto:mattea198096@gmail.com">メールで おといあわせ</a>
+        </nav>
         <p>© 2026 めとあたまのゲームパーク</p>
     </footer>
 
