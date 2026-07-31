@@ -1534,13 +1534,13 @@
 
             <div class="hero-showcase" aria-label="ゲームの タイトルがめん">
                 <figure class="screen-card">
-                    <img src="assets/home/title-color-ghosts.webp" alt="おぼえて！いろゆうれいの タイトルがめん" fetchpriority="high">
+                    <img src="assets/home/title-color-ghosts.webp" alt="おぼえて！いろゆうれいの タイトルがめん" width="960" height="600" loading="eager" fetchpriority="high" decoding="async">
                 </figure>
                 <figure class="screen-card">
-                    <img src="assets/home/title-post-office.webp" alt="ぴったりゆうびんきょくの タイトルがめん">
+                    <img src="assets/home/title-post-office.webp" alt="ぴったりゆうびんきょくの タイトルがめん" width="960" height="600" loading="lazy" fetchpriority="low" decoding="async">
                 </figure>
                 <figure class="screen-card">
-                    <img src="assets/home/title-alien-search.webp" alt="うちゅうじんをさがせ！の タイトルがめん">
+                    <img src="assets/home/title-alien-search.webp" alt="うちゅうじんをさがせ！の タイトルがめん" width="960" height="600" loading="lazy" fetchpriority="low" decoding="async">
                 </figure>
                 <span class="spark spark-one" aria-hidden="true">✦</span>
                 <span class="spark spark-two" aria-hidden="true">●</span>
@@ -1787,7 +1787,7 @@
         }
 
         function renderGames() {
-            quickGameGrid.innerHTML = games.map((game) => `
+            quickGameGrid.innerHTML = games.map((game, index) => `
                 <div class="quick-game-card">
                     <button
                         class="quick-game-button"
@@ -1799,7 +1799,10 @@
                         <img
                             src="${game.titleImage}"
                             alt=""
-                            loading="eager"
+                            width="960"
+                            height="600"
+                            loading="${index < 5 ? "eager" : "lazy"}"
+                            fetchpriority="${index < 5 ? "auto" : "low"}"
                             decoding="async"
                         >
                     </button>
@@ -1820,7 +1823,10 @@
                                 class="game-screen"
                                 src="${game.titleImage}"
                                 alt="${game.title}の タイトルがめん"
+                                width="960"
+                                height="600"
                                 loading="lazy"
+                                fetchpriority="low"
                                 decoding="async"
                             >
                             <span class="open-hint">くわしく</span>
