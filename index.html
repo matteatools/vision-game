@@ -1389,8 +1389,8 @@
 
             .quick-game-grid {
                 margin-top: 12px;
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-                gap: 6px 5px;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px 8px;
             }
 
             .detail-picker-heading {
@@ -1758,6 +1758,9 @@
         }));
 
         const quickGameGrid = document.querySelector("#quick-game-grid");
+        const quickPickerTitle = document.querySelector("#quick-picker-title");
+        const quickPickerNote = document.querySelector(".quick-picker-note");
+        const mobileQuickQuery = window.matchMedia("(max-width: 700px)");
         const gameGrid = document.querySelector("#game-grid");
         const filterButtons = [...document.querySelectorAll(".filter-button")];
         const filterStatus = document.querySelector("#filter-status");
@@ -1786,8 +1789,20 @@
                 : "";
         }
 
-        function renderGames() {
-            quickGameGrid.innerHTML = games.map((game, index) => `
+        function renderQuickGames() {
+            const mobileOnly = mobileQuickQuery.matches;
+            const quickGames = mobileOnly
+                ? games
+                    .filter((game) => game.popularRank)
+                    .sort((first, second) => first.popularRank - second.popularRank)
+                : games;
+
+            quickPickerTitle.textContent = mobileOnly ? "にんきの 3つ" : "ひとめで えらぶ";
+            quickPickerNote.textContent = mobileOnly
+                ? "1ばん・2ばん・3ばんから えらぼう！"
+                : "きになる えを タッチ！";
+
+            quickGameGrid.innerHTML = quickGames.map((game, index) => `
                 <div class="quick-game-card">
                     <button
                         class="quick-game-button"
@@ -1808,7 +1823,10 @@
                     </button>
                 </div>
             `).join("");
+        }
 
+        function renderGames() {
+            renderQuickGames();
             gameGrid.innerHTML = games.map((game) => `
                 <article class="game-card" data-slug="${game.slug}" data-skills="${game.skills.join(" ")}">
                     <button
@@ -1937,6 +1955,7 @@
         });
 
         renderGames();
+        mobileQuickQuery.addEventListener("change", renderQuickGames);
 
         const initialSlug = window.location.hash.slice(1);
         if (games.some((game) => game.slug === initialSlug)) {
