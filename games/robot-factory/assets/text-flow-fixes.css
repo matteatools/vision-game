@@ -1,0 +1,66 @@
+/*
+ * Keep child-facing explanations and result copy on semantic phrase
+ * boundaries.  Existing <br> elements in the story and practice dialogs are
+ * retained because each one separates complete clauses or sentences.
+ */
+:is(
+  .story-card h1,
+  .story-card p,
+  .how-to-play span,
+  .role-hint,
+  .rules-tip,
+  .practice-guide-panel p,
+  .practice-mission-panel > strong,
+  .practice-effect b,
+  .practice-effect small,
+  .practice-dialog h2,
+  .practice-dialog p,
+  .practice-dialog-callout,
+  .practice-result-copy h2,
+  .practice-result-copy > p,
+  .practice-learned-list span,
+  .collection-book-footer > span,
+  .completion-card h2,
+  .completion-card > strong,
+  .completion-reward b,
+  .completion-reward small,
+  .completion-lamp-reward,
+  .factory-levelup-popup > strong,
+  .factory-levelup-popup > small,
+  .result-card h2,
+  .rotate-device-card strong,
+  .rotate-device-card > span
+) {
+  line-break: strict;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.title-menu-panel .game-park-link {
+  display: flex;
+  width: 100%;
+  min-height: max(3.2cqw, 44px);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45cqw 1cqw;
+  border: 0.1cqw solid rgba(133, 232, 237, 0.52);
+  border-radius: 0.85cqw;
+  color: #d8fbfc;
+  background: rgba(0, 29, 37, 0.92);
+  font-size: max(0.78cqw, 11px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 0.45cqw 1cqw rgba(0, 0, 0, 0.45);
+}
+
+.title-menu-panel .game-park-link:hover,
+.title-menu-panel .game-park-link:focus-visible {
+  border-color: #fff09b;
+  color: #fff2a7;
+  filter: brightness(1.25);
+  outline: none;
+}

@@ -1,0 +1,2298 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#126b48">
+    <meta name="description" content="カメレオンの色のルールを見て、すきまの方向をすばやく判断する学習ゲーム。">
+    <title>カメレオン・キャッチ！</title>
+    <style>
+        :root {
+            --ink: #173b36;
+            --paper: #fffdf4;
+            --cream: #fff7d8;
+            --leaf: #1f9d67;
+            --leaf-dark: #126b48;
+            --lime: #8edb31;
+            --yellow: #ffd84a;
+            --coral: #ff6f61;
+            --blue: #3f8cff;
+            --purple: #8b5cf6;
+            --line: rgba(23, 59, 54, 0.12);
+            --shadow: 0 18px 45px rgba(10, 66, 47, 0.18);
+            --hud-height: 72px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overscroll-behavior: none;
+        }
+
+        body {
+            min-width: 320px;
+            color: var(--ink);
+            background: #d9f4d4;
+            font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+            font-weight: 700;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        a {
+            color: inherit;
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 4px solid var(--yellow);
+            outline-offset: 3px;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100dvh;
+        }
+
+        .screen[hidden] {
+            display: none !important;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .jungle-bg {
+            isolation: isolate;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255, 244, 165, 0.95) 0 11%, transparent 34%),
+                radial-gradient(circle at 12% 82%, rgba(66, 211, 165, 0.42) 0 17%, transparent 38%),
+                linear-gradient(155deg, #dff6c9 0%, #b9e79d 42%, #7dca79 100%);
+        }
+
+        .jungle-bg::before,
+        .jungle-bg::after {
+            position: absolute;
+            z-index: -1;
+            width: min(42vw, 390px);
+            height: min(58vh, 520px);
+            content: "";
+            opacity: 0.72;
+            background:
+                radial-gradient(ellipse at 26% 18%, #197c50 0 13%, transparent 14%),
+                radial-gradient(ellipse at 70% 32%, #2ba868 0 15%, transparent 16%),
+                radial-gradient(ellipse at 32% 58%, #177647 0 17%, transparent 18%),
+                radial-gradient(ellipse at 75% 72%, #36b975 0 18%, transparent 19%);
+            filter: drop-shadow(0 12px 18px rgba(18, 107, 72, 0.14));
+        }
+
+        .jungle-bg::before {
+            top: -10%;
+            left: -8%;
+            transform: rotate(-18deg);
+        }
+
+        .jungle-bg::after {
+            right: -10%;
+            bottom: -16%;
+            transform: rotate(165deg);
+        }
+
+        .sound-button {
+            position: fixed;
+            z-index: 80;
+            top: max(12px, env(safe-area-inset-top));
+            left: max(12px, env(safe-area-inset-left));
+            display: grid;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            color: var(--leaf-dark);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 17px;
+            box-shadow: 0 8px 20px rgba(17, 88, 60, 0.16);
+            font-size: 22px;
+        }
+
+        /* タイトル */
+        #screen-title {
+            display: grid;
+            padding:
+                max(18px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(18px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+            place-items: center;
+        }
+
+        .title-card {
+            position: relative;
+            width: min(94vw, 620px);
+            max-height: calc(100dvh - 32px);
+            padding: clamp(18px, 3.5vh, 32px);
+            overflow: auto;
+            background: rgba(255, 253, 244, 0.96);
+            border: 4px solid #fff;
+            border-radius: 38px;
+            box-shadow: var(--shadow);
+            scrollbar-width: none;
+        }
+
+        .title-card::-webkit-scrollbar {
+            display: none;
+        }
+
+        .brand-row {
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .title-chameleon {
+            width: 92px;
+            height: 92px;
+            object-fit: contain;
+            filter: drop-shadow(0 7px 7px rgba(20, 100, 60, 0.18));
+            animation: titleBob 2.7s ease-in-out infinite;
+        }
+
+        @keyframes titleBob {
+            0%,
+            100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(4deg) translateY(-6px); }
+        }
+
+        .eyebrow {
+            margin: 0 0 4px;
+            color: var(--leaf);
+            font-size: clamp(11px, 2.6vw, 14px);
+            font-weight: 900;
+            letter-spacing: 0.06em;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(27px, 7vw, 43px);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.05em;
+        }
+
+        .title-copy {
+            margin: 13px 0 16px;
+            color: #47645f;
+            font-size: clamp(13px, 3vw, 16px);
+            font-weight: 800;
+            line-height: 1.65;
+            text-align: center;
+        }
+
+        .rules {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .rule-card {
+            display: grid;
+            min-height: 62px;
+            grid-template-columns: 34px 1fr;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 2px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 5px 0 rgba(23, 59, 54, 0.07);
+        }
+
+        .rule-card:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .rule-dot {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            color: #fff;
+            border: 3px solid rgba(255, 255, 255, 0.92);
+            border-radius: 50%;
+            box-shadow: 0 3px 10px rgba(23, 59, 54, 0.18);
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .rule-card strong,
+        .rule-card small {
+            display: block;
+        }
+
+        .rule-card strong {
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .rule-card small {
+            margin-top: 2px;
+            color: #66807b;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .green { background: #46b95f; }
+        .blue { background: #3887f6; }
+        .yellow { color: #5a4300; background: #ffd83d; }
+        .red { background: #ff5e5e; }
+        .purple { background: #8b5cf6; }
+
+        .start-button,
+        .practice-button,
+        .tutorial-button,
+        .result-button {
+            display: flex;
+            width: 100%;
+            min-height: 60px;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            color: #fff;
+            background: linear-gradient(180deg, #3fcf78, #22a95b);
+            border: 0;
+            border-radius: 20px;
+            box-shadow: 0 7px 0 #157943, 0 13px 26px rgba(34, 169, 91, 0.25);
+            font-size: clamp(20px, 5vw, 25px);
+            font-weight: 900;
+            transition: transform 100ms ease, box-shadow 100ms ease;
+        }
+
+        .mode-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .practice-button {
+            color: var(--leaf-dark);
+            background: linear-gradient(180deg, #fff, #effbe7);
+            border: 3px solid #8dd66f;
+            box-shadow: 0 6px 0 #6dbb52, 0 11px 23px rgba(40, 135, 74, 0.16);
+            font-size: clamp(18px, 4.5vw, 22px);
+        }
+
+        .start-button:active,
+        .practice-button:active,
+        .tutorial-button:active,
+        .result-button:active {
+            box-shadow: 0 2px 0 #157943;
+            transform: translateY(5px);
+        }
+
+        .park-link {
+            display: block;
+            margin-top: 16px;
+            color: #5d736f;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* 新しい一枚絵タイトル */
+        #screen-title.title-screen {
+            display: block;
+            padding: 0;
+            isolation: isolate;
+            overflow: hidden;
+            background: #0d593d;
+        }
+
+        .title-art {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 48%;
+            pointer-events: none;
+        }
+
+        .title-scrim {
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(4, 45, 29, 0.25) 0%, transparent 31%),
+                linear-gradient(180deg, transparent 53%, rgba(3, 37, 25, 0.88) 100%);
+            pointer-events: none;
+        }
+
+        .title-logo {
+            position: absolute;
+            z-index: 3;
+            top: max(32px, calc(env(safe-area-inset-top) + 24px));
+            left: 50%;
+            width: min(98vw, 790px);
+            color: #fff;
+            text-align: center;
+            text-shadow:
+                0 3px 0 #176b3e,
+                0 6px 18px rgba(2, 37, 23, 0.7);
+            transform: translateX(-50%);
+        }
+
+        .title-logo-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            filter: drop-shadow(0 8px 12px rgba(2, 37, 23, 0.34));
+        }
+
+        .title-logo .eyebrow {
+            display: inline-block;
+            margin: 0 0 7px;
+            padding: 5px 13px;
+            color: #244a1e;
+            background: rgba(255, 246, 159, 0.94);
+            border: 2px solid rgba(255, 255, 255, 0.88);
+            border-radius: 999px;
+            box-shadow: 0 5px 15px rgba(1, 47, 29, 0.2);
+            font-size: clamp(11px, 3vw, 15px);
+            text-shadow: none;
+        }
+
+        .title-logo h1 {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .title-best {
+            position: absolute;
+            z-index: 5;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
+            min-width: 122px;
+            padding: 8px 12px 7px;
+            color: #5a3c00;
+            background: rgba(255, 249, 207, 0.95);
+            border: 3px solid #fff;
+            border-radius: 19px;
+            box-shadow: 0 8px 22px rgba(2, 42, 27, 0.3);
+            text-align: center;
+        }
+
+        .title-best > span,
+        .title-best strong {
+            display: block;
+        }
+
+        .title-best > span {
+            font-size: 10px;
+            letter-spacing: 0.03em;
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .title-best strong {
+            color: #e37b12;
+            font-size: 27px;
+            font-weight: 900;
+            line-height: 1.05;
+        }
+
+        .title-best small {
+            margin-left: 3px;
+            color: #6a4b0b;
+            font-size: 11px;
+        }
+
+        .title-actions {
+            position: absolute;
+            z-index: 4;
+            bottom: max(12px, env(safe-area-inset-bottom));
+            left: 50%;
+            display: grid;
+            width: min(92vw, 520px);
+            gap: 10px;
+            padding: 12px;
+            background: rgba(5, 57, 39, 0.78);
+            border: 2px solid rgba(255, 255, 255, 0.28);
+            border-radius: 27px;
+            box-shadow: 0 12px 32px rgba(2, 33, 22, 0.42);
+            backdrop-filter: blur(8px);
+            transform: translateX(-50%);
+        }
+
+        .title-actions .practice-button,
+        .title-actions .start-button {
+            min-height: 62px;
+            justify-content: flex-start;
+            padding: 8px 18px;
+            text-align: left;
+        }
+
+        .title-actions .mode-icon {
+            width: 38px;
+            flex: 0 0 38px;
+            font-size: 29px;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .title-actions .mode-copy {
+            display: grid;
+            gap: 1px;
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .title-actions .mode-copy strong {
+            font-size: clamp(20px, 5.5vw, 26px);
+            font-weight: 900;
+            line-height: 1.05;
+        }
+
+        .title-actions .mode-copy small {
+            font-size: clamp(10px, 2.8vw, 13px);
+            font-weight: 800;
+        }
+
+        .title-actions .park-link {
+            display: flex;
+            min-height: 40px;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            font-size: 12px;
+        }
+
+        /* ゲーム */
+        #screen-game {
+            display: grid;
+            grid-template-rows: var(--hud-height) auto minmax(0, 1fr);
+            background: #dff6c9;
+        }
+
+        .hud {
+            position: relative;
+            z-index: 40;
+            display: grid;
+            grid-row: 1;
+            height: var(--hud-height);
+            grid-template-columns: 54px minmax(80px, 0.7fr) minmax(145px, 1.5fr) minmax(64px, 0.65fr);
+            align-items: center;
+            gap: 7px;
+            padding:
+                max(7px, env(safe-area-inset-top))
+                max(8px, env(safe-area-inset-right))
+                7px
+                max(8px, env(safe-area-inset-left));
+            background: rgba(255, 253, 244, 0.97);
+            border-bottom: 3px solid rgba(18, 107, 72, 0.12);
+            box-shadow: 0 7px 24px rgba(18, 107, 72, 0.12);
+        }
+
+        .exit-button {
+            display: grid;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            color: #637772;
+            background: #edf3ee;
+            border: 0;
+            border-radius: 16px;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .stat {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            color: #718680;
+            font-size: 9px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .stat-value {
+            display: block;
+            margin-top: 3px;
+            color: var(--leaf-dark);
+            font-size: clamp(22px, 6vw, 31px);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .stat-value small {
+            font-size: 10px;
+        }
+
+        .rule-chip {
+            display: flex;
+            min-width: 0;
+            min-height: 45px;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 6px 8px;
+            color: #fff;
+            background: var(--leaf);
+            border-radius: 15px;
+            box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.11);
+            text-align: center;
+            transition: background 180ms ease, transform 180ms ease;
+        }
+
+        .rule-chip.is-new {
+            animation: chipPop 520ms cubic-bezier(.2, .8, .2, 1);
+        }
+
+        @keyframes chipPop {
+            0% { transform: scale(0.78); }
+            60% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .rule-chip-symbol {
+            flex: 0 0 auto;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .rule-chip-text {
+            overflow: hidden;
+            font-size: clamp(10px, 2.6vw, 13px);
+            font-weight: 900;
+            line-break: strict;
+            line-height: 1.22;
+            overflow-wrap: normal;
+            text-overflow: ellipsis;
+            word-break: keep-all;
+        }
+
+        .top-rules {
+            position: relative;
+            z-index: 35;
+            display: grid;
+            grid-row: 2;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 4px;
+            padding: 5px 7px 6px;
+            background: rgba(242, 250, 232, 0.97);
+            border-bottom: 2px solid rgba(18, 107, 72, 0.1);
+        }
+
+        .top-rule {
+            display: flex;
+            min-width: 0;
+            min-height: 34px;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 3px 2px;
+            color: #4d6560;
+            background: #fff;
+            border: 1px solid rgba(23, 59, 54, 0.1);
+            border-radius: 10px;
+            font-size: clamp(8px, 2.2vw, 11px);
+            font-weight: 900;
+            line-break: strict;
+            line-height: 1.08;
+            overflow-wrap: normal;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .top-rule .rule-dot {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            border-width: 2px;
+            font-size: 10px;
+        }
+
+        .play-layout {
+            position: relative;
+            display: block;
+            min-height: 0;
+            overflow: hidden;
+            grid-row: 3;
+        }
+
+        .stage {
+            position: absolute;
+            inset: 8px;
+            min-height: 0;
+            margin: 0;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(255, 248, 196, 0.92), rgba(219, 244, 187, 0.87)),
+                #e7f7ca;
+            border: 4px solid #fff;
+            border-radius: 27px;
+            box-shadow: inset 0 -16px 28px rgba(34, 143, 83, 0.08), 0 9px 22px rgba(18, 107, 72, 0.11);
+        }
+
+        .stage::before,
+        .stage::after {
+            position: absolute;
+            content: "";
+            pointer-events: none;
+        }
+
+        .stage::before {
+            inset: auto -5% -18% -5%;
+            height: 45%;
+            background:
+                radial-gradient(ellipse at 9% 95%, #278e54 0 12%, transparent 13%),
+                radial-gradient(ellipse at 25% 92%, #53b951 0 13%, transparent 14%),
+                radial-gradient(ellipse at 48% 100%, #1a7b4c 0 14%, transparent 15%),
+                radial-gradient(ellipse at 72% 91%, #46aa4a 0 14%, transparent 15%),
+                radial-gradient(ellipse at 91% 96%, #187144 0 13%, transparent 14%);
+            opacity: 0.72;
+        }
+
+        .stage::after {
+            top: 14px;
+            right: 16px;
+            width: 64px;
+            height: 64px;
+            background: radial-gradient(circle, rgba(255, 220, 74, 0.64) 0 13%, transparent 14%);
+            background-size: 22px 22px;
+            opacity: 0.65;
+        }
+
+        .tutorial-panel {
+            position: absolute;
+            z-index: 70;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 16px;
+            background: rgba(226, 246, 201, 0.74);
+            backdrop-filter: blur(4px);
+        }
+
+        .tutorial-card {
+            width: min(92%, 470px);
+            max-height: 92%;
+            padding: clamp(17px, 4vw, 25px);
+            overflow: auto;
+            background: rgba(255, 253, 244, 0.98);
+            border: 4px solid #fff;
+            border-radius: 28px;
+            box-shadow: 0 18px 42px rgba(18, 87, 57, 0.24);
+            text-align: center;
+        }
+
+        .tutorial-kicker {
+            margin: 0 0 5px;
+            color: #71817d;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .doctor-row {
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr) 50px;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .doctor-avatar {
+            position: relative;
+            width: 92px;
+            height: 92px;
+            background: #e8f8d8;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 6px 17px rgba(18, 87, 57, 0.18);
+        }
+
+        .doctor-avatar img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .tutorial-symbol {
+            display: grid;
+            width: 50px;
+            height: 50px;
+            place-items: center;
+            color: #fff;
+            background: var(--leaf);
+            border: 4px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 6px 18px rgba(18, 87, 57, 0.2);
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .tutorial-card h2 {
+            margin: 0;
+            color: var(--leaf-dark);
+            font-size: clamp(20px, 5.5vw, 28px);
+            font-weight: 900;
+            line-break: strict;
+            overflow-wrap: normal;
+            text-wrap: balance;
+            word-break: keep-all;
+        }
+
+        .tutorial-copy {
+            position: relative;
+            margin: 12px auto 13px;
+            padding: 13px 14px;
+            color: #46635d;
+            background: #fff9d9;
+            border: 3px solid #f2dfa0;
+            border-radius: 18px;
+            font-size: clamp(14px, 3.8vw, 18px);
+            font-weight: 900;
+            line-height: 1.65;
+            line-break: strict;
+            overflow-wrap: normal;
+            text-align: left;
+            word-break: keep-all;
+        }
+
+        .tutorial-copy::before {
+            position: absolute;
+            top: -11px;
+            left: 35px;
+            width: 17px;
+            height: 17px;
+            content: "";
+            background: #fff9d9;
+            border-top: 3px solid #f2dfa0;
+            border-left: 3px solid #f2dfa0;
+            transform: rotate(45deg);
+        }
+
+        .tutorial-progress {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+            margin: 0 0 14px;
+        }
+
+        .tutorial-progress span {
+            width: 12px;
+            height: 12px;
+            background: #d8e3d5;
+            border-radius: 50%;
+        }
+
+        .tutorial-progress span.is-done {
+            background: var(--leaf);
+        }
+
+        .tutorial-progress span.is-current {
+            background: var(--yellow);
+            box-shadow: 0 0 0 3px rgba(255, 216, 74, 0.3);
+            transform: scale(1.16);
+        }
+
+        .tutorial-button {
+            min-height: 52px;
+            border-radius: 17px;
+            font-size: 18px;
+        }
+
+        .tutorial-button.begin {
+            min-width: 180px;
+            margin-top: 2px;
+        }
+
+        .tutorial-button.secondary {
+            min-height: 46px;
+            margin-top: 9px;
+            color: #536b65;
+            background: #e8eeea;
+            box-shadow: 0 5px 0 #cbd8d0;
+            font-size: 14px;
+        }
+
+        .chameleon-wrap {
+            position: absolute;
+            z-index: 10;
+            width: 170px;
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            transition: left 220ms ease, top 220ms ease, width 220ms ease;
+        }
+
+        .chameleon-inner {
+            position: absolute;
+            inset: 0;
+            transform-origin: 50% 50%;
+        }
+
+        .chameleon-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 9px 7px rgba(18, 90, 54, 0.2));
+            transform-origin: 50% 50%;
+        }
+
+        .chameleon-img.type-blue {
+            filter: hue-rotate(102deg) saturate(1.25) brightness(0.87) drop-shadow(0 9px 7px rgba(20, 74, 145, 0.22));
+        }
+
+        .chameleon-img.type-yellow {
+            filter: hue-rotate(-47deg) saturate(1.35) brightness(1.09) drop-shadow(0 9px 7px rgba(142, 107, 12, 0.2));
+        }
+
+        .chameleon-img.type-red {
+            filter: hue-rotate(236deg) saturate(1.42) brightness(0.94) drop-shadow(0 9px 7px rgba(150, 44, 44, 0.2));
+        }
+
+        .chameleon-img.type-purple {
+            filter: hue-rotate(168deg) saturate(1.27) brightness(0.86) drop-shadow(0 9px 7px rgba(95, 46, 145, 0.22));
+        }
+
+        .chameleon-wrap.is-caught {
+            animation: caught 450ms cubic-bezier(.2, .8, .2, 1) forwards;
+        }
+
+        .chameleon-wrap.is-escaped {
+            animation: escaped 400ms ease-in forwards;
+        }
+
+        @keyframes caught {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            45% { transform: translate(-50%, -50%) scale(1.17) rotate(-5deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.25) rotate(16deg); }
+        }
+
+        @keyframes escaped {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -85%) scale(0.68) rotate(-15deg); }
+        }
+
+        .tap-counter {
+            position: absolute;
+            z-index: 14;
+            right: -8px;
+            bottom: 4px;
+            display: grid;
+            width: 45px;
+            height: 45px;
+            place-items: center;
+            color: #5d4500;
+            background: #fff;
+            border: 5px solid var(--yellow);
+            border-radius: 50%;
+            box-shadow: 0 6px 16px rgba(23, 59, 54, 0.18);
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .tap-counter[hidden] {
+            display: none;
+        }
+
+        .red-timer {
+            position: absolute;
+            z-index: 13;
+            right: 4%;
+            bottom: 10px;
+            left: 4%;
+            height: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 4px 10px rgba(23, 59, 54, 0.12);
+        }
+
+        .red-timer span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: var(--coral);
+            transform-origin: left center;
+            animation: redCountdown 1.5s linear forwards;
+        }
+
+        @keyframes redCountdown {
+            to { transform: scaleX(0); }
+        }
+
+        .feedback {
+            position: absolute;
+            z-index: 30;
+            top: 18%;
+            left: 50%;
+            padding: 9px 15px;
+            color: #fff;
+            background: var(--leaf);
+            border: 3px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 8px 22px rgba(23, 59, 54, 0.18);
+            font-size: clamp(17px, 5vw, 24px);
+            font-weight: 900;
+            pointer-events: none;
+            transform: translateX(-50%);
+            animation: feedback 620ms ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .feedback.bad {
+            background: var(--coral);
+        }
+
+        @keyframes feedback {
+            0% { opacity: 0; transform: translate(-50%, 15px) scale(0.8); }
+            25% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+            100% { opacity: 0; transform: translate(-50%, -28px) scale(1); }
+        }
+
+        .controls-panel {
+            position: absolute;
+            z-index: 20;
+            top: 50%;
+            left: 50%;
+            display: grid;
+            width: fit-content;
+            min-height: 0;
+            max-width: calc(100% - 24px);
+            place-items: center;
+            padding: clamp(8px, 2vw, 13px);
+            background: rgba(255, 253, 244, 0.92);
+            border: 3px solid #fff;
+            border-radius: 32px;
+            box-shadow: 0 13px 32px rgba(18, 107, 72, 0.19);
+            backdrop-filter: blur(5px);
+            transform: translate(-50%, -50%);
+        }
+
+        .dpad {
+            display: grid;
+            width: clamp(148px, 24dvh, 195px);
+            max-width: min(56vw, 195px);
+            aspect-ratio: 1;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            gap: clamp(6px, 1.3vh, 10px);
+        }
+
+        .direction-button {
+            display: grid;
+            min-width: 44px;
+            min-height: 44px;
+            place-items: center;
+            color: var(--leaf-dark);
+            background: #fff;
+            border: 3px solid #dcebdc;
+            border-bottom-width: 8px;
+            border-radius: 22px;
+            box-shadow: 0 7px 18px rgba(18, 107, 72, 0.09);
+            font-size: clamp(31px, 9vh, 48px);
+            font-weight: 900;
+            line-height: 1;
+            transition: transform 90ms ease, border-width 90ms ease, background 90ms ease;
+        }
+
+        .direction-button:active,
+        .direction-button.is-pressed {
+            color: var(--leaf-dark);
+            background: #fff2a8;
+            border-color: #efcf55;
+            border-bottom-width: 3px;
+            transform: translateY(5px);
+        }
+
+        .direction-glove {
+            display: block;
+            width: 88%;
+            height: 88%;
+            object-fit: contain;
+            pointer-events: none;
+            filter: drop-shadow(0 3px 3px rgba(18, 80, 50, 0.16));
+        }
+
+        .direction-button[data-dir="Up"] { grid-area: 1 / 2; }
+        .direction-button[data-dir="Left"] { grid-area: 2 / 1; }
+        .direction-button[data-dir="Right"] { grid-area: 2 / 3; }
+        .direction-button[data-dir="Down"] { grid-area: 3 / 2; }
+
+        .dpad-center {
+            display: grid;
+            grid-area: 2 / 2;
+            place-items: center;
+        }
+
+        .dpad-center::before {
+            width: 25%;
+            aspect-ratio: 1;
+            content: "";
+            background: #dbe9da;
+            border-radius: 50%;
+            box-shadow: inset 0 3px 5px rgba(18, 107, 72, 0.12);
+        }
+
+        /* 結果 */
+        #screen-result {
+            display: grid;
+            padding:
+                max(18px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(18px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+            place-items: center;
+            background: rgba(8, 66, 45, 0.58);
+            backdrop-filter: blur(8px);
+        }
+
+        .result-card {
+            width: min(92vw, 430px);
+            padding: clamp(22px, 4vh, 34px);
+            background: var(--paper);
+            border: 4px solid #fff;
+            border-radius: 36px;
+            box-shadow: 0 24px 60px rgba(6, 54, 37, 0.3);
+            text-align: center;
+            animation: resultIn 420ms cubic-bezier(.2, .8, .2, 1);
+        }
+
+        @keyframes resultIn {
+            from { opacity: 0; transform: scale(0.78) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .result-icon {
+            width: 94px;
+            height: 94px;
+            margin: 0 auto 7px;
+            overflow: hidden;
+            background: #e9f8d7;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 7px 18px rgba(18, 107, 72, 0.16);
+        }
+
+        .result-icon img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .result-card h2 {
+            margin: 0;
+            color: var(--leaf-dark);
+            font-size: clamp(24px, 7vw, 34px);
+            font-weight: 900;
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .result-score {
+            margin: 13px 0;
+            padding: 17px;
+            color: var(--leaf-dark);
+            background: #eaf8d7;
+            border: 3px solid #d4edb4;
+            border-radius: 25px;
+        }
+
+        .result-score strong {
+            display: block;
+            font-size: clamp(64px, 20vw, 98px);
+            font-weight: 900;
+            line-height: 0.9;
+        }
+
+        .result-score span {
+            display: block;
+            margin-top: 8px;
+            font-size: 16px;
+            font-weight: 900;
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .result-details {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            color: #5b746e;
+            font-size: 12px;
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .result-details span {
+            padding: 7px 11px;
+            background: #f0f3ed;
+            border-radius: 999px;
+        }
+
+        .result-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .result-button.secondary {
+            min-height: 52px;
+            color: #536b65;
+            background: #e8eeea;
+            box-shadow: 0 5px 0 #cbd8d0;
+            font-size: 16px;
+        }
+
+        .result-button.secondary:active {
+            box-shadow: 0 1px 0 #cbd8d0;
+            transform: translateY(4px);
+        }
+
+    @media (orientation: landscape) {
+            :root {
+                --hud-height: 62px;
+            }
+
+            .sound-button {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+                font-size: 19px;
+            }
+
+            .title-art {
+                object-position: center 38%;
+            }
+
+            .title-logo {
+                top: max(-42px, calc(env(safe-area-inset-top) - 42px));
+                left: 42%;
+                width: min(66vw, 720px);
+            }
+
+            .title-logo-image {
+                width: 100%;
+                max-width: none;
+                height: auto;
+            }
+
+            .title-logo .eyebrow {
+                margin-bottom: 3px;
+                padding: 3px 10px;
+                font-size: clamp(9px, 1.7vw, 12px);
+            }
+
+            .title-best {
+                top: max(8px, env(safe-area-inset-top));
+                right: max(8px, env(safe-area-inset-right));
+                min-width: 106px;
+                padding: 5px 9px;
+            }
+
+            .title-best strong {
+                font-size: 23px;
+            }
+
+            .title-actions {
+                bottom: max(7px, env(safe-area-inset-bottom));
+                width: min(82vw, 720px);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+                padding: 8px;
+                border-radius: 21px;
+            }
+
+            .title-actions .practice-button,
+            .title-actions .start-button {
+                min-height: 52px;
+                padding: 5px 15px;
+            }
+
+            .title-actions .mode-copy strong {
+                font-size: clamp(18px, 3.3vw, 23px);
+            }
+
+            .title-actions .mode-copy small {
+                font-size: clamp(9px, 1.7vw, 12px);
+            }
+
+            .title-actions .park-link {
+                grid-column: 1 / -1;
+                min-height: 32px;
+            }
+
+            .title-card {
+                display: grid;
+                width: min(92vw, 920px);
+                max-height: calc(100dvh - 20px);
+                grid-template-columns: minmax(240px, 0.9fr) minmax(330px, 1.35fr);
+                gap: 20px;
+                padding: 17px 24px;
+                align-items: center;
+            }
+
+            .title-left {
+                align-self: center;
+            }
+
+            .brand-row {
+                grid-template-columns: 78px 1fr;
+            }
+
+            .title-chameleon {
+                width: 78px;
+                height: 78px;
+            }
+
+            .title-copy {
+                margin-bottom: 8px;
+            }
+
+            .rules {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                margin-bottom: 10px;
+            }
+
+            .rule-card {
+                min-height: 51px;
+                padding: 5px 8px;
+            }
+
+            .rule-card:last-child {
+                grid-column: auto;
+            }
+
+            .rule-dot {
+                width: 29px;
+                height: 29px;
+                font-size: 13px;
+            }
+
+            .start-button,
+            .practice-button {
+                min-height: 48px;
+                font-size: 19px;
+            }
+
+            .mode-actions {
+                gap: 8px;
+            }
+
+            .top-rules {
+                padding-block: 3px;
+            }
+
+            .top-rule {
+                min-height: 29px;
+                font-size: 9px;
+            }
+
+            .top-rule .rule-dot {
+                width: 18px;
+                height: 18px;
+                flex-basis: 18px;
+                font-size: 9px;
+            }
+
+            .park-link {
+                margin-top: 9px;
+            }
+
+            .hud {
+                grid-template-columns: 48px minmax(76px, 0.65fr) minmax(170px, 1.7fr) minmax(58px, 0.6fr);
+            }
+
+            .exit-button {
+                width: 42px;
+                height: 42px;
+            }
+
+            .play-layout {
+                display: block;
+            }
+
+            .stage {
+                inset: 7px 8px;
+                margin: 0;
+            }
+
+            .controls-panel {
+                min-height: 0;
+                padding: 8px;
+                border: 3px solid #fff;
+                border-radius: 28px;
+                box-shadow: 0 10px 26px rgba(18, 107, 72, 0.18);
+            }
+
+            .dpad {
+                width: min(47vh, 190px);
+                max-width: min(35vw, 190px);
+                gap: 6px;
+            }
+
+            .direction-button {
+                min-width: 45px;
+                min-height: 45px;
+                border-radius: 18px;
+                font-size: clamp(27px, 8vh, 42px);
+            }
+
+            .tutorial-card {
+                width: min(88%, 460px);
+                padding: 13px 20px;
+            }
+
+            .doctor-row {
+                grid-template-columns: 66px minmax(0, 1fr) 43px;
+                gap: 8px;
+            }
+
+            .doctor-avatar {
+                width: 66px;
+                height: 66px;
+            }
+
+            .tutorial-symbol {
+                width: 43px;
+                height: 43px;
+                font-size: 18px;
+            }
+
+            .tutorial-copy {
+                margin-block: 6px 9px;
+                padding: 8px 11px;
+                font-size: 14px;
+                line-height: 1.45;
+            }
+
+            .tutorial-progress {
+                margin-bottom: 9px;
+            }
+
+            .tutorial-button {
+                min-height: 44px;
+            }
+
+            .result-card {
+                display: grid;
+                width: min(86vw, 700px);
+                grid-template-columns: 0.8fr 1fr;
+                gap: 15px 22px;
+                padding: 18px 26px;
+                align-items: center;
+            }
+
+            .result-summary {
+                grid-row: 1 / span 2;
+            }
+
+            .result-icon {
+                width: 76px;
+                height: 76px;
+                margin: 0 auto 3px;
+            }
+
+            .result-score {
+                margin: 8px 0;
+                padding: 10px;
+            }
+
+            .result-score strong {
+                font-size: 64px;
+            }
+
+            .result-details {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-height: 590px) and (orientation: portrait) {
+            :root {
+                --hud-height: 62px;
+            }
+
+            .hud {
+                grid-template-columns: 48px 70px minmax(120px, 1fr) 56px;
+            }
+
+            .exit-button {
+                width: 42px;
+                height: 42px;
+            }
+
+            .controls-panel {
+                min-height: 0;
+                padding: 7px;
+            }
+
+            .dpad {
+                width: 148px;
+                gap: 5px;
+            }
+
+            .direction-button {
+                min-width: 44px;
+                min-height: 44px;
+                border-radius: 16px;
+                font-size: 29px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-button" id="sound-button" type="button" aria-label="音を切り替える" aria-pressed="true">🔊</button>
+
+    <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
+        <img class="title-art" src="assets/title-art-parrot-professor-v1.jpg" alt="">
+        <div class="title-scrim" aria-hidden="true"></div>
+
+        <div class="title-best" aria-label="これまでの最高記録">
+            <span>これまでの さいこう</span>
+            <strong><span id="title-best">0</span><small>ひき</small></strong>
+        </div>
+
+        <div class="title-logo">
+            <img class="title-logo-image" src="assets/title-logo-chameleon-v1.png" alt="" aria-hidden="true">
+            <h1 id="game-title">カメレオンキャッチ！</h1>
+        </div>
+
+        <div class="title-actions">
+            <button class="practice-button" id="practice-button" type="button">
+                <span class="mode-icon" aria-hidden="true">📖</span>
+                <span class="mode-copy"><strong>れんしゅう</strong><small>いろのルールを おぼえる</small></span>
+            </button>
+            <button class="start-button" id="start-button" type="button">
+                <span class="mode-icon" aria-hidden="true">🧤</span>
+                <span class="mode-copy"><strong>スタート</strong><small>1ぷん チャレンジ</small></span>
+            </button>
+            <a class="park-link" href="../../index.html">← ゲームパークへ もどる</a>
+        </div>
+    </section>
+
+    <section class="screen" id="screen-game" aria-label="カメレオン・キャッチのゲーム画面" hidden>
+        <header class="hud">
+            <button class="exit-button" id="exit-button" type="button" aria-label="タイトルへ戻る">×</button>
+
+            <div class="stat">
+                <span class="stat-label" id="caught-label">つかまえた</span>
+                <span class="stat-value"><span id="caught-count">0</span><small id="caught-unit">ひき</small></span>
+            </div>
+
+            <div class="rule-chip" id="rule-chip" aria-live="polite">
+                <span class="rule-chip-symbol" id="rule-symbol">☝</span>
+                <span class="rule-chip-text" id="rule-text">みどりは あいたほうを つつく</span>
+            </div>
+
+            <div class="stat">
+                <span class="stat-label" id="time-label">のこり</span>
+                <span class="stat-value"><span id="time-count">60</span><small id="time-unit">びょう</small></span>
+            </div>
+        </header>
+
+        <div class="top-rules" id="top-rules" aria-label="ほんばんの色ルール一覧">
+            <div class="top-rule"><span class="rule-dot green">☝</span><span>みどり<br>あいた方</span></div>
+            <div class="top-rule"><span class="rule-dot blue">☝</span><span>あお<br>はんたい</span></div>
+            <div class="top-rule"><span class="rule-dot yellow">☝</span><span>きいろ<br>あいた方×3</span></div>
+            <div class="top-rule"><span class="rule-dot red">☝</span><span>あか<br>すばやく</span></div>
+            <div class="top-rule"><span class="rule-dot purple">☝</span><span>むらさき<br>タイミング</span></div>
+        </div>
+
+        <div class="play-layout">
+            <main class="stage" id="stage">
+                <div class="tutorial-panel" id="tutorial-panel" hidden>
+                    <div class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorial-heading">
+                        <div class="doctor-row">
+                            <div class="doctor-avatar" aria-hidden="true">
+                                <img src="assets/parrot-professor-glove.png" alt="" width="512" height="512">
+                            </div>
+                            <div>
+                                <p class="tutorial-kicker" id="tutorial-kicker">オウムはかせの おしえ 1 / 5</p>
+                                <h2 id="tutorial-heading">みどりの つかまえかた</h2>
+                            </div>
+                            <span class="tutorial-symbol" id="tutorial-symbol" aria-hidden="true">☝</span>
+                        </div>
+                        <p class="tutorial-copy" id="tutorial-copy">みどりは すなおじゃ。すきまが あいている ほうを つつくんじゃ！</p>
+                        <div class="tutorial-progress" id="tutorial-progress" aria-label="練習の進み具合">
+                            <span class="is-current"></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <button class="tutorial-button begin" id="tutorial-begin-button" type="button">やってみるぞ！</button>
+                        <button class="tutorial-button" id="tutorial-challenge-button" type="button" hidden>1ぷん チャレンジへ！</button>
+                        <button class="tutorial-button secondary" id="tutorial-title-button" type="button" hidden>タイトルへ</button>
+                    </div>
+                </div>
+
+                <div class="chameleon-wrap" id="chameleon-wrap" hidden>
+                    <div class="chameleon-inner" id="chameleon-inner">
+                        <img class="chameleon-img" id="chameleon-img" src="assets/chameleon-green-right.png" alt="カメレオン">
+                    </div>
+                    <span class="tap-counter" id="tap-counter" hidden>3</span>
+                </div>
+
+                <div class="red-timer" id="red-timer" hidden><span></span></div>
+                <div id="feedback-area" aria-live="polite"></div>
+            </main>
+
+            <aside class="controls-panel" id="controls-panel" aria-label="方向を指でつつくボタン">
+                <div class="dpad">
+                    <button class="direction-button" type="button" data-dir="Up" aria-label="上をつつく">
+                        <img class="direction-glove" src="assets/catch-glove-up.png" alt="" width="384" height="384" draggable="false">
+                    </button>
+                    <button class="direction-button" type="button" data-dir="Left" aria-label="左をつつく">
+                        <img class="direction-glove" src="assets/catch-glove-left.png" alt="" width="384" height="384" draggable="false">
+                    </button>
+                    <span class="dpad-center" aria-hidden="true"></span>
+                    <button class="direction-button" type="button" data-dir="Right" aria-label="右をつつく">
+                        <img class="direction-glove" src="assets/catch-glove-right.png" alt="" width="384" height="384" draggable="false">
+                    </button>
+                    <button class="direction-button" type="button" data-dir="Down" aria-label="下をつつく">
+                        <img class="direction-glove" src="assets/catch-glove-down.png" alt="" width="384" height="384" draggable="false">
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section class="screen jungle-bg" id="screen-result" aria-labelledby="result-heading" hidden>
+        <div class="result-card">
+            <div class="result-summary">
+                <div class="result-icon" aria-hidden="true">
+                    <img src="assets/parrot-professor-glove.png" alt="" width="512" height="512">
+                </div>
+                <h2 id="result-heading">たんけん おわり！</h2>
+                <div class="result-score">
+                    <strong id="result-caught">0</strong>
+                    <span>ひき つかまえた！</span>
+                </div>
+            </div>
+
+            <div class="result-details">
+                <span>1ぷん さいこう <strong id="result-best">0</strong>ひき</span>
+                <span>れんぞく <strong id="result-combo">0</strong>ひき</span>
+            </div>
+
+            <div class="result-actions">
+                <button class="result-button" id="again-button" type="button">もういちど 1ぷん！</button>
+                <button class="result-button secondary" id="title-button" type="button">タイトルへ</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const GAME_DURATION = 60;
+            const RED_LIMIT_MS = 1500;
+            const PURPLE_SPEED = 105;
+            const PURPLE_TOLERANCE = 48;
+            const DIRECTIONS = ["Up", "Right", "Down", "Left"];
+            const TYPE_ORDER = ["green", "blue", "yellow", "red", "purple"];
+            const DIRECTION_ANGLE = { Right: 0, Down: 90, Left: 180, Up: 270 };
+            const ROTATION_FOR_DIRECTION = { Right: 0, Down: 90, Left: 180, Up: 270 };
+            const OPPOSITE = { Up: "Down", Right: "Left", Down: "Up", Left: "Right" };
+            const BEST_KEY = "chameleonCatchBest60V1";
+
+            const TYPE_META = {
+                green: {
+                    unlock: 0,
+                    symbol: "☝",
+                    text: "みどりは あいたほうを つつく",
+                    chip: "#46b95f",
+                    className: ""
+                },
+                blue: {
+                    unlock: 3,
+                    symbol: "☝",
+                    text: "あおは はんたいを つつく",
+                    chip: "#3887f6",
+                    className: "type-blue"
+                },
+                yellow: {
+                    unlock: 7,
+                    symbol: "☝",
+                    text: "きいろは あいているほうを 3かい",
+                    chip: "#dca900",
+                    className: "type-yellow"
+                },
+                red: {
+                    unlock: 12,
+                    symbol: "☝",
+                    text: "あかは すばやく つつく",
+                    chip: "#ff5e5e",
+                    className: "type-red"
+                },
+                purple: {
+                    unlock: 18,
+                    symbol: "☝",
+                    text: "むらさきは むいたほうを つつく",
+                    chip: "#8b5cf6",
+                    className: "type-purple"
+                }
+            };
+
+            const TUTORIAL_COPY = {
+                green: {
+                    title: "みどりの つかまえかた",
+                    copy: "みどりは すなおじゃ。すきまが あいている ほうを つつくんじゃ！"
+                },
+                blue: {
+                    title: "あおの つかまえかた",
+                    copy: "あおは あまのじゃくじゃ。すきまと はんたいの ほうを つつくんじゃ！"
+                },
+                yellow: {
+                    title: "きいろの つかまえかた",
+                    copy: "きいろは がんじょうじゃから、すきまが あいている ほうを 3かい つつくんじゃ！"
+                },
+                red: {
+                    title: "あかの つかまえかた",
+                    copy: "あかは すばしっこいぞ。にげるまえに すきまの ほうを すばやく つつくんじゃ！"
+                },
+                purple: {
+                    title: "むらさきの つかまえかた",
+                    copy: "むらさきは くるくる まわるぞ。すきまが むいた しゅんかんに その ほうを つつくんじゃ！"
+                }
+            };
+
+            const elements = {
+                title: document.querySelector("#screen-title"),
+                game: document.querySelector("#screen-game"),
+                result: document.querySelector("#screen-result"),
+                start: document.querySelector("#start-button"),
+                practice: document.querySelector("#practice-button"),
+                exit: document.querySelector("#exit-button"),
+                again: document.querySelector("#again-button"),
+                titleButton: document.querySelector("#title-button"),
+                sound: document.querySelector("#sound-button"),
+                caughtLabel: document.querySelector("#caught-label"),
+                caught: document.querySelector("#caught-count"),
+                caughtUnit: document.querySelector("#caught-unit"),
+                timeLabel: document.querySelector("#time-label"),
+                time: document.querySelector("#time-count"),
+                timeUnit: document.querySelector("#time-unit"),
+                ruleChip: document.querySelector("#rule-chip"),
+                ruleSymbol: document.querySelector("#rule-symbol"),
+                ruleText: document.querySelector("#rule-text"),
+                topRules: document.querySelector("#top-rules"),
+                stage: document.querySelector("#stage"),
+                tutorialPanel: document.querySelector("#tutorial-panel"),
+                tutorialKicker: document.querySelector("#tutorial-kicker"),
+                tutorialSymbol: document.querySelector("#tutorial-symbol"),
+                tutorialHeading: document.querySelector("#tutorial-heading"),
+                tutorialCopy: document.querySelector("#tutorial-copy"),
+                tutorialProgress: [...document.querySelectorAll("#tutorial-progress span")],
+                tutorialBegin: document.querySelector("#tutorial-begin-button"),
+                tutorialChallenge: document.querySelector("#tutorial-challenge-button"),
+                tutorialTitle: document.querySelector("#tutorial-title-button"),
+                wrap: document.querySelector("#chameleon-wrap"),
+                inner: document.querySelector("#chameleon-inner"),
+                image: document.querySelector("#chameleon-img"),
+                controlsPanel: document.querySelector("#controls-panel"),
+                tapCounter: document.querySelector("#tap-counter"),
+                redTimer: document.querySelector("#red-timer"),
+                feedback: document.querySelector("#feedback-area"),
+                resultCaught: document.querySelector("#result-caught"),
+                resultBest: document.querySelector("#result-best"),
+                resultCombo: document.querySelector("#result-combo"),
+                titleBest: document.querySelector("#title-best"),
+                directionButtons: [...document.querySelectorAll(".direction-button")]
+            };
+
+            const state = {
+                mode: "title",
+                runMode: "challenge",
+                caught: 0,
+                combo: 0,
+                bestCombo: 0,
+                best: Number.parseInt(localStorage.getItem(BEST_KEY) || "0", 10),
+                timeLeft: GAME_DURATION,
+                startedAt: 0,
+                current: null,
+                lastDirection: null,
+                lastSpawnZone: -1,
+                seenTypes: new Set(),
+                practiceIndex: 0,
+                practiceSuccesses: 0,
+                locked: true,
+                timerId: null,
+                redTimerId: null,
+                transitionId: null,
+                purpleFrame: null,
+                purpleAngle: 0,
+                purpleLastTime: 0,
+                soundOn: true,
+                audioContext: null
+            };
+
+            function showScreen(name) {
+                elements.title.hidden = name !== "title";
+                elements.game.hidden = name !== "game";
+                elements.result.hidden = name !== "result";
+                state.mode = name;
+                elements.sound.hidden = name === "game";
+                if (name === "title") elements.titleBest.textContent = state.best;
+            }
+
+            function clearTimers() {
+                window.clearInterval(state.timerId);
+                window.clearTimeout(state.redTimerId);
+                window.clearTimeout(state.transitionId);
+                window.cancelAnimationFrame(state.purpleFrame);
+                state.timerId = null;
+                state.redTimerId = null;
+                state.transitionId = null;
+                state.purpleFrame = null;
+            }
+
+            function getAudioContext() {
+                if (!state.audioContext) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) state.audioContext = new AudioContext();
+                }
+                if (state.audioContext?.state === "suspended") state.audioContext.resume();
+                return state.audioContext;
+            }
+
+            function playSound(type) {
+                if (!state.soundOn) return;
+                const context = getAudioContext();
+                if (!context) return;
+
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                const now = context.currentTime;
+                const settings = {
+                    click: [420, 0.04, "sine"],
+                    correct: [760, 0.11, "triangle"],
+                    wrong: [170, 0.13, "sawtooth"],
+                    start: [520, 0.17, "triangle"],
+                    finish: [660, 0.32, "sine"]
+                }[type] || [420, 0.05, "sine"];
+
+                oscillator.type = settings[2];
+                oscillator.frequency.setValueAtTime(settings[0], now);
+                if (type === "correct" || type === "start" || type === "finish") {
+                    oscillator.frequency.exponentialRampToValueAtTime(settings[0] * 1.55, now + settings[1]);
+                }
+                gain.gain.setValueAtTime(0.075, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + settings[1]);
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.start(now);
+                oscillator.stop(now + settings[1]);
+            }
+
+            function toggleSound() {
+                state.soundOn = !state.soundOn;
+                elements.sound.textContent = state.soundOn ? "🔊" : "🔇";
+                elements.sound.setAttribute("aria-pressed", String(state.soundOn));
+                if (state.soundOn) playSound("click");
+            }
+
+            function randomDirection() {
+                const choices = state.lastDirection
+                    ? DIRECTIONS.filter((direction) => direction !== state.lastDirection)
+                    : DIRECTIONS;
+                const direction = choices[Math.floor(Math.random() * choices.length)];
+                state.lastDirection = direction;
+                return direction;
+            }
+
+            function availableTypes() {
+                if (state.runMode === "practice") {
+                    return [TYPE_ORDER[state.practiceIndex]];
+                }
+
+                return Object.entries(TYPE_META)
+                    .filter(([, meta]) => state.caught >= meta.unlock)
+                    .map(([type]) => type);
+            }
+
+            function chooseType() {
+                const choices = availableTypes();
+                if (state.runMode === "practice") {
+                    return { type: choices[0], isNew: false };
+                }
+
+                const unseen = choices.find((type) => !state.seenTypes.has(type));
+                if (unseen) {
+                    state.seenTypes.add(unseen);
+                    return { type: unseen, isNew: unseen !== "green" };
+                }
+
+                const previousType = state.current?.type;
+                const varied = choices.length > 1
+                    ? choices.filter((type) => type !== previousType)
+                    : choices;
+                const type = varied[Math.floor(Math.random() * varied.length)];
+                return { type, isNew: false };
+            }
+
+            function spriteSize() {
+                const stageRect = elements.stage.getBoundingClientRect();
+                const base = Math.min(stageRect.width, stageRect.height) * 0.33;
+                const shrink = state.runMode === "challenge" ? state.caught * 0.85 : 0;
+                return Math.round(Math.max(78, Math.min(155, base - shrink)));
+            }
+
+            function updateRule(type, isNew) {
+                const meta = TYPE_META[type];
+                elements.ruleSymbol.textContent = meta.symbol;
+                elements.ruleText.textContent = meta.text;
+                elements.ruleChip.style.background = meta.chip;
+                elements.ruleChip.classList.toggle("is-new", isNew);
+                if (isNew) {
+                    window.setTimeout(() => elements.ruleChip.classList.remove("is-new"), 560);
+                }
+            }
+
+            function updateHud() {
+                if (state.runMode === "practice") {
+                    elements.caughtLabel.textContent = "このいろ";
+                    elements.caught.textContent = state.practiceSuccesses;
+                    elements.caughtUnit.textContent = "/3";
+                    elements.timeLabel.textContent = "じゅんばん";
+                    elements.time.textContent = Math.min(TYPE_ORDER.length, state.practiceIndex + 1);
+                    elements.timeUnit.textContent = "/5";
+                    return;
+                }
+
+                elements.caughtLabel.textContent = "つかまえた";
+                elements.caught.textContent = state.caught;
+                elements.caughtUnit.textContent = "ひき";
+                elements.timeLabel.textContent = "のこり";
+                elements.time.textContent = Math.max(0, Math.ceil(state.timeLeft));
+                elements.timeUnit.textContent = "びょう";
+            }
+
+            function updateTutorialProgress(isComplete = false) {
+                elements.tutorialProgress.forEach((dot, index) => {
+                    dot.classList.toggle("is-done", isComplete || index < state.practiceIndex);
+                    dot.classList.toggle("is-current", !isComplete && index === state.practiceIndex);
+                });
+            }
+
+            function showPracticeIntro() {
+                const type = TYPE_ORDER[state.practiceIndex];
+                const meta = TYPE_META[type];
+                const tutorial = TUTORIAL_COPY[type];
+
+                state.locked = true;
+                state.current = null;
+                elements.wrap.hidden = true;
+                elements.redTimer.hidden = true;
+                elements.tutorialKicker.textContent = `オウムはかせの おしえ ${state.practiceIndex + 1} / ${TYPE_ORDER.length}`;
+                elements.tutorialSymbol.textContent = meta.symbol;
+                elements.tutorialSymbol.style.background = meta.chip;
+                elements.tutorialHeading.textContent = tutorial.title;
+                elements.tutorialCopy.textContent = tutorial.copy;
+                elements.tutorialBegin.hidden = false;
+                elements.tutorialChallenge.hidden = true;
+                elements.tutorialTitle.hidden = true;
+                elements.tutorialPanel.hidden = false;
+                updateTutorialProgress();
+                updateRule(type, true);
+                updateHud();
+            }
+
+            function showPracticeComplete() {
+                state.locked = true;
+                state.current = null;
+                elements.wrap.hidden = true;
+                elements.redTimer.hidden = true;
+                elements.tutorialKicker.textContent = "オウムはかせより";
+                elements.tutorialSymbol.textContent = "✓";
+                elements.tutorialSymbol.style.background = "#46b95f";
+                elements.tutorialHeading.textContent = "OK！";
+                elements.tutorialCopy.textContent = "5しゅるい ぜんぶ できたのう！ ほんばんも がんばるんじゃ！";
+                elements.tutorialBegin.hidden = true;
+                elements.tutorialChallenge.hidden = false;
+                elements.tutorialTitle.hidden = false;
+                elements.tutorialPanel.hidden = false;
+                updateTutorialProgress(true);
+                updateHud();
+                playSound("finish");
+            }
+
+            function beginPracticeRound() {
+                if (state.runMode !== "practice" || state.practiceIndex >= TYPE_ORDER.length) return;
+                elements.tutorialPanel.hidden = true;
+                state.locked = false;
+                spawnChameleon();
+            }
+
+            function randomPosition() {
+                const stageRect = elements.stage.getBoundingClientRect();
+                const controlsRect = elements.controlsPanel.getBoundingClientRect();
+                const size = spriteSize();
+                const half = size / 2 + 5;
+                const minX = Math.min(half, stageRect.width / 2);
+                const maxX = Math.max(minX, stageRect.width - half);
+                const minY = Math.min(half, stageRect.height / 2);
+                const maxY = Math.max(minY, stageRect.height - half);
+                const anchors = [
+                    { x: minX, y: minY },
+                    { x: stageRect.width / 2, y: minY },
+                    { x: maxX, y: minY },
+                    { x: minX, y: stageRect.height / 2 },
+                    { x: maxX, y: stageRect.height / 2 },
+                    { x: minX, y: maxY },
+                    { x: stageRect.width / 2, y: maxY },
+                    { x: maxX, y: maxY }
+                ].map((position, index) => ({ ...position, index }));
+
+                const clearance = 5;
+                const safeAnchors = anchors.filter(({ x, y }) => {
+                    const screenX = stageRect.left + x;
+                    const screenY = stageRect.top + y;
+                    return !(
+                        screenX + half > controlsRect.left - clearance &&
+                        screenX - half < controlsRect.right + clearance &&
+                        screenY + half > controlsRect.top - clearance &&
+                        screenY - half < controlsRect.bottom + clearance
+                    );
+                });
+
+                const candidates = (safeAnchors.length ? safeAnchors : anchors)
+                    .filter(({ index }) => index !== state.lastSpawnZone);
+                const pool = candidates.length ? candidates : (safeAnchors.length ? safeAnchors : anchors);
+                const selected = pool[Math.floor(Math.random() * pool.length)];
+                state.lastSpawnZone = selected.index;
+
+                return {
+                    x: stageRect.width ? selected.x / stageRect.width * 100 : 20,
+                    y: stageRect.height ? selected.y / stageRect.height * 100 : 20
+                };
+            }
+
+            function beginPurpleRotation() {
+                state.purpleAngle = Math.random() * 360;
+                state.purpleLastTime = performance.now();
+
+                const rotate = (time) => {
+                    if (state.mode !== "game" || state.current?.type !== "purple" || state.locked) return;
+                    const delta = Math.min(50, time - state.purpleLastTime);
+                    state.purpleLastTime = time;
+                    state.purpleAngle = (state.purpleAngle + PURPLE_SPEED * delta / 1000) % 360;
+                    elements.inner.style.transform = `rotate(${state.purpleAngle}deg)`;
+                    state.purpleFrame = window.requestAnimationFrame(rotate);
+                };
+
+                state.purpleFrame = window.requestAnimationFrame(rotate);
+            }
+
+            function spawnChameleon() {
+                if (state.mode !== "game") return;
+                window.clearTimeout(state.redTimerId);
+                window.cancelAnimationFrame(state.purpleFrame);
+                state.redTimerId = null;
+                state.purpleFrame = null;
+                state.locked = false;
+
+                const selection = chooseType();
+                const direction = randomDirection();
+                const position = randomPosition();
+                const meta = TYPE_META[selection.type];
+
+                state.current = {
+                    type: selection.type,
+                    direction,
+                    tapsRemaining: selection.type === "yellow" ? 3 : 1
+                };
+
+                elements.wrap.hidden = false;
+                elements.wrap.className = "chameleon-wrap";
+                elements.wrap.style.left = `${position.x}%`;
+                elements.wrap.style.top = `${position.y}%`;
+                elements.wrap.style.width = `${spriteSize()}px`;
+                elements.image.className = `chameleon-img ${meta.className}`.trim();
+                elements.tapCounter.hidden = selection.type !== "yellow";
+                elements.tapCounter.textContent = "3";
+                elements.redTimer.hidden = selection.type !== "red";
+                elements.redTimer.innerHTML = "<span></span>";
+                updateRule(selection.type, selection.isNew);
+
+                if (selection.type === "purple") {
+                    beginPurpleRotation();
+                } else {
+                    elements.inner.style.transform = `rotate(${ROTATION_FOR_DIRECTION[direction]}deg)`;
+                }
+
+                if (selection.type === "red") {
+                    state.redTimerId = window.setTimeout(() => failCurrent("にげられた！"), RED_LIMIT_MS);
+                }
+            }
+
+            function angleDifference(a, b) {
+                return Math.abs(((a - b + 540) % 360) - 180);
+            }
+
+            function isCorrectInput(inputDirection) {
+                if (!state.current) return false;
+                const { type, direction } = state.current;
+                if (type === "blue") return inputDirection === OPPOSITE[direction];
+                if (type === "purple") {
+                    return angleDifference(state.purpleAngle, DIRECTION_ANGLE[inputDirection]) <= PURPLE_TOLERANCE;
+                }
+                return inputDirection === direction;
+            }
+
+            function showFeedback(text, bad = false) {
+                const feedback = document.createElement("div");
+                feedback.className = `feedback${bad ? " bad" : ""}`;
+                feedback.textContent = text;
+                elements.feedback.replaceChildren(feedback);
+                window.setTimeout(() => feedback.remove(), 650);
+            }
+
+            function captureCurrent() {
+                if (state.locked) return;
+                state.locked = true;
+                window.clearTimeout(state.redTimerId);
+                window.cancelAnimationFrame(state.purpleFrame);
+                elements.redTimer.hidden = true;
+                elements.wrap.classList.add("is-caught");
+
+                state.caught += 1;
+                state.combo += 1;
+                state.bestCombo = Math.max(state.bestCombo, state.combo);
+
+                if (state.runMode === "practice") {
+                    state.practiceSuccesses += 1;
+                    const completedColor = state.practiceSuccesses >= 3;
+                    updateHud();
+                    showFeedback(completedColor ? "3かい できた！" : `${state.practiceSuccesses} / 3 できた！`);
+                    playSound("correct");
+
+                    state.transitionId = window.setTimeout(() => {
+                        if (!completedColor) {
+                            spawnChameleon();
+                            return;
+                        }
+
+                        state.practiceIndex += 1;
+                        state.practiceSuccesses = 0;
+                        if (state.practiceIndex >= TYPE_ORDER.length) {
+                            showPracticeComplete();
+                        } else {
+                            showPracticeIntro();
+                        }
+                    }, 520);
+                    return;
+                }
+
+                updateHud();
+                showFeedback(state.combo >= 4 ? `${state.combo}ひき れんぞく！` : "つかまえた！");
+                playSound("correct");
+
+                state.transitionId = window.setTimeout(spawnChameleon, 430);
+            }
+
+            function failCurrent(message = "おしい！") {
+                if (state.locked || state.mode !== "game") return;
+                state.locked = true;
+                window.clearTimeout(state.redTimerId);
+                window.cancelAnimationFrame(state.purpleFrame);
+                elements.redTimer.hidden = true;
+                elements.wrap.classList.add("is-escaped");
+                state.combo = 0;
+                showFeedback(message, true);
+                playSound("wrong");
+                state.transitionId = window.setTimeout(spawnChameleon, 430);
+            }
+
+            function handleInput(inputDirection) {
+                if (state.mode !== "game" || state.locked || !state.current) return;
+                const button = elements.directionButtons.find((item) => item.dataset.dir === inputDirection);
+                button?.classList.add("is-pressed");
+                window.setTimeout(() => button?.classList.remove("is-pressed"), 100);
+
+                if (!isCorrectInput(inputDirection)) {
+                    failCurrent("にげられた！");
+                    return;
+                }
+
+                if (state.current.type === "yellow") {
+                    state.current.tapsRemaining -= 1;
+                    elements.tapCounter.textContent = state.current.tapsRemaining;
+                    playSound("click");
+                    if (state.current.tapsRemaining > 0) {
+                        showFeedback(`あと ${state.current.tapsRemaining}かい！`);
+                        return;
+                    }
+                }
+
+                captureCurrent();
+            }
+
+            function resetRun(runMode) {
+                clearTimers();
+                playSound("start");
+                state.runMode = runMode;
+                state.caught = 0;
+                state.combo = 0;
+                state.bestCombo = 0;
+                state.timeLeft = GAME_DURATION;
+                state.startedAt = performance.now();
+                state.current = null;
+                state.lastDirection = null;
+                state.lastSpawnZone = -1;
+                state.seenTypes = new Set();
+                state.practiceIndex = 0;
+                state.practiceSuccesses = 0;
+                state.locked = true;
+                elements.feedback.replaceChildren();
+                elements.wrap.hidden = true;
+                elements.redTimer.hidden = true;
+                elements.tutorialPanel.hidden = true;
+                elements.topRules.hidden = runMode !== "challenge";
+                showScreen("game");
+                updateHud();
+            }
+
+            function startChallenge() {
+                resetRun("challenge");
+                state.locked = false;
+                state.timerId = window.setInterval(() => {
+                    const elapsed = (performance.now() - state.startedAt) / 1000;
+                    state.timeLeft = Math.max(0, GAME_DURATION - elapsed);
+                    updateHud();
+                    if (state.timeLeft <= 0) endGame();
+                }, 100);
+
+                window.requestAnimationFrame(spawnChameleon);
+            }
+
+            function startPractice() {
+                resetRun("practice");
+                showPracticeIntro();
+            }
+
+            function endGame() {
+                if (state.mode !== "game" || state.runMode !== "challenge") return;
+                state.locked = true;
+                clearTimers();
+                elements.wrap.hidden = true;
+                elements.redTimer.hidden = true;
+
+                if (state.caught > state.best) {
+                    state.best = state.caught;
+                    localStorage.setItem(BEST_KEY, String(state.best));
+                }
+
+                elements.resultCaught.textContent = state.caught;
+                elements.resultBest.textContent = state.best;
+                elements.resultCombo.textContent = state.bestCombo;
+                showScreen("result");
+                playSound("finish");
+            }
+
+            function returnToTitle() {
+                clearTimers();
+                state.locked = true;
+                elements.wrap.hidden = true;
+                elements.redTimer.hidden = true;
+                elements.tutorialPanel.hidden = true;
+                showScreen("title");
+            }
+
+            elements.start.addEventListener("click", startChallenge);
+            elements.practice.addEventListener("click", startPractice);
+            elements.exit.addEventListener("click", returnToTitle);
+            elements.again.addEventListener("click", startChallenge);
+            elements.titleButton.addEventListener("click", returnToTitle);
+            elements.tutorialChallenge.addEventListener("click", startChallenge);
+            elements.tutorialTitle.addEventListener("click", returnToTitle);
+            elements.tutorialBegin.addEventListener("click", beginPracticeRound);
+            elements.sound.addEventListener("click", toggleSound);
+            elements.directionButtons.forEach((button) => {
+                button.addEventListener("click", () => handleInput(button.dataset.dir));
+            });
+
+            window.addEventListener("keydown", (event) => {
+                const keyToDirection = {
+                    ArrowUp: "Up",
+                    ArrowRight: "Right",
+                    ArrowDown: "Down",
+                    ArrowLeft: "Left"
+                };
+
+                if (keyToDirection[event.key]) {
+                    event.preventDefault();
+                    handleInput(keyToDirection[event.key]);
+                } else if ((event.key === "Enter" || event.key === " ") && state.mode === "title") {
+                    event.preventDefault();
+                    startChallenge();
+                } else if (event.key === "Escape" && state.mode === "game") {
+                    returnToTitle();
+                }
+            });
+
+            window.addEventListener("resize", () => {
+                if (state.mode === "game" && !elements.wrap.hidden) {
+                    elements.wrap.style.width = `${spriteSize()}px`;
+                }
+            });
+
+            showScreen("title");
+        })();
+    </script>
+</body>
+</html>

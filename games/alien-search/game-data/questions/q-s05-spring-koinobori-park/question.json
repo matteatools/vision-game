@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s05-spring-koinobori-park",
+  "stageId": "s05",
+  "season": "spring",
+  "level": 5,
+  "theme": "こいのぼり公園",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s05-t01",
+      "action": "ブランコに乗っている",
+      "hitbox": {
+        "x": 1405,
+        "y": 235,
+        "width": 125,
+        "height": 135
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s05-t02",
+      "action": "笛を吹きながら歩いている",
+      "hitbox": {
+        "x": 565,
+        "y": 220,
+        "width": 115,
+        "height": 125
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s05-t03",
+      "action": "小川で虫取りあみを持っている",
+      "hitbox": {
+        "x": 580,
+        "y": 875,
+        "width": 135,
+        "height": 170
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s05-t04",
+      "action": "カメラで公園を撮っている",
+      "hitbox": {
+        "x": 1170,
+        "y": 835,
+        "width": 135,
+        "height": 145
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s05-t05",
+      "action": "シャボン玉をつかまえようとしている",
+      "hitbox": {
+        "x": 920,
+        "y": 900,
+        "width": 135,
+        "height": 155
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

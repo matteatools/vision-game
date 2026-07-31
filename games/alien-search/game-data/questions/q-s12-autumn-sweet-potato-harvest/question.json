@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s12-autumn-sweet-potato-harvest",
+  "stageId": "s12",
+  "season": "autumn",
+  "level": 2,
+  "theme": "さつまいも畑",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s12-t01",
+      "action": "さつまいもを台車で運んでいる",
+      "hitbox": {
+        "x": 625,
+        "y": 225,
+        "width": 190,
+        "height": 150
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s12-t02",
+      "action": "大きなさつまいもを引き抜いている",
+      "hitbox": {
+        "x": 65,
+        "y": 350,
+        "width": 175,
+        "height": 180
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s12-t03",
+      "action": "つるの中からさつまいもを掘っている",
+      "hitbox": {
+        "x": 300,
+        "y": 500,
+        "width": 190,
+        "height": 175
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s12-t04",
+      "action": "洗ったさつまいもをタオルで拭いている",
+      "hitbox": {
+        "x": 1270,
+        "y": 545,
+        "width": 140,
+        "height": 185
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s12-t05",
+      "action": "さつまいもの台車を引いている",
+      "hitbox": {
+        "x": 1310,
+        "y": 815,
+        "width": 200,
+        "height": 220
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

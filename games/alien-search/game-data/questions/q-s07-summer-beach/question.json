@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s07-summer-beach",
+  "stageId": "s07",
+  "season": "summer",
+  "level": 2,
+  "theme": "海水浴",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s07-t01",
+      "action": "海の家の前ですいかを食べている",
+      "hitbox": {
+        "x": 1175,
+        "y": 180,
+        "width": 145,
+        "height": 140
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s07-t02",
+      "action": "桟橋で日焼け止めを持っている",
+      "hitbox": {
+        "x": 990,
+        "y": 245,
+        "width": 125,
+        "height": 160
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s07-t03",
+      "action": "砂のお城を作っている",
+      "hitbox": {
+        "x": 480,
+        "y": 525,
+        "width": 150,
+        "height": 180
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s07-t04",
+      "action": "サングラスをかけてシートに座っている",
+      "hitbox": {
+        "x": 585,
+        "y": 850,
+        "width": 170,
+        "height": 205
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s07-t05",
+      "action": "貝がらを見せている",
+      "hitbox": {
+        "x": 1270,
+        "y": 785,
+        "width": 145,
+        "height": 170
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

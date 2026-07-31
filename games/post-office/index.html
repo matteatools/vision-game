@@ -1,0 +1,3047 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#173d68">
+    <title>ぴったりゆうびんきょく</title>
+    <style>
+        :root {
+            --navy: #173d68;
+            --navy-dark: #0d2949;
+            --postal-red: #c94e43;
+            --gold: #f4c55d;
+            --cream: #fff8df;
+            --ink: #3f352b;
+            --wood: #87552d;
+            --shadow: 0 16px 42px rgba(65, 38, 19, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            overscroll-behavior: none;
+        }
+
+        body {
+            overflow: hidden;
+            color: var(--ink);
+            background: #d8eff8;
+            font-family:
+                "M PLUS Rounded 1c",
+                "Hiragino Maru Gothic ProN",
+                "Yu Gothic",
+                system-ui,
+                sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        a,
+        select {
+            font: inherit;
+        }
+
+        button,
+        a {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        select:focus-visible {
+            outline: 4px solid #fff06b;
+            outline-offset: 3px;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            overflow: hidden;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .title-screen {
+            align-items: flex-end;
+            justify-content: center;
+            padding:
+                max(14px, env(safe-area-inset-top))
+                max(14px, env(safe-area-inset-right))
+                max(16px, env(safe-area-inset-bottom))
+                max(14px, env(safe-area-inset-left));
+            background:
+                linear-gradient(180deg, rgba(19, 48, 60, 0) 0 67%, rgba(20, 15, 12, 0.7) 100%),
+                url("./assets/title-postoffice-final-v3.jpg") center / cover no-repeat,
+                #6e492e;
+        }
+
+        .title-brand {
+            position: absolute;
+            z-index: 3;
+            top: max(17px, env(safe-area-inset-top));
+            left: max(14px, env(safe-area-inset-left));
+            width: min(68%, 420px);
+            color: white;
+            filter: drop-shadow(0 4px 1px rgba(54, 28, 15, 0.8));
+        }
+
+        .title-kicker {
+            display: inline-block;
+            margin: 0 0 5px;
+            padding: 4px 10px;
+            border: 2px solid rgba(255, 255, 255, 0.75);
+            border-radius: 999px;
+            color: #4a2d1d;
+            background: #ffe899;
+            font-size: clamp(10px, 2.8vw, 15px);
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            filter: none;
+        }
+
+        .title-brand h1 {
+            margin: 0;
+            font-weight: 1000;
+            line-height: 0.94;
+            letter-spacing: -0.055em;
+            text-shadow:
+                0 3px 0 #163d68,
+                0 6px 0 #0d2949,
+                0 10px 20px rgba(33, 22, 16, 0.55);
+        }
+
+        .title-brand h1 span,
+        .title-brand h1 strong {
+            display: block;
+            white-space: nowrap;
+        }
+
+        .title-brand h1 span {
+            color: #fff9df;
+            font-size: clamp(30px, 8.6vw, 54px);
+        }
+
+        .title-brand h1 strong {
+            margin-top: 5px;
+            color: #ffdc66;
+            font-size: clamp(34px, 9.6vw, 62px);
+        }
+
+        .title-record {
+            position: absolute;
+            z-index: 4;
+            right: max(12px, env(safe-area-inset-right));
+            bottom: max(150px, calc(env(safe-area-inset-bottom) + 150px));
+            min-width: 82px;
+            padding: 7px 10px;
+            border: 2px solid rgba(255, 233, 158, 0.66);
+            border-radius: 15px;
+            color: #fff7d7;
+            background: rgba(16, 45, 69, 0.77);
+            box-shadow: 0 6px 16px rgba(21, 28, 31, 0.24);
+            text-align: center;
+            backdrop-filter: blur(6px);
+        }
+
+        .title-record span {
+            display: block;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .title-record strong {
+            display: block;
+            color: #ffe067;
+            font-size: 22px;
+            line-height: 1.05;
+        }
+
+        .title-menu {
+            position: relative;
+            z-index: 5;
+            display: grid;
+            width: min(94vw, 520px);
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 9px;
+            border: 1px solid rgba(255, 234, 177, 0.24);
+            border-radius: 21px;
+            background: rgba(22, 34, 38, 0.72);
+            box-shadow: 0 15px 34px rgba(17, 11, 8, 0.35);
+            backdrop-filter: blur(8px);
+        }
+
+        .menu-button {
+            display: flex;
+            min-height: 49px;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(145deg, #315e88, #153c67);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.22), 0 4px 0 #0a2849;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 900;
+            text-decoration: none;
+        }
+
+        .menu-button.primary {
+            color: #492e16;
+            border-color: #fff0a9;
+            background: linear-gradient(145deg, #fff09c, #f4b84d);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6), 0 4px 0 #a7652c;
+        }
+
+        .menu-button.park {
+            grid-column: 1 / -1;
+            min-height: 39px;
+            font-size: 12px;
+        }
+
+        .menu-button:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        @media (orientation: landscape) and (min-width: 700px) {
+            .title-screen {
+                background-image:
+                    linear-gradient(180deg, rgba(19, 48, 60, 0) 0 67%, rgba(20, 15, 12, 0.7) 100%),
+                    url("./assets/title-postoffice-wide-v3.jpg");
+                background-position: center;
+            }
+        }
+
+        .choice-screen,
+        .result-screen {
+            align-items: center;
+            justify-content: center;
+            padding:
+                max(18px, env(safe-area-inset-top))
+                max(14px, env(safe-area-inset-right))
+                max(18px, env(safe-area-inset-bottom))
+                max(14px, env(safe-area-inset-left));
+            background:
+                linear-gradient(rgba(255, 250, 226, 0.74), rgba(227, 243, 245, 0.82)),
+                url("./assets/game-postoffice-v1.jpg") center / cover no-repeat;
+        }
+
+        .choice-panel,
+        .result-panel {
+            width: min(94vw, 620px);
+            max-height: 94dvh;
+            overflow: auto;
+            padding: 18px;
+            border: 3px solid rgba(255, 232, 156, 0.9);
+            border-radius: 26px;
+            background: rgba(255, 250, 230, 0.96);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .result-panel {
+            overflow: hidden;
+        }
+
+        .choice-panel p,
+        .result-panel > p {
+            text-align: left;
+        }
+
+        .choice-character,
+        .result-character,
+        .guide-character {
+            display: block;
+            object-fit: cover;
+            object-position: center 43%;
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(64, 42, 24, 0.22);
+        }
+
+        .choice-character {
+            width: 104px;
+            height: 104px;
+            margin: -2px auto 8px;
+        }
+
+        .choice-panel h2,
+        .result-panel h2 {
+            margin: 5px 0 4px;
+            color: var(--navy);
+            font-size: clamp(24px, 6.5vw, 38px);
+            line-height: 1.1;
+        }
+
+        .choice-panel > p,
+        .result-panel > p {
+            margin: 6px 0 14px;
+            color: #74563f;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .speed-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 9px;
+        }
+
+        .speed-button {
+            min-height: 65px;
+            padding: 8px;
+            border: 2px solid #b9d3dc;
+            border-radius: 17px;
+            color: #244760;
+            background: linear-gradient(145deg, #f7ffff, #dceef1);
+            box-shadow: 0 4px 0 #9ebdc6;
+            cursor: pointer;
+            font-weight: 900;
+        }
+
+        .speed-button strong,
+        .speed-button small {
+            display: block;
+        }
+
+        .speed-button strong {
+            font-size: 17px;
+        }
+
+        .speed-button small {
+            margin-top: 3px;
+            color: #607c87;
+            font-size: 10px;
+        }
+
+        .speed-button.busy {
+            border-color: #e6ae72;
+            color: #713b24;
+            background: linear-gradient(145deg, #fff7db, #ffd69a);
+            box-shadow: 0 4px 0 #c9894f;
+        }
+
+        .speed-button.busy small {
+            color: #8b5b3c;
+        }
+
+        .choice-back {
+            margin-top: 15px;
+            border: 0;
+            color: #6b5a4f;
+            background: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 900;
+            text-decoration: underline;
+        }
+
+        .game-screen {
+            flex-direction: column;
+            padding:
+                max(7px, env(safe-area-inset-top))
+                max(8px, env(safe-area-inset-right))
+                max(8px, env(safe-area-inset-bottom))
+                max(8px, env(safe-area-inset-left));
+            background:
+                linear-gradient(180deg, rgba(247, 252, 244, 0.25), rgba(255, 244, 211, 0.38)),
+                url("./assets/game-postoffice-v1.jpg") center / cover no-repeat,
+                #f2dfbc;
+        }
+
+        .game-header {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            min-height: 58px;
+            align-items: center;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 7px;
+            padding: 7px 10px;
+            border: 2px solid rgba(255, 237, 175, 0.88);
+            border-radius: 18px;
+            background: rgba(20, 57, 85, 0.9);
+            box-shadow: 0 6px 16px rgba(42, 32, 21, 0.18);
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+
+        .hud-stat {
+            min-width: 0;
+            text-align: left;
+        }
+
+        .hud-stat.right {
+            text-align: right;
+        }
+
+        .hud-stat span {
+            display: block;
+            color: #d6e8f3;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .hud-stat strong {
+            display: block;
+            color: #ffe26c;
+            font-size: 23px;
+            line-height: 1;
+        }
+
+        .work-box {
+            text-align: center;
+        }
+
+        .work-box span,
+        .anger-box span {
+            display: block;
+            color: #d8e8f2;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .work-box strong {
+            display: inline-block;
+            color: #ffe26c;
+            font-size: 23px;
+            line-height: 1;
+        }
+
+        .work-box small {
+            margin-left: 2px;
+            color: #d8e8f2;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .anger-box {
+            min-width: 92px;
+            text-align: right;
+        }
+
+        #anger-marks {
+            display: flex;
+            justify-content: flex-end;
+            gap: 2px;
+            white-space: nowrap;
+        }
+
+        #anger-marks i {
+            display: grid;
+            width: 18px;
+            height: 18px;
+            place-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.48);
+            border-radius: 50%;
+            color: transparent;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 15px;
+            font-style: normal;
+            line-height: 1;
+        }
+
+        #anger-marks i.filled {
+            border-color: #ffaaa1;
+            color: #ff5d58;
+            background: #fff1cf;
+            text-shadow: 0 1px 0 #9b2626;
+            animation: anger-pop 0.28s cubic-bezier(0.2, 1.3, 0.3, 1);
+        }
+
+        @keyframes anger-pop {
+            0% { transform: scale(0.35) rotate(-15deg); }
+            70% { transform: scale(1.18) rotate(5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .game-body {
+            position: relative;
+            z-index: 3;
+            display: grid;
+            flex: 1;
+            min-height: 0;
+            align-items: center;
+            justify-items: center;
+            grid-template-rows: auto 1fr;
+            gap: 7px;
+            padding: 7px 0 5px;
+        }
+
+        .postmaster-card {
+            display: grid;
+            width: min(100%, 580px);
+            min-height: 112px;
+            align-items: center;
+            grid-template-columns: 64px 1fr;
+            grid-template-rows: auto auto;
+            gap: 3px 8px;
+            padding: 5px 10px 5px 5px;
+            border: 2px solid rgba(255, 230, 142, 0.88);
+            border-radius: 18px;
+            background: rgba(255, 250, 228, 0.93);
+            box-shadow: 0 7px 17px rgba(72, 43, 22, 0.16);
+        }
+
+        .guide-character {
+            grid-column: 1;
+            grid-row: 1;
+            justify-self: center;
+            width: 52px;
+            height: 52px;
+            border-width: 3px;
+        }
+
+        .postmaster-card .whistle-button {
+            grid-column: 1;
+            grid-row: 2;
+            justify-self: center;
+            width: 54px;
+            margin: 0;
+            filter: drop-shadow(0 4px 0 #8b532d) drop-shadow(0 6px 7px rgba(50, 31, 19, 0.22));
+        }
+
+        .postmaster-message {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            align-self: center;
+            min-width: 0;
+            text-align: left;
+        }
+
+        .postmaster-message strong,
+        .postmaster-message span {
+            display: block;
+        }
+
+        .postmaster-message strong {
+            color: var(--postal-red);
+            font-size: 10px;
+        }
+
+        .postmaster-message span {
+            color: #4f4438;
+            font-size: clamp(12px, 3.2vw, 16px);
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
+        .sorting-machine {
+            position: relative;
+            display: flex;
+            width: min(94vw, 610px);
+            min-height: 0;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .board {
+            position: relative;
+            z-index: 4;
+            width: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 22px;
+            background:
+                url("./assets/sorting-belt-v2.jpg") center / cover no-repeat;
+            box-shadow:
+                0 6px 0 #4d321e,
+                0 12px 26px rgba(74, 43, 20, 0.24);
+            contain: layout paint;
+        }
+
+        .board::before {
+            content: "";
+            position: absolute;
+            inset: 1%;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(57, 76, 91, 0.17) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(57, 76, 91, 0.17) 2px, transparent 2px),
+                linear-gradient(180deg, transparent 0 80%, rgba(231, 83, 68, 0.09) 80% 100%);
+            background-size: 20% 20%, 20% 20%, auto;
+            border-radius: 10px;
+            box-shadow: inset 0 0 16px rgba(36, 57, 73, 0.13);
+        }
+
+        .deadline-row {
+            position: absolute;
+            z-index: 2;
+            right: 1%;
+            bottom: 1%;
+            left: 1%;
+            height: 19.6%;
+            border-top: 3px dashed rgba(220, 78, 62, 0.58);
+            pointer-events: none;
+        }
+
+        .mail {
+            --col: 0;
+            --row: 0;
+            --paper: #ef5a5a;
+            --paper-dark: #b8353d;
+            position: absolute;
+            z-index: 3;
+            top: 1%;
+            left: 1%;
+            display: grid;
+            width: 19.6%;
+            height: 19.6%;
+            place-items: center;
+            padding: clamp(4px, 1.2vw, 9px);
+            opacity: 1;
+            transform: translate3d(calc(var(--col) * 100%), calc(var(--row) * 100%), 0);
+            transition:
+                transform 0.46s cubic-bezier(0.22, 0.82, 0.28, 1),
+                opacity 0.32s ease,
+                filter 0.25s ease;
+            will-change: transform;
+            pointer-events: none;
+        }
+
+        .envelope {
+            position: relative;
+            display: grid;
+            width: 100%;
+            aspect-ratio: 1.34;
+            place-items: center;
+            overflow: hidden;
+            border: 3px solid rgba(81, 47, 33, 0.26);
+            border-radius: clamp(7px, 2vw, 13px);
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.25), transparent 46%),
+                var(--paper);
+            box-shadow:
+                inset 0 -4px 0 rgba(87, 40, 40, 0.12),
+                0 5px 8px rgba(45, 43, 36, 0.2);
+        }
+
+        .envelope::before,
+        .envelope::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            left: 0;
+            height: 70%;
+            pointer-events: none;
+        }
+
+        .envelope::before {
+            top: 0;
+            background: var(--paper);
+            background: color-mix(in srgb, var(--paper) 76%, white);
+            clip-path: polygon(0 0, 50% 68%, 100% 0);
+            filter: drop-shadow(0 2px 1px rgba(71, 38, 31, 0.18));
+        }
+
+        .envelope::after {
+            bottom: 0;
+            background:
+                linear-gradient(28deg, transparent 48%, rgba(255, 255, 255, 0.2) 49% 52%, transparent 53%),
+                linear-gradient(-28deg, transparent 48%, rgba(83, 45, 37, 0.13) 49% 52%, transparent 53%);
+        }
+
+        .mail-mark {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            width: clamp(19px, 5vw, 32px);
+            aspect-ratio: 1;
+            place-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            border-radius: 50%;
+            color: white;
+            background: var(--paper-dark);
+            background: color-mix(in srgb, var(--paper-dark) 82%, transparent);
+            font-size: clamp(10px, 2.7vw, 17px);
+            font-weight: 1000;
+            line-height: 1;
+            text-shadow: 0 1px 1px rgba(54, 28, 25, 0.34);
+        }
+
+        .mail.leaving-row {
+            opacity: 0;
+            transform: translate3d(calc(var(--col) * 100%), 520%, 0) rotate(4deg);
+        }
+
+        .mail.delivered {
+            z-index: 8;
+            opacity: 0;
+            filter: brightness(1.28);
+            transform: translate3d(calc(var(--col) * 100%), calc(var(--row) * 100%), 0) scale(0.28) translateY(-80%);
+        }
+
+        .mail.missed {
+            z-index: 7;
+            opacity: 0;
+            filter: saturate(0.75) brightness(1.12);
+            transform:
+                translate3d(
+                    calc(var(--col) * 100% + 36vw),
+                    calc(var(--row) * 100% - 15vh),
+                    0
+                )
+                scale(0.24)
+                rotate(15deg);
+        }
+
+        .mail.target-preview .envelope {
+            animation: target-glow 0.72s ease-in-out infinite alternate;
+        }
+
+        @keyframes target-glow {
+            to {
+                filter: brightness(1.13);
+                box-shadow:
+                    inset 0 -4px 0 rgba(87, 40, 40, 0.1),
+                    0 0 0 4px rgba(255, 232, 96, 0.78),
+                    0 0 18px rgba(255, 210, 65, 0.72);
+            }
+        }
+
+        .practice-banner {
+            position: absolute;
+            z-index: 20;
+            right: 7%;
+            bottom: 5%;
+            left: 7%;
+            padding: 9px 12px;
+            border: 3px solid #ffe481;
+            border-radius: 16px;
+            color: #3d342a;
+            background: rgba(255, 252, 230, 0.95);
+            box-shadow: 0 8px 20px rgba(64, 39, 22, 0.24);
+            font-size: clamp(11px, 3vw, 15px);
+            font-weight: 900;
+            text-align: left;
+            line-height: 1.35;
+            pointer-events: none;
+        }
+
+        .practice-banner.hidden {
+            display: none;
+        }
+
+        .pause-sign {
+            position: absolute;
+            z-index: 30;
+            top: 50%;
+            left: 50%;
+            display: none;
+            width: min(72%, 330px);
+            padding: 14px 18px;
+            border: 4px solid #ffe27c;
+            border-radius: 20px;
+            color: white;
+            background: rgba(19, 57, 86, 0.94);
+            box-shadow: 0 12px 26px rgba(35, 27, 21, 0.3);
+            font-size: clamp(22px, 6vw, 38px);
+            font-weight: 1000;
+            text-align: center;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .pause-sign.show {
+            display: block;
+        }
+
+        .mail-collector {
+            position: relative;
+            z-index: 6;
+            width: 100%;
+            height: clamp(38px, 7vw, 56px);
+            align-self: center;
+            margin: -3px auto 0;
+            border: 3px solid #69421f;
+            border-top: 0;
+            border-radius: 5px 5px 18px 18px;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.08) 0 2px,
+                    transparent 2px 46px
+                ),
+                linear-gradient(180deg, #b97132, #8b4e24 72%, #6e391c);
+            box-shadow:
+                inset 0 4px 0 rgba(255, 224, 151, 0.35),
+                inset 0 -6px 0 rgba(76, 38, 18, 0.2),
+                0 6px 0 rgba(75, 41, 20, 0.5),
+                0 10px 16px rgba(56, 34, 20, 0.2);
+        }
+
+        .mail-collector::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            top: -9px;
+            right: 5%;
+            left: 5%;
+            height: 18px;
+            border: 3px solid #69421f;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #3c291e, #151d22);
+            box-shadow: inset 0 4px 5px rgba(0, 0, 0, 0.42);
+        }
+
+        .mail-collector::after {
+            content: "";
+            position: absolute;
+            z-index: 3;
+            inset: 8px 7px 7px;
+            border: 2px solid rgba(255, 220, 139, 0.26);
+            border-radius: 4px 4px 11px 11px;
+            pointer-events: none;
+        }
+
+        .collected-letter {
+            position: absolute;
+            z-index: 2;
+            top: -5px;
+            width: clamp(28px, 6vw, 43px);
+            aspect-ratio: 1.42;
+            border: 2px solid rgba(76, 42, 30, 0.3);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(38, 25, 20, 0.3);
+        }
+
+        .collected-letter::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(31deg, transparent 49%, rgba(255, 255, 255, 0.36) 50% 52%, transparent 53%),
+                linear-gradient(-31deg, transparent 49%, rgba(74, 38, 34, 0.14) 50% 52%, transparent 53%);
+        }
+
+        .collected-letter.one {
+            left: 29%;
+            background: #ef6d69;
+            transform: rotate(-8deg);
+        }
+
+        .collected-letter.two {
+            left: 46%;
+            background: #f0c84c;
+            transform: rotate(4deg) translateY(2px);
+        }
+
+        .collected-letter.three {
+            left: 62%;
+            background: #67b879;
+            transform: rotate(9deg);
+        }
+
+        .timer-panel {
+            display: grid;
+            width: min(100%, 610px);
+            align-items: center;
+            grid-template-columns: auto 1fr auto;
+            gap: 8px;
+            margin: 8px auto 0;
+            padding: 6px 9px;
+            border: 2px solid rgba(255, 229, 143, 0.88);
+            border-radius: 13px;
+            color: white;
+            background: rgba(19, 58, 86, 0.9);
+            box-shadow: 0 5px 12px rgba(50, 34, 20, 0.16);
+        }
+
+        .timer-panel span {
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .timer-track {
+            height: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-radius: 999px;
+            background: rgba(8, 35, 57, 0.75);
+        }
+
+        #timer-fill {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #70d59e, #ffe16c 58%, #f07160);
+            transform-origin: left center;
+        }
+
+        #timer-number {
+            min-width: 21px;
+            color: #ffe374;
+            font-size: 17px;
+            text-align: right;
+        }
+
+        .game-footer {
+            position: relative;
+            z-index: 12;
+            display: grid;
+            min-height: 42px;
+            align-items: center;
+            grid-template-columns: 1fr auto auto;
+            gap: 9px;
+            padding: 5px 4px 0;
+        }
+
+        .footer-note {
+            color: #493b2e;
+            font-size: 9px;
+            font-weight: 900;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+        }
+
+        .whistle-button {
+            position: relative;
+            display: block;
+            width: clamp(80px, 24vw, 108px);
+            aspect-ratio: 1;
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            filter: drop-shadow(0 7px 0 #8b532d) drop-shadow(0 11px 12px rgba(50, 31, 19, 0.26));
+            cursor: pointer;
+        }
+
+        .whistle-button img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.12s ease, filter 0.12s ease;
+        }
+
+        .whistle-button:focus-visible {
+            outline: 4px solid white;
+            outline-offset: 4px;
+        }
+
+        .whistle-button:active,
+        .whistle-button.blowing {
+            filter: drop-shadow(0 2px 0 #8b532d) drop-shadow(0 5px 8px rgba(50, 31, 19, 0.2));
+            transform: translateY(5px);
+        }
+
+        .whistle-button:active img,
+        .whistle-button.blowing img {
+            filter: brightness(1.12);
+            transform: scale(0.96);
+        }
+
+        .pause-button,
+        .quit-button {
+            justify-self: end;
+            min-height: 40px;
+            padding: 6px 10px;
+            border: 2px solid rgba(255, 255, 255, 0.75);
+            border-radius: 12px;
+            color: white;
+            background: rgba(24, 58, 81, 0.86);
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .pause-button {
+            min-width: 76px;
+            border-color: rgba(255, 229, 125, 0.9);
+            color: #173d68;
+            background: #ffe176;
+        }
+
+        .pause-button[aria-pressed="true"] {
+            color: white;
+            background: #d95b4e;
+        }
+
+        .effect-text {
+            position: fixed;
+            z-index: 60;
+            top: 47%;
+            left: 50%;
+            width: min(86vw, 430px);
+            padding: 11px 18px;
+            border: 3px solid #fff0a7;
+            border-radius: 18px;
+            color: white;
+            background: rgba(19, 57, 86, 0.94);
+            box-shadow: 0 12px 30px rgba(42, 28, 19, 0.28);
+            font-size: clamp(19px, 5.5vw, 31px);
+            font-weight: 1000;
+            text-align: center;
+            white-space: pre-line;
+            opacity: 0;
+            transform: translate(-50%, -42%) scale(0.82);
+            transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.2, 1.2, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .effect-text.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .effect-text.penalty {
+            border-color: #8edcff;
+            background: rgba(19, 73, 119, 0.96);
+            text-shadow: 0 2px 0 #18466f;
+        }
+
+        .rival-cut-in {
+            position: fixed;
+            z-index: 59;
+            top: 17%;
+            right: clamp(8px, 4vw, 38px);
+            display: grid;
+            width: min(72vw, 330px);
+            min-height: 92px;
+            align-items: center;
+            grid-template-columns: 84px 1fr;
+            gap: 9px;
+            padding: 7px 12px 7px 7px;
+            border: 3px solid #bceaff;
+            border-radius: 22px;
+            color: white;
+            background: linear-gradient(145deg, rgba(31, 100, 151, 0.98), rgba(20, 58, 101, 0.98));
+            box-shadow: 0 12px 28px rgba(25, 46, 68, 0.32);
+            opacity: 0;
+            transform: translateX(125%) rotate(4deg);
+            transition: opacity 0.16s ease, transform 0.3s cubic-bezier(0.2, 1.1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .rival-cut-in.show {
+            opacity: 1;
+            transform: translateX(0) rotate(-1deg);
+        }
+
+        .rival-cut-in img {
+            width: 78px;
+            height: 78px;
+            object-fit: cover;
+            object-position: center 38%;
+            border: 3px solid white;
+            border-radius: 50%;
+        }
+
+        .rival-cut-in strong,
+        .rival-cut-in span {
+            display: block;
+        }
+
+        .rival-cut-in strong {
+            color: #d9f3ff;
+            font-size: 11px;
+        }
+
+        .rival-cut-in span {
+            margin-top: 2px;
+            color: #fff2a1;
+            font-size: clamp(17px, 4.8vw, 24px);
+            font-weight: 1000;
+            line-height: 1.08;
+        }
+
+        .bird-layer {
+            position: fixed;
+            z-index: 55;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .delivery-bird {
+            --bird-color: #ef5a5a;
+            position: absolute;
+            left: -210px;
+            top: calc(27% + var(--bird-index) * 9%);
+            width: clamp(120px, 30vw, 185px);
+            aspect-ratio: 360 / 310;
+            filter: drop-shadow(0 5px 4px rgba(54, 38, 26, 0.25));
+            animation: bird-delivery 0.92s cubic-bezier(0.2, 0.68, 0.3, 1) forwards;
+        }
+
+        .bird-frame {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .bird-frame.wings-up {
+            animation: bird-wings-up 0.22s steps(1, end) infinite;
+        }
+
+        .bird-frame.wings-down {
+            animation: bird-wings-down 0.22s steps(1, end) infinite;
+        }
+
+        .bird-label {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            z-index: 3;
+            padding: 2px 7px;
+            border: 2px solid white;
+            border-radius: 999px;
+            color: #59401f;
+            background: #ffe36a;
+            box-shadow: 0 3px 0 rgba(72, 45, 22, 0.28);
+            font-size: 9px;
+            font-weight: 1000;
+            line-height: 1;
+            white-space: nowrap;
+            transform: translateX(-50%);
+        }
+
+        .bird-color-seal {
+            position: absolute;
+            z-index: 4;
+            right: 5%;
+            bottom: 24%;
+            width: clamp(14px, 3.7vw, 22px);
+            aspect-ratio: 1;
+            border: 3px solid white;
+            border-radius: 50%;
+            background: var(--bird-color);
+            box-shadow: 0 2px 4px rgba(46, 31, 21, 0.3);
+        }
+
+        .delivery-bird.rival-bird {
+            right: -210px;
+            left: auto;
+            aspect-ratio: 360 / 299;
+            animation-name: bird-rival-snatch;
+        }
+
+        .delivery-bird.rival-bird .bird-label {
+            color: white;
+            background: #328bd2;
+            box-shadow: 0 3px 0 #175487;
+        }
+
+        .delivery-bird.rival-bird .bird-color-seal {
+            right: auto;
+            bottom: 23%;
+            left: 4%;
+        }
+
+        @keyframes bird-wings-up {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes bird-wings-down {
+            0%, 49% { opacity: 0; }
+            50%, 100% { opacity: 1; }
+        }
+
+        @keyframes bird-delivery {
+            0% {
+                transform: translate3d(0, 42px, 0) rotate(-8deg);
+            }
+            48% {
+                transform: translate3d(52vw, -12px, 0) rotate(4deg);
+            }
+            100% {
+                transform: translate3d(calc(100vw + 130px), -90px, 0) rotate(-8deg);
+            }
+        }
+
+        @keyframes bird-rival-snatch {
+            0% {
+                transform: translate3d(0, -48px, 0) rotate(8deg);
+            }
+            48% {
+                transform: translate3d(-52vw, 5px, 0) rotate(-5deg);
+            }
+            100% {
+                transform: translate3d(calc(-100vw - 150px), -82px, 0) rotate(8deg);
+            }
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 80;
+            inset: 0;
+            display: none;
+            place-items: center;
+            padding: 16px;
+            background: rgba(17, 31, 40, 0.65);
+            backdrop-filter: blur(6px);
+        }
+
+        .modal.show {
+            display: grid;
+        }
+
+        .modal-card {
+            width: min(92vw, 520px);
+            max-height: 92dvh;
+            overflow: auto;
+            padding: 17px;
+            border: 3px solid #ffe080;
+            border-radius: 24px;
+            background: #fff9df;
+            box-shadow: 0 18px 45px rgba(36, 24, 18, 0.35);
+            text-align: center;
+        }
+
+        .modal-card h2 {
+            margin: 3px 0 8px;
+            color: var(--navy);
+            font-size: clamp(23px, 6vw, 34px);
+        }
+
+        .modal-card p {
+            margin: 7px 0;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.55;
+            text-align: left;
+        }
+
+        .rule-example {
+            display: grid;
+            margin: 13px 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .rule-card {
+            padding: 9px 4px;
+            border: 2px solid #e2d4b2;
+            border-radius: 13px;
+            background: white;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .rule-card strong {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--postal-red);
+            font-size: 17px;
+        }
+
+        .rule-card.good {
+            border-color: #6fc78d;
+            background: #effcef;
+        }
+
+        .rival-intro {
+            display: grid;
+            align-items: center;
+            grid-template-columns: 88px 1fr;
+            gap: 10px;
+            margin: 12px 0 4px;
+            padding: 8px 11px 8px 8px;
+            border: 2px solid #9fd7ee;
+            border-radius: 18px;
+            color: #174f72;
+            background: #eaf8ff;
+            text-align: left;
+        }
+
+        .rival-intro img {
+            width: 82px;
+            height: 82px;
+            object-fit: cover;
+            object-position: center 34%;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(32, 80, 106, 0.2);
+        }
+
+        .rival-intro strong,
+        .rival-intro span {
+            display: block;
+        }
+
+        .rival-intro strong {
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+
+        .rival-intro span {
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .modal-actions .menu-button:only-child {
+            grid-column: 1 / -1;
+        }
+
+        .result-character {
+            width: 125px;
+            height: 125px;
+            margin: 0 auto 8px;
+        }
+
+        .result-score {
+            margin: 4px 0;
+            color: var(--postal-red);
+            font-size: clamp(42px, 13vw, 72px);
+            font-weight: 1000;
+            line-height: 1;
+        }
+
+        .result-score small {
+            font-size: 14px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 7px;
+            margin: 14px 0;
+        }
+
+        .result-item {
+            padding: 8px;
+            border-radius: 13px;
+            background: #edf5f2;
+            color: #5d6b64;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .result-item strong {
+            display: block;
+            color: var(--navy);
+            font-size: 21px;
+        }
+
+        .debug-panel {
+            position: fixed;
+            z-index: 100;
+            top: 72px;
+            right: 8px;
+            width: min(310px, 92vw);
+            padding: 8px;
+            border: 2px solid #ffe16b;
+            border-radius: 12px;
+            background: rgba(14, 38, 57, 0.96);
+            color: white;
+            font-size: 10px;
+        }
+
+        .debug-panel[hidden] {
+            display: none;
+        }
+
+        .debug-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .debug-controls button,
+        .debug-controls select {
+            min-height: 30px;
+            border: 1px solid white;
+            border-radius: 6px;
+            color: #173d68;
+            background: white;
+            font-size: 10px;
+        }
+
+        @media (orientation: landscape) and (min-width: 700px) and (min-height: 521px) {
+            .game-body {
+                align-content: center;
+                align-items: start;
+                justify-content: center;
+                grid-template-columns: minmax(190px, 230px) auto;
+                grid-template-rows: auto;
+                gap: 14px;
+                padding: 7px 18px 5px;
+            }
+
+            .postmaster-card {
+                align-self: start;
+                justify-self: end;
+                width: min(100%, 230px);
+                height: min(61vw, 610px, calc(100dvh - 220px));
+                min-height: 0;
+                align-content: center;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 8px;
+                padding: 0;
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+                text-align: center;
+            }
+
+            .guide-character {
+                grid-column: 1;
+                grid-row: 1;
+                width: clamp(130px, 24dvh, 180px);
+                height: clamp(130px, 24dvh, 180px);
+                margin: auto;
+                box-shadow: 0 8px 22px rgba(56, 35, 22, 0.25);
+            }
+
+            .postmaster-card .whistle-button {
+                grid-column: 1;
+                grid-row: 2;
+                width: clamp(94px, 18dvh, 128px);
+                margin: 0 auto;
+            }
+
+            .postmaster-message {
+                grid-column: 1;
+                grid-row: 3;
+                width: 100%;
+                padding: 9px 11px;
+                border: 2px solid rgba(255, 226, 135, 0.88);
+                border-radius: 15px;
+                background: rgba(255, 250, 228, 0.94);
+                box-shadow: 0 7px 16px rgba(72, 43, 22, 0.17);
+            }
+
+            .postmaster-message span {
+                font-size: clamp(12px, 1.35vw, 16px);
+            }
+
+            .sorting-machine {
+                align-self: start;
+                justify-self: start;
+                width: min(61vw, 610px, calc(100dvh - 220px));
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 520px) {
+            .title-screen {
+                background-position: center top;
+            }
+
+            .title-brand {
+                top: max(8px, env(safe-area-inset-top));
+                width: 47%;
+            }
+
+            .title-kicker {
+                font-size: 9px;
+            }
+
+            .title-brand h1 span {
+                font-size: clamp(25px, 5.2vw, 42px);
+            }
+
+            .title-brand h1 strong {
+                font-size: clamp(28px, 5.8vw, 47px);
+            }
+
+            .title-menu {
+                position: absolute;
+                right: max(12px, env(safe-area-inset-right));
+                bottom: max(10px, env(safe-area-inset-bottom));
+                width: min(47vw, 430px);
+            }
+
+            .title-record {
+                top: auto;
+                bottom: max(126px, calc(env(safe-area-inset-bottom) + 126px));
+                min-width: 72px;
+            }
+
+            .menu-button {
+                min-height: 42px;
+                font-size: 13px;
+            }
+
+            .menu-button.park {
+                min-height: 32px;
+            }
+
+            .game-header {
+                min-height: 46px;
+                padding-block: 4px;
+            }
+
+            .hud-stat strong {
+                font-size: 18px;
+            }
+
+            .work-box strong {
+                font-size: 18px;
+            }
+
+            .anger-box {
+                min-width: 80px;
+            }
+
+            #anger-marks i {
+                width: 15px;
+                height: 15px;
+                font-size: 12px;
+            }
+
+            .game-body {
+                grid-template-columns: minmax(125px, 22%) 1fr;
+                grid-template-rows: 1fr;
+                gap: 9px;
+                padding: 5px 74px 3px 0;
+            }
+
+            .postmaster-card {
+                align-self: center;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                padding: 7px;
+                text-align: center;
+            }
+
+            .guide-character {
+                grid-column: 1;
+                grid-row: 1;
+                width: 74px;
+                height: 74px;
+                margin: auto;
+            }
+
+            .postmaster-card .whistle-button {
+                grid-column: 1;
+                grid-row: 2;
+                width: 62px;
+                margin: 0 auto;
+            }
+
+            .postmaster-message {
+                grid-column: 1;
+                grid-row: 3;
+            }
+
+            .postmaster-message span {
+                font-size: 11px;
+            }
+
+            .sorting-machine {
+                width: min(64vw, calc(100dvh - 160px));
+                max-width: 550px;
+            }
+
+            .timer-panel {
+                margin-top: 5px;
+                padding-block: 4px;
+            }
+
+            .game-footer {
+                position: absolute;
+                z-index: 30;
+                right: max(6px, env(safe-area-inset-right));
+                bottom: max(7px, env(safe-area-inset-bottom));
+                width: 72px;
+                min-height: 0;
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .whistle-button {
+                width: 62px;
+            }
+
+            .footer-note {
+                display: none;
+            }
+
+            .pause-button,
+            .quit-button {
+                justify-self: stretch;
+                min-height: 31px;
+                padding: 4px;
+            }
+
+            .pause-button {
+                min-width: 0;
+            }
+
+            .choice-panel {
+                display: grid;
+                align-items: center;
+                grid-template-columns: 110px 1fr;
+                column-gap: 14px;
+            }
+
+            .choice-character {
+                grid-row: 1 / 5;
+            }
+
+            .choice-panel > *:not(.choice-character) {
+                grid-column: 2;
+            }
+
+            .choice-back {
+                justify-self: center;
+            }
+
+            .result-screen {
+                padding: 6px;
+            }
+
+            .result-panel {
+                max-height: calc(100dvh - 12px);
+                padding: 7px 12px 9px;
+            }
+
+            .result-character {
+                width: 68px;
+                height: 68px;
+                margin-bottom: 1px;
+            }
+
+            .result-panel h2 {
+                margin-block: 1px;
+                font-size: clamp(22px, 4.2vw, 29px);
+            }
+
+            .result-panel > p {
+                margin: 2px 0;
+                font-size: 10px;
+            }
+
+            .result-score {
+                margin: 0;
+                font-size: 38px;
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+                margin: 5px 0;
+            }
+
+            .result-item {
+                padding: 4px;
+                font-size: 8px;
+            }
+
+            .result-item strong {
+                font-size: 16px;
+            }
+
+            .result-panel .modal-actions {
+                margin-top: 6px;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .title-brand {
+                width: 72%;
+            }
+
+            .title-record {
+                min-width: 67px;
+                padding-inline: 7px;
+            }
+
+            .title-record strong {
+                font-size: 19px;
+            }
+
+            .postmaster-card {
+                min-height: 103px;
+                grid-template-columns: 52px 1fr;
+            }
+
+            .guide-character {
+                width: 45px;
+                height: 45px;
+            }
+
+            .postmaster-card .whistle-button {
+                width: 47px;
+            }
+
+            .sorting-machine {
+                width: 96vw;
+            }
+
+            .game-footer {
+                min-height: 42px;
+            }
+
+            .whistle-button {
+                width: 74px;
+            }
+
+            .footer-note {
+                font-size: 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mail {
+                transition-duration: 0.18s;
+            }
+
+            .delivery-bird {
+                animation-duration: 0.5s;
+            }
+
+            .bird-frame.wings-up {
+                animation: none;
+                opacity: 1;
+            }
+
+            .bird-frame.wings-down {
+                animation: none;
+                opacity: 0;
+            }
+
+            .mail.target-preview .envelope {
+                animation: none;
+            }
+        }
+
+        /*
+         * Dialogue and explanation copy may wrap only at authored spaces.
+         * This keeps particles and final kana from being stranded alone.
+         */
+        :is(
+            .choice-panel h2,
+            .choice-panel > p,
+            .speed-button small,
+            .postmaster-message span,
+            .practice-banner,
+            .effect-text,
+            .rival-cut-in span,
+            .modal-card h2,
+            .modal-card p,
+            .rival-intro span,
+            .result-panel h2,
+            .result-panel > p
+        ) {
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .title-menu .menu-button.park {
+            min-height: 44px;
+        }
+    </style>
+</head>
+<body>
+    <main id="app">
+        <section id="title-screen" class="screen title-screen active" aria-labelledby="game-title">
+            <h1 id="game-title" class="visually-hidden">ぴったりゆうびんきょく</h1>
+
+            <div class="title-record">
+                <span>さいこう ポイント</span>
+                <strong id="title-best">0</strong>
+            </div>
+
+            <nav class="title-menu" aria-label="タイトルメニュー">
+                <button id="practice-button" class="menu-button" type="button">れんしゅう</button>
+                <button id="start-button" class="menu-button primary" type="button">スタート</button>
+                <a class="menu-button park" href="../../index.html">ゲームパークへ もどる</a>
+            </nav>
+        </section>
+
+        <section id="choice-screen" class="screen choice-screen" aria-labelledby="choice-title">
+            <div class="choice-panel">
+                <img class="choice-character" src="./assets/postmaster-v1.jpg" alt="しんじんの はりまる">
+                <h2 id="choice-title">はやさを えらぼう</h2>
+                <p>2ふんかん、きっちりものの アルマより はやく 5つを みつけよう！</p>
+                <div class="speed-grid">
+                    <button class="speed-button" type="button" data-speed="4000">
+                        <strong>みならい</strong>
+                        <small>まずは なれよう</small>
+                    </button>
+                    <button class="speed-button" type="button" data-speed="2000">
+                        <strong>しんじん</strong>
+                        <small>できるかな？</small>
+                    </button>
+                    <button class="speed-button" type="button" data-speed="1000">
+                        <strong>せんぱい</strong>
+                        <small>はやいよ</small>
+                    </button>
+                    <button class="speed-button" type="button" data-speed="500">
+                        <strong>ベテラン</strong>
+                        <small>とても はやいよ</small>
+                    </button>
+                </div>
+                <button class="choice-back" type="button" data-action="title">タイトルへ もどる</button>
+            </div>
+        </section>
+
+        <section id="job-choice-screen" class="screen choice-screen" aria-labelledby="job-choice-title">
+            <div class="choice-panel">
+                <img class="choice-character" src="./assets/postmaster-v1.jpg" alt="しんじんの はりまる">
+                <h2 id="job-choice-title">じきを えらぼう</h2>
+                <p>てがみの きかたが かわるよ。なれてきたら「おおいそがし」に ちょうせんしよう！</p>
+                <div class="speed-grid">
+                    <button class="speed-button job-button" type="button" data-job="normal">
+                        <strong>つうじょう</strong>
+                        <small>おなじいろの てがみが くるよ</small>
+                    </button>
+                    <button class="speed-button job-button busy" type="button" data-job="busy">
+                        <strong>おおいそがし</strong>
+                        <small>てがみが 3つ 1～3しょくで くるよ</small>
+                    </button>
+                </div>
+                <button id="job-choice-back" class="choice-back" type="button">はやさを えらびなおす</button>
+            </div>
+        </section>
+
+        <section id="game-screen" class="screen game-screen" aria-label="ゲーム">
+            <header class="game-header">
+                <div class="hud-stat">
+                    <span>ポイント</span>
+                    <strong id="delivered-count">0</strong>
+                </div>
+                <div class="work-box">
+                    <span>あと</span>
+                    <strong id="work-time">120</strong><small>びょう</small>
+                </div>
+                <div class="anger-box">
+                    <span>ふちゅうい</span>
+                    <div id="anger-marks" aria-label="ふちゅういマーク0こ"></div>
+                </div>
+            </header>
+
+            <div class="game-body">
+                <aside class="postmaster-card">
+                    <img id="guide-character" class="guide-character" src="./assets/postmaster-v1.jpg" alt="">
+                    <button id="whistle-button" class="whistle-button" type="button" aria-label="ふえを ふく">
+                        <img src="./assets/whistle-button-v1.png" alt="">
+                    </button>
+                    <div class="postmaster-message">
+                        <strong>しんじん はりまる</strong>
+                        <span id="postmaster-speech">おなじいろが 5つで ふえを ふこう！</span>
+                    </div>
+                </aside>
+
+                <div class="sorting-machine">
+                    <div id="board" class="board" aria-label="5れつ5だんの しわけだい">
+                        <div class="deadline-row" aria-hidden="true"></div>
+                        <div id="practice-banner" class="practice-banner hidden"></div>
+                        <div id="pause-sign" class="pause-sign" aria-hidden="true">ストップちゅう</div>
+                    </div>
+                    <div class="mail-collector" aria-hidden="true">
+                        <i class="collected-letter one"></i>
+                        <i class="collected-letter two"></i>
+                        <i class="collected-letter three"></i>
+                    </div>
+                    <div class="timer-panel">
+                        <span id="mode-label">つぎの てがみまで</span>
+                        <div class="timer-track" aria-hidden="true">
+                            <div id="timer-fill"></div>
+                        </div>
+                        <strong id="timer-number">4</strong>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="game-footer">
+                <span class="footer-note">スペースキーでも OK</span>
+                <button id="pause-button" class="pause-button" type="button" aria-pressed="false">ストップ</button>
+                <button class="quit-button" type="button" data-action="title">やめる</button>
+            </footer>
+        </section>
+
+        <section id="result-screen" class="screen result-screen" aria-labelledby="result-title">
+            <div class="result-panel">
+                <img class="result-character" src="./assets/postmaster-success-v1.jpg" alt="しんじんの はりまる">
+                <h2 id="result-title">2ふんの しごと おわり！</h2>
+                <p id="result-message">てつだってくれて ありがとう！</p>
+                <div class="result-score"><span id="result-delivered">0</span><small>ポイント</small></div>
+                <div class="result-grid">
+                    <div class="result-item">せいかい<strong id="result-correct">0</strong></div>
+                    <div class="result-item">みのがし<strong id="result-missed">0</strong></div>
+                    <div class="result-item">ふちゅういマーク<strong id="result-wrong">0 / 5</strong></div>
+                    <div class="result-item">さいだい れんぞく<strong id="result-streak">0</strong></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="menu-button primary" type="button" id="retry-button">もういちど</button>
+                    <button class="menu-button" type="button" data-action="title">タイトルへ</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="practice-intro" class="modal" role="dialog" aria-modal="true" aria-labelledby="practice-intro-title">
+        <div class="modal-card">
+            <img class="choice-character" src="./assets/postmaster-v1.jpg" alt="">
+            <h2 id="practice-intro-title">しわけを おしえるよ！</h2>
+            <p>おなじいろの てがみが、ぜんぶで <strong>ちょうど5つ</strong>に なったら「ピッ！」</p>
+            <div class="rule-example">
+                <div class="rule-card"><strong>4つ</strong>まだ たりない</div>
+                <div class="rule-card good"><strong>5つ</strong>ピッ！</div>
+                <div class="rule-card"><strong>6つ</strong>もちきれない</div>
+            </div>
+            <p>うえから はいる てがみと、したから ながれる てがみを よくみてね。</p>
+            <p>ほんばんの しごとは <strong>2ふんかん</strong>。おしまちがいで 💢 が1こ。<strong>5こ</strong>で おこられて おわりだよ。</p>
+            <div class="rival-intro">
+                <img src="./assets/armadillo-rival-ready-v1.jpg" alt="ライバルの アルマ">
+                <div>
+                    <strong>ライバルの アルマ</strong>
+                    <span>きっちりものだから みのがさないよ。おそいと さきに「ピッ！」</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="practice-start-button" class="menu-button primary" type="button">れんしゅうスタート</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="practice-complete" class="modal" role="dialog" aria-modal="true" aria-labelledby="practice-complete-title">
+        <div class="modal-card">
+            <img class="choice-character" src="./assets/postmaster-success-v1.jpg" alt="">
+            <h2 id="practice-complete-title">ばっちり！</h2>
+            <p>せいかいも、しっぱいも、アルマの さきどりも わかったね！<br>ほんばんは 2ふんかん がんばろう。</p>
+            <div class="modal-actions">
+                <button id="practice-to-start" class="menu-button primary" type="button">スタート</button>
+                <button class="menu-button" type="button" data-action="title">タイトルへ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="effect-text" class="effect-text" aria-live="assertive"></div>
+    <div id="rival-cut-in" class="rival-cut-in" aria-hidden="true">
+        <img src="./assets/armadillo-rival-whistle-v1.jpg" alt="">
+        <div>
+            <strong>ライバルの アルマ</strong>
+            <span>さきに ピッ！</span>
+        </div>
+    </div>
+    <div id="bird-layer" class="bird-layer" aria-hidden="true"></div>
+
+    <section id="debug-panel" class="debug-panel" hidden>
+        <strong>システムかくにん</strong>
+        <div id="debug-counts"></div>
+        <div id="debug-log"></div>
+        <div class="debug-controls">
+            <button id="debug-pause" type="button">とめる</button>
+            <button id="debug-step" type="button">1かいすすむ</button>
+            <button id="debug-reset" type="button">リセット</button>
+            <select id="debug-color" aria-label="いろ">
+                <option value="red">あか</option>
+                <option value="blue">あお</option>
+                <option value="yellow">きいろ</option>
+                <option value="green">みどり</option>
+                <option value="purple">むらさき</option>
+            </select>
+            <select id="debug-amount" aria-label="かず">
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+        </div>
+    </section>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const COLORS = [
+                { key: "red", name: "あか", paper: "#ef5b5d", dark: "#b8323e", mark: "●" },
+                { key: "blue", name: "あお", paper: "#4e93df", dark: "#2764a7", mark: "★" },
+                { key: "yellow", name: "きいろ", paper: "#f3c83f", dark: "#aa7b1a", mark: "▲" },
+                { key: "green", name: "みどり", paper: "#62b96e", dark: "#337c46", mark: "◆" },
+                { key: "purple", name: "むらさき", paper: "#9a6bd3", dark: "#68449f", mark: "♥" }
+            ];
+            const BOARD_ROWS = 5;
+            // ハリガリの比率を参考に、低学年でも2＋3を見つけやすい16枚構成へ調整。
+            const MAIL_AMOUNT_DECK = [
+                1, 1, 1,
+                2, 2, 2, 2, 2,
+                3, 3, 3, 3, 3,
+                4, 4,
+                5
+            ];
+            // ときどき3行で「ぴったり5まい」を作り、2＋3以外の見方も楽しめるようにする。
+            const THREE_ROW_PATTERNS = [
+                [1, 2, 2],
+                [1, 2, 2],
+                [1, 1, 3]
+            ];
+
+            const ART = {
+                hedgehogNormal: "./assets/postmaster-v1.jpg",
+                hedgehogSuccess: "./assets/postmaster-success-v1.jpg",
+                hedgehogMiss: "./assets/postmaster-miss-v1.jpg",
+                rivalReady: "./assets/armadillo-rival-ready-v1.jpg",
+                rivalWhistle: "./assets/armadillo-rival-whistle-v1.jpg",
+                yellowUp: "./assets/bird-yellow-up-v1.png",
+                yellowDown: "./assets/bird-yellow-down-v1.png",
+                blueUp: "./assets/bird-blue-up-v1.png",
+                blueDown: "./assets/bird-blue-down-v1.png"
+            };
+
+            const PAGE_PARAMS = new URLSearchParams(location.search);
+            const DEBUG_MODE = PAGE_PARAMS.get("debug") === "1";
+            const debugWorkSeconds = Number(PAGE_PARAMS.get("work"));
+            const WORK_DURATION = DEBUG_MODE && Number.isFinite(debugWorkSeconds) && debugWorkSeconds > 0
+                ? debugWorkSeconds * 1000
+                : 120000;
+            const MAX_ANGER = 5;
+
+            const PRACTICE_STEPS = [
+                {
+                    type: "correct",
+                    message: "あかい てがみが 5つ！ ふえを ふいてね。",
+                    mails: [
+                        ["red", 2, 0], ["red", 2, 1], ["red", 2, 2], ["red", 2, 3], ["red", 2, 4]
+                    ]
+                },
+                {
+                    type: "wrong",
+                    message: "きいろは 4つ。こんどは ふえを ふいて、しっぱいも ためしてね。",
+                    mails: [
+                        ["yellow", 1, 0], ["yellow", 1, 1], ["yellow", 1, 2], ["yellow", 1, 3]
+                    ]
+                },
+                {
+                    type: "miss",
+                    message: "あおが 5つ。でも ふえを ふかずに まって、さきどりを みてみよう。",
+                    mails: [
+                        ["blue", 1, 0], ["blue", 1, 1], ["blue", 1, 2], ["blue", 1, 3], ["blue", 1, 4]
+                    ],
+                    autoDelay: 2600
+                },
+                {
+                    type: "correct",
+                    message: "むらさきの てがみは、うえに2つ したに3つ。ぜんぶで5つ！ ふえを ふいてね。",
+                    mails: [
+                        ["purple", 0, 0], ["purple", 0, 1],
+                        ["purple", 2, 0], ["purple", 2, 1], ["purple", 2, 2]
+                    ]
+                }
+            ];
+
+            const elements = {
+                screens: [...document.querySelectorAll(".screen")],
+                titleBest: document.getElementById("title-best"),
+                practiceButton: document.getElementById("practice-button"),
+                startButton: document.getElementById("start-button"),
+                jobChoiceBack: document.getElementById("job-choice-back"),
+                practiceIntro: document.getElementById("practice-intro"),
+                practiceStart: document.getElementById("practice-start-button"),
+                practiceComplete: document.getElementById("practice-complete"),
+                practiceToStart: document.getElementById("practice-to-start"),
+                board: document.getElementById("board"),
+                practiceBanner: document.getElementById("practice-banner"),
+                pauseSign: document.getElementById("pause-sign"),
+                pauseButton: document.getElementById("pause-button"),
+                whistle: document.getElementById("whistle-button"),
+                delivered: document.getElementById("delivered-count"),
+                workTime: document.getElementById("work-time"),
+                angerMarks: document.getElementById("anger-marks"),
+                speech: document.getElementById("postmaster-speech"),
+                guideCharacter: document.getElementById("guide-character"),
+                modeLabel: document.getElementById("mode-label"),
+                timerFill: document.getElementById("timer-fill"),
+                timerNumber: document.getElementById("timer-number"),
+                effectText: document.getElementById("effect-text"),
+                rivalCutIn: document.getElementById("rival-cut-in"),
+                birdLayer: document.getElementById("bird-layer"),
+                resultTitle: document.getElementById("result-title"),
+                resultDelivered: document.getElementById("result-delivered"),
+                resultCorrect: document.getElementById("result-correct"),
+                resultMissed: document.getElementById("result-missed"),
+                resultWrong: document.getElementById("result-wrong"),
+                resultStreak: document.getElementById("result-streak"),
+                resultMessage: document.getElementById("result-message"),
+                retry: document.getElementById("retry-button"),
+                debugPanel: document.getElementById("debug-panel"),
+                debugCounts: document.getElementById("debug-counts"),
+                debugLog: document.getElementById("debug-log"),
+                debugPause: document.getElementById("debug-pause"),
+                debugStep: document.getElementById("debug-step"),
+                debugReset: document.getElementById("debug-reset"),
+                debugColor: document.getElementById("debug-color"),
+                debugAmount: document.getElementById("debug-amount")
+            };
+
+            let mails = [];
+            let nextMailId = 1;
+            let mode = "game";
+            let currentSpeed = 4000;
+            let lastSpeed = 4000;
+            let pendingSpeed = 4000;
+            let incomingStyle = "normal";
+            let lastIncomingStyle = "normal";
+            let angerCount = 0;
+            let deliveredCount = 0;
+            let correctCount = 0;
+            let missedCount = 0;
+            let wrongCount = 0;
+            let streak = 0;
+            let maxStreak = 0;
+            let round = 0;
+            let claimableColors = [];
+            let transitioning = false;
+            let inputLocked = false;
+            let timerActive = false;
+            let timerDeadline = 0;
+            let timerFrame = 0;
+            let roundTimerRemaining = currentSpeed;
+            let workTimerActive = false;
+            let workDeadline = 0;
+            let workTimerFrame = 0;
+            let workRemaining = WORK_DURATION;
+            let practiceStep = 0;
+            let practiceWaitTimer = 0;
+            let practiceWaitDeadline = 0;
+            let practiceWaitRemaining = 0;
+            let gamePaused = false;
+            let speechBeforePause = "";
+            let audioContext = null;
+            let effectTimer = 0;
+            let guideResetTimer = 0;
+            let rivalCutInTimer = 0;
+            let artPreloaded = false;
+            let debugPaused = false;
+            let forcedIncoming = null;
+            let incomingDeck = [];
+            let guidedPatternQueue = [];
+            let ordinaryRoundsUntilPattern = 0;
+
+            function wait(ms) {
+                return new Promise((resolve) => window.setTimeout(resolve, ms));
+            }
+
+            function preloadGameArt() {
+                if (artPreloaded) return;
+                artPreloaded = true;
+                Object.values(ART).forEach((src) => {
+                    const image = new Image();
+                    image.src = src;
+                });
+            }
+
+            function showScreen(id) {
+                elements.screens.forEach((screen) => {
+                    screen.classList.toggle("active", screen.id === id);
+                });
+            }
+
+            function getBest() {
+                return Number(localStorage.getItem("postoffice_best") || 0);
+            }
+
+            function saveBest(value) {
+                if (value > getBest()) {
+                    localStorage.setItem("postoffice_best", String(value));
+                }
+            }
+
+            function updateTitleBest() {
+                elements.titleBest.textContent = getBest();
+            }
+
+            function initAudio() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioContext.state === "suspended") {
+                    audioContext.resume();
+                }
+            }
+
+            function tone(frequency, duration, type = "sine", volume = 0.04, delay = 0) {
+                initAudio();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                const start = audioContext.currentTime + delay;
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, start);
+                gain.gain.setValueAtTime(volume, start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.start(start);
+                oscillator.stop(start + duration);
+            }
+
+            function playWhistle() {
+                tone(1450, 0.12, "sine", 0.045);
+                tone(1720, 0.18, "sine", 0.035, 0.055);
+            }
+
+            function playRivalWhistle() {
+                tone(1040, 0.1, "square", 0.035);
+                tone(1390, 0.17, "sine", 0.03, 0.055);
+            }
+
+            function playWrong() {
+                tone(230, 0.2, "triangle", 0.045);
+                tone(170, 0.25, "triangle", 0.035, 0.11);
+            }
+
+            function playMiss() {
+                tone(540, 0.12, "square", 0.025);
+                tone(360, 0.2, "triangle", 0.035, 0.1);
+            }
+
+            function playBirds() {
+                tone(1120, 0.1, "sine", 0.025);
+                tone(1380, 0.1, "sine", 0.02, 0.1);
+                tone(1580, 0.12, "sine", 0.018, 0.2);
+            }
+
+            function vibrate(pattern) {
+                if (navigator.vibrate) navigator.vibrate(pattern);
+            }
+
+            function setSpeech(message) {
+                elements.speech.textContent = message;
+            }
+
+            function setGuidePortrait(src, duration = 0) {
+                clearTimeout(guideResetTimer);
+                elements.guideCharacter.src = src;
+                if (duration > 0) {
+                    guideResetTimer = window.setTimeout(() => {
+                        elements.guideCharacter.src = ART.hedgehogNormal;
+                    }, duration);
+                }
+            }
+
+            function hideRivalCutIn() {
+                clearTimeout(rivalCutInTimer);
+                elements.rivalCutIn.classList.remove("show");
+                elements.rivalCutIn.setAttribute("aria-hidden", "true");
+            }
+
+            function showRivalCutIn(duration = 950) {
+                hideRivalCutIn();
+                elements.rivalCutIn.classList.add("show");
+                elements.rivalCutIn.setAttribute("aria-hidden", "false");
+                rivalCutInTimer = window.setTimeout(hideRivalCutIn, duration);
+            }
+
+            function showEffect(message, duration = 780, variant = "") {
+                clearTimeout(effectTimer);
+                elements.effectText.textContent = message;
+                elements.effectText.classList.toggle("penalty", variant === "penalty");
+                elements.effectText.classList.add("show");
+                effectTimer = window.setTimeout(() => {
+                    elements.effectText.classList.remove("show");
+                    elements.effectText.classList.remove("penalty");
+                }, duration);
+            }
+
+            function updateHud() {
+                elements.delivered.textContent = deliveredCount;
+                elements.angerMarks.innerHTML = Array.from({ length: MAX_ANGER }, (_, index) => (
+                    `<i class="${index < angerCount ? "filled" : ""}">${index < angerCount ? "💢" : ""}</i>`
+                )).join("");
+                elements.angerMarks.setAttribute("aria-label", `ふちゅういマーク${angerCount}こ`);
+                updateDebug();
+            }
+
+            function colorInfo(key) {
+                return COLORS.find((color) => color.key === key);
+            }
+
+            function createMail(colorKey, row, col, entering = false) {
+                const color = colorInfo(colorKey);
+                const mail = {
+                    id: nextMailId++,
+                    color: colorKey,
+                    row,
+                    col,
+                    element: document.createElement("div")
+                };
+                mail.element.className = "mail";
+                mail.element.dataset.id = String(mail.id);
+                mail.element.dataset.color = colorKey;
+                mail.element.style.setProperty("--col", String(col));
+                mail.element.style.setProperty("--row", String(entering ? -1 : row));
+                mail.element.style.setProperty("--paper", color.paper);
+                mail.element.style.setProperty("--paper-dark", color.dark);
+                mail.element.innerHTML = `<div class="envelope"><span class="mail-mark">${color.mark}</span></div>`;
+                elements.board.appendChild(mail.element);
+                if (entering) {
+                    mail.element.getBoundingClientRect();
+                    requestAnimationFrame(() => {
+                        mail.element.style.setProperty("--row", String(row));
+                    });
+                }
+                mails.push(mail);
+                return mail;
+            }
+
+            function removeMail(mail) {
+                mail.element.remove();
+                mails = mails.filter((item) => item !== mail);
+            }
+
+            function clearBoard() {
+                mails.forEach((mail) => mail.element.remove());
+                mails = [];
+                claimableColors = [];
+            }
+
+            function countColors(list = mails) {
+                const counts = Object.fromEntries(COLORS.map((color) => [color.key, 0]));
+                list.forEach((mail) => {
+                    counts[mail.color] += 1;
+                });
+                return counts;
+            }
+
+            function exactFiveColors() {
+                const counts = countColors();
+                return COLORS
+                    .filter((color) => counts[color.key] === 5)
+                    .map((color) => color.key);
+            }
+
+            function refillIncomingDeck() {
+                incomingDeck = COLORS.flatMap((color) =>
+                    MAIL_AMOUNT_DECK.map((amount) => ({
+                        color: color.key,
+                        amount
+                    }))
+                );
+
+                for (let index = incomingDeck.length - 1; index > 0; index -= 1) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [incomingDeck[index], incomingDeck[swapIndex]] = [
+                        incomingDeck[swapIndex],
+                        incomingDeck[index]
+                    ];
+                }
+            }
+
+            function drawFromIncomingDeck(excludedColor = "") {
+                if (incomingDeck.length === 0) refillIncomingDeck();
+
+                let deckIndex = incomingDeck.length - 1;
+                if (excludedColor) {
+                    while (deckIndex >= 0 && incomingDeck[deckIndex].color === excludedColor) {
+                        deckIndex -= 1;
+                    }
+                    if (deckIndex < 0) {
+                        refillIncomingDeck();
+                        deckIndex = incomingDeck.length - 1;
+                        while (deckIndex >= 0 && incomingDeck[deckIndex].color === excludedColor) {
+                            deckIndex -= 1;
+                        }
+                    }
+                }
+
+                return incomingDeck.splice(deckIndex, 1)[0];
+            }
+
+            function nextPatternGap() {
+                // 3行の仕込み5回＋通常4～6回で、完成はおよそ9～11回に1度。
+                return 4 + Math.floor(Math.random() * 3);
+            }
+
+            function makeGuidedPattern(stayingMails) {
+                const counts = countColors(stayingMails);
+                const availableColors = COLORS.filter((color) => counts[color.key] === 0);
+                if (availableColors.length === 0) return false;
+
+                const target = availableColors[Math.floor(Math.random() * availableColors.length)].key;
+                const source = THREE_ROW_PATTERNS[
+                    Math.floor(Math.random() * THREE_ROW_PATTERNS.length)
+                ];
+                const amounts = [...source];
+
+                // 同じ組み合わせでも、1・2・2などの出る順番は毎回変える。
+                for (let index = amounts.length - 1; index > 0; index -= 1) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [amounts[index], amounts[swapIndex]] = [amounts[swapIndex], amounts[index]];
+                }
+
+                guidedPatternQueue = [
+                    { color: target, amount: amounts[0], guided: true },
+                    { fillerFor: target },
+                    { color: target, amount: amounts[1], guided: true },
+                    { fillerFor: target },
+                    { color: target, amount: amounts[2], guided: true }
+                ];
+                ordinaryRoundsUntilPattern = nextPatternGap();
+                return true;
+            }
+
+            function chooseBusyIncoming() {
+                const shuffledColors = COLORS.map((color) => color.key);
+                for (let index = shuffledColors.length - 1; index > 0; index -= 1) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [shuffledColors[index], shuffledColors[swapIndex]] = [
+                        shuffledColors[swapIndex],
+                        shuffledColors[index]
+                    ];
+                }
+
+                const roll = Math.random();
+                if (roll < 0.25) {
+                    const color = shuffledColors[0];
+                    return {
+                        slots: Array(3).fill(color),
+                        summary: `${color} 3`
+                    };
+                }
+
+                if (roll < 0.8) {
+                    const doubledIndex = Math.random() < 0.5 ? 0 : 1;
+                    const slots = [
+                        shuffledColors[0],
+                        shuffledColors[1],
+                        shuffledColors[doubledIndex]
+                    ];
+
+                    for (let index = slots.length - 1; index > 0; index -= 1) {
+                        const swapIndex = Math.floor(Math.random() * (index + 1));
+                        [slots[index], slots[swapIndex]] = [slots[swapIndex], slots[index]];
+                    }
+
+                    return {
+                        slots,
+                        summary: `${shuffledColors[0]}＋${shuffledColors[1]}`
+                    };
+                }
+
+                return {
+                    slots: shuffledColors.slice(0, 3),
+                    summary: `${shuffledColors[0]}＋${shuffledColors[1]}＋${shuffledColors[2]}`
+                };
+            }
+
+            function chooseIncoming(stayingMails) {
+                if (forcedIncoming) {
+                    const incoming = forcedIncoming;
+                    forcedIncoming = null;
+                    guidedPatternQueue = [];
+                    ordinaryRoundsUntilPattern = 2;
+                    return incoming;
+                }
+
+                if (incomingStyle === "busy") {
+                    return chooseBusyIncoming();
+                }
+
+                if (guidedPatternQueue.length === 0) {
+                    if (ordinaryRoundsUntilPattern <= 0) {
+                        makeGuidedPattern(stayingMails);
+                    } else {
+                        ordinaryRoundsUntilPattern -= 1;
+                    }
+                }
+
+                if (guidedPatternQueue.length > 0) {
+                    const planned = guidedPatternQueue.shift();
+                    if (planned.fillerFor) {
+                        return drawFromIncomingDeck(planned.fillerFor);
+                    }
+                    return planned;
+                }
+
+                return drawFromIncomingDeck();
+            }
+
+            function markPracticeTargets() {
+                mails.forEach((mail) => {
+                    mail.element.classList.toggle(
+                        "target-preview",
+                        mode === "practice" && claimableColors.includes(mail.color)
+                    );
+                });
+            }
+
+            function startTimer(duration = currentSpeed) {
+                cancelTimer();
+                if (mode !== "game" || debugPaused || gamePaused) return;
+                roundTimerRemaining = duration;
+                timerActive = true;
+                timerDeadline = performance.now() + duration;
+                elements.modeLabel.textContent = "つぎの てがみまで";
+
+                const tick = (now) => {
+                    if (!timerActive) return;
+                    const remaining = Math.max(0, timerDeadline - now);
+                    roundTimerRemaining = remaining;
+                    const ratio = Math.max(0, Math.min(1, remaining / duration));
+                    elements.timerFill.style.transform = `scaleX(${ratio})`;
+                    elements.timerNumber.textContent = String(Math.max(0, Math.ceil(remaining / 1000)));
+                    if (remaining <= 0) {
+                        timerActive = false;
+                        advanceBoard();
+                        return;
+                    }
+                    timerFrame = requestAnimationFrame(tick);
+                };
+                timerFrame = requestAnimationFrame(tick);
+            }
+
+            function cancelTimer() {
+                timerActive = false;
+                cancelAnimationFrame(timerFrame);
+            }
+
+            function startWorkTimer(duration = workRemaining) {
+                cancelWorkTimer();
+                if (mode !== "game" || gamePaused) return;
+                workRemaining = duration;
+                workTimerActive = true;
+                workDeadline = performance.now() + duration;
+
+                const tick = (now) => {
+                    if (!workTimerActive) return;
+                    workRemaining = Math.max(0, workDeadline - now);
+                    elements.workTime.textContent = String(Math.max(0, Math.ceil(workRemaining / 1000)));
+                    if (workRemaining <= 0) {
+                        workTimerActive = false;
+                        finishGame("time");
+                        return;
+                    }
+                    workTimerFrame = requestAnimationFrame(tick);
+                };
+                workTimerFrame = requestAnimationFrame(tick);
+            }
+
+            function pauseWorkTimer() {
+                if (workTimerActive) {
+                    workRemaining = Math.max(0, workDeadline - performance.now());
+                }
+                cancelWorkTimer();
+            }
+
+            function cancelWorkTimer() {
+                workTimerActive = false;
+                cancelAnimationFrame(workTimerFrame);
+            }
+
+            function schedulePracticeMiss(delay) {
+                clearTimeout(practiceWaitTimer);
+                practiceWaitRemaining = delay;
+                practiceWaitDeadline = performance.now() + delay;
+                practiceWaitTimer = window.setTimeout(async () => {
+                    practiceWaitTimer = 0;
+                    practiceWaitRemaining = 0;
+                    if (gamePaused || mode !== "practice" || PRACTICE_STEPS[practiceStep]?.type !== "miss") return;
+                    await handleMiss();
+                    if (mode !== "practice") return;
+                    practiceStep += 1;
+                    setupPracticeStep();
+                }, delay);
+            }
+
+            function updatePauseUi() {
+                elements.pauseButton.textContent = gamePaused ? "つづける" : "ストップ";
+                elements.pauseButton.setAttribute("aria-pressed", String(gamePaused));
+                elements.pauseSign.classList.toggle("show", gamePaused);
+                elements.pauseSign.setAttribute("aria-hidden", String(!gamePaused));
+            }
+
+            function togglePause() {
+                if (mode !== "game" && mode !== "practice") return;
+
+                gamePaused = !gamePaused;
+                updatePauseUi();
+
+                if (gamePaused) {
+                    speechBeforePause = elements.speech.textContent;
+                    if (timerActive) {
+                        roundTimerRemaining = Math.max(0, timerDeadline - performance.now());
+                    }
+                    cancelTimer();
+                    pauseWorkTimer();
+
+                    if (mode === "practice" && PRACTICE_STEPS[practiceStep]?.type === "miss") {
+                        practiceWaitRemaining = Math.max(0, practiceWaitDeadline - performance.now());
+                        clearTimeout(practiceWaitTimer);
+                        practiceWaitTimer = 0;
+                    }
+                    setSpeech("ひとやすみ。つづけるときは ボタンを おしてね。");
+                    return;
+                }
+
+                setSpeech(speechBeforePause);
+                if (mode === "game") {
+                    if (!transitioning && !inputLocked) {
+                        startTimer(roundTimerRemaining > 0 ? roundTimerRemaining : currentSpeed);
+                    }
+                    startWorkTimer(workRemaining);
+                } else if (PRACTICE_STEPS[practiceStep]?.type === "miss" && practiceWaitRemaining > 0) {
+                    schedulePracticeMiss(practiceWaitRemaining);
+                }
+            }
+
+            async function removeColoredMails(colors, className) {
+                const selected = mails.filter((mail) => colors.includes(mail.color));
+                selected.forEach((mail) => mail.element.classList.add(className));
+                await wait(className === "delivered" ? 560 : 470);
+                selected.forEach(removeMail);
+            }
+
+            function launchBirds(colors, role = "delivery") {
+                elements.birdLayer.innerHTML = "";
+                const isRival = role === "rival";
+                const upSource = isRival ? ART.blueUp : ART.yellowUp;
+                const downSource = isRival ? ART.blueDown : ART.yellowDown;
+                colors.forEach((colorKey, index) => {
+                    const color = colorInfo(colorKey);
+                    const bird = document.createElement("div");
+                    bird.className = `delivery-bird ${isRival ? "rival-bird" : "yellow-bird"}`;
+                    bird.style.setProperty("--bird-index", String(index));
+                    bird.style.setProperty("--bird-color", color.paper);
+                    bird.innerHTML = `
+                        <b class="bird-label">${isRival ? "アルマの とり" : "こちらの とり"}</b>
+                        <img class="bird-frame wings-up" src="${upSource}" alt="">
+                        <img class="bird-frame wings-down" src="${downSource}" alt="">
+                        <i class="bird-color-seal"></i>
+                    `;
+                    elements.birdLayer.appendChild(bird);
+                });
+                window.setTimeout(() => {
+                    elements.birdLayer.innerHTML = "";
+                }, 1100);
+            }
+
+            async function handleCorrect() {
+                const targets = [...claimableColors];
+                claimableColors = [];
+                inputLocked = true;
+                cancelTimer();
+                elements.whistle.classList.add("blowing");
+                playWhistle();
+                vibrate([18, 24, 34]);
+                showEffect(targets.length > 1 ? `${targets.length}しょ まとめて はいたつ！` : "ピッ！ はいたつ！");
+                setGuidePortrait(ART.hedgehogSuccess, 850);
+                setSpeech(mode === "practice"
+                    ? "やった！ ちょうど5つだね！"
+                    : "やった！ アルマより さきに ふけた！");
+                launchBirds(targets, "delivery");
+                playBirds();
+                deliveredCount += targets.length * 5;
+                correctCount += 1;
+                streak += 1;
+                maxStreak = Math.max(maxStreak, streak);
+                updateHud();
+                await removeColoredMails(targets, "delivered");
+
+                elements.whistle.classList.remove("blowing");
+                inputLocked = false;
+
+                if (mode === "practice") {
+                    practiceStep += 1;
+                    await wait(260);
+                    setupPracticeStep();
+                } else if (mode === "game") {
+                    startTimer(currentSpeed);
+                }
+            }
+
+            function handleWrong() {
+                wrongCount += 1;
+                angerCount = Math.min(MAX_ANGER, angerCount + 1);
+                streak = 0;
+                updateHud();
+                playWrong();
+                vibrate(30);
+                setGuidePortrait(ART.hedgehogMiss, 650);
+                showEffect("いまは 5つじゃないよ\nふちゅういマークが 1こ！", 720, "penalty");
+
+                const expectedPracticeWrong = mode === "practice"
+                    && PRACTICE_STEPS[practiceStep]?.type === "wrong";
+
+                if (expectedPracticeWrong) {
+                    inputLocked = true;
+                    setSpeech("これが おしまちがい。ふちゅういマークが 1こ つくよ！");
+                    practiceWaitTimer = window.setTimeout(() => {
+                        if (mode !== "practice" || PRACTICE_STEPS[practiceStep]?.type !== "wrong") return;
+                        practiceStep += 1;
+                        setupPracticeStep();
+                    }, 1250);
+                    return;
+                }
+
+                setSpeech(mode === "practice"
+                    ? "ふちゅういマークが ついたよ。ちょうど5つを もういちど みてみよう！"
+                    : "おっと！ ちょうど5つの いろを さがそう！");
+
+                if (mode === "game" && angerCount >= MAX_ANGER) {
+                    inputLocked = true;
+                    cancelTimer();
+                    pauseWorkTimer();
+                    showEffect("ふちゅういマークが 5こ！\nおこられちゃった！", 900, "penalty");
+                    setSpeech("おしまちがいが 5かい。きょうの しごとは おわりだよ。");
+                    window.setTimeout(() => {
+                        if (mode === "game") finishGame("anger");
+                    }, 900);
+                }
+            }
+
+            async function handleMiss() {
+                const missedColors = [...claimableColors];
+                const penalty = missedColors.length * 5;
+                claimableColors = [];
+                cancelTimer();
+                inputLocked = true;
+                missedCount += missedColors.length;
+                deliveredCount = Math.max(0, deliveredCount - penalty);
+                streak = 0;
+                updateHud();
+                playRivalWhistle();
+                setGuidePortrait(ART.hedgehogMiss, 1200);
+                showRivalCutIn(1050);
+                vibrate([45, 30, 45]);
+                showEffect(mode === "practice"
+                    ? "ピッ！ アルマが さき！"
+                    : `ピッ！ アルマが さき！\n-${penalty}ポイント`, 1050, "penalty");
+                setSpeech("あっ！ アルマに さきに ふえを ふかれちゃった！");
+                await wait(170);
+                playMiss();
+                launchBirds(missedColors, "rival");
+                await removeColoredMails(missedColors, "missed");
+                inputLocked = false;
+            }
+
+            async function advanceBoard(force = false) {
+                if (mode !== "game" || transitioning || inputLocked || gamePaused) return;
+                if (debugPaused && !force) return;
+                transitioning = true;
+                cancelTimer();
+
+                if (claimableColors.length > 0) {
+                    await handleMiss();
+                    if (mode !== "game") {
+                        transitioning = false;
+                        return;
+                    }
+                }
+
+                const outgoing = mails.filter((mail) => mail.row === BOARD_ROWS - 1);
+                outgoing.forEach((mail) => mail.element.classList.add("leaving-row"));
+
+                const staying = mails.filter((mail) => mail.row < BOARD_ROWS - 1);
+                staying.forEach((mail) => {
+                    mail.row += 1;
+                    mail.element.style.setProperty("--row", String(mail.row));
+                });
+
+                const incoming = chooseIncoming(staying);
+                const incomingColors = incoming.slots
+                    || Array.from({ length: incoming.amount }, () => incoming.color);
+                incomingColors.forEach((color, col) => {
+                    createMail(color, 0, col, true);
+                });
+
+                round += 1;
+                setSpeech("てがみが きたよ！");
+                await wait(490);
+                outgoing.forEach(removeMail);
+
+                claimableColors = exactFiveColors();
+
+                transitioning = false;
+                updateDebug(`こうしん ${round}：${incoming.summary || `${incoming.color} ${incoming.amount}`}`);
+                if (!debugPaused) startTimer(currentSpeed);
+            }
+
+            function whistle() {
+                if (!document.getElementById("game-screen").classList.contains("active")) return;
+                if (transitioning || inputLocked || gamePaused) return;
+                initAudio();
+                if (claimableColors.length > 0) {
+                    handleCorrect();
+                } else {
+                    handleWrong();
+                }
+            }
+
+            function resetState() {
+                cancelTimer();
+                cancelWorkTimer();
+                clearTimeout(practiceWaitTimer);
+                practiceWaitTimer = 0;
+                practiceWaitRemaining = 0;
+                clearTimeout(guideResetTimer);
+                hideRivalCutIn();
+                elements.birdLayer.innerHTML = "";
+                setGuidePortrait(ART.hedgehogNormal);
+                clearBoard();
+                angerCount = 0;
+                deliveredCount = 0;
+                correctCount = 0;
+                missedCount = 0;
+                wrongCount = 0;
+                streak = 0;
+                maxStreak = 0;
+                round = 0;
+                transitioning = false;
+                inputLocked = false;
+                debugPaused = false;
+                gamePaused = false;
+                speechBeforePause = "";
+                roundTimerRemaining = currentSpeed;
+                incomingDeck = [];
+                guidedPatternQueue = [];
+                ordinaryRoundsUntilPattern = 2 + Math.floor(Math.random() * 3);
+                workRemaining = WORK_DURATION;
+                elements.debugPause.textContent = "とめる";
+                updatePauseUi();
+                elements.workTime.textContent = mode === "practice"
+                    ? "ー"
+                    : String(Math.ceil(WORK_DURATION / 1000));
+                elements.timerFill.style.transform = "scaleX(1)";
+                elements.timerNumber.textContent = mode === "practice" ? "ー" : String(Math.ceil(currentSpeed / 1000));
+                updateHud();
+            }
+
+            function startGame(speed = lastSpeed, style = lastIncomingStyle) {
+                initAudio();
+                preloadGameArt();
+                mode = "game";
+                currentSpeed = speed;
+                lastSpeed = speed;
+                incomingStyle = style;
+                lastIncomingStyle = style;
+                resetState();
+                elements.practiceBanner.classList.add("hidden");
+                elements.modeLabel.textContent = "つぎの てがみまで";
+                setSpeech(style === "busy"
+                    ? "おおいそがし！ 1～3しょくの てがみを よくみよう！"
+                    : "アルマより はやく 5つを みつけよう！");
+                showScreen("game-screen");
+                startWorkTimer(WORK_DURATION);
+                advanceBoard();
+            }
+
+            function setPracticeMails(step) {
+                clearBoard();
+                step.mails.forEach(([color, row, col]) => createMail(color, row, col));
+                claimableColors = exactFiveColors();
+                markPracticeTargets();
+                updateDebug();
+            }
+
+            function setupPracticeStep() {
+                clearTimeout(practiceWaitTimer);
+                practiceWaitTimer = 0;
+                practiceWaitRemaining = 0;
+                if (practiceStep >= PRACTICE_STEPS.length) {
+                    cancelTimer();
+                    elements.practiceBanner.classList.add("hidden");
+                    elements.practiceComplete.classList.add("show");
+                    playBirds();
+                    return;
+                }
+
+                const step = PRACTICE_STEPS[practiceStep];
+                inputLocked = false;
+                transitioning = false;
+                setPracticeMails(step);
+                elements.practiceBanner.textContent = step.message;
+                elements.practiceBanner.classList.remove("hidden");
+                setSpeech(step.message);
+                elements.modeLabel.textContent = `れんしゅう ${practiceStep + 1} / ${PRACTICE_STEPS.length}`;
+                elements.timerFill.style.transform = "scaleX(1)";
+                elements.timerNumber.textContent = "ー";
+
+                if (step.type === "miss") {
+                    inputLocked = true;
+                    schedulePracticeMiss(step.autoDelay);
+                }
+            }
+
+            function startPractice() {
+                initAudio();
+                preloadGameArt();
+                mode = "practice";
+                practiceStep = 0;
+                resetState();
+                showScreen("game-screen");
+                setupPracticeStep();
+            }
+
+            function finishGame(reason = "time") {
+                if (mode !== "game") return;
+                mode = "result";
+                gamePaused = false;
+                updatePauseUi();
+                cancelTimer();
+                cancelWorkTimer();
+                clearTimeout(practiceWaitTimer);
+                inputLocked = true;
+                elements.whistle.classList.remove("blowing");
+                saveBest(deliveredCount);
+                elements.resultTitle.textContent = reason === "anger"
+                    ? "おこられちゃった！"
+                    : "2ふんの しごと おわり！";
+                elements.resultDelivered.textContent = deliveredCount;
+                elements.resultCorrect.textContent = correctCount;
+                elements.resultMissed.textContent = missedCount;
+                elements.resultWrong.textContent = `${angerCount} / ${MAX_ANGER}`;
+                elements.resultStreak.textContent = maxStreak;
+                elements.resultMessage.textContent = reason === "anger"
+                    ? "つぎは ゆっくり たしかめてから ふえを ふこう！"
+                    : deliveredCount >= 50
+                        ? "すごい！ まちじゅうに てがみが とどいたよ！"
+                        : deliveredCount >= 25
+                            ? "たくさん はいたつできたね！"
+                            : "つぎは もっと 5つを みつけよう！";
+                updateTitleBest();
+                showScreen("result-screen");
+            }
+
+            function goTitle() {
+                gamePaused = false;
+                updatePauseUi();
+                cancelTimer();
+                cancelWorkTimer();
+                clearTimeout(practiceWaitTimer);
+                clearTimeout(guideResetTimer);
+                hideRivalCutIn();
+                elements.birdLayer.innerHTML = "";
+                mode = "title";
+                elements.practiceIntro.classList.remove("show");
+                elements.practiceComplete.classList.remove("show");
+                elements.practiceBanner.classList.add("hidden");
+                clearBoard();
+                updateTitleBest();
+                showScreen("title-screen");
+            }
+
+            function updateDebug(logMessage = "") {
+                const counts = countColors();
+                elements.debugCounts.textContent = COLORS
+                    .map((color) => `${color.name}:${counts[color.key]}`)
+                    .join(" / ");
+                if (logMessage) elements.debugLog.textContent = logMessage;
+            }
+
+            elements.practiceButton.addEventListener("click", () => {
+                elements.practiceIntro.classList.add("show");
+            });
+
+            elements.practiceStart.addEventListener("click", () => {
+                elements.practiceIntro.classList.remove("show");
+                startPractice();
+            });
+
+            elements.startButton.addEventListener("click", () => {
+                showScreen("choice-screen");
+            });
+
+            document.querySelectorAll(".speed-button").forEach((button) => {
+                if (!button.dataset.speed) return;
+                button.addEventListener("click", () => {
+                    pendingSpeed = Number(button.dataset.speed);
+                    showScreen("job-choice-screen");
+                });
+            });
+
+            document.querySelectorAll(".job-button").forEach((button) => {
+                button.addEventListener("click", () => {
+                    startGame(pendingSpeed, button.dataset.job);
+                });
+            });
+
+            elements.jobChoiceBack.addEventListener("click", () => showScreen("choice-screen"));
+
+            document.querySelectorAll('[data-action="title"]').forEach((button) => {
+                button.addEventListener("click", goTitle);
+            });
+
+            elements.practiceToStart.addEventListener("click", () => {
+                elements.practiceComplete.classList.remove("show");
+                showScreen("choice-screen");
+            });
+
+            elements.retry.addEventListener("click", () => startGame(lastSpeed, lastIncomingStyle));
+            elements.whistle.addEventListener("click", whistle);
+            elements.pauseButton.addEventListener("click", togglePause);
+
+            document.addEventListener("keydown", (event) => {
+                if (event.code === "Space") {
+                    event.preventDefault();
+                    whistle();
+                }
+            });
+
+            elements.debugPause.addEventListener("click", () => {
+                debugPaused = !debugPaused;
+                elements.debugPause.textContent = debugPaused ? "さいかい" : "とめる";
+                if (debugPaused) {
+                    cancelTimer();
+                    pauseWorkTimer();
+                } else if (mode === "game") {
+                    startTimer(currentSpeed);
+                    startWorkTimer(workRemaining);
+                }
+            });
+
+            elements.debugStep.addEventListener("click", () => {
+                if (mode === "game") advanceBoard(true);
+            });
+
+            elements.debugReset.addEventListener("click", () => {
+                if (mode === "game") startGame(currentSpeed, incomingStyle);
+            });
+
+            elements.debugColor.addEventListener("change", () => {
+                forcedIncoming = {
+                    color: elements.debugColor.value,
+                    amount: Number(elements.debugAmount.value)
+                };
+            });
+
+            elements.debugAmount.addEventListener("change", () => {
+                forcedIncoming = {
+                    color: elements.debugColor.value,
+                    amount: Number(elements.debugAmount.value)
+                };
+            });
+
+            if (DEBUG_MODE) {
+                elements.debugPanel.hidden = false;
+            }
+
+            updateTitleBest();
+            updateHud();
+        })();
+    </script>
+</body>
+</html>

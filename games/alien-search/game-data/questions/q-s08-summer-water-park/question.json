@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s08-summer-water-park",
+  "stageId": "s08",
+  "season": "summer",
+  "level": 3,
+  "theme": "水遊び公園",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s08-t01",
+      "action": "じょうろで水を流している",
+      "hitbox": {
+        "x": 50,
+        "y": 325,
+        "width": 165,
+        "height": 140
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s08-t02",
+      "action": "すべり台から水の中へすべっている",
+      "hitbox": {
+        "x": 130,
+        "y": 480,
+        "width": 145,
+        "height": 160
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s08-t03",
+      "action": "大きな水鉄砲をかまえている",
+      "hitbox": {
+        "x": 410,
+        "y": 535,
+        "width": 155,
+        "height": 180
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s08-t04",
+      "action": "噴水の中で楽しんでいる",
+      "hitbox": {
+        "x": 1420,
+        "y": 410,
+        "width": 150,
+        "height": 170
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s08-t05",
+      "action": "タオルを持って休憩している",
+      "hitbox": {
+        "x": 985,
+        "y": 875,
+        "width": 145,
+        "height": 185
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

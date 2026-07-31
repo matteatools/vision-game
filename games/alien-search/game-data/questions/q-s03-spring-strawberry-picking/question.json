@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s03-spring-strawberry-picking",
+  "stageId": "s03",
+  "season": "spring",
+  "level": 3,
+  "theme": "いちご狩り",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s03-t01",
+      "action": "きのこの帽子でいちごのかごを持っている",
+      "hitbox": {
+        "x": 150,
+        "y": 240,
+        "width": 165,
+        "height": 180
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s03-t02",
+      "action": "いちごのかごを大事に持っている",
+      "hitbox": {
+        "x": 970,
+        "y": 305,
+        "width": 125,
+        "height": 145
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s03-t03",
+      "action": "いちごを台車で運んでいる",
+      "hitbox": {
+        "x": 910,
+        "y": 495,
+        "width": 175,
+        "height": 175
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s03-t04",
+      "action": "じょうろでいちごに水をあげている",
+      "hitbox": {
+        "x": 1435,
+        "y": 485,
+        "width": 160,
+        "height": 180
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s03-t05",
+      "action": "星の飾りをつけていちご畑を歩いている",
+      "hitbox": {
+        "x": 915,
+        "y": 415,
+        "width": 135,
+        "height": 125
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

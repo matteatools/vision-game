@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s02-spring-hanami",
+  "stageId": "s02",
+  "season": "spring",
+  "level": 2,
+  "theme": "お花見",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s02-t01",
+      "action": "橋の上でカメラをかまえている",
+      "hitbox": {
+        "x": 970,
+        "y": 80,
+        "width": 135,
+        "height": 145
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s02-t02",
+      "action": "小川に落ちてびっくりしている",
+      "hitbox": {
+        "x": 1155,
+        "y": 365,
+        "width": 120,
+        "height": 160
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s02-t03",
+      "action": "レジャーシートでロールケーキを持っている",
+      "hitbox": {
+        "x": 475,
+        "y": 595,
+        "width": 140,
+        "height": 160
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s02-t04",
+      "action": "花畑でカメラをかまえている",
+      "hitbox": {
+        "x": 1140,
+        "y": 625,
+        "width": 165,
+        "height": 150
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s02-t05",
+      "action": "花畑で気持ちよさそうに眠っている",
+      "hitbox": {
+        "x": 965,
+        "y": 905,
+        "width": 180,
+        "height": 175
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

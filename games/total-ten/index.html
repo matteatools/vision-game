@@ -1,0 +1,3777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#164f3b">
+    <meta name="description" content="すうじスライムを うえ・した・ひだり・みぎにつないで、かたさをぴったり10か20にするゲームです。">
+    <title>ぽんすけの あわせて10</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=M+PLUS+Rounded+1c:wght@700;800&display=swap');
+
+        :root {
+            --ink: #252046;
+            --muted: #736f92;
+            --violet: #6f55ff;
+            --violet-deep: #3d2bb7;
+            --pink: #ff5ca8;
+            --cyan: #35d5e6;
+            --gold: #ffc857;
+            --danger: #ff496f;
+            --cream: #fffaf0;
+            --glass: rgba(255, 255, 255, 0.82);
+            --shadow: 0 24px 70px rgba(21, 12, 75, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        body {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 20% 10%, rgba(86, 219, 255, 0.32), transparent 26%),
+                radial-gradient(circle at 80% 90%, rgba(255, 92, 168, 0.28), transparent 30%),
+                linear-gradient(145deg, #17133f 0%, #30206f 48%, #161138 100%);
+            font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+            touch-action: none;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+        }
+
+        .ambient {
+            position: fixed;
+            inset: -20%;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(80, 221, 255, 0.18), transparent 25%),
+                radial-gradient(circle at 70% 65%, rgba(255, 92, 168, 0.16), transparent 28%);
+            filter: blur(18px);
+            animation: ambientDrift 12s ease-in-out infinite alternate;
+            transition: opacity 0.2s ease;
+        }
+
+        body.game-running .ambient {
+            opacity: 0;
+            animation-play-state: paused;
+        }
+
+        #app {
+            position: relative;
+            width: min(100%, 500px);
+            height: 100dvh;
+            overflow: hidden;
+            isolation: isolate;
+            background: #f8f5ff;
+            box-shadow: var(--shadow);
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.02);
+            transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .screen:not(.active) *,
+        .screen:not(.active)::before,
+        .screen:not(.active)::after {
+            animation-play-state: paused !important;
+        }
+
+        .title-screen {
+            justify-content: flex-end;
+            padding: 18px 20px max(22px, env(safe-area-inset-bottom));
+            color: white;
+            background:
+                linear-gradient(180deg, rgba(17, 12, 59, 0.1) 0%, rgba(17, 12, 59, 0.28) 46%, rgba(17, 12, 59, 0.95) 100%),
+                url("./assets/slime-town-title-v1.jpg") center top / cover no-repeat,
+                radial-gradient(circle at 50% 20%, #7356ff 0%, #312270 52%, #17133f 100%);
+        }
+
+        .title-screen::before,
+        .title-screen::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .title-screen::before {
+            width: 340px;
+            height: 340px;
+            top: -145px;
+            right: -145px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 0 80px rgba(96, 223, 255, 0.18);
+        }
+
+        .title-screen::after {
+            width: 12px;
+            height: 12px;
+            top: 18%;
+            left: 12%;
+            background: white;
+            box-shadow:
+                106px -41px 0 -3px rgba(255, 255, 255, 0.8),
+                274px 19px 0 -4px rgba(255, 255, 255, 0.65),
+                317px 135px 0 -2px rgba(255, 255, 255, 0.7),
+                36px 178px 0 -4px rgba(255, 255, 255, 0.8);
+            animation: twinkle 2.6s ease-in-out infinite alternate;
+        }
+
+        .title-topbar {
+            position: absolute;
+            z-index: 2;
+            top: max(16px, env(safe-area-inset-top));
+            left: 18px;
+            right: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .edition-pill,
+        .icon-button {
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            color: white;
+            background: rgba(24, 16, 72, 0.45);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(12px);
+        }
+
+        .edition-pill {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+        }
+
+        .icon-button {
+            display: grid;
+            width: 40px;
+            height: 40px;
+            place-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .hero {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            margin: 0 0 2px;
+            color: #8ff4ff;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.24em;
+        }
+
+        .hero h1 {
+            margin: 0;
+            color: white;
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: clamp(58px, 16vw, 80px);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.055em;
+            text-shadow: 0 5px 0 rgba(62, 38, 156, 0.9), 0 12px 30px rgba(22, 8, 76, 0.55);
+        }
+
+        .hero h1 span {
+            color: var(--gold);
+        }
+
+        .hero-subtitle {
+            margin: 8px 0 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .start-card {
+            position: relative;
+            z-index: 2;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.21);
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.17), 0 18px 45px rgba(12, 7, 54, 0.27);
+            backdrop-filter: blur(18px);
+        }
+
+        .high-score-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 4px 11px;
+            color: rgba(255, 255, 255, 0.74);
+            font-size: 12px;
+        }
+
+        .high-score-row strong {
+            color: white;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .primary-button,
+        .secondary-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 58px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.12s ease, filter 0.12s ease;
+        }
+
+        .primary-button {
+            gap: 11px;
+            color: #352052;
+            background: linear-gradient(135deg, #fff3a5 0%, #ffc857 55%, #ff9f43 100%);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.62), 0 7px 0 #c96a30, 0 13px 24px rgba(7, 3, 42, 0.3);
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .primary-button::before {
+            content: "▶";
+            display: grid;
+            width: 32px;
+            height: 32px;
+            place-items: center;
+            border-radius: 50%;
+            color: white;
+            background: rgba(73, 37, 112, 0.82);
+            font-size: 12px;
+        }
+
+        .primary-button:active,
+        .secondary-button:active,
+        .icon-button:active,
+        .quit-button:active {
+            transform: translateY(3px) scale(0.985);
+            filter: brightness(0.95);
+        }
+
+        .title-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .secondary-button {
+            min-height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            background: rgba(20, 14, 63, 0.34);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .secondary-button.classic::before {
+            content: "◷";
+            margin-right: 6px;
+            color: #8ff4ff;
+        }
+
+        .game-screen {
+            overflow: hidden;
+            padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
+            background:
+                radial-gradient(circle at 50% -8%, rgba(116, 86, 255, 0.36), transparent 29%),
+                linear-gradient(180deg, #f5f0ff 0%, #e8f8ff 58%, #f7f5ff 100%);
+        }
+
+        .game-header {
+            z-index: 3;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            min-height: 62px;
+            padding: 6px 8px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .stat.right {
+            align-items: flex-end;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+        }
+
+        .stat-value {
+            color: var(--ink);
+            font-family: "Baloo 2", sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .game-mark {
+            display: flex;
+            align-items: baseline;
+            color: var(--violet-deep);
+            font-family: "Baloo 2", sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .game-mark span {
+            color: var(--pink);
+        }
+
+        .timer-ring {
+            --progress: 1;
+            position: relative;
+            display: grid;
+            width: 43px;
+            height: 43px;
+            place-items: center;
+            border-radius: 50%;
+            background: conic-gradient(var(--pink) calc(var(--progress) * 1turn), rgba(76, 55, 154, 0.12) 0);
+        }
+
+        .timer-ring::after {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border-radius: inherit;
+            background: #f2f0ff;
+        }
+
+        .timer-ring span {
+            z-index: 1;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .sum-panel {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 50px;
+            margin: 0 4px 9px;
+            padding: 8px 12px;
+            border: 1px solid rgba(93, 70, 170, 0.11);
+            border-radius: 17px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 10px 26px rgba(67, 45, 139, 0.09);
+            backdrop-filter: blur(10px);
+        }
+
+        .sum-copy {
+            min-width: 92px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+        }
+
+        #sum-display {
+            display: block;
+            color: var(--violet-deep);
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .sum-meter {
+            display: grid;
+            flex: 1;
+            grid-template-columns: repeat(20, 1fr);
+            gap: 2px;
+            height: 12px;
+        }
+
+        .sum-tick {
+            border-radius: 4px;
+            background: #e8e3f6;
+            transition: background 0.12s ease, transform 0.12s ease;
+        }
+
+        .sum-tick.filled {
+            transform: scaleY(1.15);
+            background: linear-gradient(180deg, #8b77ff, #5c46dc);
+        }
+
+        .sum-tick.goal {
+            background: var(--gold);
+            box-shadow: 0 0 8px rgba(255, 200, 87, 0.8);
+        }
+
+        .sum-tick.over {
+            background: var(--danger);
+        }
+
+        .board-shell {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #board-container {
+            position: relative;
+            width: min(100%, calc((100dvh - 166px) * 0.8));
+            max-height: 100%;
+            aspect-ratio: 8 / 10;
+            overflow: hidden;
+            border: 5px solid rgba(255, 255, 255, 0.94);
+            border-radius: 24px;
+            background:
+                linear-gradient(rgba(103, 83, 180, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(103, 83, 180, 0.045) 1px, transparent 1px),
+                radial-gradient(circle at 48% 85%, rgba(53, 213, 230, 0.23), transparent 40%),
+                linear-gradient(180deg, rgba(249, 247, 255, 0.98), rgba(230, 247, 255, 0.96));
+            background-size: 12.5% 10%, 12.5% 10%, auto, auto;
+            box-shadow:
+                inset 0 0 0 1px rgba(86, 59, 164, 0.1),
+                inset 0 18px 40px rgba(91, 69, 164, 0.08),
+                0 16px 38px rgba(67, 45, 139, 0.2);
+            contain: layout paint;
+            touch-action: none;
+        }
+
+        #board-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 12% 14%, white 0 1px, transparent 2px),
+                radial-gradient(circle at 81% 22%, white 0 1px, transparent 2px),
+                radial-gradient(circle at 72% 54%, white 0 1px, transparent 2px);
+            background-size: 72px 92px, 96px 83px, 84px 106px;
+            opacity: 0.75;
+        }
+
+        #path-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .danger-line {
+            position: absolute;
+            z-index: 2;
+            top: 10%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            pointer-events: none;
+            background: repeating-linear-gradient(90deg, transparent 0 8px, rgba(255, 73, 111, 0.48) 8px 15px);
+            filter: drop-shadow(0 0 5px rgba(255, 73, 111, 0.6));
+        }
+
+        .danger-label {
+            position: absolute;
+            right: 6px;
+            top: 5px;
+            z-index: 3;
+            color: rgba(226, 49, 90, 0.7);
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+        }
+
+        .block {
+            --block-color: #8a75ff;
+            --block-light: #b7aaff;
+            --block-x: 0%;
+            --block-y: 0%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
+            display: grid;
+            width: 12.5%;
+            height: 10%;
+            place-items: center;
+            border: 3px solid transparent;
+            border-radius: clamp(8px, 2.7vw, 13px);
+            color: white;
+            background:
+                radial-gradient(circle at 32% 19%, rgba(255, 255, 255, 0.66) 0 8%, transparent 24%),
+                linear-gradient(145deg, var(--block-light), var(--block-color) 72%);
+            background-clip: padding-box;
+            box-shadow:
+                inset 0 -6px 0 rgba(35, 22, 91, 0.15),
+                inset 0 2px 0 rgba(255, 255, 255, 0.5),
+                0 6px 10px rgba(66, 43, 133, 0.18);
+            font-family: "Baloo 2", sans-serif;
+            font-size: clamp(20px, 6.2vw, 31px);
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 2px 1px rgba(39, 26, 98, 0.24);
+            user-select: none;
+            transform: translate3d(var(--block-x), var(--block-y), 0) scale(0.91);
+            transition:
+                transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.15s ease,
+                opacity 0.15s ease;
+            pointer-events: none;
+        }
+
+        .block::after {
+            content: "";
+            position: absolute;
+            inset: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.23);
+            border-radius: 8px;
+        }
+
+        .block.selected {
+            z-index: 7;
+            border-color: rgba(255, 255, 255, 0.92);
+            filter: brightness(1.12) saturate(1.12);
+            transform: translate3d(var(--block-x), var(--block-y), 0) scale(1.06);
+            box-shadow:
+                0 0 0 3px var(--gold),
+                0 0 18px 5px rgba(255, 200, 87, 0.75),
+                inset 0 -5px 0 rgba(35, 22, 91, 0.12);
+        }
+
+        .block.clearing {
+            z-index: 8;
+            opacity: 0;
+            filter: brightness(2);
+            transform: translate3d(var(--block-x), var(--block-y), 0) scale(1.75) rotate(10deg);
+        }
+
+        .color-0 { --block-color: #7b71a8; --block-light: #aaa2ce; }
+        .color-1 { --block-color: #ff5a86; --block-light: #ff9db8; }
+        .color-2 { --block-color: #ff8650; --block-light: #ffbe7c; }
+        .color-3 { --block-color: #e1aa28; --block-light: #ffdc6c; }
+        .color-4 { --block-color: #40bf7a; --block-light: #7de0a8; }
+        .color-5 { --block-color: #24b9ce; --block-light: #6ee3ed; }
+        .color-6 { --block-color: #438ce8; --block-light: #82b8ff; }
+        .color-7 { --block-color: #6257d9; --block-light: #9a8cff; }
+        .color-8 { --block-color: #a94fd8; --block-light: #d892f2; }
+        .color-9 { --block-color: #e54c9b; --block-light: #ff8cc6; }
+
+        .game-footer {
+            z-index: 3;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            min-height: 49px;
+            padding: 7px 5px 0;
+        }
+
+        .hint {
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .quit-button {
+            min-width: 54px;
+            padding: 9px 12px;
+            border-radius: 13px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.76);
+            box-shadow: 0 4px 12px rgba(67, 45, 139, 0.08);
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .footer-gem {
+            width: 25px;
+            height: 25px;
+            border-radius: 9px;
+            background: linear-gradient(145deg, #9a8cff, #5b44da);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 4px 9px rgba(67, 45, 139, 0.24);
+            transform: rotate(12deg);
+        }
+
+        .result-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 28px 24px max(24px, env(safe-area-inset-bottom));
+            text-align: center;
+            background:
+                radial-gradient(circle at 50% 22%, rgba(255, 200, 87, 0.35), transparent 27%),
+                radial-gradient(circle at 16% 72%, rgba(53, 213, 230, 0.25), transparent 24%),
+                linear-gradient(160deg, #312273, #17133f 70%);
+        }
+
+        .result-kicker {
+            margin: 0 0 8px;
+            color: #8ff4ff;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+        }
+
+        .result-screen h2 {
+            margin: 0;
+            color: white;
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: 43px;
+            line-height: 1;
+            text-shadow: 0 5px 0 rgba(15, 8, 63, 0.55);
+        }
+
+        .result-orb {
+            position: relative;
+            display: grid;
+            width: min(66vw, 260px);
+            aspect-ratio: 1;
+            margin: 28px 0;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.75), transparent 10%),
+                radial-gradient(circle at 50% 50%, #8e72ff 0%, #593ccf 58%, #302077 100%);
+            box-shadow:
+                inset 0 0 35px rgba(255, 255, 255, 0.16),
+                0 0 0 12px rgba(255, 255, 255, 0.04),
+                0 22px 60px rgba(8, 4, 44, 0.48);
+        }
+
+        .result-orb::before,
+        .result-orb::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(143, 244, 255, 0.36);
+            border-radius: 50%;
+            transform: rotate(-18deg);
+        }
+
+        .result-orb::before {
+            inset: -14px 13px;
+        }
+
+        .result-orb::after {
+            inset: 13px -14px;
+            transform: rotate(24deg);
+        }
+
+        .result-score-label {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+        }
+
+        #result-score {
+            color: white;
+            font-family: "Baloo 2", sans-serif;
+            font-size: clamp(64px, 19vw, 88px);
+            font-weight: 800;
+            line-height: 0.95;
+            text-shadow: 0 6px 0 rgba(41, 25, 122, 0.8);
+        }
+
+        #result-rank {
+            margin-top: 8px;
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .result-actions {
+            width: min(100%, 330px);
+        }
+
+        .result-actions .secondary-button {
+            margin-top: 13px;
+        }
+
+        .modal {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            padding: 20px;
+            place-items: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            background: rgba(14, 8, 50, 0.68);
+            backdrop-filter: blur(9px);
+            transition: opacity 0.2s ease, visibility 0.2s;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            width: min(100%, 400px);
+            max-height: 82dvh;
+            overflow: auto;
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 24px 70px rgba(13, 7, 54, 0.38);
+        }
+
+        .modal-card h2 {
+            margin: 0 0 6px;
+            color: var(--violet-deep);
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: 30px;
+        }
+
+        .modal-card > p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .rule {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 11px;
+            align-items: start;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            background: #f2effc;
+        }
+
+        .rule-icon {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            border-radius: 13px;
+            color: white;
+            background: linear-gradient(145deg, #9a8cff, #5b44da);
+            font-family: "Baloo 2", sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .rule strong {
+            display: block;
+            margin: 1px 0 3px;
+            color: var(--ink);
+            font-size: 12px;
+        }
+
+        .rule span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .modal-card .primary-button {
+            min-height: 48px;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        .effect-text {
+            position: absolute;
+            z-index: 30;
+            top: 42%;
+            left: 50%;
+            width: 100%;
+            color: white;
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: clamp(30px, 9vw, 44px);
+            font-weight: 800;
+            line-height: 0.9;
+            text-align: center;
+            text-shadow: 0 3px 0 #4e2bb6, 0 0 20px rgba(255, 92, 168, 0.8);
+            pointer-events: none;
+            animation: comboPop 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .effect-text small {
+            display: block;
+            margin-top: 9px;
+            color: #fff3a5;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-shadow: 0 2px 0 rgba(50, 24, 112, 0.7);
+        }
+
+        .score-pop {
+            position: absolute;
+            z-index: 28;
+            color: white;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            text-shadow: 0 2px 0 #4930a3, 0 0 12px rgba(255, 255, 255, 0.9);
+            pointer-events: none;
+            animation: scoreFloat 0.9s ease-out forwards;
+        }
+
+        .warning-effect {
+            position: absolute;
+            z-index: 32;
+            top: 45%;
+            left: 50%;
+            min-width: 190px;
+            padding: 14px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.68);
+            border-radius: 18px;
+            color: white;
+            background: linear-gradient(135deg, #ff6d88, #e52f61);
+            box-shadow: 0 16px 34px rgba(188, 25, 72, 0.36);
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.35;
+            text-align: center;
+            white-space: pre-line;
+            pointer-events: none;
+            animation: warningPop 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .particle-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: var(--size, 7px);
+            height: var(--size, 7px);
+            border-radius: 45% 55% 50% 50%;
+            background: var(--particle-color, #fff3a5);
+            box-shadow: 0 0 9px var(--particle-color, #fff3a5);
+            pointer-events: none;
+            animation: particleFly var(--duration, 700ms) cubic-bezier(0.17, 0.67, 0.21, 1) forwards;
+        }
+
+        .shockwave {
+            position: absolute;
+            z-index: 23;
+            width: 20px;
+            height: 20px;
+            border: 4px solid rgba(255, 255, 255, 0.92);
+            border-radius: 50%;
+            box-shadow: 0 0 18px rgba(143, 244, 255, 0.9), inset 0 0 18px rgba(255, 200, 87, 0.7);
+            pointer-events: none;
+            animation: shockwave 0.58s ease-out forwards;
+        }
+
+        #flash-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 80;
+            opacity: 0;
+            pointer-events: none;
+            background: white;
+        }
+
+        #flash-overlay.active {
+            animation: flash 0.34s ease-out;
+        }
+
+        .shake {
+            animation: shake 0.38s linear;
+        }
+
+        .danger-pulse .timer-ring {
+            animation: timerPulse 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes ambientDrift {
+            to { transform: translate3d(6%, -3%, 0) rotate(3deg); }
+        }
+
+        @keyframes twinkle {
+            to { opacity: 0.35; transform: scale(0.78); }
+        }
+
+        @keyframes comboPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.25) rotate(-8deg); }
+            22% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); }
+            52% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+            100% { opacity: 0; transform: translate(-50%, -82%) scale(1.25); }
+        }
+
+        @keyframes scoreFloat {
+            0% { opacity: 0; transform: translate(-50%, 10px) scale(0.7); }
+            20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+            100% { opacity: 0; transform: translate(-50%, -65px) scale(1); }
+        }
+
+        @keyframes warningPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-5deg); }
+            18%, 75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.08); }
+        }
+
+        @keyframes particleFly {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.15) rotate(260deg); }
+        }
+
+        @keyframes shockwave {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(9); }
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            18% { opacity: 0.86; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            20% { transform: translate(-6px, 2px) rotate(-0.4deg); }
+            40% { transform: translate(6px, -2px) rotate(0.4deg); }
+            60% { transform: translate(-4px, 1px) rotate(-0.3deg); }
+            80% { transform: translate(4px, -1px) rotate(0.2deg); }
+        }
+
+        @keyframes timerPulse {
+            to { filter: drop-shadow(0 0 8px rgba(255, 73, 111, 0.72)); transform: scale(1.07); }
+        }
+
+        @media (max-height: 690px) {
+            .title-screen { padding-bottom: 12px; }
+            .hero { margin-bottom: 11px; }
+            .hero h1 { font-size: 54px; }
+            .hero-subtitle { display: none; }
+            .start-card { padding: 12px; }
+            .primary-button { min-height: 51px; }
+            .title-actions { margin-top: 9px; }
+            .secondary-button { min-height: 39px; }
+            .game-header { min-height: 52px; }
+            .sum-panel { min-height: 44px; margin-bottom: 6px; }
+            .game-footer { min-height: 42px; }
+            #board-container { width: min(100%, calc((100dvh - 145px) * 0.8)); }
+        }
+
+        @media (pointer: coarse) and (max-width: 500px) {
+            .game-screen {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
+
+            .title-screen {
+                padding-left: max(22px, env(safe-area-inset-left));
+                padding-right: max(22px, env(safe-area-inset-right));
+            }
+        }
+
+        html.mobile-lite .ambient {
+            display: none;
+        }
+
+        html.mobile-lite .edition-pill,
+        html.mobile-lite .icon-button,
+        html.mobile-lite .start-card,
+        html.mobile-lite .sum-panel,
+        html.mobile-lite .modal {
+            backdrop-filter: none;
+        }
+
+        html.mobile-lite .title-screen::after {
+            animation: none;
+        }
+
+        html.mobile-lite #board-container {
+            box-shadow:
+                inset 0 0 0 1px rgba(86, 59, 164, 0.1),
+                0 9px 22px rgba(67, 45, 139, 0.14);
+        }
+
+        html.mobile-lite .block {
+            box-shadow:
+                inset 0 -3px 0 rgba(35, 22, 91, 0.13),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        }
+
+        html.mobile-lite .block::after {
+            display: none;
+        }
+
+        html.mobile-lite .block.selected {
+            filter: none;
+            box-shadow:
+                0 0 0 3px var(--gold),
+                0 0 10px rgba(255, 200, 87, 0.56);
+        }
+
+        html.mobile-lite .block.clearing {
+            filter: none;
+        }
+
+        html.mobile-lite .particle,
+        html.mobile-lite .shockwave {
+            box-shadow: none;
+        }
+
+        @media (min-width: 501px) {
+            #app { height: min(920px, 96dvh); border-radius: 30px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* かるいキャラクターゲームのテーマ */
+        :root {
+            --ink: #15324a;
+            --muted: #557287;
+            --violet: #18aeca;
+            --violet-deep: #087694;
+            --pink: #ff8b38;
+            --cyan: #35e4ef;
+            --gold: #ffd45f;
+            --danger: #ef4d62;
+            --cream: #fffdf4;
+            --glass: rgba(255, 255, 255, 0.88);
+            --shadow: 0 24px 70px rgba(1, 31, 56, 0.34);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 18% 12%, rgba(53, 228, 239, 0.3), transparent 28%),
+                radial-gradient(circle at 82% 88%, rgba(255, 139, 56, 0.25), transparent 30%),
+                linear-gradient(145deg, #051a30 0%, #063c59 50%, #041524 100%);
+        }
+
+        .ambient {
+            background:
+                radial-gradient(circle at 28% 20%, rgba(41, 225, 238, 0.2), transparent 25%),
+                radial-gradient(circle at 70% 65%, rgba(255, 151, 61, 0.16), transparent 28%);
+        }
+
+        .title-screen {
+            justify-content: flex-end;
+            padding: 18px 18px max(16px, env(safe-area-inset-bottom));
+            background:
+                linear-gradient(180deg, rgba(3, 24, 44, 0.05) 0%, rgba(3, 24, 44, 0.08) 47%, rgba(3, 20, 39, 0.9) 100%),
+                url("./assets/slime-town-title-v1.jpg") center top / cover no-repeat,
+                #062f4b;
+        }
+
+        .title-screen::before,
+        .title-screen::after {
+            display: none;
+        }
+
+        .title-topbar {
+            gap: 8px;
+        }
+
+        .edition-pill,
+        .icon-button,
+        .title-record {
+            border-color: rgba(93, 236, 245, 0.34);
+            background: rgba(3, 33, 55, 0.66);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.17), 0 5px 16px rgba(0, 20, 38, 0.24);
+            backdrop-filter: blur(8px);
+        }
+
+        .edition-pill {
+            color: #d9fcff;
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            letter-spacing: 0.08em;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .title-record {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            padding: 7px 10px;
+            border: 1px solid rgba(93, 236, 245, 0.34);
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .title-record strong {
+            color: #fff4a8;
+            font-family: "Baloo 2", sans-serif;
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .hero {
+            position: absolute;
+            z-index: 2;
+            top: clamp(120px, 18.5dvh, 180px);
+            left: 20px;
+            width: min(72%, 335px);
+            margin: 0;
+            text-align: center;
+            filter: drop-shadow(0 8px 14px rgba(0, 14, 30, 0.42));
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin: 0 0 6px;
+            padding: 5px 13px;
+            border: 1px solid rgba(125, 239, 248, 0.45);
+            border-radius: 999px;
+            color: #c7fbff;
+            background: rgba(4, 42, 67, 0.72);
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            font-size: clamp(11px, 3vw, 14px);
+            letter-spacing: 0.07em;
+        }
+
+        .hero h1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            line-height: 1;
+            letter-spacing: 0;
+            text-shadow:
+                0 3px 0 #073b5d,
+                0 6px 0 rgba(0, 19, 38, 0.7),
+                0 13px 26px rgba(0, 12, 27, 0.5);
+        }
+
+        .hero .title-main {
+            display: block;
+            color: #fff;
+            font-size: clamp(38px, 11.3vw, 57px);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .hero .title-main em {
+            color: #ffd45f;
+            font-family: "Baloo 2", "M PLUS Rounded 1c", sans-serif;
+            font-size: 1.18em;
+            font-style: normal;
+            text-shadow: 0 3px 0 #b7611c, 0 7px 16px rgba(0, 17, 34, 0.5);
+        }
+
+        .hero .title-command {
+            display: block;
+            margin-top: 7px;
+            padding: 6px 14px 7px;
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 12px;
+            color: #082d46;
+            background: linear-gradient(135deg, #d9fcff, #60e4ee);
+            box-shadow: 0 5px 0 #087493;
+            font-size: clamp(14px, 4vw, 20px);
+            font-weight: 800;
+            transform: rotate(-1deg);
+        }
+
+        .hero-subtitle {
+            display: none;
+        }
+
+        .start-card {
+            z-index: 3;
+            padding: 8px;
+            border-color: rgba(101, 231, 241, 0.25);
+            border-radius: 22px;
+            background: rgba(2, 27, 48, 0.66);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 14px 36px rgba(0, 12, 26, 0.34);
+            backdrop-filter: blur(9px);
+        }
+
+        .title-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .title-menu .primary-button,
+        .title-menu .secondary-button {
+            min-height: 45px;
+            margin: 0;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .title-menu .primary-button {
+            color: #243349;
+            background: linear-gradient(135deg, #fff5ad 0%, #ffd45f 55%, #ff9c48 100%);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.64), 0 4px 0 #b75e2a;
+        }
+
+        .title-menu .primary-button::before {
+            content: "10";
+            width: 25px;
+            height: 25px;
+            font-size: 10px;
+            background: #087896;
+        }
+
+        .title-menu .secondary-button {
+            color: white;
+            background: rgba(4, 57, 83, 0.84);
+            border-color: rgba(113, 234, 243, 0.28);
+        }
+
+        .title-menu .practice-button::before,
+        .title-menu .classic::before,
+        .title-menu .park-link::before {
+            margin-right: 6px;
+            color: #8ff6ff;
+        }
+
+        .title-menu .practice-button::before { content: "🔬"; }
+        .title-menu .classic::before { content: "◇"; }
+        .title-menu .park-link::before { content: "⌂"; }
+
+        .title-menu .park-link {
+            padding-inline: 6px;
+            line-height: 1.15;
+            white-space: normal;
+            overflow-wrap: normal;
+            word-break: keep-all;
+            line-break: strict;
+        }
+
+        .game-screen {
+            background:
+                linear-gradient(rgba(23, 107, 137, 0.055) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 107, 137, 0.055) 1px, transparent 1px),
+                radial-gradient(circle at 50% -8%, rgba(52, 224, 235, 0.26), transparent 31%),
+                linear-gradient(180deg, #e8fbfd 0%, #d6f1f6 56%, #f7fbf7 100%);
+            background-size: 24px 24px, 24px 24px, auto, auto;
+        }
+
+        .game-header {
+            color: #16364d;
+        }
+
+        .game-mark {
+            color: #087896;
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            font-size: 13px;
+            letter-spacing: 0;
+        }
+
+        .game-mark span {
+            color: #f07b2f;
+        }
+
+        .timer-ring {
+            background: conic-gradient(#ff8b38 calc(var(--progress) * 1turn), rgba(6, 92, 121, 0.13) 0);
+        }
+
+        .timer-ring::after {
+            background: #eaf9fa;
+        }
+
+        .sum-panel {
+            border-color: rgba(8, 118, 148, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 9px 24px rgba(4, 71, 94, 0.1);
+        }
+
+        .sum-copy {
+            color: #527489;
+        }
+
+        #sum-display {
+            color: #087694;
+        }
+
+        .sum-tick.filled {
+            background: linear-gradient(180deg, #41d8e4, #0787a5);
+        }
+
+        #board-container {
+            border-color: rgba(218, 251, 255, 0.96);
+            background:
+                linear-gradient(rgba(61, 228, 239, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(61, 228, 239, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 50% 100%, rgba(31, 219, 229, 0.22), transparent 45%),
+                linear-gradient(180deg, #092d48 0%, #064663 100%);
+            background-size: 12.5% 10%, 12.5% 10%, auto, auto;
+            box-shadow:
+                inset 0 0 0 1px rgba(89, 232, 242, 0.22),
+                inset 0 18px 40px rgba(0, 12, 28, 0.28),
+                0 16px 38px rgba(4, 61, 87, 0.23);
+        }
+
+        #board-container::before {
+            opacity: 0.35;
+        }
+
+        .danger-label {
+            color: rgba(255, 118, 102, 0.92);
+            letter-spacing: 0.04em;
+        }
+
+        .danger-line {
+            background: repeating-linear-gradient(90deg, transparent 0 8px, rgba(255, 104, 91, 0.66) 8px 15px);
+        }
+
+        .block {
+            border-width: 2px;
+            border-radius: 46% 54% 47% 53% / 50% 45% 55% 50%;
+            background:
+                radial-gradient(circle at 29% 17%, rgba(255, 255, 255, 0.7) 0 7%, transparent 19%),
+                radial-gradient(circle at 74% 78%, rgba(255, 255, 255, 0.16) 0 8%, transparent 17%),
+                linear-gradient(145deg, var(--block-light), var(--block-color) 70%);
+            box-shadow:
+                inset 0 -5px 0 rgba(0, 42, 64, 0.16),
+                inset 0 2px 0 rgba(255, 255, 255, 0.48),
+                0 5px 8px rgba(0, 27, 50, 0.22);
+            font-size: clamp(17px, 5.4vw, 27px);
+        }
+
+        .block::before {
+            content: "";
+            position: absolute;
+            top: 17%;
+            left: 37%;
+            width: 3px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(7, 38, 57, 0.86);
+            box-shadow: 8px 0 0 rgba(7, 38, 57, 0.86);
+        }
+
+        .block::after {
+            content: "";
+            position: absolute;
+            top: 29%;
+            left: 50%;
+            width: 7px;
+            height: 3px;
+            border-bottom: 2px solid rgba(7, 38, 57, 0.68);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .virus-number {
+            position: relative;
+            z-index: 1;
+            transform: translateY(19%);
+        }
+
+        .color-0 { --block-color: #6f7e93; --block-light: #a7b5c4; }
+        .color-1 { --block-color: #f05270; --block-light: #ff94a7; }
+        .color-2 { --block-color: #f47c35; --block-light: #ffb674; }
+        .color-3 { --block-color: #dba526; --block-light: #ffe071; }
+        .color-4 { --block-color: #3bae69; --block-light: #77d99e; }
+        .color-5 { --block-color: #16aebc; --block-light: #6be0e6; }
+        .color-6 { --block-color: #3187da; --block-light: #7fb9f5; }
+        .color-7 { --block-color: #5e56c9; --block-light: #9c91ed; }
+        .color-8 { --block-color: #9a4cca; --block-light: #d48ce9; }
+        .color-9 { --block-color: #d64a99; --block-light: #f58bc3; }
+
+        .footer-virus {
+            display: grid;
+            width: 27px;
+            height: 27px;
+            place-items: center;
+            border-radius: 48% 52% 45% 55%;
+            color: white;
+            background: linear-gradient(145deg, #67dfe8, #087b9c);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 4px 9px rgba(4, 70, 93, 0.22);
+            font-family: "Baloo 2", sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            transform: rotate(-7deg);
+        }
+
+        .practice-guide {
+            position: absolute;
+            z-index: 9;
+            top: 14%;
+            left: 50%;
+            display: grid;
+            grid-template-columns: 62px 1fr;
+            align-items: center;
+            width: min(88%, 330px);
+            padding: 8px 12px 8px 6px;
+            border: 2px solid rgba(130, 241, 248, 0.7);
+            border-radius: 18px;
+            color: #15364e;
+            background: rgba(248, 255, 255, 0.95);
+            box-shadow: 0 10px 24px rgba(0, 22, 40, 0.28);
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .practice-guide.hidden {
+            display: none;
+        }
+
+        .practice-guide img {
+            width: 62px;
+            height: 62px;
+            object-fit: contain;
+        }
+
+        .practice-guide strong {
+            display: block;
+            margin-bottom: 2px;
+            color: #087694;
+            font-size: 10px;
+        }
+
+        .practice-guide span {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .result-screen {
+            background:
+                radial-gradient(circle at 50% 20%, rgba(63, 226, 237, 0.3), transparent 30%),
+                linear-gradient(160deg, #07516f, #04223b 72%);
+        }
+
+        .result-kicker {
+            color: #9cf7fb;
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            letter-spacing: 0.08em;
+        }
+
+        .result-screen h2 {
+            font-family: "M PLUS Rounded 1c", sans-serif;
+            font-size: clamp(34px, 10vw, 45px);
+        }
+
+        .result-orb {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            width: min(100%, 390px);
+            height: 230px;
+            aspect-ratio: auto;
+            margin: 24px 0;
+            overflow: hidden;
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(211, 249, 251, 0.94));
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 18px 48px rgba(0, 15, 31, 0.44);
+        }
+
+        .result-orb::before,
+        .result-orb::after {
+            display: none;
+        }
+
+        .result-doctor {
+            align-self: end;
+            width: 146%;
+            max-height: 222px;
+            object-fit: contain;
+            object-position: center bottom;
+            transform: translateX(-16%);
+        }
+
+        .result-data {
+            z-index: 1;
+            align-self: center;
+            padding-right: 12px;
+        }
+
+        .result-score-label {
+            color: #567486;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        #result-score {
+            color: #087694;
+            font-size: clamp(58px, 17vw, 80px);
+            text-shadow: 0 4px 0 rgba(39, 186, 199, 0.18);
+        }
+
+        #result-rank {
+            color: #d06e28;
+            line-height: 1.35;
+        }
+
+        #result-speech {
+            margin-top: 9px;
+            color: #36566b;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .modal-card {
+            border-color: rgba(105, 226, 234, 0.65);
+            background: rgba(248, 255, 255, 0.97);
+        }
+
+        .modal-card h2 {
+            color: #087694;
+            font-family: "M PLUS Rounded 1c", sans-serif;
+        }
+
+        .doctor-intro {
+            display: grid;
+            grid-template-columns: 105px 1fr;
+            align-items: center;
+            gap: 8px;
+            margin: -6px 0 10px;
+        }
+
+        .doctor-intro img {
+            width: 112px;
+            height: 126px;
+            object-fit: contain;
+            object-position: center bottom;
+        }
+
+        .doctor-intro p {
+            margin: 0;
+            padding: 10px 12px;
+            border-radius: 16px;
+            color: #21485f;
+            background: #e6f9fa;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.65;
+        }
+
+        .rule {
+            background: #eaf8f9;
+        }
+
+        .rule-icon {
+            background: linear-gradient(145deg, #4ddce5, #087896);
+        }
+
+        .practice-complete-card {
+            text-align: center;
+        }
+
+        .practice-complete-card img {
+            width: 150px;
+            height: 170px;
+            object-fit: contain;
+        }
+
+        .practice-complete-card p {
+            margin: 0;
+            color: #36566b;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.7;
+        }
+
+        @media (max-height: 690px) {
+            .hero {
+                top: 92px;
+            }
+
+            .hero .title-main {
+                font-size: 37px;
+            }
+
+            .hero .title-command {
+                margin-top: 4px;
+                padding-block: 4px 5px;
+                font-size: 14px;
+            }
+
+            .start-card {
+                padding: 7px;
+            }
+
+            .title-menu .primary-button,
+            .title-menu .secondary-button {
+                min-height: 39px;
+            }
+
+            .result-orb {
+                height: 190px;
+                margin: 14px 0;
+            }
+
+            .result-doctor {
+                max-height: 185px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .title-menu .primary-button,
+            .title-menu .secondary-button {
+                font-size: 11px;
+            }
+
+            .title-record span {
+                display: none;
+            }
+        }
+
+        /* ゆうしゃぽんすけと、まちへせまるすうじスライム */
+        :root {
+            --ink: #293f34;
+            --muted: #657668;
+            --violet: #27b7c6;
+            --violet-deep: #167d8f;
+            --pink: #f19a36;
+            --cyan: #63e7ee;
+            --gold: #ffd35c;
+            --danger: #e85151;
+            --cream: #fffaf0;
+            --glass: rgba(255, 253, 241, 0.9);
+            --shadow: 0 24px 70px rgba(6, 28, 22, 0.38);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 18% 12%, rgba(68, 202, 164, 0.28), transparent 28%),
+                radial-gradient(circle at 82% 88%, rgba(255, 192, 78, 0.24), transparent 30%),
+                linear-gradient(145deg, #08291f 0%, #164f3b 50%, #071d18 100%);
+        }
+
+        .ambient {
+            background:
+                radial-gradient(circle at 28% 20%, rgba(77, 216, 176, 0.18), transparent 25%),
+                radial-gradient(circle at 70% 65%, rgba(255, 188, 77, 0.15), transparent 28%);
+        }
+
+        .title-screen {
+            background:
+                linear-gradient(180deg, rgba(4, 25, 26, 0.03) 0%, rgba(4, 25, 26, 0.08) 46%, rgba(4, 22, 19, 0.9) 100%),
+                url("./assets/slime-town-title-v1.jpg") center top / cover no-repeat,
+                #173f34;
+        }
+
+        .edition-pill,
+        .icon-button,
+        .title-record {
+            border-color: rgba(255, 222, 128, 0.35);
+            background: rgba(10, 40, 34, 0.68);
+        }
+
+        .edition-pill {
+            color: #fff1b5;
+        }
+
+        .title-record {
+            border-color: rgba(255, 222, 128, 0.35);
+        }
+
+        .hero {
+            top: clamp(112px, 17dvh, 166px);
+            left: 17px;
+            width: min(70%, 325px);
+            filter: drop-shadow(0 8px 14px rgba(1, 17, 15, 0.5));
+        }
+
+        .eyebrow {
+            border-color: rgba(255, 232, 154, 0.5);
+            color: #fff2bf;
+            background: rgba(15, 56, 44, 0.78);
+        }
+
+        .hero h1 {
+            text-shadow:
+                0 3px 0 #1d5741,
+                0 6px 0 rgba(3, 27, 20, 0.76),
+                0 13px 26px rgba(0, 15, 12, 0.54);
+        }
+
+        .hero .title-main em {
+            color: #ffe063;
+            text-shadow: 0 3px 0 #b96a22, 0 7px 16px rgba(0, 17, 11, 0.5);
+        }
+
+        .hero .title-command {
+            border-color: rgba(255, 255, 255, 0.7);
+            color: #244333;
+            background: linear-gradient(135deg, #fff8c9, #ffd75f);
+            box-shadow: 0 5px 0 #aa692a;
+            font-size: clamp(13px, 3.7vw, 18px);
+        }
+
+        .start-card {
+            border-color: rgba(255, 224, 130, 0.24);
+            background: rgba(5, 31, 25, 0.71);
+        }
+
+        .title-menu .primary-button {
+            color: #334025;
+            background: linear-gradient(135deg, #fff6ad 0%, #ffd35c 55%, #f3a33f 100%);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.64), 0 4px 0 #a85d2d;
+        }
+
+        .title-menu .primary-button::before {
+            content: "⚔";
+            background: #217c68;
+            font-size: 11px;
+        }
+
+        .title-menu .secondary-button {
+            background: rgba(22, 72, 55, 0.87);
+            border-color: rgba(255, 228, 149, 0.25);
+        }
+
+        .title-menu .practice-button::before { content: "⚔"; color: #ffe480; }
+
+        .game-screen {
+            background:
+                linear-gradient(180deg, rgba(218, 239, 224, 0.48) 0%, rgba(247, 236, 203, 0.34) 52%, rgba(208, 231, 211, 0.5) 100%),
+                url("./assets/slime-battle-bg-v1.jpg") center 28% / cover no-repeat,
+                #dfeada;
+        }
+
+        .game-mark {
+            color: #286b4e;
+        }
+
+        .game-mark span {
+            color: #c9782d;
+        }
+
+        .timer-ring {
+            background: conic-gradient(#f29c39 calc(var(--progress) * 1turn), rgba(41, 109, 80, 0.13) 0);
+        }
+
+        .timer-ring::after {
+            background: #eef5e5;
+        }
+
+        .sum-panel {
+            border-color: rgba(61, 121, 78, 0.16);
+            background: rgba(255, 253, 240, 0.92);
+            box-shadow: 0 9px 24px rgba(39, 84, 55, 0.1);
+        }
+
+        .sum-copy {
+            color: #687962;
+        }
+
+        #sum-display {
+            color: #24755b;
+        }
+
+        .sum-tick.filled {
+            background: linear-gradient(180deg, #68d7c5, #21866f);
+        }
+
+        .board-shell::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: min(100%, calc((100dvh - 150px) * 0.8 + 28px));
+            aspect-ratio: 8 / 10;
+            border-radius: 30px;
+            background:
+                radial-gradient(ellipse at 50% 10%, rgba(255, 211, 95, 0.34), transparent 42%),
+                radial-gradient(ellipse at 50% 92%, rgba(60, 191, 134, 0.28), transparent 55%);
+            filter: blur(12px);
+            opacity: 0.75;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        #board-container {
+            border: 7px solid #665f49;
+            outline: 2px solid rgba(255, 229, 145, 0.72);
+            outline-offset: -4px;
+            background:
+                linear-gradient(rgba(255, 239, 183, 0.13) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 239, 183, 0.13) 2px, transparent 2px),
+                radial-gradient(ellipse at 50% 110%, rgba(255, 210, 94, 0.3), transparent 55%),
+                linear-gradient(90deg, rgba(16, 63, 39, 0.58), transparent 21%, transparent 79%, rgba(16, 63, 39, 0.58)),
+                repeating-linear-gradient(155deg, rgba(255, 255, 255, 0.035) 0 17px, rgba(50, 35, 20, 0.06) 17px 34px),
+                linear-gradient(180deg, #304d3c 0 10%, #796640 10% 58%, #4d633d 100%);
+            background-size: 12.5% 10%, 12.5% 10%, auto, auto, auto, auto;
+            box-shadow:
+                inset 0 0 0 2px rgba(255, 238, 165, 0.22),
+                inset 0 16px 34px rgba(7, 25, 17, 0.32),
+                inset 0 -18px 30px rgba(27, 56, 28, 0.24),
+                0 5px 0 #393a2d,
+                0 18px 34px rgba(20, 45, 29, 0.34);
+        }
+
+        #board-container::before {
+            inset: 0;
+            background:
+                radial-gradient(circle at 10px 10px, #ffe69c 0 2px, #4a4939 3px 5px, transparent 6px),
+                radial-gradient(circle at calc(100% - 10px) 10px, #ffe69c 0 2px, #4a4939 3px 5px, transparent 6px),
+                radial-gradient(circle at 10px calc(100% - 10px), #ffe69c 0 2px, #4a4939 3px 5px, transparent 6px),
+                radial-gradient(circle at calc(100% - 10px) calc(100% - 10px), #ffe69c 0 2px, #4a4939 3px 5px, transparent 6px),
+                radial-gradient(circle at 14% 28%, rgba(118, 231, 158, 0.38) 0 2px, transparent 3px),
+                radial-gradient(circle at 84% 43%, rgba(255, 225, 112, 0.3) 0 2px, transparent 3px),
+                radial-gradient(circle at 72% 76%, rgba(104, 226, 203, 0.3) 0 2px, transparent 3px);
+            background-repeat: no-repeat;
+            opacity: 0.95;
+        }
+
+        #board-container::after {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            inset: 5px;
+            border: 1px solid rgba(255, 235, 157, 0.25);
+            border-radius: 15px;
+            box-shadow:
+                inset 0 0 18px rgba(12, 35, 21, 0.34),
+                0 0 0 1px rgba(36, 45, 32, 0.28);
+            pointer-events: none;
+        }
+
+        .town-gate {
+            position: absolute;
+            z-index: 3;
+            top: -1px;
+            left: 50%;
+            display: grid;
+            width: 62%;
+            height: 10.7%;
+            overflow: visible;
+            place-items: center;
+            border: 1px solid rgba(255, 226, 142, 0.32);
+            border-top: 0;
+            border-radius: 0 0 22px 22px;
+            color: #fff1b7;
+            background:
+                repeating-linear-gradient(0deg, transparent 0 12px, rgba(255, 232, 160, 0.08) 12px 13px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 16%, rgba(0, 0, 0, 0.035) 16% 32%),
+                linear-gradient(180deg, #77745f 0%, #4a4c3f 66%, #33372f 100%);
+            box-shadow:
+                inset 0 -4px 0 rgba(25, 29, 25, 0.42),
+                0 4px 0 rgba(25, 29, 25, 0.7),
+                0 9px 18px rgba(8, 19, 13, 0.32);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-shadow: 0 2px 2px rgba(15, 18, 14, 0.85);
+            transform: translateX(-50%);
+        }
+
+        .town-gate::before,
+        .town-gate::after {
+            content: "";
+            position: absolute;
+            z-index: 1;
+        }
+
+        .town-gate::before {
+            bottom: -3px;
+            left: 50%;
+            width: 24%;
+            height: 62%;
+            border: 2px solid rgba(255, 211, 113, 0.5);
+            border-bottom: 0;
+            border-radius: 50% 50% 0 0;
+            background:
+                radial-gradient(ellipse at 50% 70%, rgba(255, 188, 75, 0.18), transparent 58%),
+                linear-gradient(180deg, #30352e, #171c18);
+            box-shadow:
+                inset 0 0 9px rgba(255, 192, 80, 0.12),
+                0 -2px 0 rgba(30, 33, 29, 0.58);
+            transform: translateX(-50%);
+        }
+
+        .town-gate::after {
+            display: none;
+        }
+
+        .town-gate span {
+            position: relative;
+            z-index: 3;
+            align-self: start;
+            margin-top: 4px;
+            padding: 1px 7px 2px;
+            border-radius: 999px;
+            background: rgba(42, 45, 39, 0.76);
+        }
+
+        .danger-label {
+            top: 11.6%;
+            right: 7px;
+            padding: 2px 6px;
+            border: 1px solid rgba(255, 210, 112, 0.34);
+            border-radius: 8px;
+            color: rgba(255, 205, 120, 0.96);
+            background: rgba(62, 43, 28, 0.72);
+            text-shadow: 0 1px 2px rgba(48, 25, 13, 0.8);
+        }
+
+        .danger-line {
+            top: 10.5%;
+            height: 4px;
+            background:
+                repeating-linear-gradient(90deg, #ffd574 0 7px, #ff7048 7px 14px);
+            box-shadow:
+                0 0 0 1px rgba(91, 43, 29, 0.45),
+                0 0 8px rgba(255, 148, 66, 0.68);
+        }
+
+        html.mobile-lite .board-shell::before {
+            filter: none;
+            opacity: 0.35;
+        }
+
+        .block {
+            border-width: 2px;
+            border-radius: 50% 50% 40% 40% / 55% 55% 43% 43%;
+            background:
+                radial-gradient(circle at 30% 23%, rgba(255, 255, 255, 0.72) 0 8%, transparent 20%),
+                radial-gradient(circle at 74% 78%, rgba(255, 255, 255, 0.16) 0 9%, transparent 18%),
+                linear-gradient(145deg, var(--block-light), var(--block-color) 72%);
+            box-shadow:
+                inset 0 -5px 0 rgba(38, 41, 26, 0.15),
+                inset 0 2px 0 rgba(255, 255, 255, 0.52),
+                0 5px 8px rgba(24, 39, 25, 0.24);
+        }
+
+        .block::before {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            top: 6%;
+            left: 50%;
+            width: 26%;
+            height: 25%;
+            border-radius: 68% 24% 68% 38%;
+            background: linear-gradient(145deg, var(--block-light), var(--block-color));
+            box-shadow: none;
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        .block::after {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            top: 31%;
+            left: 35%;
+            display: block;
+            width: 3px;
+            height: 5px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(27, 38, 27, 0.88);
+            box-shadow: 10px 0 0 rgba(27, 38, 27, 0.88);
+            transform: none;
+        }
+
+        html.mobile-lite .block::after {
+            display: block;
+        }
+
+        .virus-number {
+            color: white;
+            transform: translateY(22%);
+        }
+
+        .block.selected {
+            box-shadow:
+                0 0 0 3px #ffe169,
+                0 0 18px 5px rgba(94, 231, 238, 0.8),
+                inset 0 -5px 0 rgba(38, 41, 26, 0.1);
+        }
+
+        html.mobile-lite .block.selected {
+            box-shadow:
+                0 0 0 3px #ffe169,
+                0 0 10px rgba(94, 231, 238, 0.65);
+        }
+
+        .footer-virus {
+            border-radius: 52% 52% 40% 40% / 58% 58% 42% 42%;
+            background: linear-gradient(145deg, #7be4ce, #25866f);
+        }
+
+        .practice-guide {
+            border-color: rgba(255, 221, 112, 0.8);
+            color: #314835;
+            background: rgba(255, 253, 237, 0.96);
+            box-shadow: 0 10px 24px rgba(11, 35, 22, 0.3);
+        }
+
+        .practice-guide strong {
+            color: #24755b;
+        }
+
+        .result-screen {
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255, 209, 89, 0.25), transparent 30%),
+                radial-gradient(circle at 15% 72%, rgba(88, 211, 175, 0.18), transparent 25%),
+                linear-gradient(160deg, #35684f, #142d25 72%);
+        }
+
+        .result-kicker {
+            color: #fff0ac;
+        }
+
+        .result-orb {
+            background: linear-gradient(145deg, rgba(255, 253, 237, 0.98), rgba(229, 243, 218, 0.96));
+        }
+
+        .result-doctor {
+            width: 135%;
+            max-height: 222px;
+            transform: translateX(-11%);
+        }
+
+        #result-score {
+            color: #27785d;
+            text-shadow: 0 4px 0 rgba(50, 143, 103, 0.18);
+        }
+
+        #result-rank {
+            color: #bd6a2a;
+        }
+
+        #result-speech {
+            color: #4b6350;
+        }
+
+        .modal-card {
+            border-color: rgba(255, 220, 119, 0.68);
+            background: rgba(255, 253, 240, 0.98);
+        }
+
+        .modal-card h2 {
+            color: #24755b;
+        }
+
+        .doctor-intro p {
+            color: #36533e;
+            background: #edf3de;
+        }
+
+        .rule {
+            background: #edf3df;
+        }
+
+        .rule-icon {
+            color: #fff8ca;
+            background: linear-gradient(145deg, #55b18a, #286c50);
+        }
+
+        .practice-complete-card p {
+            color: #4b6350;
+        }
+
+        @media (max-height: 690px) {
+            .hero {
+                top: 86px;
+            }
+        }
+
+        .hero {
+            left: 12px;
+            width: min(84%, 400px);
+        }
+
+        .title-logo-heading {
+            display: block;
+            width: 100%;
+            filter: drop-shadow(0 8px 12px rgba(2, 18, 12, 0.52));
+        }
+
+        .title-logo {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .hero > .title-command {
+            width: fit-content;
+            margin: 7px auto 0;
+        }
+
+        .audio-credit {
+            display: block;
+            width: fit-content;
+            margin: 12px auto 0;
+            color: #69806f;
+            font-size: 10px;
+            line-height: 1.35;
+            text-decoration: none;
+        }
+
+        .audio-credit:hover,
+        .audio-credit:focus-visible {
+            color: #24755b;
+            text-decoration: underline;
+        }
+
+        .title-screen > .audio-credit {
+            position: relative;
+            z-index: 4;
+            margin-top: 7px;
+            color: rgba(255, 255, 255, 0.76);
+            text-shadow: 0 1px 4px rgba(0, 20, 14, 0.8);
+        }
+
+        .title-screen > .audio-credit:hover,
+        .title-screen > .audio-credit:focus-visible {
+            color: #fff3bd;
+        }
+
+        /* PCでは背景を画面全体に広げ、遊ぶ部分だけを縦型のまま中央に置く */
+        @media (min-width: 701px) {
+            body {
+                place-items: stretch;
+            }
+
+            #app {
+                width: 100vw;
+                max-width: none;
+                height: 100dvh;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+
+            .title-screen {
+                padding:
+                    18px max(28px, env(safe-area-inset-right))
+                    max(16px, env(safe-area-inset-bottom))
+                    max(28px, env(safe-area-inset-left));
+                background:
+                    linear-gradient(90deg, rgba(4, 22, 19, 0.58), rgba(4, 22, 19, 0.06) 33%, rgba(4, 22, 19, 0.06) 67%, rgba(4, 22, 19, 0.58)),
+                    linear-gradient(180deg, rgba(4, 25, 26, 0.02), rgba(4, 22, 19, 0.35)),
+                    url("./assets/slime-town-title-desktop-v1.jpg") center / cover no-repeat,
+                    #173f34;
+            }
+
+            .title-screen::before {
+                display: none;
+            }
+
+            .title-screen::after {
+                display: none;
+            }
+
+            .title-topbar {
+                right: max(30px, env(safe-area-inset-right));
+                left: max(30px, env(safe-area-inset-left));
+            }
+
+            .hero {
+                top: clamp(64px, 10dvh, 96px);
+                left: 50%;
+                width: min(44vw, 560px);
+                transform: translateX(-50%);
+            }
+
+            .start-card {
+                width: min(470px, calc(100vw - 48px));
+                margin-right: auto;
+                margin-left: auto;
+            }
+
+            .title-screen > .audio-credit {
+                align-self: center;
+            }
+
+            .game-screen {
+                padding:
+                    max(10px, env(safe-area-inset-top))
+                    max(18px, env(safe-area-inset-right))
+                    max(10px, env(safe-area-inset-bottom))
+                    max(18px, env(safe-area-inset-left));
+                background:
+                    linear-gradient(180deg, rgba(218, 239, 224, 0.22), rgba(247, 236, 203, 0.16) 52%, rgba(18, 53, 35, 0.28)),
+                    url("./assets/slime-battle-bg-v1.jpg") center 29% / cover no-repeat,
+                    #dfeada;
+            }
+
+            .game-header,
+            .sum-panel,
+            .board-shell,
+            .game-footer {
+                width: min(500px, calc(100vw - 36px));
+                align-self: center;
+            }
+
+            .game-header {
+                margin-bottom: 6px;
+                border: 1px solid rgba(255, 231, 156, 0.5);
+                border-radius: 19px;
+                background: rgba(255, 253, 240, 0.84);
+                box-shadow: 0 9px 24px rgba(17, 47, 30, 0.18);
+                backdrop-filter: blur(8px);
+            }
+
+            .sum-panel {
+                margin-right: auto;
+                margin-left: auto;
+            }
+
+            .game-footer {
+                margin-top: 5px;
+                padding: 6px 9px;
+                border: 1px solid rgba(255, 231, 156, 0.45);
+                border-radius: 16px;
+                background: rgba(255, 253, 240, 0.82);
+                box-shadow: 0 8px 20px rgba(17, 47, 30, 0.16);
+                backdrop-filter: blur(8px);
+            }
+        }
+
+        /* 12だんの盤面を主役にした、下部集約型のゲーム画面 */
+        .game-screen {
+            gap: 0;
+            padding:
+                max(7px, env(safe-area-inset-top))
+                max(8px, env(safe-area-inset-right))
+                max(7px, env(safe-area-inset-bottom))
+                max(8px, env(safe-area-inset-left));
+        }
+
+        .board-shell {
+            width: min(500px, 100%);
+            min-height: 0;
+            align-self: center;
+        }
+
+        .board-shell::before {
+            width: min(100%, calc((100dvh - 92px) * 0.6667 + 28px));
+            aspect-ratio: 2 / 3;
+        }
+
+        #board-container {
+            width: min(100%, calc((100dvh - 92px) * 0.6667));
+            max-height: 100%;
+            aspect-ratio: 2 / 3;
+            background-size: 12.5% 8.333333%, 12.5% 8.333333%, auto, auto, auto, auto;
+        }
+
+        .town-gate {
+            height: 8.9%;
+        }
+
+        .danger-line {
+            top: 8.5%;
+        }
+
+        .danger-label {
+            top: 9.4%;
+        }
+
+        .block {
+            height: 8.333333%;
+        }
+
+        .game-bottom {
+            position: relative;
+            z-index: 12;
+            width: min(500px, 100%);
+            flex: 0 0 auto;
+            align-self: center;
+            padding-top: 5px;
+        }
+
+        .combat-status {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 6px;
+            min-height: 48px;
+            padding: 5px 6px;
+            border: 1px solid rgba(255, 231, 156, 0.55);
+            border-radius: 16px;
+            background: rgba(255, 253, 240, 0.94);
+            box-shadow: 0 7px 18px rgba(17, 47, 30, 0.17);
+        }
+
+        .combat-status .stat {
+            min-width: 44px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .combat-status .stat-label {
+            max-width: 72px;
+            font-size: 8px;
+            line-height: 1.2;
+            letter-spacing: 0.02em;
+        }
+
+        .combat-status .stat-value {
+            font-size: 22px;
+        }
+
+        .combat-status .sum-panel {
+            width: auto;
+            min-width: 0;
+            min-height: 38px;
+            margin: 0;
+            padding: 4px 7px;
+            align-self: stretch;
+            gap: 6px;
+            border-radius: 12px;
+            box-shadow: none;
+        }
+
+        .combat-status .sum-copy {
+            min-width: 50px;
+            font-size: 8px;
+            line-height: 1.15;
+            text-align: left;
+        }
+
+        .combat-status #sum-display {
+            margin-top: 2px;
+            font-size: 19px;
+        }
+
+        .combat-status .sum-meter {
+            min-width: 0;
+            height: 9px;
+            gap: 1px;
+        }
+
+        .combat-status .timer-ring {
+            width: 34px;
+            height: 34px;
+        }
+
+        .combat-status .timer-ring::after {
+            inset: 3px;
+        }
+
+        .combat-status .timer-ring span {
+            font-size: 15px;
+        }
+
+        .pause-button {
+            min-width: 49px;
+            min-height: 36px;
+            padding: 6px 7px;
+            border: 2px solid #fff;
+            border-radius: 12px;
+            color: #405b48;
+            background: linear-gradient(#fff9cf, #f2d66d);
+            box-shadow: 0 3px 0 #9d7b35;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .game-footer {
+            width: 100%;
+            min-height: 31px;
+            margin: 0;
+            padding: 4px 3px 0;
+            grid-template-columns: 1fr auto;
+            gap: 6px;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .game-footer .footer-virus {
+            display: none;
+        }
+
+        .game-footer .hint {
+            min-width: 0;
+            text-align: left;
+        }
+
+        .game-footer .quit-button {
+            min-width: 48px;
+            padding: 7px 9px;
+        }
+
+        .pause-overlay {
+            position: absolute;
+            z-index: 80;
+            inset: 0;
+            display: grid;
+            padding: 20px;
+            place-items: center;
+            color: #2d4a38;
+            background:
+                radial-gradient(circle at 50% 24%, rgba(255, 221, 105, 0.34), transparent 28%),
+                linear-gradient(160deg, #dcebd7, #f8edc8 58%, #cfe5d7);
+        }
+
+        .pause-overlay[hidden] {
+            display: none;
+        }
+
+        .pause-card {
+            width: min(100%, 330px);
+            padding: 24px 22px;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            border-radius: 26px;
+            background: rgba(255, 253, 238, 0.98);
+            box-shadow: 0 18px 42px rgba(20, 50, 31, 0.28);
+            text-align: center;
+        }
+
+        .pause-card h2 {
+            margin: 0 0 8px;
+            color: #26765a;
+            font-size: clamp(28px, 8vw, 38px);
+        }
+
+        .pause-card p {
+            margin: 0 0 18px;
+            color: #526956;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .pause-card .primary-button {
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .game-screen.paused #board-container .block,
+        .game-screen.paused #path-canvas,
+        .game-screen.paused #board-container .effect-text,
+        .game-screen.paused #board-container .warning-effect,
+        .game-screen.paused #board-container .score-pop,
+        .game-screen.paused #board-container .particle-layer,
+        .game-screen.paused #board-container .shockwave {
+            visibility: hidden;
+        }
+
+        .game-screen.paused *,
+        .game-screen.paused *::before,
+        .game-screen.paused *::after {
+            animation-play-state: paused !important;
+        }
+
+        .doctor-intro p,
+        .rule strong,
+        .rule span,
+        .practice-guide span,
+        #result-speech,
+        .pause-card h2,
+        .pause-card p,
+        .practice-complete-card h2,
+        .practice-complete-card p,
+        .effect-text,
+        .effect-text small,
+        .warning-effect {
+            text-align: left;
+            text-wrap: pretty;
+            overflow-wrap: normal;
+            word-break: keep-all;
+            line-break: strict;
+        }
+
+        .effect-text,
+        .effect-text small,
+        .warning-effect {
+            text-align: center;
+        }
+
+        @media (max-width: 370px) {
+            .combat-status {
+                gap: 4px;
+                padding-inline: 4px;
+            }
+
+            .combat-status .stat-label {
+                max-width: 57px;
+                font-size: 7px;
+            }
+
+            .combat-status .sum-panel {
+                padding-inline: 5px;
+            }
+
+            .combat-status .sum-copy {
+                min-width: 43px;
+            }
+
+            .pause-button {
+                min-width: 44px;
+                padding-inline: 5px;
+            }
+        }
+
+        @media (max-height: 620px) {
+            .result-screen {
+                padding: 12px 18px max(12px, env(safe-area-inset-bottom));
+            }
+
+            .result-kicker {
+                margin-bottom: 4px;
+            }
+
+            .result-screen h2 {
+                font-size: 30px;
+            }
+
+            .result-orb {
+                height: min(31dvh, 170px);
+                margin: 8px 0;
+            }
+
+            .result-doctor {
+                max-height: min(30dvh, 165px);
+            }
+
+            .result-actions .primary-button {
+                min-height: 46px;
+            }
+
+            .result-actions .secondary-button {
+                min-height: 38px;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+
+    <main id="app" aria-live="polite">
+        <section id="title-screen" class="screen title-screen active" aria-label="タイトル">
+            <div class="title-topbar">
+                <span class="edition-pill">まちを まもれ！</span>
+                <div class="topbar-right">
+                    <div class="title-record">
+                        <span>さいこう</span>
+                        <strong id="high-score">0</strong>
+                    </div>
+                    <button id="sound-button" class="icon-button" type="button" aria-label="サウンドを きりかえる" onclick="toggleSound()">♪</button>
+                </div>
+            </div>
+
+            <div class="hero">
+                <h1 class="title-logo-heading">
+                    <img class="title-logo" src="./assets/title-logo-ponsuke-v1.png" alt="ぽんすけの あわせて10">
+                </h1>
+            </div>
+
+            <div class="start-card">
+                <div class="title-menu">
+                    <button class="secondary-button practice-button" type="button" onclick="showPracticeIntro()">れんしゅう</button>
+                    <button class="primary-button" type="button" onclick="startGame()">スタート</button>
+                    <a class="secondary-button classic" href="./classic.html">クラシック</a>
+                    <a class="secondary-button park-link" href="../../index.html">ゲームパークへ もどる</a>
+                </div>
+            </div>
+            <a class="audio-credit" href="https://otologic.jp/" target="_blank" rel="noopener">おんげん：OtoLogic（CC BY 4.0）</a>
+        </section>
+
+        <section id="game-screen" class="screen game-screen" aria-label="ゲーム">
+            <div class="board-shell">
+                <div id="board-container" aria-label="すうじスライムの ばんめん">
+                    <div class="town-gate" aria-hidden="true"></div>
+                    <div class="danger-line"></div>
+                    <div id="practice-guide" class="practice-guide hidden">
+                        <img src="./assets/hero-ponsuke-v1.png" alt="">
+                        <div>
+                            <strong>ゆうしゃぽんすけ</strong>
+                            <span id="practice-guide-text"></span>
+                        </div>
+                    </div>
+                    <canvas id="path-canvas"></canvas>
+                </div>
+            </div>
+
+            <div class="game-bottom">
+                <div class="combat-status" aria-label="ゲームの じょうたい">
+                    <div class="stat">
+                        <span id="score-label" class="stat-label">たいじポイント</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                    <div class="sum-panel">
+                        <div class="sum-copy">
+                            ごうけい
+                            <span id="sum-display">10 / 20</span>
+                        </div>
+                        <div id="sum-meter" class="sum-meter" aria-hidden="true"></div>
+                    </div>
+                    <div class="stat progress-stat">
+                        <span id="timer-label" class="stat-label">スライムが すすむ</span>
+                        <div id="timer-ring" class="timer-ring"><span id="time">15</span></div>
+                    </div>
+                    <button id="pause-button" class="pause-button" type="button" onclick="pauseGame()">とめる</button>
+                </div>
+                <footer class="game-footer">
+                    <div class="footer-virus" aria-hidden="true">10</div>
+                    <div id="hint" class="hint">スライムを つないで 10 または 20</div>
+                    <button class="quit-button" type="button" onclick="showTitle()">やめる</button>
+                </footer>
+            </div>
+
+            <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+                <div class="pause-card">
+                    <h2 id="pause-title">いったん おやすみ</h2>
+                    <p>スライムも とまっているよ。</p>
+                    <button class="primary-button" type="button" onclick="resumeGame()">つづける</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="result-screen" class="screen result-screen" aria-label="けっか">
+            <p class="result-kicker">たたかいの きろく</p>
+            <h2>たたかいおわり！</h2>
+            <div class="result-orb">
+                <img class="result-doctor" src="./assets/hero-ponsuke-v1.png" alt="ゆうしゃぽんすけ">
+                <div class="result-data">
+                    <div class="result-score-label">たいじポイント</div>
+                    <div id="result-score">0</div>
+                    <div id="result-rank">まちの みまもりやく</div>
+                    <div id="result-speech">スライムの かたさが、 よく みえていたぞ！</div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="primary-button" type="button" onclick="startGame()">もういちど</button>
+                <button class="secondary-button" type="button" onclick="showTitle()">タイトルへ</button>
+            </div>
+        </section>
+
+        <div id="flash-overlay"></div>
+
+        <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+            <div class="modal-card">
+                <h2 id="help-title">ぽんすけと れんしゅう</h2>
+                <div class="doctor-intro">
+                    <img src="./assets/hero-ponsuke-v1.png" alt="ゆうしゃぽんすけ">
+                    <p>スライムは、 やわらかすぎて そのままでは きれないんだ。 つないだ かたさを 10か20にして、 ぼくと いっしょに まちを まもろう！</p>
+                </div>
+                <div class="rule">
+                    <div class="rule-icon">10</div>
+                    <div>
+                        <strong>かたさ10で きれる</strong>
+                        <span>うえ・した・ひだり・みぎに いる スライムを つなぎ、 かたさを ぴったり10に しよう。</span>
+                    </div>
+                </div>
+                <div class="rule">
+                    <div class="rule-icon">20</div>
+                    <div>
+                        <strong>20なら にじゅうぎり</strong>
+                        <span>7や8などの かたい スライムは、 20を ねらうと きりやすいぞ。</span>
+                    </div>
+                </div>
+                <div class="rule">
+                    <div class="rule-icon">↘</div>
+                    <div>
+                        <strong>よこへ ころがっておちる</strong>
+                        <span>したが つまっていると、 よこの あいている ほうへ ころがりながら おちるぞ。</span>
+                    </div>
+                </div>
+                <div class="rule">
+                    <div class="rule-icon">⚔</div>
+                    <div>
+                        <strong>かたちで ひっさつわざ</strong>
+                        <span>しかく、 よこ4ひき、 たて4ひきを つなぐと、 おおわざが でるぞ。</span>
+                    </div>
+                </div>
+                <button class="primary-button" type="button" onclick="startPractice()">れんしゅうスタート</button>
+            </div>
+        </div>
+
+        <div id="practice-complete-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="practice-complete-title">
+            <div class="modal-card practice-complete-card">
+                <img src="./assets/hero-ponsuke-v1.png" alt="ゆうしゃぽんすけ">
+                <h2 id="practice-complete-title">れんしゅう かんりょう！</h2>
+                <p>10も20も、ひっさつわざも ばっちりだ！<br>ほんばんでは、いっしょに まちを まもろう！</p>
+                <button class="primary-button" type="button" onclick="startGame()">ほんばんスタート</button>
+                <button class="secondary-button" type="button" onclick="showTitle()">タイトルへ</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const COLS = 8;
+        const ROWS = 12;
+        const INITIAL_FILLED_ROWS = 5;
+        const boardEl = document.getElementById("board-container");
+        const pathCanvas = document.getElementById("path-canvas");
+        const pathCtx = pathCanvas.getContext("2d");
+        const sumEl = document.getElementById("sum-display");
+        const sumMeterEl = document.getElementById("sum-meter");
+        const scoreEl = document.getElementById("score");
+        const timeEl = document.getElementById("time");
+        const timerRingEl = document.getElementById("timer-ring");
+        const gameScreenEl = document.getElementById("game-screen");
+        const hintEl = document.getElementById("hint");
+        const practiceGuideEl = document.getElementById("practice-guide");
+        const practiceGuideTextEl = document.getElementById("practice-guide-text");
+        const scoreLabelEl = document.getElementById("score-label");
+        const timerLabelEl = document.getElementById("timer-label");
+        const pauseButtonEl = document.getElementById("pause-button");
+        const pauseOverlayEl = document.getElementById("pause-overlay");
+        const mobilePerformance = window.matchMedia("(pointer: coarse)").matches
+            || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+            || (navigator.deviceMemory && navigator.deviceMemory <= 4);
+
+        document.documentElement.classList.toggle("mobile-lite", Boolean(mobilePerformance));
+
+        let board = Array.from({ length: COLS }, () => Array(ROWS).fill(null));
+        let nextId = 0;
+        let isDragging = false;
+        let isResolving = false;
+        let selectedPath = [];
+        let currentSum = 0;
+        let score = 0;
+        let timeUntilPenalty = 15;
+        let penaltyInterval = 15;
+        let timerInterval = null;
+        let audioCtx = null;
+        let soundEnabled = localStorage.getItem("totalten_sound") !== "off";
+        const audioSamples = {
+            cut: new Audio("./Cut01-1.mp3"),
+            smash: new Audio("./assets/audio/smash-impact.mp3"),
+            slime: new Audio("./assets/audio/slime-step.mp3")
+        };
+        let lastClearAt = 0;
+        let streak = 0;
+        let gameIsActive = false;
+        let boardRectCache = null;
+        let resizeFrame = 0;
+        let isPracticeMode = false;
+        let practiceStep = 0;
+        let isPaused = false;
+        const scheduledGameTasks = new Set();
+
+        Object.values(audioSamples).forEach((sample) => {
+            sample.preload = "auto";
+            sample.playsInline = true;
+        });
+
+        const practiceChallenges = [
+            {
+                message: "4と6を つないだら、ゆびを はなそう！",
+                blocks: [[3, 9, 4], [4, 9, 6]]
+            },
+            {
+                message: "7、8、5を つないだら、ゆびを はなして にじゅうぎりだ！",
+                blocks: [[2, 9, 7], [3, 9, 8], [4, 9, 5]]
+            },
+            {
+                message: "ひだりしたの 4と6を つないで、 ゆびを はなそう。 うえの スライムを みていてね！",
+                blocks: [[0, 11, 4], [1, 11, 6], [3, 10, 8], [3, 11, 1]]
+            },
+            {
+                message: "4ひきを しかくに つないで、 ゆびを はなそう。 スクエアブレイクだ！",
+                blocks: [[3, 9, 1], [4, 9, 2], [4, 10, 3], [3, 10, 4]]
+            },
+            {
+                message: "4ひきを よこいちれつに つないで、 ゆびを はなそう。 よこスマッシュだ！",
+                blocks: [[2, 10, 1], [3, 10, 2], [4, 10, 3], [5, 10, 4]]
+            },
+            {
+                message: "4ひきを たていちれつに つないで、 ゆびを はなそう。 たてスラッシュだ！",
+                blocks: [[3, 7, 1], [3, 8, 2], [3, 9, 3], [3, 10, 4]]
+            }
+        ];
+
+        for (let i = 0; i < 20; i++) {
+            const tick = document.createElement("span");
+            tick.className = "sum-tick";
+            sumMeterEl.appendChild(tick);
+        }
+
+        function armScheduledTask(task) {
+            task.startedAt = performance.now();
+            task.timeoutId = window.setTimeout(() => {
+                task.timeoutId = null;
+                scheduledGameTasks.delete(task);
+                task.callback();
+            }, task.remaining);
+        }
+
+        function scheduleGameTimeout(callback, delay) {
+            const task = {
+                callback,
+                remaining: Math.max(0, delay),
+                startedAt: 0,
+                timeoutId: null
+            };
+            scheduledGameTasks.add(task);
+            if (!isPaused) armScheduledTask(task);
+            return task;
+        }
+
+        function pauseScheduledTasks() {
+            const now = performance.now();
+            scheduledGameTasks.forEach((task) => {
+                if (task.timeoutId === null) return;
+                window.clearTimeout(task.timeoutId);
+                task.timeoutId = null;
+                task.remaining = Math.max(0, task.remaining - (now - task.startedAt));
+            });
+        }
+
+        function resumeScheduledTasks() {
+            scheduledGameTasks.forEach((task) => {
+                if (task.timeoutId === null) armScheduledTask(task);
+            });
+        }
+
+        function clearScheduledTasks() {
+            scheduledGameTasks.forEach((task) => {
+                if (task.timeoutId !== null) window.clearTimeout(task.timeoutId);
+            });
+            scheduledGameTasks.clear();
+        }
+
+        function startPenaltyTimer() {
+            clearInterval(timerInterval);
+            if (isPracticeMode || isPaused || !gameIsActive) return;
+            timerInterval = setInterval(() => {
+                if (!gameIsActive || isPaused || isResolving) return;
+                timeUntilPenalty--;
+                updateTimer();
+                if (timeUntilPenalty <= 0) {
+                    applyPenalty();
+                    timeUntilPenalty = penaltyInterval;
+                    updateTimer();
+                }
+            }, 1000);
+        }
+
+        function resetPauseState({ clearTasks = false } = {}) {
+            isPaused = false;
+            gameScreenEl.classList.remove("paused");
+            pauseOverlayEl.hidden = true;
+            pauseButtonEl.disabled = false;
+            pauseButtonEl.textContent = "とめる";
+            if (clearTasks) clearScheduledTasks();
+        }
+
+        function pauseGame() {
+            if (!gameIsActive || isPaused) return;
+            isPaused = true;
+            clearInterval(timerInterval);
+            timerInterval = null;
+            pauseScheduledTasks();
+            isDragging = false;
+            selectedPath.forEach((block) => block.el?.classList.remove("selected"));
+            selectedPath = [];
+            currentSum = 0;
+            drawPath();
+            updateSumDisplay();
+            Object.values(audioSamples).forEach((sample) => sample.pause());
+            if (audioCtx?.state === "running") audioCtx.suspend().catch(() => {});
+            gameScreenEl.classList.add("paused");
+            pauseButtonEl.disabled = true;
+            pauseOverlayEl.hidden = false;
+        }
+
+        function resumeGame() {
+            if (!gameIsActive || !isPaused) return;
+            isPaused = false;
+            gameScreenEl.classList.remove("paused");
+            pauseOverlayEl.hidden = true;
+            pauseButtonEl.disabled = false;
+            if (soundEnabled && audioCtx?.state === "suspended") audioCtx.resume().catch(() => {});
+            resumeScheduledTasks();
+            startPenaltyTimer();
+        }
+
+        function switchScreen(screenId) {
+            gameIsActive = screenId === "game-screen";
+            document.body.classList.toggle("game-running", gameIsActive);
+            document.querySelectorAll(".screen").forEach((screen) => {
+                screen.classList.toggle("active", screen.id === screenId);
+            });
+        }
+
+        function showTitle() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            resetPauseState({ clearTasks: true });
+            clearSelection();
+            isResolving = false;
+            isPracticeMode = false;
+            practiceGuideEl.classList.add("hidden");
+            document.getElementById("help-modal").classList.remove("show");
+            document.getElementById("practice-complete-modal").classList.remove("show");
+            document.getElementById("high-score").textContent = getHighScore();
+            switchScreen("title-screen");
+        }
+
+        function showPracticeIntro() {
+            document.getElementById("help-modal").classList.add("show");
+        }
+
+        function showHelp() {
+            showPracticeIntro();
+        }
+
+        function hideHelp() {
+            document.getElementById("help-modal").classList.remove("show");
+        }
+
+        function getHighScore() {
+            return Number(localStorage.getItem("make10_highscore") || 0);
+        }
+
+        function saveHighScore(value) {
+            if (value > getHighScore()) {
+                localStorage.setItem("make10_highscore", String(value));
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem("totalten_sound", soundEnabled ? "on" : "off");
+            updateSoundButton();
+            if (soundEnabled) {
+                initAudio();
+                playTone(720, "sine", 0.08, 0.045);
+            } else {
+                Object.values(audioSamples).forEach((sample) => {
+                    sample.pause();
+                    try {
+                        sample.currentTime = 0;
+                    } catch (_error) {
+                        // よみこみまえなら、ていしだけでよい
+                    }
+                });
+            }
+        }
+
+        function updateSoundButton() {
+            const button = document.getElementById("sound-button");
+            button.textContent = soundEnabled ? "♪" : "×";
+            button.setAttribute("aria-label", soundEnabled ? "サウンドをオフにする" : "サウンドをオンにする");
+        }
+
+        function initAudio() {
+            if (!soundEnabled) return;
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === "suspended") audioCtx.resume();
+        }
+
+        function playSample(name, volume = 0.4, playbackRate = 1) {
+            if (!soundEnabled) return;
+            const sample = audioSamples[name];
+            if (!sample) return;
+            sample.pause();
+            try {
+                sample.currentTime = 0;
+            } catch (_error) {
+                // よみこみまえでも、そのままさいせいをためす
+            }
+            sample.volume = Math.max(0, Math.min(1, volume));
+            sample.playbackRate = playbackRate;
+            sample.play().catch(() => {});
+        }
+
+        function playTone(freq, type, duration, volume = 0.05, delay = 0) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const start = audioCtx.currentTime + delay;
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(volume, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(start);
+            osc.stop(start + duration);
+        }
+
+        function playSelectSound() {
+            playTone(520 + Math.min(currentSum, 20) * 24, "sine", 0.09, 0.035);
+        }
+
+        function playClearSound(isTwenty = false) {
+            playSample("cut", isTwenty ? 0.21 : 0.17, isTwenty ? 0.88 : 1.04);
+            if (isTwenty) {
+                playTone(150, "sine", 0.22, 0.035);
+            }
+        }
+
+        function playMistakeSound() {
+            playTone(190, "sawtooth", 0.28, 0.055);
+        }
+
+        function playExplosionSound() {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+            const duration = 0.42;
+            const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < data.length; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.2);
+            }
+            const noise = audioCtx.createBufferSource();
+            const gain = audioCtx.createGain();
+            noise.buffer = buffer;
+            gain.gain.value = 0.07;
+            noise.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+            playTone(125, "sine", 0.38, 0.08);
+        }
+
+        function playSmashSound() {
+            playSample("cut", 0.58, 0.92);
+            scheduleGameTimeout(() => playSample("smash", 0.76, 0.9), 45);
+            scheduleGameTimeout(() => playExplosionSound(), 35);
+            playTone(940, "square", 0.11, 0.022, 0.02);
+        }
+
+        function playSlimeStepSound() {
+            playSample("slime", 0.45, 0.82);
+        }
+
+        function haptic(pattern) {
+            if (navigator.vibrate) navigator.vibrate(pattern);
+        }
+
+        function startGame() {
+            initAudio();
+            clearInterval(timerInterval);
+            timerInterval = null;
+            resetPauseState({ clearTasks: true });
+            isPracticeMode = false;
+            practiceGuideEl.classList.add("hidden");
+            document.getElementById("help-modal").classList.remove("show");
+            document.getElementById("practice-complete-modal").classList.remove("show");
+            scoreLabelEl.textContent = "たいじポイント";
+            timerLabelEl.textContent = "スライムが すすむ";
+            timerRingEl.style.visibility = "";
+            score = 0;
+            scoreEl.textContent = "0";
+            selectedPath = [];
+            currentSum = 0;
+            isDragging = false;
+            isResolving = false;
+            streak = 0;
+            lastClearAt = 0;
+            penaltyInterval = 15;
+            timeUntilPenalty = penaltyInterval;
+            updateTimer();
+            updateSumDisplay();
+
+            boardEl.querySelectorAll(".block, .particle, .shockwave, .effect-text, .warning-effect, .score-pop").forEach((el) => el.remove());
+            board = Array.from({ length: COLS }, () => Array(ROWS).fill(null));
+
+            const startRow = ROWS - INITIAL_FILLED_ROWS;
+            for (let c = 0; c < COLS; c++) {
+                for (let r = startRow; r < ROWS; r++) {
+                    board[c][r] = createBlock(c, r);
+                }
+            }
+
+            switchScreen("game-screen");
+            requestAnimationFrame(() => {
+                resizePathCanvas();
+                drawPath();
+            });
+
+            startPenaltyTimer();
+        }
+
+        function startPractice() {
+            initAudio();
+            clearInterval(timerInterval);
+            timerInterval = null;
+            resetPauseState({ clearTasks: true });
+            document.getElementById("help-modal").classList.remove("show");
+            document.getElementById("practice-complete-modal").classList.remove("show");
+            isPracticeMode = true;
+            practiceStep = 0;
+            score = 0;
+            selectedPath = [];
+            currentSum = 0;
+            isDragging = false;
+            isResolving = false;
+            streak = 0;
+            lastClearAt = 0;
+            scoreLabelEl.textContent = "れんしゅう";
+            timerLabelEl.textContent = "れんしゅう";
+            timerRingEl.style.visibility = "hidden";
+            switchScreen("game-screen");
+            setupPracticeChallenge();
+        }
+
+        function setupPracticeChallenge() {
+            clearSelection();
+            isResolving = false;
+            boardEl.querySelectorAll(".block, .particle, .shockwave, .effect-text, .warning-effect, .score-pop").forEach((el) => el.remove());
+            board = Array.from({ length: COLS }, () => Array(ROWS).fill(null));
+
+            const challenge = practiceChallenges[practiceStep];
+            challenge.blocks.forEach(([c, r, value]) => {
+                board[c][r] = createBlock(c, r, value);
+            });
+
+            scoreEl.textContent = `${practiceStep + 1}/${practiceChallenges.length}`;
+            practiceGuideTextEl.textContent = challenge.message;
+            practiceGuideEl.classList.remove("hidden");
+            hintEl.textContent = "スライムを うえ・した・ひだり・みぎにつなごう";
+            requestAnimationFrame(() => {
+                resizePathCanvas();
+                drawPath();
+            });
+        }
+
+        function finishPracticeChallenge() {
+            practiceStep++;
+            if (practiceStep >= practiceChallenges.length) {
+                practiceGuideEl.classList.add("hidden");
+                document.getElementById("practice-complete-modal").classList.add("show");
+                playTone(1180, "sine", 0.22, 0.05);
+                playTone(1420, "sine", 0.26, 0.045, 0.12);
+                return;
+            }
+            setupPracticeChallenge();
+        }
+
+        function finishBattle() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            isResolving = true;
+            playExplosionSound();
+            playTone(760, "sine", 0.24, 0.05);
+            playTone(980, "sine", 0.3, 0.045, 0.12);
+            haptic([35, 25, 70]);
+            screenFlash();
+            shakeBoard();
+            particleBurst(50, 28, 36);
+
+            const lastSlimes = board.flat().filter(Boolean);
+            board = Array.from({ length: COLS }, () => Array(ROWS).fill(null));
+            lastSlimes.forEach((block, index) => {
+                scheduleGameTimeout(() => block.el?.classList.add("clearing"), Math.min(index * 6, 150));
+                scheduleGameTimeout(() => block.el?.remove(), 280 + Math.min(index * 6, 150));
+            });
+
+            scheduleGameTimeout(() => {
+                saveHighScore(score);
+                document.getElementById("result-score").textContent = score;
+                document.getElementById("result-rank").textContent = getRank(score);
+                document.getElementById("result-speech").textContent = getPonsukeSpeech(score);
+                isResolving = false;
+                switchScreen("result-screen");
+            }, 1150);
+        }
+
+        function getRank(value) {
+            if (value >= 3000) return "でんせつの ゆうしゃ";
+            if (value >= 1600) return "まほうけんの たつじん";
+            if (value >= 700) return "スライムハンター";
+            return "まちの みまもりやく";
+        }
+
+        function getPonsukeSpeech(value) {
+            if (value >= 3000) return "きみこそ、 ぼくの さいこうの あいぼうだ！";
+            if (value >= 1600) return "10と20を、 じゆうに きりわけていたな！";
+            if (value >= 700) return "かたい スライムも、 うまく きれたぞ！";
+            return "スライムの かたさが、 よく みえていたぞ！";
+        }
+
+        function getRandomNumber() {
+            return Math.random() < 0.7
+                ? Math.floor(Math.random() * 6)
+                : Math.floor(Math.random() * 4) + 6;
+        }
+
+        function createBlock(c, r, forcedValue = null) {
+            const value = forcedValue ?? getRandomNumber();
+            const el = document.createElement("div");
+            el.className = `block color-${value}`;
+            const numberEl = document.createElement("span");
+            numberEl.className = "virus-number";
+            numberEl.textContent = value;
+            el.appendChild(numberEl);
+            boardEl.appendChild(el);
+            const block = { id: nextId++, c, r, val: value, el };
+            updateBlockPosition(block, true);
+            return block;
+        }
+
+        function updateBlockPosition(block, noTransition = false) {
+            if (!block || !block.el) return;
+            if (noTransition) {
+                block.el.style.transition = "none";
+                requestAnimationFrame(() => {
+                    if (block.el) block.el.style.transition = "";
+                });
+            }
+            block.el.style.setProperty("--block-x", `${block.c * 100}%`);
+            block.el.style.setProperty("--block-y", `${block.r * 100}%`);
+        }
+
+        function getCellFromPointer(event) {
+            const rect = boardRectCache || boardEl.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            if (x < 0 || x >= rect.width || y < 0 || y >= rect.height) return null;
+            return {
+                c: Math.floor((x / rect.width) * COLS),
+                r: Math.floor((y / rect.height) * ROWS)
+            };
+        }
+
+        function handlePointerDown(event) {
+            if (isPaused || isResolving || !gameIsActive) return;
+            event.preventDefault();
+            initAudio();
+            boardRectCache = boardEl.getBoundingClientRect();
+            const cell = getCellFromPointer(event);
+            if (!cell) return;
+            const block = board[cell.c][cell.r];
+            if (!block) return;
+            boardEl.setPointerCapture?.(event.pointerId);
+            isDragging = true;
+            selectedPath = [block];
+            currentSum = block.val;
+            block.el.classList.add("selected");
+            playSelectSound();
+            haptic(8);
+            updateSumDisplay();
+            drawPath();
+        }
+
+        function handlePointerMove(event) {
+            if (isPaused || !isDragging || isResolving) return;
+            event.preventDefault();
+            const cell = getCellFromPointer(event);
+            if (!cell) return;
+            const block = board[cell.c][cell.r];
+            if (!block) return;
+
+            if (selectedPath.includes(block)) {
+                if (selectedPath.length >= 2 && selectedPath[selectedPath.length - 2] === block) {
+                    const removed = selectedPath.pop();
+                    removed.el.classList.remove("selected");
+                    currentSum -= removed.val;
+                    playSelectSound();
+                    updateSumDisplay();
+                    drawPath();
+                }
+                return;
+            }
+
+            const last = selectedPath[selectedPath.length - 1];
+            const adjacent = Math.abs(last.c - block.c) + Math.abs(last.r - block.r) === 1;
+            if (!adjacent) return;
+
+            selectedPath.push(block);
+            currentSum += block.val;
+            block.el.classList.add("selected");
+            playSelectSound();
+            haptic(7);
+            updateSumDisplay();
+            drawPath();
+        }
+
+        function handlePointerEnd(event) {
+            if (isPaused || !isDragging || isResolving) return;
+            event.preventDefault();
+            if (currentSum === 10 || currentSum === 20) {
+                checkSumResult();
+            } else if (currentSum > 20) {
+                playMistakeSound();
+                haptic([35, 30, 50]);
+                showWarningEffect(isPracticeMode ? "かたすぎるぞ\nもういちど！" : "かたすぎる！\nけんが はじかれた");
+                shakeBoard();
+                clearSelection();
+                if (!isPracticeMode) {
+                    applyPenalty();
+                    timeUntilPenalty = penaltyInterval;
+                    updateTimer();
+                }
+            } else {
+                clearSelection();
+            }
+        }
+
+        function clearSelection() {
+            selectedPath.forEach((block) => block.el?.classList.remove("selected"));
+            selectedPath = [];
+            currentSum = 0;
+            isDragging = false;
+            updateSumDisplay();
+            drawPath();
+        }
+
+        function updateSumDisplay() {
+            const ticks = sumMeterEl.children;
+            const amount = Math.min(currentSum, 20);
+            for (let i = 0; i < ticks.length; i++) {
+                ticks[i].className = "sum-tick";
+                if (i < amount) ticks[i].classList.add("filled");
+                if ((currentSum === 10 && i < 10) || (currentSum === 20 && i < 20)) ticks[i].classList.add("goal");
+                if (currentSum > 20 && i < amount) ticks[i].classList.add("over");
+            }
+
+            if (selectedPath.length === 0) {
+                sumEl.textContent = "10 / 20";
+                sumEl.style.color = "";
+                if (!isPracticeMode) hintEl.textContent = "スライムを つないで 10 または 20";
+            } else {
+                sumEl.textContent = String(currentSum);
+                if (currentSum === 10 || currentSum === 20) {
+                    sumEl.style.color = "#d19312";
+                    hintEl.textContent = currentSum === 20 ? "ゆびを はなして にじゅうぎり！" : "ゆびを はなして きる！";
+                } else if (currentSum > 20) {
+                    sumEl.style.color = "var(--danger)";
+                    hintEl.textContent = "ゆびを もどして ちょうせいしよう";
+                } else {
+                    sumEl.style.color = "var(--violet-deep)";
+                    hintEl.textContent = `あと ${currentSum < 10 ? 10 - currentSum : 20 - currentSum}`;
+                }
+            }
+        }
+
+        function updateTimer() {
+            timeEl.textContent = Math.max(0, timeUntilPenalty);
+            timerRingEl.style.setProperty("--progress", Math.max(0, timeUntilPenalty / penaltyInterval));
+            gameScreenEl.classList.toggle("danger-pulse", timeUntilPenalty <= 4);
+        }
+
+        function resizePathCanvas() {
+            const rect = boardEl.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            boardRectCache = rect;
+            const dpr = mobilePerformance ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+            pathCanvas.width = Math.round(rect.width * dpr);
+            pathCanvas.height = Math.round(rect.height * dpr);
+            pathCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            drawPath();
+        }
+
+        function drawPath() {
+            const rect = boardRectCache || boardEl.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            pathCtx.clearRect(0, 0, rect.width, rect.height);
+            if (selectedPath.length < 2) return;
+
+            const points = selectedPath.map((block) => ({
+                x: (block.c + 0.5) * rect.width / COLS,
+                y: (block.r + 0.5) * rect.height / ROWS
+            }));
+
+            pathCtx.save();
+            pathCtx.lineCap = "round";
+            pathCtx.lineJoin = "round";
+            pathCtx.beginPath();
+            points.forEach((point, index) => {
+                if (index === 0) pathCtx.moveTo(point.x, point.y);
+                else pathCtx.lineTo(point.x, point.y);
+            });
+            pathCtx.strokeStyle = "rgba(90, 232, 239, 0.26)";
+            pathCtx.lineWidth = Math.max(13, rect.width / 25);
+            pathCtx.stroke();
+            pathCtx.strokeStyle = "#efffff";
+            pathCtx.shadowColor = "#58e5ee";
+            pathCtx.shadowBlur = mobilePerformance ? 4 : 12;
+            pathCtx.lineWidth = Math.max(4, rect.width / 75);
+            pathCtx.stroke();
+            pathCtx.restore();
+        }
+
+        function isSquare2x2(path) {
+            if (path.length !== 4) return false;
+            const columns = path.map((block) => block.c);
+            const rows = path.map((block) => block.r);
+            return Math.max(...columns) - Math.min(...columns) === 1
+                && Math.max(...rows) - Math.min(...rows) === 1;
+        }
+
+        function isHorizontalLine(path) {
+            return path.length >= 4 && path.every((block) => block.r === path[0].r);
+        }
+
+        function isVerticalLine(path) {
+            return path.length >= 4 && path.every((block) => block.c === path[0].c);
+        }
+
+        function checkSumResult() {
+            if (isPaused || (currentSum !== 10 && currentSum !== 20)) return;
+
+            isDragging = false;
+            isResolving = true;
+            const selectedSnapshot = [...selectedPath];
+            const exactSum = currentSum;
+            const blocksToRemove = [...selectedSnapshot];
+            const square = isSquare2x2(selectedSnapshot);
+            const horizontal = isHorizontalLine(selectedSnapshot);
+            const vertical = isVerticalLine(selectedSnapshot);
+            let bonus = 0;
+            let message = "ジャスト10！";
+            let submessage = "スライムを きった！";
+
+            const now = Date.now();
+            streak = now - lastClearAt < 3200 ? streak + 1 : 1;
+            lastClearAt = now;
+
+            if (exactSum === 20) {
+                bonus += 50;
+                message = "にじゅうぎり！";
+                submessage = "まとめて いっとうりょうだん！ +50";
+                screenFlash();
+                shakeBoard();
+            }
+
+            if (square) {
+                message = "スクエアブレイク！";
+                submessage = "しかくの ちからで まとめぎり";
+                const minC = Math.min(...selectedSnapshot.map((block) => block.c));
+                const maxC = Math.max(...selectedSnapshot.map((block) => block.c));
+                const minR = Math.min(...selectedSnapshot.map((block) => block.r));
+                const maxR = Math.max(...selectedSnapshot.map((block) => block.r));
+                for (let c = minC - 1; c <= maxC + 1; c++) {
+                    for (let r = minR - 1; r <= maxR + 1; r++) {
+                        const block = board[c]?.[r];
+                        if (block && !blocksToRemove.includes(block)) {
+                            blocksToRemove.push(block);
+                            bonus += 15;
+                        }
+                    }
+                }
+            } else if (horizontal) {
+                message = "よこスマッシュ！";
+                submessage = "よこ3れつを いっせん";
+                const targetR = selectedSnapshot[0].r;
+                for (let c = 0; c < COLS; c++) {
+                    for (let r = targetR - 1; r <= targetR + 1; r++) {
+                        const block = board[c]?.[r];
+                        if (block && !blocksToRemove.includes(block)) {
+                            blocksToRemove.push(block);
+                            bonus += 10;
+                        }
+                    }
+                }
+            } else if (vertical) {
+                message = "たてスラッシュ！";
+                submessage = "たて3れつを まっぷたつ";
+                const targetC = selectedSnapshot[0].c;
+                for (let c = targetC - 1; c <= targetC + 1; c++) {
+                    for (let r = 0; r < ROWS; r++) {
+                        const block = board[c]?.[r];
+                        if (block && !blocksToRemove.includes(block)) {
+                            blocksToRemove.push(block);
+                            bonus += 10;
+                        }
+                    }
+                }
+            }
+
+            if (square || horizontal || vertical) {
+                screenFlash();
+                shakeBoard();
+                playSmashSound();
+            } else {
+                playClearSound(exactSum === 20);
+            }
+
+            if (streak >= 2) submessage += ` ・ れんぞくぎり ${streak}`;
+            showEffectText(message, submessage);
+            haptic(square || horizontal || vertical || exactSum === 20 ? [25, 20, 45] : 16);
+
+            const center = selectedSnapshot[Math.floor(selectedSnapshot.length / 2)];
+            const centerX = (center.c + 0.5) * 100 / COLS;
+            const centerY = (center.r + 0.5) * 100 / ROWS;
+            particleBurst(centerX, centerY, square || horizontal || vertical ? 30 : 18);
+            createShockwave(centerX, centerY);
+
+            const points = selectedSnapshot.length * 10 + bonus;
+            score += points;
+            scoreEl.textContent = isPracticeMode ? `${practiceStep + 1}/${practiceChallenges.length}` : score;
+            showScoreEffect(center, points);
+
+            if (!isPracticeMode) {
+                const nextInterval = Math.max(5, 15 - Math.floor(score / 300));
+                if (nextInterval < penaltyInterval) {
+                    penaltyInterval = nextInterval;
+                    if (timeUntilPenalty > penaltyInterval) timeUntilPenalty = penaltyInterval;
+                    scheduleGameTimeout(() => showWarningEffect(`スライムが はやくなった！\nつぎは ${penaltyInterval} びょう`), 500);
+                    updateTimer();
+                }
+            }
+
+            selectedPath = [];
+            currentSum = 0;
+            drawPath();
+            updateSumDisplay();
+
+            blocksToRemove.forEach((block, index) => {
+                if (board[block.c]?.[block.r] === block) board[block.c][block.r] = null;
+                scheduleGameTimeout(() => block.el?.classList.add("clearing"), Math.min(index * 7, 90));
+                scheduleGameTimeout(() => block.el?.remove(), 240 + Math.min(index * 7, 90));
+            });
+
+            scheduleGameTimeout(() => {
+                applyGravity();
+                isResolving = false;
+                if (isPracticeMode) {
+                    scheduleGameTimeout(finishPracticeChallenge, practiceStep === 2 ? 1100 : 620);
+                    return;
+                }
+                const remaining = board.flat().filter(Boolean).length;
+                if (remaining <= 15 && gameIsActive) {
+                    showWarningEffect("スライムの むれがきた！");
+                    applyPenalty();
+                    timeUntilPenalty = penaltyInterval;
+                    updateTimer();
+                }
+            }, 280);
+        }
+
+        function showEffectText(text, subtext) {
+            const el = document.createElement("div");
+            el.className = "effect-text";
+            el.innerHTML = `${text}<small>${subtext}</small>`;
+            boardEl.appendChild(el);
+            scheduleGameTimeout(() => el.remove(), 1200);
+        }
+
+        function showWarningEffect(text) {
+            const el = document.createElement("div");
+            el.className = "warning-effect";
+            el.textContent = text;
+            boardEl.appendChild(el);
+            scheduleGameTimeout(() => el.remove(), 1100);
+        }
+
+        function showScoreEffect(block, points) {
+            const el = document.createElement("div");
+            el.className = "score-pop";
+            el.textContent = `+${points}`;
+            el.style.left = `${(block.c + 0.5) * 100 / COLS}%`;
+            el.style.top = `${(block.r + 0.5) * 100 / ROWS}%`;
+            boardEl.appendChild(el);
+            scheduleGameTimeout(() => el.remove(), 920);
+        }
+
+        function particleBurst(x, y, count = 18) {
+            const colors = ["#fff3a5", "#8ff4ff", "#ff81ba", "#a999ff", "#ffffff"];
+            const actualCount = mobilePerformance ? Math.min(count, 12) : count;
+            const layer = document.createElement("div");
+            layer.className = "particle-layer";
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < actualCount; i++) {
+                const particle = document.createElement("span");
+                const angle = (Math.PI * 2 * i / actualCount) + Math.random() * 0.35;
+                const distance = 45 + Math.random() * 105;
+                particle.className = "particle";
+                particle.style.left = `${x}%`;
+                particle.style.top = `${y}%`;
+                particle.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty("--dy", `${Math.sin(angle) * distance}px`);
+                particle.style.setProperty("--size", `${4 + Math.random() * 7}px`);
+                particle.style.setProperty("--duration", `${560 + Math.random() * 340}ms`);
+                particle.style.setProperty("--particle-color", colors[i % colors.length]);
+                fragment.appendChild(particle);
+            }
+            layer.appendChild(fragment);
+            boardEl.appendChild(layer);
+            scheduleGameTimeout(() => layer.remove(), 950);
+        }
+
+        function createShockwave(x, y) {
+            const wave = document.createElement("span");
+            wave.className = "shockwave";
+            wave.style.left = `${x}%`;
+            wave.style.top = `${y}%`;
+            boardEl.appendChild(wave);
+            scheduleGameTimeout(() => wave.remove(), 620);
+        }
+
+        function screenFlash() {
+            const flash = document.getElementById("flash-overlay");
+            flash.classList.remove("active");
+            void flash.offsetWidth;
+            flash.classList.add("active");
+            scheduleGameTimeout(() => flash.classList.remove("active"), 360);
+        }
+
+        function shakeBoard() {
+            boardEl.classList.remove("shake");
+            void boardEl.offsetWidth;
+            boardEl.classList.add("shake");
+            scheduleGameTimeout(() => boardEl.classList.remove("shake"), 400);
+        }
+
+        function applyGravity() {
+            let moved = true;
+            while (moved) {
+                moved = false;
+                for (let r = ROWS - 2; r >= 0; r--) {
+                    for (let c = 0; c < COLS; c++) {
+                        const block = board[c][r];
+                        if (!block) continue;
+                        if (board[c][r + 1] === null) {
+                            board[c][r + 1] = block;
+                            board[c][r] = null;
+                            block.r = r + 1;
+                            moved = true;
+                        } else {
+                            const directions = Math.random() < 0.5 ? [1, -1] : [-1, 1];
+                            for (const direction of directions) {
+                                const nextC = c + direction;
+                                if (
+                                    nextC >= 0 && nextC < COLS
+                                    && board[nextC][r] === null
+                                    && board[nextC][r + 1] === null
+                                ) {
+                                    board[nextC][r + 1] = block;
+                                    board[c][r] = null;
+                                    block.c = nextC;
+                                    block.r = r + 1;
+                                    moved = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            board.flat().filter(Boolean).forEach((block) => updateBlockPosition(block));
+        }
+
+        function applyPenalty() {
+            if (!gameIsActive || isPaused) return;
+            const reachedTop = board.some((column) => column[0] !== null);
+            if (reachedTop) {
+                finishBattle();
+                return;
+            }
+
+            playSlimeStepSound();
+            haptic(24);
+            for (let c = 0; c < COLS; c++) {
+                for (let r = 0; r < ROWS - 1; r++) {
+                    board[c][r] = board[c][r + 1];
+                    if (board[c][r]) {
+                        board[c][r].r = r;
+                        updateBlockPosition(board[c][r]);
+                    }
+                }
+                const newBlock = createBlock(c, ROWS);
+                board[c][ROWS - 1] = newBlock;
+                newBlock.r = ROWS - 1;
+                requestAnimationFrame(() => updateBlockPosition(newBlock));
+            }
+        }
+
+        boardEl.addEventListener("pointerdown", handlePointerDown);
+        boardEl.addEventListener("pointermove", handlePointerMove);
+        boardEl.addEventListener("pointerup", handlePointerEnd);
+        boardEl.addEventListener("pointercancel", handlePointerEnd);
+        function schedulePathCanvasResize() {
+            if (resizeFrame) return;
+            resizeFrame = requestAnimationFrame(() => {
+                resizeFrame = 0;
+                resizePathCanvas();
+            });
+        }
+
+        window.addEventListener("resize", schedulePathCanvasResize);
+        new ResizeObserver(schedulePathCanvasResize).observe(boardEl);
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                if (document.getElementById("help-modal").classList.contains("show")) hideHelp();
+                else if (isPaused) resumeGame();
+                else if (gameScreenEl.classList.contains("active")) showTitle();
+            }
+        });
+        document.addEventListener("touchmove", (event) => {
+            if (gameIsActive) event.preventDefault();
+        }, { passive: false });
+        document.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
+
+        updateSoundButton();
+        showTitle();
+    </script>
+</body>
+</html>

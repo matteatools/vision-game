@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#176b43">
+    <title>ピョコッとしゅうかく！</title>
+    <style>
+        :root {
+            --ink: #244136;
+            --leaf: #2f9a5d;
+            --leaf-dark: #176b43;
+            --lime: #a8dd57;
+            --sun: #ffd45a;
+            --cream: #fffaf0;
+            --coral: #ff7868;
+            --line: rgba(31, 104, 68, 0.16);
+            --shadow: 0 16px 38px rgba(11, 67, 42, 0.24);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overscroll-behavior: none;
+        }
+
+        body {
+            min-width: 320px;
+            overflow: hidden;
+            color: var(--ink);
+            background: #dff4b9;
+            font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+            font-weight: 800;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        a {
+            color: inherit;
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 4px solid var(--sun);
+            outline-offset: 3px;
+        }
+
+        .choice-copy,
+        .field-kicker,
+        .field-panel h2,
+        .field-rule span,
+        .field-copy,
+        .round-message,
+        .guide-card h2,
+        .guide-card p,
+        .result-card h2,
+        .result-best {
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100dvh;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .sound-button {
+            position: fixed;
+            z-index: 100;
+            top: max(12px, env(safe-area-inset-top));
+            left: max(12px, env(safe-area-inset-left));
+            display: grid;
+            width: 46px;
+            height: 46px;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #fff;
+            border-radius: 16px;
+            box-shadow: 0 7px 18px rgba(15, 67, 43, 0.2);
+            font-size: 21px;
+        }
+
+        /* タイトル */
+        .title-screen {
+            isolation: isolate;
+            overflow: hidden;
+            background: #255f3f;
+        }
+
+        .title-art {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 50%;
+            filter: brightness(1.13) saturate(1.06);
+            pointer-events: none;
+        }
+
+        .title-scrim {
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 250, 201, 0.08) 0%, transparent 36%),
+                linear-gradient(180deg, transparent 62%, rgba(8, 68, 38, 0.3) 100%);
+            pointer-events: none;
+        }
+
+        .title-logo {
+            position: absolute;
+            z-index: 3;
+            top: max(42px, calc(env(safe-area-inset-top) + 34px));
+            left: 50%;
+            width: min(98vw, 780px);
+            color: #fff;
+            text-align: center;
+            text-shadow:
+                0 3px 0 #176b43,
+                0 7px 20px rgba(4, 43, 25, 0.7);
+            transform: translateX(-50%);
+        }
+
+        .title-logo-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            filter: drop-shadow(0 8px 12px rgba(4, 43, 25, 0.34));
+        }
+
+        .title-logo h1 {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .title-actions {
+            position: absolute;
+            z-index: 4;
+            top: 52%;
+            bottom: auto;
+            left: 50%;
+            display: grid;
+            width: min(82vw, 440px);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            padding: 9px;
+            background: rgba(27, 105, 60, 0.66);
+            border: 2px solid rgba(255, 255, 255, 0.48);
+            border-radius: 23px;
+            box-shadow: 0 12px 28px rgba(2, 34, 21, 0.28);
+            backdrop-filter: blur(6px);
+            transform: translate(-50%, -50%);
+        }
+
+        .main-choice {
+            display: flex;
+            min-height: 70px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .start-button {
+            color: #fff;
+            background: linear-gradient(180deg, #55d37c, #22a95b);
+            border: 0;
+            box-shadow: 0 6px 0 #147b42;
+        }
+
+        .practice-button {
+            color: #2c6645;
+            background: linear-gradient(180deg, #fff, #f3ffe8);
+            border: 3px solid #9bd66d;
+            box-shadow: 0 5px 0 #70b850;
+        }
+
+        .main-choice:active {
+            box-shadow: 0 2px 0 #147b42;
+            transform: translateY(4px);
+        }
+
+        .choice-icon {
+            width: 28px;
+            flex: 0 0 auto;
+            font-size: 23px;
+            text-align: center;
+        }
+
+        .choice-copy {
+            display: grid;
+            gap: 1px;
+        }
+
+        .choice-copy strong {
+            font-size: clamp(19px, 4.7vw, 24px);
+            font-weight: 900;
+            line-height: 1.05;
+        }
+
+        .choice-copy small {
+            font-size: clamp(10px, 2.8vw, 13px);
+        }
+
+        .title-links {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .title-link {
+            display: flex;
+            min-height: 34px;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 8px;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 13px;
+            font-size: 10px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* はたけをえらぶ */
+        .field-screen {
+            display: grid;
+            padding:
+                max(68px, calc(env(safe-area-inset-top) + 58px))
+                max(14px, env(safe-area-inset-right))
+                max(16px, env(safe-area-inset-bottom))
+                max(14px, env(safe-area-inset-left));
+            overflow: auto;
+            place-items: center;
+            background:
+                radial-gradient(circle at 50% 8%, rgba(255, 248, 173, 0.96) 0 12%, transparent 36%),
+                linear-gradient(160deg, #eaf7bb, #a8dc78);
+        }
+
+        .field-panel {
+            width: min(94vw, 760px);
+            padding: clamp(18px, 4vw, 28px);
+            background: rgba(255, 253, 242, 0.97);
+            border: 4px solid #fff;
+            border-radius: 34px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .field-kicker {
+            display: inline-block;
+            margin: 0 0 5px;
+            padding: 5px 12px;
+            color: #80551e;
+            background: #fff1ad;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .field-panel h2 {
+            margin: 0 0 16px;
+            color: var(--leaf-dark);
+            font-size: clamp(27px, 7vw, 39px);
+            font-weight: 900;
+        }
+
+        .field-rule {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 6px 12px;
+            margin: -8px 0 13px;
+            color: #557064;
+            font-size: 11px;
+        }
+
+        .field-rule span {
+            padding: 5px 10px;
+            background: #eef6e6;
+            border-radius: 999px;
+        }
+
+        .field-rule .rabbit-rule {
+            color: #9b4c3e;
+            background: #fff0e8;
+        }
+
+        .field-options {
+            display: grid;
+            gap: 11px;
+        }
+
+        .field-choice {
+            display: grid;
+            min-height: 98px;
+            grid-template-columns: 84px 1fr;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: #365d49;
+            background: linear-gradient(180deg, #fff, #f6fbe9);
+            border: 3px solid #b6dc79;
+            border-radius: 22px;
+            box-shadow: 0 5px 0 #83b958;
+            text-align: left;
+        }
+
+        .field-choice:active {
+            box-shadow: 0 1px 0 #83b958;
+            transform: translateY(4px);
+        }
+
+        .field-choice.recommended {
+            border-color: #5fc978;
+            background: linear-gradient(180deg, #f6fff0, #e8fbdc);
+        }
+
+        .field-mini {
+            display: grid;
+            width: 78px;
+            height: 78px;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            gap: 4px;
+            padding: 6px;
+            background: #8f5a32;
+            border: 4px solid #bc8250;
+            border-radius: 17px;
+            box-shadow: inset 0 5px 8px rgba(61, 34, 18, 0.35);
+        }
+
+        .field-mini i {
+            display: block;
+            background: #4b2b18;
+            border: 2px solid #784829;
+            border-radius: 50%;
+        }
+
+        .field-copy {
+            display: grid;
+            gap: 2px;
+        }
+
+        .field-copy strong {
+            font-size: clamp(18px, 5vw, 24px);
+            font-weight: 900;
+        }
+
+        .field-copy small {
+            color: #74867c;
+            font-size: 11px;
+        }
+
+        .field-best {
+            color: #d87d11;
+            font-size: 12px;
+        }
+
+        .field-back {
+            min-height: 43px;
+            margin-top: 15px;
+            padding: 8px 22px;
+            color: #60736a;
+            background: #e8eee8;
+            border: 0;
+            border-radius: 15px;
+        }
+
+        /* ゲーム */
+        .game-screen {
+            display: grid;
+            grid-template-rows: 70px minmax(0, 1fr);
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 5%, rgba(255, 248, 171, 0.95) 0 12%, transparent 37%),
+                radial-gradient(circle at 12% 88%, rgba(69, 162, 91, 0.27) 0 19%, transparent 39%),
+                linear-gradient(180deg, #e5f5b7, #b2dc79 64%, #8bb867 65%, #8a5936 100%);
+        }
+
+        .hud {
+            position: relative;
+            z-index: 20;
+            display: grid;
+            height: 70px;
+            grid-template-columns: 48px 1fr 1fr;
+            align-items: center;
+            gap: 8px;
+            padding:
+                max(8px, env(safe-area-inset-top))
+                max(10px, env(safe-area-inset-right))
+                7px
+                max(10px, env(safe-area-inset-left));
+            background: rgba(255, 253, 237, 0.96);
+            box-shadow: 0 5px 20px rgba(28, 92, 55, 0.14);
+        }
+
+        .exit-button {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            color: #5b7065;
+            background: #e9efe8;
+            border: 0;
+            border-radius: 14px;
+            font-size: 22px;
+        }
+
+        .stat {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .stat span,
+        .stat strong {
+            display: block;
+        }
+
+        .stat span {
+            color: #6a8176;
+            font-size: 10px;
+        }
+
+        .stat strong {
+            color: var(--leaf-dark);
+            font-size: clamp(22px, 6vw, 31px);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .stat small {
+            margin-left: 2px;
+            font-size: 10px;
+        }
+
+        .play-field {
+            position: relative;
+            display: grid;
+            min-height: 0;
+            place-items: center;
+            padding: 44px 12px 12px;
+            overflow: hidden;
+        }
+
+        .forest-leaves {
+            position: absolute;
+            inset: auto -7% -12% -7%;
+            height: 30%;
+            opacity: 0.46;
+            background:
+                radial-gradient(ellipse at 8% 85%, #207a49 0 10%, transparent 11%),
+                radial-gradient(ellipse at 24% 76%, #389a58 0 13%, transparent 14%),
+                radial-gradient(ellipse at 50% 88%, #217849 0 15%, transparent 16%),
+                radial-gradient(ellipse at 74% 77%, #42a966 0 13%, transparent 14%),
+                radial-gradient(ellipse at 93% 88%, #217a49 0 12%, transparent 13%);
+            pointer-events: none;
+        }
+
+        .round-message {
+            position: absolute;
+            z-index: 12;
+            top: 8px;
+            left: 50%;
+            max-width: 92%;
+            padding: 7px 15px;
+            color: #2d6f45;
+            background: rgba(255, 255, 255, 0.92);
+            border: 2px solid rgba(94, 169, 92, 0.32);
+            border-radius: 999px;
+            box-shadow: 0 6px 14px rgba(24, 105, 59, 0.14);
+            font-size: clamp(12px, 3.4vw, 16px);
+            text-align: center;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .hole-grid {
+            position: relative;
+            z-index: 3;
+            display: grid;
+            width: min(91vw, calc(100dvh - 150px), 610px);
+            height: min(91vw, calc(100dvh - 150px), 610px);
+            gap: clamp(9px, 2.5vw, 18px);
+        }
+
+        .hole-grid.cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hole-grid.cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .hole-grid.cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .hole {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            padding: 0;
+            overflow: visible;
+            background: transparent;
+            border: 0;
+            border-radius: 34%;
+        }
+
+        .hole::before {
+            position: absolute;
+            right: 8%;
+            bottom: 8%;
+            left: 8%;
+            height: 34%;
+            content: "";
+            background: #4d2d19;
+            border: clamp(5px, 1.3vw, 10px) solid #8a5630;
+            border-radius: 50%;
+            box-shadow:
+                inset 0 9px 12px rgba(22, 12, 6, 0.62),
+                0 8px 0 rgba(71, 116, 54, 0.25);
+            transition: transform 90ms ease;
+        }
+
+        .friend {
+            position: absolute;
+            z-index: 2;
+            bottom: 1%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            filter: drop-shadow(0 7px 5px rgba(44, 62, 25, 0.25));
+            transform: translateY(42%) scale(0.72);
+            transform-origin: 50% 82%;
+            transition:
+                transform 135ms cubic-bezier(0.2, 0.9, 0.26, 1.2),
+                opacity 70ms linear;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        .hole.active .friend {
+            opacity: 1;
+            transform: translateY(-4%) scale(1);
+        }
+
+        .hole.active::before {
+            transform: scaleX(1.06);
+        }
+
+        .hole.caught .friend {
+            animation: caughtPop 160ms ease-out both;
+        }
+
+        @keyframes caughtPop {
+            0% { transform: translateY(-4%) scale(1); }
+            48% { transform: translateY(-10%) scale(1.08) rotate(-3deg); }
+            100% { transform: translateY(30%) scale(0.76); opacity: 0; }
+        }
+
+        .feedback {
+            position: absolute;
+            z-index: 15;
+            top: 50%;
+            left: 50%;
+            color: #fff;
+            font-size: clamp(42px, 13vw, 76px);
+            font-weight: 900;
+            opacity: 0;
+            text-shadow: 0 4px 0 #e49713, 0 8px 18px rgba(30, 76, 43, 0.34);
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0.7);
+        }
+
+        .feedback.show {
+            animation: feedbackPop 380ms ease-out both;
+        }
+
+        .feedback.bad {
+            color: #ff3030;
+            font-size: clamp(30px, 8.8vw, 58px);
+            white-space: nowrap;
+            -webkit-text-stroke: 2px #fff;
+            paint-order: stroke fill;
+            text-shadow: 0 4px 0 #a91e19, 0 8px 18px rgba(91, 30, 23, 0.38);
+        }
+
+        .feedback.safe {
+            color: #fff7a4;
+            text-shadow: 0 4px 0 #47934e, 0 8px 18px rgba(30, 76, 43, 0.34);
+        }
+
+        @keyframes feedbackPop {
+            0% { opacity: 0; transform: translate(-50%, -30%) scale(0.65); }
+            34% { opacity: 1; transform: translate(-50%, -60%) scale(1.08); }
+            100% { opacity: 0; transform: translate(-50%, -105%) scale(0.92); }
+        }
+
+        /* れんしゅう・カウントダウン */
+        .guide-layer {
+            position: fixed;
+            z-index: 70;
+            inset: 0;
+            display: grid;
+            padding: 18px;
+            place-items: center;
+            background: rgba(13, 73, 45, 0.7);
+        }
+
+        .guide-card {
+            width: min(90vw, 430px);
+            padding: 18px 20px 21px;
+            color: var(--ink);
+            background: rgba(255, 253, 242, 0.98);
+            border: 4px solid #fff;
+            border-radius: 31px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .guide-mascot {
+            width: min(43vw, 180px);
+            height: min(43vw, 180px);
+            object-fit: contain;
+            margin: -9px auto 0;
+        }
+
+        .guide-card h2 {
+            margin: -4px 0 7px;
+            color: var(--leaf-dark);
+            font-size: clamp(23px, 6vw, 31px);
+            font-weight: 900;
+        }
+
+        .guide-card p {
+            margin: 0;
+            color: #597167;
+            font-size: clamp(14px, 3.8vw, 18px);
+            line-height: 1.65;
+            text-align: left;
+        }
+
+        .guide-button {
+            min-width: 170px;
+            min-height: 50px;
+            margin-top: 15px;
+            padding: 9px 22px;
+            color: #fff;
+            background: linear-gradient(180deg, #55d37c, #22a95b);
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 6px 0 #147b42;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .guide-button:active {
+            box-shadow: 0 2px 0 #147b42;
+            transform: translateY(4px);
+        }
+
+        .countdown-number {
+            margin: 0;
+            color: #fff;
+            font-size: min(31vw, 150px);
+            font-weight: 900;
+            text-shadow: 0 7px 0 var(--leaf-dark), 0 15px 35px rgba(5, 45, 26, 0.35);
+        }
+
+        /* けっか */
+        .result-screen {
+            display: grid;
+            padding:
+                max(16px, env(safe-area-inset-top))
+                max(14px, env(safe-area-inset-right))
+                max(16px, env(safe-area-inset-bottom))
+                max(14px, env(safe-area-inset-left));
+            overflow: hidden;
+            place-items: center;
+            background:
+                radial-gradient(circle at 50% 15%, #fff7ad 0 13%, transparent 36%),
+                linear-gradient(155deg, #e6f9c9, #9ddd78);
+        }
+
+        .result-card {
+            width: min(92vw, 450px);
+            padding: 18px 20px 22px;
+            background: rgba(255, 253, 242, 0.97);
+            border: 4px solid #fff;
+            border-radius: 34px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .result-mascot {
+            width: min(41vw, 170px);
+            height: min(41vw, 170px);
+            margin: -8px auto -8px;
+            object-fit: contain;
+        }
+
+        .result-card h2 {
+            margin: 0 0 5px;
+            color: var(--leaf-dark);
+            font-size: clamp(25px, 7vw, 34px);
+            font-weight: 900;
+        }
+
+        .result-score {
+            margin: 4px 0 12px;
+            color: #e98d13;
+            font-size: clamp(48px, 15vw, 72px);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .result-score small {
+            margin-left: 4px;
+            color: #6d765b;
+            font-size: 16px;
+        }
+
+        .result-best {
+            margin: 0 0 15px;
+            padding: 9px 12px;
+            color: #5c6f63;
+            background: #eff6e8;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+
+        .result-actions {
+            display: grid;
+            gap: 9px;
+        }
+
+        .result-actions button {
+            min-height: 55px;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .again-button {
+            color: #fff;
+            background: linear-gradient(180deg, #55d37c, #22a95b);
+            border: 0;
+            box-shadow: 0 6px 0 #147b42;
+        }
+
+        .title-button {
+            color: #557065;
+            background: #e8eee8;
+            border: 0;
+            box-shadow: 0 5px 0 #ccd9ce;
+        }
+
+        @media (orientation: landscape) {
+            .title-logo {
+                top: max(7px, env(safe-area-inset-top));
+                left: 50%;
+                width: min(76vw, 760px);
+            }
+
+            .title-logo-image {
+                width: auto;
+                max-width: 100%;
+                height: min(38vh, 250px);
+            }
+
+            .title-actions {
+                top: 57%;
+                bottom: auto;
+                width: min(70vw, 620px);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+                padding: 7px;
+                border-radius: 18px;
+            }
+
+            .main-choice {
+                min-height: 46px;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 9px;
+                padding: 4px 12px;
+                text-align: left;
+            }
+
+            .choice-copy strong {
+                font-size: clamp(17px, 2.5vw, 21px);
+            }
+
+            .choice-copy small {
+                font-size: clamp(9px, 1.6vw, 12px);
+            }
+
+            .title-links {
+                grid-column: 1 / -1;
+            }
+
+            .title-link {
+                min-height: 28px;
+            }
+
+            .field-screen {
+                padding-top: max(57px, calc(env(safe-area-inset-top) + 49px));
+            }
+
+            .field-panel {
+                width: min(91vw, 900px);
+                padding: 14px 20px 17px;
+            }
+
+            .field-panel h2 {
+                margin-bottom: 10px;
+                font-size: clamp(25px, 4vw, 34px);
+            }
+
+            .field-rule {
+                margin-bottom: 8px;
+            }
+
+            .field-options {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 9px;
+            }
+
+            .field-choice {
+                min-height: 104px;
+                grid-template-columns: 72px 1fr;
+                gap: 8px;
+                padding: 8px 9px;
+            }
+
+            .field-mini {
+                width: 68px;
+                height: 68px;
+                padding: 5px;
+            }
+
+            .field-copy strong {
+                font-size: clamp(16px, 2.3vw, 21px);
+            }
+
+            .field-back {
+                min-height: 34px;
+                margin-top: 10px;
+                padding-block: 4px;
+            }
+
+            .game-screen {
+                grid-template-rows: 58px minmax(0, 1fr);
+            }
+
+            .hud {
+                height: 58px;
+                padding-block: 5px;
+            }
+
+            .hole-grid {
+                width: min(65vw, calc(100dvh - 92px), 560px);
+                height: min(65vw, calc(100dvh - 92px), 560px);
+                gap: 8px;
+            }
+
+            .play-field {
+                padding-top: 36px;
+            }
+
+            .round-message {
+                top: 4px;
+                padding-block: 5px;
+            }
+
+            .guide-card {
+                display: grid;
+                width: min(78vw, 620px);
+                grid-template-columns: 165px 1fr;
+                align-items: center;
+                padding: 12px 22px;
+                text-align: left;
+            }
+
+            .guide-mascot {
+                width: 155px;
+                height: 155px;
+                grid-row: 1 / 4;
+            }
+
+            .guide-card h2 {
+                margin: 0 0 5px;
+            }
+
+            .guide-button {
+                grid-column: 2;
+                justify-self: center;
+                margin-top: 8px;
+            }
+
+            .result-card {
+                display: grid;
+                width: min(80vw, 680px);
+                grid-template-columns: 180px 1fr;
+                column-gap: 18px;
+                align-items: center;
+                padding: 12px 20px 16px;
+            }
+
+            .result-mascot {
+                width: 180px;
+                height: 180px;
+                grid-row: 1 / 6;
+                margin: 0;
+            }
+
+            .result-actions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-height: 620px) and (orientation: portrait) {
+            .title-logo {
+                top: 44px;
+            }
+
+            .field-screen {
+                place-items: start center;
+                padding-top: 62px;
+            }
+
+            .title-logo-image {
+                max-height: 32vh;
+                object-fit: contain;
+            }
+
+            .title-actions {
+                gap: 7px;
+                padding: 9px;
+            }
+
+            .main-choice {
+                min-height: 48px;
+            }
+
+            .choice-icon {
+                font-size: 22px;
+            }
+
+            .result-mascot {
+                width: 125px;
+                height: 125px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-button" id="sound-button" type="button" aria-label="音を切り替える" aria-pressed="true">🔊</button>
+
+    <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
+        <img class="title-art" src="assets/harvest-title-v1.jpg" alt="">
+        <div class="title-scrim" aria-hidden="true"></div>
+
+        <div class="title-logo">
+            <img class="title-logo-image" src="assets/title-logo-harvest-v1.png" alt="" aria-hidden="true">
+            <h1 id="game-title">ピョコッとしゅうかく！</h1>
+        </div>
+
+        <div class="title-actions">
+            <button class="main-choice start-button" id="start-button" type="button">
+                <span class="choice-icon" aria-hidden="true">▶</span>
+                <span class="choice-copy"><strong>スタート</strong><small>はたけを えらぶ</small></span>
+            </button>
+            <button class="main-choice practice-button" id="practice-button" type="button">
+                <span class="choice-icon" aria-hidden="true">📖</span>
+                <span class="choice-copy"><strong>れんしゅう</strong></span>
+            </button>
+            <div class="title-links">
+                <a class="title-link" href="classic.html">クラシックモード</a>
+                <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="screen field-screen" id="screen-field" aria-labelledby="field-heading" hidden>
+        <div class="field-panel">
+            <p class="field-kicker">30びょう チャレンジ</p>
+            <h2 id="field-heading">はたけを えらぼう</h2>
+            <p class="field-rule">
+                <span>🥕 おやさいは タッチ</span>
+                <span class="rabbit-rule">🐰 やさいうさぎは さわらない</span>
+            </p>
+            <div class="field-options">
+                <button class="field-choice" type="button" data-field-size="4">
+                    <span class="field-mini" style="--cols:2" aria-hidden="true">
+                        <i></i><i></i><i></i><i></i>
+                    </span>
+                    <span class="field-copy">
+                        <strong>ちいさな はたけ</strong>
+                        <small>4マス・はじめて</small>
+                        <span class="field-best">さいこう <b id="field-best-4">0</b>こ</span>
+                    </span>
+                </button>
+                <button class="field-choice recommended" type="button" data-field-size="9">
+                    <span class="field-mini" style="--cols:3" aria-hidden="true">
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                    </span>
+                    <span class="field-copy">
+                        <strong>ふつうの はたけ</strong>
+                        <small>9マス・おすすめ</small>
+                        <span class="field-best">さいこう <b id="field-best-9">0</b>こ</span>
+                    </span>
+                </button>
+                <button class="field-choice" type="button" data-field-size="16">
+                    <span class="field-mini" style="--cols:4" aria-hidden="true">
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                    </span>
+                    <span class="field-copy">
+                        <strong>おおきな はたけ</strong>
+                        <small>16マス・ちょうせん</small>
+                        <span class="field-best">さいこう <b id="field-best-16">0</b>こ</span>
+                    </span>
+                </button>
+            </div>
+            <button class="field-back" id="field-back-button" type="button">← タイトルへ</button>
+        </div>
+    </section>
+
+    <section class="screen game-screen" id="screen-game" aria-label="ピョコッとしゅうかくのゲーム画面" hidden>
+        <header class="hud">
+            <button class="exit-button" id="exit-button" type="button" aria-label="タイトルへ戻る">×</button>
+            <div class="stat">
+                <span id="score-label">しゅうかく</span>
+                <strong><span id="score-count">0</span><small id="score-unit">こ</small></strong>
+            </div>
+            <div class="stat">
+                <span id="time-label">のこり</span>
+                <strong><span id="time-count">30</span><small id="time-unit">びょう</small></strong>
+            </div>
+        </header>
+
+        <main class="play-field">
+            <div class="round-message" id="round-message" aria-live="polite">おやさいを タッチ！</div>
+            <div class="hole-grid cols-2" id="hole-grid" aria-label="はたけの穴"></div>
+            <div class="feedback" id="feedback" aria-hidden="true">しゅうかく！</div>
+            <div class="forest-leaves" aria-hidden="true"></div>
+        </main>
+
+        <div class="guide-layer" id="guide-layer" hidden>
+            <div class="guide-card" id="guide-card">
+                <img class="guide-mascot" id="guide-mascot" src="assets/harvest-carrot-v1.png" alt="">
+                <h2 id="guide-heading">おやさいは タッチ！</h2>
+                <p id="guide-copy">3しゅるい しゅうかくしたら、 やさいうさぎを さわらず みおくろう！</p>
+                <button class="guide-button" id="guide-button" type="button">やってみる！</button>
+            </div>
+            <div class="countdown-number" id="countdown-number" hidden>3</div>
+        </div>
+    </section>
+
+    <section class="screen result-screen" id="screen-result" aria-labelledby="result-heading" hidden>
+        <div class="result-card">
+            <img class="result-mascot" src="assets/harvest-pumpkin-v1.png" alt="">
+            <h2 id="result-heading">30びょう おわり！</h2>
+            <div class="result-score"><span id="result-score">0</span><small id="result-unit">こ</small></div>
+            <p class="result-best" id="result-best">このはたけの さいこう：0こ</p>
+            <div class="result-actions">
+                <button class="again-button" id="again-button" type="button">もういちど！</button>
+                <button class="title-button" id="title-button" type="button">タイトルへ</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const GAME_SECONDS = 30;
+            const BEST_PREFIX = "pyokoHarvestBest30V1";
+            const CHARACTERS = {
+                carrot: {
+                    name: "にんじんちゃん",
+                    src: "assets/harvest-carrot-v1.png",
+                    vegetable: true
+                },
+                pumpkin: {
+                    name: "かぼちゃちゃん",
+                    src: "assets/harvest-pumpkin-v1.png",
+                    vegetable: true
+                },
+                sweetpotato: {
+                    name: "さつまいもちゃん",
+                    src: "assets/harvest-sweetpotato-v1.png",
+                    vegetable: true
+                },
+                rabbit: {
+                    name: "やさいうさぎ",
+                    src: "assets/harvest-rabbit-v1.png",
+                    vegetable: false
+                }
+            };
+            const VEGETABLE_TYPES = ["carrot", "pumpkin", "sweetpotato"];
+            const PRACTICE_ORDER = ["carrot", "pumpkin", "sweetpotato", "rabbit"];
+            const FIELD_NAMES = {
+                4: "ちいさな はたけ",
+                9: "ふつうの はたけ",
+                16: "おおきな はたけ"
+            };
+
+            const elements = {
+                title: document.querySelector("#screen-title"),
+                field: document.querySelector("#screen-field"),
+                game: document.querySelector("#screen-game"),
+                result: document.querySelector("#screen-result"),
+                sound: document.querySelector("#sound-button"),
+                start: document.querySelector("#start-button"),
+                practice: document.querySelector("#practice-button"),
+                fieldBack: document.querySelector("#field-back-button"),
+                fieldChoices: [...document.querySelectorAll("[data-field-size]")],
+                fieldBests: {
+                    4: document.querySelector("#field-best-4"),
+                    9: document.querySelector("#field-best-9"),
+                    16: document.querySelector("#field-best-16")
+                },
+                exit: document.querySelector("#exit-button"),
+                again: document.querySelector("#again-button"),
+                titleButton: document.querySelector("#title-button"),
+                scoreLabel: document.querySelector("#score-label"),
+                score: document.querySelector("#score-count"),
+                scoreUnit: document.querySelector("#score-unit"),
+                timeLabel: document.querySelector("#time-label"),
+                time: document.querySelector("#time-count"),
+                timeUnit: document.querySelector("#time-unit"),
+                message: document.querySelector("#round-message"),
+                grid: document.querySelector("#hole-grid"),
+                feedback: document.querySelector("#feedback"),
+                guide: document.querySelector("#guide-layer"),
+                guideCard: document.querySelector("#guide-card"),
+                guideMascot: document.querySelector("#guide-mascot"),
+                guideHeading: document.querySelector("#guide-heading"),
+                guideCopy: document.querySelector("#guide-copy"),
+                guideButton: document.querySelector("#guide-button"),
+                countdown: document.querySelector("#countdown-number"),
+                resultHeading: document.querySelector("#result-heading"),
+                resultScore: document.querySelector("#result-score"),
+                resultUnit: document.querySelector("#result-unit"),
+                resultBest: document.querySelector("#result-best")
+            };
+
+            const state = {
+                screen: "title",
+                runMode: "challenge",
+                playing: false,
+                locked: true,
+                score: 0,
+                combo: 0,
+                bestCombo: 0,
+                bests: {
+                    4: Number.parseInt(localStorage.getItem(`${BEST_PREFIX}-4`) || "0", 10) || 0,
+                    9: Number.parseInt(localStorage.getItem(`${BEST_PREFIX}-9`) || "0", 10) || 0,
+                    16: Number.parseInt(localStorage.getItem(`${BEST_PREFIX}-16`) || "0", 10) || 0
+                },
+                activeIndex: -1,
+                lastIndex: -1,
+                fieldSize: 9,
+                gridSize: 9,
+                currentType: null,
+                lastWasRabbit: false,
+                practiceIndex: 0,
+                phase: 0,
+                startedAt: 0,
+                spawnTimer: null,
+                clockTimer: null,
+                transitionTimer: null,
+                messageTimer: null,
+                countdownTimer: null,
+                soundOn: true,
+                audioContext: null
+            };
+
+            function showScreen(name) {
+                elements.title.hidden = name !== "title";
+                elements.field.hidden = name !== "field";
+                elements.game.hidden = name !== "game";
+                elements.result.hidden = name !== "result";
+                elements.sound.hidden = name === "game";
+                state.screen = name;
+            }
+
+            function clearTimers() {
+                window.clearTimeout(state.spawnTimer);
+                window.clearTimeout(state.transitionTimer);
+                window.clearTimeout(state.messageTimer);
+                window.clearTimeout(state.countdownTimer);
+                window.clearInterval(state.clockTimer);
+                state.spawnTimer = null;
+                state.transitionTimer = null;
+                state.messageTimer = null;
+                state.countdownTimer = null;
+                state.clockTimer = null;
+            }
+
+            function getAudioContext() {
+                if (!state.audioContext) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) state.audioContext = new AudioContext();
+                }
+                if (state.audioContext?.state === "suspended") state.audioContext.resume();
+                return state.audioContext;
+            }
+
+            function playTone(type) {
+                if (!state.soundOn) return;
+                const context = getAudioContext();
+                if (!context) return;
+
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                const now = context.currentTime;
+                const isFinish = type === "finish";
+                const isMiss = type === "miss";
+                oscillator.type = isFinish ? "triangle" : isMiss ? "square" : "sine";
+                oscillator.frequency.setValueAtTime(isFinish ? 520 : isMiss ? 260 : 620, now);
+                oscillator.frequency.exponentialRampToValueAtTime(isFinish ? 880 : isMiss ? 150 : 820, now + 0.12);
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(isFinish ? 0.18 : isMiss ? 0.07 : 0.11, now + 0.015);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + (isFinish ? 0.32 : 0.16));
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.start(now);
+                oscillator.stop(now + (isFinish ? 0.34 : 0.18));
+            }
+
+            function toggleSound() {
+                state.soundOn = !state.soundOn;
+                elements.sound.textContent = state.soundOn ? "🔊" : "🔇";
+                elements.sound.setAttribute("aria-pressed", String(state.soundOn));
+                if (state.soundOn) playTone("tap");
+            }
+
+            Object.values(CHARACTERS).forEach((character) => {
+                const image = new Image();
+                image.src = character.src;
+            });
+
+            function buildGrid(total) {
+                state.gridSize = total;
+                state.activeIndex = -1;
+                elements.grid.innerHTML = "";
+                elements.grid.className = `hole-grid cols-${Math.sqrt(total)}`;
+
+                for (let index = 0; index < total; index += 1) {
+                    const hole = document.createElement("button");
+                    hole.className = "hole";
+                    hole.type = "button";
+                    hole.dataset.index = String(index);
+                    hole.setAttribute("aria-label", "ここをタッチ");
+
+                    const friend = document.createElement("img");
+                    friend.className = "friend";
+                    friend.src = CHARACTERS.carrot.src;
+                    friend.alt = "";
+                    friend.draggable = false;
+                    hole.appendChild(friend);
+                    hole.addEventListener("click", () => handleHole(index));
+                    elements.grid.appendChild(hole);
+                }
+            }
+
+            function holes() {
+                return [...elements.grid.querySelectorAll(".hole")];
+            }
+
+            function currentVisibleTime() {
+                if (state.runMode === "practice") {
+                    return state.currentType === "rabbit" ? 1800 : 1500;
+                }
+                const base = {
+                    4: 1100,
+                    9: 900,
+                    16: 760
+                }[state.fieldSize];
+                return state.phase >= 2 ? Math.round(base * 0.8) : base;
+            }
+
+            function hideActive() {
+                if (state.activeIndex < 0) return;
+                const hole = holes()[state.activeIndex];
+                hole?.classList.remove("active", "caught", "rabbit-active");
+                state.lastIndex = state.activeIndex;
+                state.lastWasRabbit = state.currentType === "rabbit";
+                state.activeIndex = -1;
+                state.currentType = null;
+            }
+
+            function pickCharacterType() {
+                if (state.runMode === "practice") {
+                    return PRACTICE_ORDER[Math.min(state.practiceIndex, PRACTICE_ORDER.length - 1)];
+                }
+                const rabbitChance = state.phase === 0 ? 0 : state.phase === 1 ? 0.15 : 0.25;
+                if (!state.lastWasRabbit && Math.random() < rabbitChance) return "rabbit";
+                return VEGETABLE_TYPES[Math.floor(Math.random() * VEGETABLE_TYPES.length)];
+            }
+
+            function spawnFriend(delay = 100) {
+                window.clearTimeout(state.spawnTimer);
+                state.spawnTimer = window.setTimeout(() => {
+                    if (!state.playing || state.locked) return;
+                    hideActive();
+
+                    let next = 0;
+                    do {
+                        next = Math.floor(Math.random() * state.gridSize);
+                    } while (state.gridSize > 1 && next === state.lastIndex);
+
+                    state.activeIndex = next;
+                    state.currentType = pickCharacterType();
+                    const hole = holes()[next];
+                    const character = CHARACTERS[state.currentType];
+                    const image = hole?.querySelector(".friend");
+                    if (image) image.src = character.src;
+                    if (state.runMode === "practice") {
+                        elements.message.textContent = character.vegetable
+                            ? `${character.name}を タッチ！`
+                            : "やさいうさぎは タッチしない！";
+                    }
+                    hole?.setAttribute("aria-label", character.vegetable ? `${character.name}を しゅうかく` : "やさいうさぎは タッチしない");
+                    hole?.classList.add("active");
+                    if (!character.vegetable) hole?.classList.add("rabbit-active");
+
+                    state.spawnTimer = window.setTimeout(() => {
+                        if (!state.playing || state.locked) return;
+                        const expiredType = state.currentType;
+                        if (expiredType === "rabbit") {
+                            showFeedback("よくみた！", "safe");
+                            if (state.runMode === "practice") {
+                                state.practiceIndex += 1;
+                            }
+                        } else {
+                            state.combo = 0;
+                        }
+                        hideActive();
+                        if (state.runMode === "practice" && state.practiceIndex >= PRACTICE_ORDER.length) {
+                            state.transitionTimer = window.setTimeout(finishPractice, 420);
+                            return;
+                        }
+                        spawnFriend(expiredType === "rabbit" ? 260 : 80);
+                    }, currentVisibleTime());
+                }, delay);
+            }
+
+            function showFeedback(text, style = "") {
+                elements.feedback.textContent = text;
+                elements.feedback.classList.remove("show", "bad", "safe");
+                if (style) elements.feedback.classList.add(style);
+                void elements.feedback.offsetWidth;
+                elements.feedback.classList.add("show");
+            }
+
+            function handleHole(index) {
+                if (!state.playing || state.locked || index !== state.activeIndex) return;
+                const hole = holes()[index];
+                if (!hole) return;
+
+                state.locked = true;
+                window.clearTimeout(state.spawnTimer);
+                const character = CHARACTERS[state.currentType];
+
+                if (character.vegetable) {
+                    state.score += 1;
+                    state.combo += 1;
+                    state.bestCombo = Math.max(state.bestCombo, state.combo);
+                    if (state.runMode === "practice") state.practiceIndex += 1;
+                    showFeedback("しゅうかく！");
+                    playTone("tap");
+                } else {
+                    state.score = Math.max(0, state.score - (state.runMode === "challenge" ? 1 : 0));
+                    state.combo = 0;
+                    showFeedback("やさいうさぎ×", "bad");
+                    playTone("miss");
+                }
+
+                elements.score.textContent = String(state.score);
+                hole.classList.add("caught");
+
+                state.transitionTimer = window.setTimeout(() => {
+                    hideActive();
+                    state.locked = false;
+                    spawnFriend(character.vegetable ? 70 : 240);
+                }, 165);
+            }
+
+            function resetRun(mode, fieldSize = 4) {
+                clearTimers();
+                state.runMode = mode;
+                state.playing = false;
+                state.locked = true;
+                state.score = 0;
+                state.combo = 0;
+                state.bestCombo = 0;
+                state.phase = 0;
+                state.fieldSize = fieldSize;
+                state.activeIndex = -1;
+                state.lastIndex = -1;
+                state.currentType = null;
+                state.lastWasRabbit = false;
+                state.practiceIndex = 0;
+                elements.score.textContent = "0";
+                elements.feedback.classList.remove("show", "bad", "safe");
+                elements.guide.hidden = true;
+                elements.guideCard.hidden = false;
+                elements.countdown.hidden = true;
+                buildGrid(fieldSize);
+                showScreen("game");
+            }
+
+            function startPractice() {
+                resetRun("practice", 4);
+                elements.scoreLabel.textContent = "しゅうかく";
+                elements.scoreUnit.textContent = "こ";
+                elements.timeLabel.textContent = "おやさい";
+                elements.time.textContent = "3";
+                elements.timeUnit.textContent = "しゅるい";
+                elements.message.textContent = "おやさいを タッチ！";
+                elements.guideMascot.src = CHARACTERS.carrot.src;
+                elements.guideHeading.textContent = "おやさいは タッチ！";
+                elements.guideCopy.textContent = "3しゅるい しゅうかくしたら、 やさいうさぎを さわらず みおくろう！";
+                elements.guideButton.hidden = false;
+                elements.guide.hidden = false;
+            }
+
+            function runCountdown() {
+                elements.guide.hidden = false;
+                elements.guideCard.hidden = true;
+                elements.countdown.hidden = false;
+                let count = 3;
+                elements.countdown.textContent = String(count);
+
+                const step = () => {
+                    count -= 1;
+                    if (count > 0) {
+                        elements.countdown.textContent = String(count);
+                        state.countdownTimer = window.setTimeout(step, 560);
+                        return;
+                    }
+                    elements.countdown.textContent = "スタート！";
+                    state.countdownTimer = window.setTimeout(() => {
+                        elements.guide.hidden = true;
+                        elements.guideCard.hidden = false;
+                        elements.countdown.hidden = true;
+                        beginChallenge();
+                    }, 480);
+                };
+
+                state.countdownTimer = window.setTimeout(step, 560);
+            }
+
+            function updateFieldBests() {
+                [4, 9, 16].forEach((size) => {
+                    elements.fieldBests[size].textContent = String(state.bests[size]);
+                });
+            }
+
+            function showFieldSelect() {
+                clearTimers();
+                state.playing = false;
+                state.locked = true;
+                hideActive();
+                updateFieldBests();
+                showScreen("field");
+            }
+
+            function startChallenge(fieldSize = state.fieldSize) {
+                resetRun("challenge", Number(fieldSize));
+                elements.scoreLabel.textContent = "しゅうかく";
+                elements.scoreUnit.textContent = "こ";
+                elements.timeLabel.textContent = "のこり";
+                elements.time.textContent = String(GAME_SECONDS);
+                elements.timeUnit.textContent = "びょう";
+                elements.message.textContent = "おやさいを タッチ！";
+                runCountdown();
+            }
+
+            function beginChallenge() {
+                state.playing = true;
+                state.locked = false;
+                state.startedAt = performance.now();
+                spawnFriend(120);
+                state.clockTimer = window.setInterval(updateClock, 100);
+            }
+
+            function showRoundMessage(text) {
+                elements.message.textContent = text;
+                window.clearTimeout(state.messageTimer);
+                state.messageTimer = window.setTimeout(() => {
+                    if (state.playing) elements.message.textContent = "おやさいを タッチ！";
+                }, 1300);
+            }
+
+            function updateClock() {
+                if (!state.playing || state.runMode !== "challenge") return;
+                const elapsed = (performance.now() - state.startedAt) / 1000;
+                const left = Math.max(0, GAME_SECONDS - elapsed);
+                elements.time.textContent = String(Math.ceil(left));
+
+                if (elapsed >= 20 && state.phase < 2) {
+                    state.phase = 2;
+                    showRoundMessage("やさいうさぎに ちゅうい！");
+                } else if (elapsed >= 10 && state.phase < 1) {
+                    state.phase = 1;
+                    showRoundMessage("やさいうさぎが くるよ！");
+                }
+
+                if (left <= 0) finishChallenge();
+            }
+
+            function finishChallenge() {
+                if (!state.playing) return;
+                state.playing = false;
+                state.locked = true;
+                clearTimers();
+                hideActive();
+
+                if (state.score > state.bests[state.fieldSize]) {
+                    state.bests[state.fieldSize] = state.score;
+                    localStorage.setItem(`${BEST_PREFIX}-${state.fieldSize}`, String(state.score));
+                }
+
+                elements.resultHeading.textContent = "30びょう おわり！";
+                elements.resultScore.textContent = String(state.score);
+                elements.resultUnit.textContent = "こ";
+                elements.resultBest.textContent =
+                    `${FIELD_NAMES[state.fieldSize]}の さいこう：${state.bests[state.fieldSize]}こ`;
+                elements.again.textContent = "もういちど！";
+                showScreen("result");
+                playTone("finish");
+            }
+
+            function finishPractice() {
+                state.playing = false;
+                state.locked = true;
+                clearTimers();
+                hideActive();
+                elements.resultHeading.textContent = "れんしゅう ばっちり！";
+                elements.resultScore.textContent = "3";
+                elements.resultUnit.textContent = "しゅるい";
+                elements.resultBest.textContent = "こんどは 30びょうに ちょうせんしよう！";
+                elements.again.textContent = "スタート！";
+                showScreen("result");
+                playTone("finish");
+            }
+
+            function returnToTitle() {
+                clearTimers();
+                state.playing = false;
+                state.locked = true;
+                hideActive();
+                elements.guide.hidden = true;
+                showScreen("title");
+            }
+
+            elements.start.addEventListener("click", showFieldSelect);
+            elements.practice.addEventListener("click", startPractice);
+            elements.fieldBack.addEventListener("click", returnToTitle);
+            elements.fieldChoices.forEach((button) => {
+                button.addEventListener("click", () => startChallenge(button.dataset.fieldSize));
+            });
+            elements.exit.addEventListener("click", returnToTitle);
+            elements.titleButton.addEventListener("click", returnToTitle);
+            elements.guideButton.addEventListener("click", () => {
+                if (state.runMode !== "practice" || state.playing) return;
+                elements.guide.hidden = true;
+                state.playing = true;
+                state.locked = false;
+                spawnFriend(120);
+            });
+            elements.again.addEventListener("click", () => {
+                if (state.runMode === "practice") {
+                    showFieldSelect();
+                } else {
+                    startChallenge(state.fieldSize);
+                }
+            });
+            elements.sound.addEventListener("click", toggleSound);
+
+            window.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && state.screen === "game") returnToTitle();
+                if (event.key === "Escape" && state.screen === "field") returnToTitle();
+            });
+
+            showScreen("title");
+        })();
+    </script>
+</body>
+</html>

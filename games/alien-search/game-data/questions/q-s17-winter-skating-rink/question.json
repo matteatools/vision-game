@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s17-winter-skating-rink",
+  "stageId": "s17",
+  "season": "winter",
+  "level": 2,
+  "theme": "スケートひろば",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s17-t01",
+      "action": "ベンチで温かい飲み物を飲んでいる",
+      "hitbox": {
+        "x": 960,
+        "y": 80,
+        "width": 160,
+        "height": 190
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s17-t02",
+      "action": "スケート靴を両手に持っている",
+      "hitbox": {
+        "x": 1370,
+        "y": 175,
+        "width": 145,
+        "height": 180
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s17-t03",
+      "action": "笑顔で片足すべりをしている",
+      "hitbox": {
+        "x": 390,
+        "y": 255,
+        "width": 145,
+        "height": 180
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s17-t04",
+      "action": "きのこの帽子でくるりと回っている",
+      "hitbox": {
+        "x": 995,
+        "y": 285,
+        "width": 150,
+        "height": 185
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s17-t05",
+      "action": "リンクの外でスケート靴を運んでいる",
+      "hitbox": {
+        "x": 800,
+        "y": 950,
+        "width": 165,
+        "height": 220
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

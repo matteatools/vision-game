@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s06-summer-hydrangea-rain",
+  "stageId": "s06",
+  "season": "summer",
+  "level": 1,
+  "theme": "あじさいの雨さんぽ",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s06-t01",
+      "action": "傘をさして水たまりを歩いている",
+      "hitbox": {
+        "x": 135,
+        "y": 545,
+        "width": 190,
+        "height": 225
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s06-t02",
+      "action": "あじさいを傘の下から見ている",
+      "hitbox": {
+        "x": 375,
+        "y": 590,
+        "width": 210,
+        "height": 220
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s06-t03",
+      "action": "葉っぱをお皿にして雨水を集めている",
+      "hitbox": {
+        "x": 820,
+        "y": 570,
+        "width": 135,
+        "height": 190
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s06-t04",
+      "action": "水たまりで元気に跳ねている",
+      "hitbox": {
+        "x": 745,
+        "y": 775,
+        "width": 205,
+        "height": 270
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s06-t05",
+      "action": "大きな葉っぱを傘にしている",
+      "hitbox": {
+        "x": 1230,
+        "y": 765,
+        "width": 210,
+        "height": 235
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

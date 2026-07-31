@@ -1,0 +1,166 @@
+{
+  "version": 2,
+  "questionCount": 20,
+  "questions": [
+    {
+      "id": "q-s01-spring-flower-field",
+      "stageId": "s01",
+      "season": "spring",
+      "level": 1,
+      "theme": "春の花畑",
+      "path": "questions/q-s01-spring-flower-field/question.json"
+    },
+    {
+      "id": "q-s02-spring-hanami",
+      "stageId": "s02",
+      "season": "spring",
+      "level": 2,
+      "theme": "お花見",
+      "path": "questions/q-s02-spring-hanami/question.json"
+    },
+    {
+      "id": "q-s03-spring-strawberry-picking",
+      "stageId": "s03",
+      "season": "spring",
+      "level": 3,
+      "theme": "いちご狩り",
+      "path": "questions/q-s03-spring-strawberry-picking/question.json"
+    },
+    {
+      "id": "q-s04-spring-schoolyard",
+      "stageId": "s04",
+      "season": "spring",
+      "level": 4,
+      "theme": "入学式の校庭",
+      "path": "questions/q-s04-spring-schoolyard/question.json"
+    },
+    {
+      "id": "q-s05-spring-koinobori-park",
+      "stageId": "s05",
+      "season": "spring",
+      "level": 5,
+      "theme": "こいのぼり公園",
+      "path": "questions/q-s05-spring-koinobori-park/question.json"
+    },
+    {
+      "id": "q-s06-summer-hydrangea-rain",
+      "stageId": "s06",
+      "season": "summer",
+      "level": 1,
+      "theme": "あじさいの雨さんぽ",
+      "path": "questions/q-s06-summer-hydrangea-rain/question.json"
+    },
+    {
+      "id": "q-s07-summer-beach",
+      "stageId": "s07",
+      "season": "summer",
+      "level": 2,
+      "theme": "海水浴",
+      "path": "questions/q-s07-summer-beach/question.json"
+    },
+    {
+      "id": "q-s08-summer-water-park",
+      "stageId": "s08",
+      "season": "summer",
+      "level": 3,
+      "theme": "水遊び公園",
+      "path": "questions/q-s08-summer-water-park/question.json"
+    },
+    {
+      "id": "q-s09-summer-festival",
+      "stageId": "s09",
+      "season": "summer",
+      "level": 4,
+      "theme": "夏祭り",
+      "path": "questions/q-s09-summer-festival/question.json"
+    },
+    {
+      "id": "q-s10-summer-fireworks-riverbank",
+      "stageId": "s10",
+      "season": "summer",
+      "level": 5,
+      "theme": "花火大会の河原",
+      "path": "questions/q-s10-summer-fireworks-riverbank/question.json"
+    },
+    {
+      "id": "q-s11-autumn-acorn-forest",
+      "stageId": "s11",
+      "season": "autumn",
+      "level": 1,
+      "theme": "どんぐりの森",
+      "path": "questions/q-s11-autumn-acorn-forest/question.json"
+    },
+    {
+      "id": "q-s12-autumn-sweet-potato-harvest",
+      "stageId": "s12",
+      "season": "autumn",
+      "level": 2,
+      "theme": "さつまいも畑",
+      "path": "questions/q-s12-autumn-sweet-potato-harvest/question.json"
+    },
+    {
+      "id": "q-s13-autumn-sports-day",
+      "stageId": "s13",
+      "season": "autumn",
+      "level": 3,
+      "theme": "秋の運動会",
+      "path": "questions/q-s13-autumn-sports-day/question.json"
+    },
+    {
+      "id": "q-s14-autumn-halloween-town",
+      "stageId": "s14",
+      "season": "autumn",
+      "level": 4,
+      "theme": "ハロウィンの町",
+      "path": "questions/q-s14-autumn-halloween-town/question.json"
+    },
+    {
+      "id": "q-s15-autumn-foliage-festival",
+      "stageId": "s15",
+      "season": "autumn",
+      "level": 5,
+      "theme": "紅葉まつり",
+      "path": "questions/q-s15-autumn-foliage-festival/question.json"
+    },
+    {
+      "id": "q-s16-winter-snow-play",
+      "stageId": "s16",
+      "season": "winter",
+      "level": 1,
+      "theme": "雪あそび",
+      "path": "questions/q-s16-winter-snow-play/question.json"
+    },
+    {
+      "id": "q-s17-winter-skating-rink",
+      "stageId": "s17",
+      "season": "winter",
+      "level": 2,
+      "theme": "スケートひろば",
+      "path": "questions/q-s17-winter-skating-rink/question.json"
+    },
+    {
+      "id": "q-s18-winter-christmas-market",
+      "stageId": "s18",
+      "season": "winter",
+      "level": 3,
+      "theme": "クリスマスマーケット",
+      "path": "questions/q-s18-winter-christmas-market/question.json"
+    },
+    {
+      "id": "q-s19-winter-snow-hot-spring-town",
+      "stageId": "s19",
+      "season": "winter",
+      "level": 4,
+      "theme": "雪の温泉街",
+      "path": "questions/q-s19-winter-snow-hot-spring-town/question.json"
+    },
+    {
+      "id": "q-s20-winter-new-year-shrine",
+      "stageId": "s20",
+      "season": "winter",
+      "level": 5,
+      "theme": "お正月の神社",
+      "path": "questions/q-s20-winter-new-year-shrine/question.json"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="cool-title cool-desc">
+  <title id="cool-title">めとあたまのゲームパーク</title>
+  <desc id="cool-desc">目を表すマークと、ひらめきがひろがる光を組み合わせたロゴ</desc>
+  <defs>
+    <filter id="cool-shadow" x="-20%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="9" stdDeviation="5" flood-color="#071a2a" flood-opacity=".2"/>
+    </filter>
+    <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#31d4c4"/>
+      <stop offset=".52" stop-color="#168fca"/>
+      <stop offset="1" stop-color="#3157bb"/>
+    </linearGradient>
+    <linearGradient id="cool-word" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#17324d"/>
+      <stop offset=".58" stop-color="#17324d"/>
+      <stop offset=".59" stop-color="#08766f"/>
+      <stop offset="1" stop-color="#0aa89d"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(26 36)" filter="url(#cool-shadow)">
+    <path d="M18 141 84 55h113l69 86-69 87H84Z"
+          fill="#17324d" stroke="#071a2a" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M50 141c35-52 70-72 115-72 42 0 72 20 102 72-30 52-60 72-102 72-45 0-80-20-115-72Z"
+          fill="url(#visor)"/>
+    <ellipse cx="126" cy="141" rx="43" ry="54" fill="#fffefb" stroke="#071a2a" stroke-width="9"/>
+    <ellipse cx="190" cy="141" rx="43" ry="54" fill="#fffefb" stroke="#071a2a" stroke-width="9"/>
+    <ellipse cx="141" cy="148" rx="15" ry="24" fill="#071a2a"/>
+    <ellipse cx="205" cy="148" rx="15" ry="24" fill="#071a2a"/>
+    <circle cx="146" cy="139" r="5" fill="#fff"/>
+    <circle cx="210" cy="139" r="5" fill="#fff"/>
+    <path d="m214 41 18-30 6 34 34-6-29 19 18 29-31-15-15 31 6-35-34-6Z"
+          fill="#ff6b57" stroke="#071a2a" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M42 254h177" fill="none" stroke="#31d4c4" stroke-width="12" stroke-linecap="round"/>
+    <path d="M12 281h142" fill="none" stroke="#ff6b57" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <g font-family="ui-rounded, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif"
+     font-weight="900" filter="url(#cool-shadow)">
+    <text x="316" y="102" fill="#17324d" font-size="62" letter-spacing="12">めとあたまの</text>
+    <g transform="skewX(-6)">
+      <text x="335" y="267" fill="url(#cool-word)" font-size="140" letter-spacing="-10">ゲームパーク</text>
+    </g>
+  </g>
+
+  <path d="M322 306h774" fill="none" stroke="#17324d" stroke-width="10" stroke-linecap="round"/>
+  <path d="M322 326h520" fill="none" stroke="#ff6b57" stroke-width="8" stroke-linecap="round"/>
+  <path d="m1094 284 42 22-42 22 12-22Z" fill="#31d4c4" stroke="#17324d" stroke-width="7" stroke-linejoin="round"/>
+</svg>

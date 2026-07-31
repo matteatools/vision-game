@@ -1,0 +1,31 @@
+/*
+ * Runtime counterpart of the source text-flow rules.  The public bundle is
+ * intentionally left intact, because it has independent upload-path fixes.
+ */
+:is(
+  .intro-copy h1,
+  .intro-copy > p,
+  .intro-copy li,
+  .done-card h1,
+  .done-card > p,
+  .select-header p,
+  .select-header h1,
+  .level-card-title h2,
+  .select-help,
+  .speech-panel p,
+  .tray-heading span,
+  .tray-heading small,
+  .result-card p,
+  .result-card h2
+) {
+  line-break: strict;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.title-actions .park-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}

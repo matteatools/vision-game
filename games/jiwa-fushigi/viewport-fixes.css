@@ -1,0 +1,338 @@
+/* Keep the active game inside one viewport and give the square scene priority. */
+.game-shell.phase-playing,
+.game-shell.phase-dark {
+  display: flex;
+  height: 100dvh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding-block: clamp(8px, 1.8vh, 18px);
+}
+
+.phase-playing .game-header,
+.phase-dark .game-header {
+  flex: 0 0 auto;
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+}
+
+.phase-playing .game-layout,
+.phase-dark .game-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: stretch;
+}
+
+.game-park-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 0 18px;
+  border: 1px solid rgba(202, 177, 151, 0.3);
+  border-radius: 999px;
+  color: #bbaa98;
+  background: rgba(22, 10, 13, 0.72);
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.game-park-link:hover,
+.game-park-link:focus-visible {
+  border-color: var(--red-bright);
+  color: #f6ead3;
+  filter: brightness(1.12);
+}
+
+.game-park-link:focus-visible {
+  outline: 2px solid var(--red-bright);
+  outline-offset: 4px;
+}
+
+.phase-playing .scene-panel,
+.phase-dark .scene-panel {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.phase-playing .scene-button,
+.phase-dark .scene-button {
+  width: min(100%, calc(100dvh - 150px));
+  max-height: 100%;
+  align-self: center;
+  justify-self: center;
+}
+
+.phase-playing .tap-hint,
+.phase-dark .tap-hint {
+  margin-top: clamp(6px, 1.2vh, 12px);
+}
+
+.phase-playing .lens-guide p:first-child,
+.phase-dark .lens-guide p:first-child {
+  font-size: clamp(0.72rem, 1.3vw, 0.88rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.game-shell.phase-answer,
+.game-shell.phase-timeout {
+  display: flex;
+  height: 100dvh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding-block: clamp(8px, 1.8vh, 18px);
+}
+
+.phase-answer .game-header,
+.phase-timeout .game-header {
+  flex: 0 0 auto;
+  margin-bottom: 6px;
+}
+
+.phase-answer .success-result {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  align-content: center;
+  padding: 0;
+}
+
+.phase-answer .result-heading {
+  margin-bottom: clamp(6px, 1.2vh, 12px);
+}
+
+.phase-answer .result-heading > p:last-child {
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.phase-answer .comparison-grid {
+  width: min(100%, 90dvh);
+  max-height: 45dvh;
+  align-self: center;
+}
+
+.phase-answer .comparison-answers {
+  margin-block: clamp(6px, 1.2vh, 12px);
+}
+
+.phase-answer .result-actions {
+  flex-wrap: nowrap;
+}
+
+.phase-timeout .timeout-result {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding-block: 12px;
+}
+
+@media (max-width: 899px) and (orientation: portrait) {
+  .phase-playing .game-layout,
+  .phase-dark .game-layout {
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: clamp(7px, 1.4vh, 13px);
+  }
+
+  .phase-playing .scene-panel,
+  .phase-dark .scene-panel {
+    width: min(100%, 670px);
+  }
+
+  .phase-playing .game-info,
+  .phase-dark .game-info {
+    min-height: 0;
+    padding-top: clamp(7px, 1.4vh, 13px);
+  }
+}
+
+@media (min-width: 900px) {
+  .phase-playing .scene-panel,
+  .phase-dark .scene-panel {
+    max-width: min(100%, calc(100dvh - 95px));
+  }
+
+  .phase-playing .scene-button,
+  .phase-dark .scene-button {
+    width: min(100%, calc(100dvh - 118px));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 720px) {
+  .game-shell.phase-playing,
+  .game-shell.phase-dark {
+    padding: 5px 10px;
+  }
+
+  .phase-playing .game-header,
+  .phase-dark .game-header {
+    min-height: 36px;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+  }
+
+  .phase-playing .wordmark,
+  .phase-dark .wordmark {
+    width: clamp(125px, 20vw, 190px);
+  }
+
+  .phase-playing .game-layout,
+  .phase-dark .game-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 270px);
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(10px, 2vw, 22px);
+  }
+
+  .phase-playing .scene-panel,
+  .phase-dark .scene-panel {
+    width: min(100%, calc(100dvh - 68px));
+    max-width: none;
+    justify-self: end;
+  }
+
+  .phase-playing .scene-button,
+  .phase-dark .scene-button {
+    width: min(100%, calc(100dvh - 88px));
+  }
+
+  .phase-playing .game-info,
+  .phase-dark .game-info {
+    display: flex;
+    width: 100%;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    padding: 0 0 0 12px;
+    border-top: 0;
+    border-left: 1px solid rgba(150, 29, 39, 0.2);
+  }
+
+  .phase-playing .lens-guide,
+  .phase-dark .lens-guide {
+    gap: 3px;
+  }
+
+  .phase-playing .lens-guide p,
+  .phase-dark .lens-guide p {
+    font-size: clamp(0.68rem, 1.7vw, 0.82rem);
+    line-height: 1.35;
+  }
+
+  .phase-playing .lens-guide p:last-child,
+  .phase-dark .lens-guide p:last-child,
+  .phase-playing .lens-guide span,
+  .phase-dark .lens-guide span {
+    display: none;
+  }
+
+  .phase-playing .checks-lenses,
+  .phase-dark .checks-lenses {
+    min-height: 28px;
+    margin-top: 7px;
+  }
+
+  .phase-playing .checks-lenses img,
+  .phase-dark .checks-lenses img {
+    width: 27px;
+    height: 27px;
+  }
+
+  .phase-playing .candle-timer,
+  .phase-dark .candle-timer {
+    gap: 8px;
+    margin-top: 7px;
+  }
+
+  .phase-playing .candle-stage,
+  .phase-dark .candle-stage {
+    width: 42px;
+    height: 84px;
+  }
+
+  .phase-playing .candle,
+  .phase-dark .candle {
+    width: 27px;
+    height: calc(25px + (var(--burn) * 38px));
+    min-height: 25px;
+  }
+
+  .phase-playing .time-copy strong,
+  .phase-dark .time-copy strong {
+    font-size: clamp(1.7rem, 6vh, 2.4rem);
+  }
+
+  .phase-answer .result-heading h1 {
+    font-size: clamp(1.45rem, 6vh, 2.25rem);
+  }
+
+  .phase-answer .result-heading > p:last-child {
+    display: none;
+  }
+
+  .phase-answer .comparison-grid {
+    width: min(100%, 62dvh);
+    max-height: 31dvh;
+  }
+
+  .phase-answer .comparison-grid figcaption {
+    margin-top: 3px;
+  }
+
+  .phase-answer .comparison-answers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    margin-block: 5px;
+  }
+
+  .phase-answer .comparison-answers li {
+    gap: 3px;
+    font-size: 0.6rem;
+    line-height: 1.25;
+  }
+
+  .phase-answer .result-actions button {
+    min-height: 38px;
+  }
+}
+
+/*
+ * Match the source copy flow: prefer authored phrase spaces and never leave a
+ * single kana or particle by itself on the following line.
+ */
+:is(
+  .intro-eyebrow,
+  .intro-copy,
+  .intro-note,
+  .stage-select-copy,
+  .stage-card strong,
+  .ura-stage-gate span,
+  .ura-stage-gate small,
+  .practice-card h1,
+  .practice-lead,
+  .practice-rules li,
+  .practice-warning,
+  .tap-hint,
+  .lens-guide p,
+  .checks-failed p,
+  .question-block h1,
+  .answer-panel h1,
+  .answer-panel li,
+  .result-heading h1,
+  .result-heading > p:last-child,
+  .comparison-answers li,
+  .timeout-result h1,
+  .timeout-result > p
+) {
+  line-break: strict;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}

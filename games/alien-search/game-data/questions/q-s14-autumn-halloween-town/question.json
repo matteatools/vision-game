@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s14-autumn-halloween-town",
+  "stageId": "s14",
+  "season": "autumn",
+  "level": 4,
+  "theme": "ハロウィンの町",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s14-t01",
+      "action": "黒い魔女の帽子でお菓子を集めている",
+      "hitbox": {
+        "x": 915,
+        "y": 380,
+        "width": 125,
+        "height": 155
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s14-t02",
+      "action": "紫のマントでお菓子のかごを持っている",
+      "hitbox": {
+        "x": 970,
+        "y": 605,
+        "width": 145,
+        "height": 170
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s14-t03",
+      "action": "仮装した友だちをカメラで撮っている",
+      "hitbox": {
+        "x": 1095,
+        "y": 770,
+        "width": 145,
+        "height": 185
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s14-t04",
+      "action": "魔女の帽子でお菓子のかごを持っている",
+      "hitbox": {
+        "x": 515,
+        "y": 875,
+        "width": 145,
+        "height": 170
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s14-t05",
+      "action": "ハチの仮装でお菓子のかごを持っている",
+      "hitbox": {
+        "x": 900,
+        "y": 915,
+        "width": 125,
+        "height": 165
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

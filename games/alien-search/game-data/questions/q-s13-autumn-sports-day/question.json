@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s13-autumn-sports-day",
+  "stageId": "s13",
+  "season": "autumn",
+  "level": 3,
+  "theme": "秋の運動会",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s13-t01",
+      "action": "ゴールで旗を振っている",
+      "hitbox": {
+        "x": 1310,
+        "y": 215,
+        "width": 165,
+        "height": 165
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s13-t02",
+      "action": "青いバトンを持って走っている",
+      "hitbox": {
+        "x": 180,
+        "y": 375,
+        "width": 150,
+        "height": 170
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s13-t03",
+      "action": "赤いバトンを持って走っている",
+      "hitbox": {
+        "x": 600,
+        "y": 360,
+        "width": 190,
+        "height": 170
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s13-t04",
+      "action": "運動靴のひもを結んでいる",
+      "hitbox": {
+        "x": 1065,
+        "y": 900,
+        "width": 145,
+        "height": 175
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s13-t05",
+      "action": "背中のうずまきを見せて水筒を持っている",
+      "hitbox": {
+        "x": 1215,
+        "y": 905,
+        "width": 150,
+        "height": 175
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

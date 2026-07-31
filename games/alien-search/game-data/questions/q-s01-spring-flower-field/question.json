@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s01-spring-flower-field",
+  "stageId": "s01",
+  "season": "spring",
+  "level": 1,
+  "theme": "春の花畑",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s01-t01",
+      "action": "じょうろで花に水をあげている",
+      "hitbox": {
+        "x": 80,
+        "y": 350,
+        "width": 150,
+        "height": 150
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s01-t02",
+      "action": "ベンチで飲み物を飲んでいる",
+      "hitbox": {
+        "x": 710,
+        "y": 165,
+        "width": 125,
+        "height": 155
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s01-t03",
+      "action": "小川のそばでシャボン玉を飛ばしている",
+      "hitbox": {
+        "x": 1155,
+        "y": 185,
+        "width": 165,
+        "height": 185
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s01-t04",
+      "action": "レジャーシートでおにぎりを食べている",
+      "hitbox": {
+        "x": 500,
+        "y": 575,
+        "width": 185,
+        "height": 205
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s01-t05",
+      "action": "虫めがねでチューリップを見ている",
+      "hitbox": {
+        "x": 995,
+        "y": 775,
+        "width": 190,
+        "height": 210
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

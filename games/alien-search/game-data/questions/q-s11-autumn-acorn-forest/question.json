@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s11-autumn-acorn-forest",
+  "stageId": "s11",
+  "season": "autumn",
+  "level": 1,
+  "theme": "どんぐりの森",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s11-t01",
+      "action": "落ち葉の冠をかぶって切り株に座っている",
+      "hitbox": {
+        "x": 90,
+        "y": 185,
+        "width": 220,
+        "height": 200
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s11-t02",
+      "action": "ちょうネクタイでどんぐりを持っている",
+      "hitbox": {
+        "x": 630,
+        "y": 180,
+        "width": 140,
+        "height": 170
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s11-t03",
+      "action": "落ち葉を持ってどんぐりを集めている",
+      "hitbox": {
+        "x": 515,
+        "y": 380,
+        "width": 190,
+        "height": 200
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s11-t04",
+      "action": "大きなまつぼっくりを抱えている",
+      "hitbox": {
+        "x": 535,
+        "y": 770,
+        "width": 210,
+        "height": 230
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s11-t05",
+      "action": "虫めがねでどんぐりを観察している",
+      "hitbox": {
+        "x": 785,
+        "y": 720,
+        "width": 155,
+        "height": 195
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

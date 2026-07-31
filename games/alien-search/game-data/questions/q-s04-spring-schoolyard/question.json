@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s04-spring-schoolyard",
+  "stageId": "s04",
+  "season": "spring",
+  "level": 4,
+  "theme": "入学式の校庭",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s04-t01",
+      "action": "手さげかばんを持って登校している",
+      "hitbox": {
+        "x": 70,
+        "y": 275,
+        "width": 145,
+        "height": 150
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s04-t02",
+      "action": "校舎の前で元気に手を振っている",
+      "hitbox": {
+        "x": 485,
+        "y": 315,
+        "width": 150,
+        "height": 150
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s04-t03",
+      "action": "すべり台のそばをランドセルで歩いている",
+      "hitbox": {
+        "x": 1270,
+        "y": 305,
+        "width": 145,
+        "height": 170
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s04-t04",
+      "action": "校庭でうずまき模様を見せている",
+      "hitbox": {
+        "x": 555,
+        "y": 590,
+        "width": 145,
+        "height": 180
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s04-t05",
+      "action": "ボールを追いかけて走っている",
+      "hitbox": {
+        "x": 1205,
+        "y": 730,
+        "width": 180,
+        "height": 170
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

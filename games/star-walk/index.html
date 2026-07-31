@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#081b52">
+    <title>ほしぞらの くうちゅうさんぽ</title>
+    <link rel="preload" as="image" href="assets/star-catch-title-v1.jpg">
+    <link rel="preload" as="image" href="assets/title-wordmark-v2.png">
+    <link rel="preload" as="image" href="assets/star-catch-sky-v1.jpg">
+    <link rel="preload" as="image" href="assets/momon-guide-v1.jpg">
+    <link rel="preload" as="image" href="assets/momon-cursor-v1.png">
+    <link rel="preload" as="image" href="assets/star-kirakira-v1.png">
+    <link rel="preload" as="image" href="assets/star-kimagure-v1.png">
+    <link rel="preload" as="image" href="assets/star-kirameki-v1.png">
+    <link rel="preload" as="image" href="assets/star-kiseki-v1.png">
+    <link rel="preload" as="image" href="assets/star-kikyu-v1.png">
+    <style>
+        :root {
+            --navy: #071743;
+            --blue: #123a83;
+            --cyan: #8eeeff;
+            --gold: #ffd85f;
+            --pink: #ff82c8;
+            --cream: #fff9dc;
+            --ink: #17305d;
+            --panel: rgba(255, 252, 228, 0.96);
+            --shadow: rgba(1, 10, 44, 0.38);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--navy);
+            color: var(--cream);
+            font-family:
+                "Hiragino Maru Gothic ProN",
+                "Yu Gothic",
+                Meiryo,
+                sans-serif;
+            user-select: none;
+            touch-action: none;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 100svh;
+            overflow: hidden;
+            background:
+                linear-gradient(rgba(2, 12, 49, 0.08), rgba(2, 12, 49, 0.18)),
+                url("assets/star-catch-sky-v1.jpg") center / cover no-repeat;
+        }
+
+        #game-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        @media (any-pointer: fine) {
+            body.game-cursor-active #game-canvas {
+                cursor: url("assets/momon-cursor-v1.png") 24 24, crosshair;
+            }
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+        }
+
+        .title-screen {
+            overflow: hidden;
+            background: #08194d;
+        }
+
+        .title-art {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .title-screen::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(to bottom, rgba(2, 10, 42, 0.54) 0%, transparent 28%),
+                linear-gradient(to top, rgba(2, 9, 39, 0.72) 0%, transparent 34%),
+                radial-gradient(circle at 50% 45%, transparent 20%, rgba(2, 9, 39, 0.12) 100%);
+        }
+
+        .sound-button,
+        .back-button {
+            position: absolute;
+            z-index: 40;
+            display: grid;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            place-items: center;
+            color: #fff;
+            background: rgba(7, 23, 67, 0.76);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 5px 0 rgba(1, 8, 34, 0.46);
+        }
+
+        .sound-button {
+            top: max(10px, env(safe-area-inset-top));
+            left: max(10px, env(safe-area-inset-left));
+            font-size: 21px;
+        }
+
+        .back-button {
+            top: auto;
+            bottom: max(12px, env(safe-area-inset-bottom));
+            left: max(10px, env(safe-area-inset-left));
+            font-size: 21px;
+            pointer-events: auto;
+        }
+
+        .sound-button:active,
+        .back-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 rgba(1, 8, 34, 0.46);
+        }
+
+        .title-logo {
+            position: absolute;
+            z-index: 20;
+            top: max(7%, calc(env(safe-area-inset-top) + 48px));
+            left: 50%;
+            width: min(96vw, 820px);
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .title-logo h1 {
+            width: 100%;
+            margin: 0;
+        }
+
+        .title-wordmark {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 8px rgba(141, 232, 255, 0.72));
+            animation: titleWordmarkGlow 2.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleWordmarkGlow {
+            from {
+                transform: translateY(-2px);
+                filter: brightness(0.97) drop-shadow(0 0 7px rgba(141, 232, 255, 0.62));
+            }
+            to {
+                transform: translateY(2px);
+                filter: brightness(1.13) drop-shadow(0 0 12px rgba(255, 226, 111, 0.82));
+            }
+        }
+
+        .title-actions {
+            position: absolute;
+            z-index: 25;
+            bottom: max(16px, calc(env(safe-area-inset-bottom) + 10px));
+            left: 50%;
+            display: grid;
+            width: min(94vw, 620px);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+            transform: translateX(-50%);
+        }
+
+        .main-button,
+        .sub-link {
+            display: grid;
+            min-height: 52px;
+            padding: 8px 14px;
+            place-items: center;
+            border-radius: 18px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 120ms ease, box-shadow 120ms ease;
+        }
+
+        .main-button {
+            color: #25335e;
+            border: 3px solid #fff7cd;
+            box-shadow: 0 7px 0 #895a18, 0 11px 23px rgba(1, 8, 35, 0.45);
+            font-size: clamp(16px, 3.4vw, 22px);
+        }
+
+        .practice-button {
+            background: linear-gradient(#bff6ff, #78dbf6);
+            box-shadow: 0 7px 0 #277693, 0 11px 23px rgba(1, 8, 35, 0.45);
+        }
+
+        .start-button {
+            background: linear-gradient(#fff59e, #ffd34f);
+        }
+
+        .sub-link {
+            grid-column: 1 / -1;
+            min-height: 40px;
+            padding: 5px 12px;
+            color: #fff;
+            background: rgba(7, 23, 67, 0.82);
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            box-shadow: 0 5px 0 rgba(1, 8, 34, 0.58);
+            font-size: 13px;
+        }
+
+        .select-screen {
+            z-index: 14;
+            display: grid;
+            padding:
+                max(12px, env(safe-area-inset-top))
+                max(12px, env(safe-area-inset-right))
+                max(12px, env(safe-area-inset-bottom))
+                max(12px, env(safe-area-inset-left));
+            place-items: center;
+            overflow: auto;
+            background:
+                linear-gradient(rgba(2, 9, 40, 0.28), rgba(2, 9, 40, 0.58)),
+                url("assets/star-catch-sky-v1.jpg") center / cover no-repeat;
+        }
+
+        .select-card {
+            width: min(96vw, 980px);
+            max-height: calc(100svh - 24px);
+            padding: clamp(11px, 2.4vw, 20px);
+            overflow: auto;
+            color: var(--ink);
+            background: rgba(255, 252, 228, 0.96);
+            border: 5px solid #fff;
+            border-radius: 28px;
+            box-shadow: 0 12px 0 rgba(30, 65, 145, 0.76), 0 23px 42px rgba(1, 7, 31, 0.52);
+            text-align: center;
+        }
+
+        .select-card h2 {
+            margin: 0;
+            color: #2851a4;
+            font-size: clamp(24px, 5vw, 38px);
+            line-height: 1.15;
+        }
+
+        .select-copy {
+            margin: 3px 0 10px;
+            color: #637092;
+            font-size: clamp(11px, 2.2vw, 14px);
+            font-weight: 900;
+        }
+
+        .star-choice-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: clamp(7px, 1.5vw, 12px);
+        }
+
+        .star-choice {
+            display: grid;
+            min-width: 0;
+            padding: 7px 6px 8px;
+            grid-template-rows: auto auto 1fr auto;
+            justify-items: center;
+            color: #25345e;
+            background: linear-gradient(#fffef2, #e8f5ff);
+            border: 3px solid #91cce9;
+            border-radius: 18px;
+            box-shadow: 0 6px 0 #527aaa;
+            text-align: center;
+            transition: transform 120ms ease, box-shadow 120ms ease;
+        }
+
+        .star-choice[data-star="kimagure"] {
+            background: linear-gradient(#fff5fc, #f0ddff);
+            border-color: #c99ceb;
+            box-shadow: 0 6px 0 #8257aa;
+        }
+
+        .star-choice[data-star="kirameki"] {
+            background: linear-gradient(#fff, #dff8ff);
+        }
+
+        .star-choice[data-star="kiseki"] {
+            background: linear-gradient(#fff8fd, #eee5ff);
+            border-color: #d39be6;
+            box-shadow: 0 6px 0 #7650a4;
+        }
+
+        .star-choice[data-star="kikyu"] {
+            background: linear-gradient(#fffbed, #ffe5c1);
+            border-color: #efb866;
+            box-shadow: 0 6px 0 #a2662d;
+        }
+
+        .star-choice:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #527aaa;
+        }
+
+        .choice-star {
+            width: min(100%, 116px);
+            aspect-ratio: 1;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 4px rgba(34, 54, 111, 0.28));
+        }
+
+        .star-choice strong {
+            font-size: clamp(13px, 2.2vw, 18px);
+            line-height: 1.15;
+        }
+
+        .star-choice > small {
+            display: block;
+            margin-top: 3px;
+            color: #596985;
+            font-size: clamp(9px, 1.45vw, 11px);
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .choice-power {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            padding: 4px 3px;
+            color: #fff;
+            background: #3158af;
+            border-radius: 999px;
+            font-size: clamp(9px, 1.5vw, 11px);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .select-back {
+            margin-top: 12px;
+            min-width: 150px;
+            min-height: 40px;
+            padding: 5px 18px;
+            color: #fff;
+            background: #52638b;
+            border: 3px solid #fff;
+            border-radius: 14px;
+            box-shadow: 0 5px 0 #293a67;
+            font-weight: 900;
+        }
+
+        .main-button:active,
+        .sub-link:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(1, 8, 34, 0.6);
+        }
+
+        .play-screen {
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        .play-screen::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 45%, transparent 45%, rgba(2, 10, 45, 0.18) 100%);
+            pointer-events: none;
+        }
+
+        .hud {
+            position: absolute;
+            z-index: 30;
+            top: max(9px, env(safe-area-inset-top));
+            left: 50%;
+            display: grid;
+            width: min(74vw, 430px);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            transform: translateX(-50%);
+        }
+
+        .hud-card {
+            padding: 5px 8px;
+            color: #fff;
+            background: rgba(7, 23, 67, 0.82);
+            border: 2px solid rgba(181, 240, 255, 0.62);
+            border-radius: 14px;
+            box-shadow: 0 5px 0 rgba(1, 8, 34, 0.46);
+            text-align: center;
+            line-height: 1.05;
+        }
+
+        .hud-card span {
+            display: block;
+            color: #c7efff;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .hud-card strong {
+            display: block;
+            margin-top: 2px;
+            color: #fff6a7;
+            font-size: clamp(17px, 4vw, 24px);
+        }
+
+        .instruction-strip {
+            position: absolute;
+            z-index: 25;
+            top: max(70px, calc(env(safe-area-inset-top) + 63px));
+            left: 50%;
+            width: max-content;
+            max-width: 78vw;
+            padding: 5px 14px;
+            transform: translateX(-50%);
+            color: #fff;
+            background: rgba(18, 48, 115, 0.72);
+            border: 2px solid rgba(255, 255, 255, 0.44);
+            border-radius: 999px;
+            font-size: clamp(11px, 2.6vw, 15px);
+            font-weight: 900;
+            text-align: center;
+            text-shadow: 0 2px 2px #172257;
+        }
+
+        .practice-progress {
+            position: absolute;
+            z-index: 25;
+            right: max(11px, env(safe-area-inset-right));
+            bottom: max(12px, env(safe-area-inset-bottom));
+            width: min(48vw, 240px);
+            padding: 7px 9px;
+            color: #fff;
+            background: rgba(7, 23, 67, 0.78);
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 11px;
+            margin-top: 4px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 999px;
+        }
+
+        .progress-fill {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #86ecff, #ffe56d, #ff86d4);
+            border-radius: inherit;
+            transition: width 100ms linear;
+        }
+
+        .coach-layer,
+        .countdown-layer {
+            position: absolute;
+            z-index: 50;
+            inset: 0;
+            display: grid;
+            padding: max(14px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            place-items: center;
+            background: rgba(2, 9, 41, 0.34);
+            pointer-events: auto;
+        }
+
+        .countdown-layer {
+            padding-top: max(108px, calc(env(safe-area-inset-top) + 90px));
+            place-items: start center;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .coach-card {
+            display: grid;
+            width: min(92vw, 610px);
+            grid-template-columns: 142px minmax(0, 1fr);
+            gap: 14px;
+            align-items: center;
+            padding: 14px;
+            color: var(--ink);
+            background: var(--panel);
+            border: 5px solid #fff;
+            border-radius: 28px;
+            box-shadow: 0 12px 0 rgba(32, 71, 151, 0.72), 0 24px 40px rgba(1, 7, 31, 0.48);
+        }
+
+        .coach-portrait {
+            width: 142px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            object-position: 50% 39%;
+            border: 5px solid #ffe486;
+            border-radius: 50%;
+            box-shadow: 0 6px 0 #886529;
+        }
+
+        .coach-name {
+            display: inline-block;
+            margin: 0 0 5px;
+            padding: 3px 10px;
+            color: #fff;
+            background: #3158af;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .coach-text {
+            min-height: 3.4em;
+            margin: 0 0 10px;
+            font-size: clamp(16px, 3.7vw, 22px);
+            font-weight: 900;
+            line-height: 1.55;
+        }
+
+        .coach-button {
+            width: min(100%, 260px);
+            min-height: 45px;
+            padding: 7px 12px;
+            color: #20315b;
+            background: linear-gradient(#fff58e, #ffd34d);
+            border: 3px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 0 #9b691d;
+            font-weight: 900;
+        }
+
+        .coach-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #9b691d;
+        }
+
+        .countdown-box {
+            display: grid;
+            min-width: min(58vw, 270px);
+            min-height: 0;
+            padding: 8px 18px 10px;
+            place-items: center;
+            color: #fff;
+            background: rgba(13, 36, 99, 0.8);
+            border: 5px solid rgba(255, 246, 173, 0.92);
+            border-radius: 34px;
+            box-shadow: 0 11px 0 rgba(1, 8, 34, 0.58);
+            text-align: center;
+        }
+
+        .countdown-box span {
+            display: block;
+            color: #d8f7ff;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .countdown-box strong {
+            display: block;
+            color: #fff177;
+            font-size: clamp(47px, 13vw, 72px);
+            line-height: 0.95;
+            text-shadow: 0 5px 0 #9a6a25;
+        }
+
+        .result-screen {
+            display: grid;
+            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            place-items: center;
+            overflow: hidden;
+            background:
+                linear-gradient(rgba(2, 9, 40, 0.35), rgba(2, 9, 40, 0.68)),
+                url("assets/star-catch-sky-v1.jpg") center / cover no-repeat;
+        }
+
+        .result-card {
+            display: grid;
+            width: min(94vw, 760px);
+            max-height: calc(100svh - 24px);
+            grid-template-columns: minmax(150px, 0.7fr) minmax(0, 1.3fr);
+            gap: 13px;
+            padding: 15px;
+            overflow: hidden;
+            color: var(--ink);
+            background: var(--panel);
+            border: 5px solid #fff;
+            border-radius: 28px;
+            box-shadow: 0 12px 0 rgba(30, 65, 145, 0.76), 0 23px 42px rgba(1, 7, 31, 0.52);
+        }
+
+        .result-guide {
+            display: grid;
+            align-content: center;
+            justify-items: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .result-guide img {
+            width: min(100%, 185px);
+            aspect-ratio: 1;
+            object-fit: cover;
+            object-position: 50% 39%;
+            border: 5px solid #ffe486;
+            border-radius: 50%;
+            box-shadow: 0 6px 0 #886529;
+        }
+
+        .result-message {
+            margin: 0;
+            font-size: clamp(14px, 2.7vw, 18px);
+            font-weight: 900;
+            line-height: 1.45;
+            text-align: left;
+        }
+
+        .sub-link,
+        .select-card h2,
+        .select-copy,
+        .star-choice strong,
+        .star-choice > small,
+        .instruction-strip,
+        .coach-text,
+        .countdown-box span,
+        .result-message,
+        .result-main h2 {
+            overflow-wrap: normal;
+            word-break: keep-all;
+            line-break: strict;
+        }
+
+        .result-main {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .result-main h2 {
+            margin: 0 0 3px;
+            color: #2851a4;
+            font-size: clamp(23px, 5vw, 34px);
+            line-height: 1.1;
+        }
+
+        .result-showcase {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(9px, 3vw, 20px);
+            margin: 3px 0 6px;
+        }
+
+        .final-star-wrap {
+            display: grid;
+            flex: 0 0 auto;
+            justify-items: center;
+            gap: 2px;
+        }
+
+        .final-star-aura {
+            display: grid;
+            width: clamp(76px, 16vw, 104px);
+            aspect-ratio: 1;
+            place-items: center;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(235, 251, 255, 0.95), rgba(164, 225, 244, 0.36) 54%, transparent 72%);
+            filter: drop-shadow(0 0 9px rgba(255, 255, 255, 0.82));
+            animation: resultStarPulse 1.1s ease-in-out infinite alternate;
+        }
+
+        .final-star-aura.power-yellow {
+            background: radial-gradient(circle, rgba(255, 245, 140, 0.98), rgba(245, 194, 55, 0.38) 55%, transparent 73%);
+            filter: drop-shadow(0 0 10px rgba(255, 226, 89, 0.9));
+        }
+
+        .final-star-aura.power-gold {
+            background: radial-gradient(circle, rgba(255, 216, 82, 1), rgba(225, 125, 22, 0.42) 55%, transparent 74%);
+            filter: drop-shadow(0 0 12px rgba(255, 178, 38, 0.94));
+        }
+
+        .final-star-aura.power-rainbow {
+            background: conic-gradient(from 25deg, rgba(255, 113, 186, 0.72), rgba(255, 224, 92, 0.72), rgba(101, 221, 255, 0.72), rgba(148, 111, 243, 0.72), rgba(255, 113, 186, 0.72));
+            filter: drop-shadow(0 0 13px rgba(210, 143, 255, 0.96));
+        }
+
+        .final-star {
+            display: block;
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 3px rgba(43, 55, 112, 0.34));
+        }
+
+        .final-star-label {
+            color: #5a6688;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .result-score-side {
+            min-width: 0;
+        }
+
+        .result-score {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 1px 0 4px;
+            color: #b06a14;
+            font-weight: 900;
+        }
+
+        .result-score strong {
+            color: #e68c20;
+            font-size: clamp(42px, 10vw, 66px);
+            line-height: 1;
+            text-shadow: 0 3px 0 #ffed9a;
+        }
+
+        .result-score span {
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        @keyframes resultStarPulse {
+            from { transform: scale(0.96) rotate(-2deg); }
+            to { transform: scale(1.04) rotate(2deg); }
+        }
+
+        .result-best {
+            margin: 0 0 7px;
+            color: #566789;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .new-record {
+            display: inline-block;
+            margin-left: 4px;
+            padding: 2px 7px;
+            color: #fff;
+            background: #ee699e;
+            border-radius: 999px;
+        }
+
+        .map-wrap {
+            padding: 6px;
+            background: #0b235f;
+            border: 4px solid #9ddff4;
+            border-radius: 17px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #result-map {
+            display: block;
+            width: 100%;
+            height: min(20vh, 160px);
+            min-height: 90px;
+            border-radius: 10px;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 13px;
+            margin-top: 4px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-right: 4px;
+            border-radius: 50%;
+        }
+
+        .result-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            margin-top: 9px;
+        }
+
+        .result-button {
+            min-height: 42px;
+            padding: 6px 9px;
+            color: #20315b;
+            border: 3px solid #fff;
+            border-radius: 14px;
+            box-shadow: 0 5px 0 #6a73a9;
+            font-weight: 900;
+        }
+
+        .result-button:first-child {
+            background: linear-gradient(#fff58e, #ffd34d);
+            box-shadow: 0 5px 0 #9b691d;
+        }
+
+        .result-button:last-child {
+            background: linear-gradient(#d5f6ff, #8bdcf2);
+        }
+
+        .result-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #6a73a9;
+        }
+
+        @media (orientation: portrait) {
+            .title-art {
+                object-position: 50% 50%;
+            }
+
+            .title-logo {
+                top: max(8%, calc(env(safe-area-inset-top) + 50px));
+                width: min(98vw, 620px);
+            }
+
+            .title-actions {
+                width: min(94vw, 500px);
+            }
+
+            .star-choice-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .star-choice:last-child {
+                grid-column: 1 / -1;
+                grid-template-columns: 72px minmax(0, 1fr);
+                grid-template-rows: auto auto auto;
+                column-gap: 8px;
+                text-align: left;
+            }
+
+            .star-choice:last-child .choice-star {
+                grid-row: 1 / 4;
+                width: 72px;
+            }
+
+            .star-choice:last-child .choice-power {
+                text-align: center;
+            }
+
+            .coach-card {
+                width: min(91vw, 480px);
+                grid-template-columns: 108px minmax(0, 1fr);
+                gap: 10px;
+                padding: 11px;
+            }
+
+            .coach-portrait {
+                width: 108px;
+            }
+
+            .result-card {
+                width: min(94vw, 520px);
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .result-guide {
+                grid-template-columns: 92px minmax(0, 1fr);
+                gap: 9px;
+                text-align: left;
+            }
+
+            .result-guide img {
+                width: 92px;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .title-logo {
+                top: max(4%, calc(env(safe-area-inset-top) + 28px));
+                left: 50%;
+                width: min(46vw, 660px);
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 650px) {
+            .title-logo {
+                top: max(9px, env(safe-area-inset-top));
+                left: 50%;
+                width: min(46vw, 540px);
+            }
+
+            .title-actions {
+                bottom: max(8px, env(safe-area-inset-bottom));
+                width: min(72vw, 650px);
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 7px;
+            }
+
+            .select-card {
+                width: min(96vw, 980px);
+                padding: 8px 12px 10px;
+            }
+
+            .select-card h2 {
+                font-size: min(5.5vw, 29px);
+            }
+
+            .select-copy {
+                margin-bottom: 6px;
+            }
+
+            .choice-star {
+                width: min(100%, 88px);
+            }
+
+            .star-choice {
+                padding: 4px 4px 6px;
+            }
+
+            .select-back {
+                min-height: 34px;
+                margin-top: 8px;
+            }
+
+            .sub-link {
+                grid-column: auto;
+                min-height: 45px;
+            }
+
+            .main-button {
+                min-height: 45px;
+                padding: 5px 9px;
+                font-size: 15px;
+            }
+
+            .sound-button,
+            .back-button {
+                width: 39px;
+                height: 39px;
+            }
+
+            .hud {
+                width: min(55vw, 390px);
+            }
+
+            .hud-card {
+                padding: 3px 7px;
+            }
+
+            .hud-card strong {
+                font-size: 17px;
+            }
+
+            .instruction-strip {
+                top: max(54px, calc(env(safe-area-inset-top) + 48px));
+                padding: 3px 11px;
+                font-size: 11px;
+            }
+
+            .coach-card {
+                width: min(76vw, 640px);
+                grid-template-columns: 112px minmax(0, 1fr);
+                padding: 10px;
+            }
+
+            .coach-portrait {
+                width: 112px;
+            }
+
+            .coach-text {
+                font-size: 16px;
+                line-height: 1.4;
+            }
+
+            .result-card {
+                width: min(90vw, 760px);
+                padding: 10px;
+            }
+
+            .result-guide img {
+                width: min(100%, 130px);
+            }
+
+            #result-map {
+                height: min(18vh, 105px);
+                min-height: 75px;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .title-actions {
+                gap: 6px;
+            }
+
+            .main-button {
+                min-height: 47px;
+                padding: 6px 7px;
+                font-size: 15px;
+            }
+
+            .sub-link {
+                min-height: 36px;
+            }
+
+            .hud {
+                width: min(72vw, 300px);
+            }
+
+            .coach-card {
+                grid-template-columns: 84px minmax(0, 1fr);
+            }
+
+            .coach-portrait {
+                width: 84px;
+            }
+
+            .coach-name {
+                font-size: 10px;
+            }
+
+            .coach-text {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-height: 520px) {
+            .result-screen {
+                padding: 6px;
+            }
+
+            .result-card {
+                max-height: none;
+                gap: 6px;
+                padding: 7px;
+            }
+
+            .result-guide {
+                gap: 6px;
+            }
+
+            .result-guide img {
+                width: min(100%, 84px);
+            }
+
+            .result-message {
+                font-size: 12px;
+                line-height: 1.3;
+            }
+
+            .result-main h2 {
+                font-size: 20px;
+            }
+
+            .result-showcase {
+                margin-block: 0 3px;
+            }
+
+            .final-star-aura {
+                width: 62px;
+            }
+
+            #result-map {
+                height: 64px;
+                min-height: 56px;
+            }
+
+            .map-wrap {
+                padding: 3px;
+            }
+
+            .map-legend {
+                margin-top: 2px;
+                font-size: 9px;
+            }
+
+            .result-actions {
+                margin-top: 4px;
+            }
+
+            .result-button {
+                min-height: 36px;
+                padding: 3px 7px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 1ms !important;
+                transition-duration: 1ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main id="app">
+        <canvas id="game-canvas" aria-label="ながれぼしを ゆびで おいかける げえむ"></canvas>
+
+        <button class="sound-button" id="sound-button" type="button" aria-label="おとを きりかえる" aria-pressed="true">🔊</button>
+
+        <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
+            <img class="title-art" src="assets/star-catch-title-v1.jpg" alt="">
+
+            <div class="title-logo">
+                <h1 id="game-title">
+                    <img class="title-wordmark" src="assets/title-wordmark-v2.png" alt="ほしぞらの くうちゅうさんぽ">
+                </h1>
+            </div>
+
+            <div class="title-actions">
+                <button class="main-button practice-button" id="practice-button" type="button">れんしゅう</button>
+                <button class="main-button start-button" id="start-button" type="button">スタート</button>
+                <a class="sub-link" href="../../index.html">ゲームパークへ もどる</a>
+            </div>
+        </section>
+
+        <section class="screen select-screen hidden" id="screen-select" aria-labelledby="select-title">
+            <div class="select-card">
+                <h2 id="select-title">どのほしを おいかける？</h2>
+                <p class="select-copy">ほしパワーは ほしごとに きろくされるよ</p>
+
+                <div class="star-choice-grid">
+                    <button class="star-choice" type="button" data-star="kirakira">
+                        <img class="choice-star" src="assets/star-kirakira-v1.png" alt="">
+                        <strong>きらきらぼし</strong>
+                        <small>ゆっくり まわるよ</small>
+                        <span class="choice-power">さいこう <b id="best-kirakira">0</b> パワー</span>
+                    </button>
+                    <button class="star-choice" type="button" data-star="kimagure">
+                        <img class="choice-star" src="assets/star-kimagure-v1.png" alt="">
+                        <strong>きまぐれぼし</strong>
+                        <small>へんな うごきをするよ</small>
+                        <span class="choice-power">さいこう <b id="best-kimagure">0</b> パワー</span>
+                    </button>
+                    <button class="star-choice" type="button" data-star="kikyu">
+                        <img class="choice-star" src="assets/star-kikyu-v1.png" alt="">
+                        <strong>ききゅうぼし</strong>
+                        <small>ゆっくりうえへ すばやくしたへ</small>
+                        <span class="choice-power">さいこう <b id="best-kikyu">0</b> パワー</span>
+                    </button>
+                    <button class="star-choice" type="button" data-star="kirameki">
+                        <img class="choice-star" src="assets/star-kirameki-v1.png" alt="">
+                        <strong>きらめきほし</strong>
+                        <small>おおきさが かわるよ</small>
+                        <span class="choice-power">さいこう <b id="best-kirameki">0</b> パワー</span>
+                    </button>
+                    <button class="star-choice" type="button" data-star="kiseki">
+                        <img class="choice-star" src="assets/star-kiseki-v1.png" alt="">
+                        <strong>きせきのほし</strong>
+                        <small>ちいさくて はやいよ</small>
+                        <span class="choice-power">さいこう <b id="best-kiseki">0</b> パワー</span>
+                    </button>
+                </div>
+
+                <button class="select-back" id="select-back-button" type="button">タイトルへ もどる</button>
+            </div>
+        </section>
+
+        <section class="screen play-screen hidden" id="screen-play" aria-label="げえむがめん">
+            <button class="back-button" id="play-back-button" type="button" aria-label="タイトルへ もどる">⌂</button>
+
+            <div class="hud">
+                <div class="hud-card">
+                    <span id="hud-time-label">のこり</span>
+                    <strong id="hud-time">30びょう</strong>
+                </div>
+                <div class="hud-card">
+                    <span>ほしパワー</span>
+                    <strong id="hud-shine">0</strong>
+                </div>
+            </div>
+
+            <div class="instruction-strip" id="instruction-strip">ほしに ゆびを のせて おいかけよう</div>
+
+            <div class="practice-progress hidden" id="practice-progress">
+                <span id="practice-progress-label">れんしゅう 1／3</span>
+                <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+            </div>
+
+            <div class="coach-layer hidden" id="coach-layer">
+                <div class="coach-card">
+                    <img class="coach-portrait" src="assets/momon-guide-v1.jpg" alt="ほしもりの ももん">
+                    <div>
+                        <p class="coach-name">ほしもりの ももん</p>
+                        <p class="coach-text" id="coach-text"></p>
+                        <button class="coach-button" id="coach-button" type="button"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="countdown-layer hidden" id="countdown-layer">
+                <div class="countdown-box">
+                    <span>ながれぼしを よくみてね</span>
+                    <strong id="countdown-number">3</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="screen result-screen hidden" id="screen-result" aria-labelledby="result-title">
+            <div class="result-card">
+                <div class="result-guide">
+                    <img src="assets/momon-guide-v1.jpg" alt="ほしもりの ももん">
+                    <p class="result-message" id="result-message"></p>
+                </div>
+
+                <div class="result-main">
+                    <h2 id="result-title">よぞらの きろく</h2>
+                    <div class="result-showcase">
+                        <div class="final-star-wrap">
+                            <div class="final-star-aura power-white" id="result-star-aura">
+                                <img class="final-star" id="result-star" src="assets/star-kirakira-v1.png" alt="">
+                            </div>
+                            <span class="final-star-label" id="result-star-label">しろいひかり</span>
+                        </div>
+                        <div class="result-score-side">
+                            <div class="result-score">
+                                <strong id="result-score">0</strong>
+                                <span>ほしパワー</span>
+                            </div>
+                            <p class="result-best">
+                                さいこう <span id="result-best">0</span> パワー
+                                <span class="new-record hidden" id="new-record">しんきろく！</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="map-wrap">
+                        <canvas id="result-map" width="640" height="220" aria-label="ながれぼしと ゆびの うごき"></canvas>
+                        <div class="map-legend">
+                            <span><i class="legend-dot" style="background:#8eeeff"></i>ながれぼし</span>
+                            <span><i class="legend-dot" style="background:#ff82c8"></i>きみの ゆび</span>
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="result-button" id="retry-button" type="button">もういちど</button>
+                        <button class="result-button" id="result-title-button" type="button">タイトルへ</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const canvas = document.getElementById("game-canvas");
+            const ctx = canvas.getContext("2d");
+            const resultMap = document.getElementById("result-map");
+            const resultCtx = resultMap.getContext("2d");
+
+            const elements = {
+                title: document.getElementById("screen-title"),
+                select: document.getElementById("screen-select"),
+                play: document.getElementById("screen-play"),
+                result: document.getElementById("screen-result"),
+                sound: document.getElementById("sound-button"),
+                practiceButton: document.getElementById("practice-button"),
+                startButton: document.getElementById("start-button"),
+                selectBack: document.getElementById("select-back-button"),
+                playBack: document.getElementById("play-back-button"),
+                hudTimeLabel: document.getElementById("hud-time-label"),
+                hudTime: document.getElementById("hud-time"),
+                hudShine: document.getElementById("hud-shine"),
+                instruction: document.getElementById("instruction-strip"),
+                practiceProgress: document.getElementById("practice-progress"),
+                practiceProgressLabel: document.getElementById("practice-progress-label"),
+                progressFill: document.getElementById("progress-fill"),
+                coachLayer: document.getElementById("coach-layer"),
+                coachText: document.getElementById("coach-text"),
+                coachButton: document.getElementById("coach-button"),
+                countdownLayer: document.getElementById("countdown-layer"),
+                countdownNumber: document.getElementById("countdown-number"),
+                resultTitle: document.getElementById("result-title"),
+                resultStarAura: document.getElementById("result-star-aura"),
+                resultStar: document.getElementById("result-star"),
+                resultStarLabel: document.getElementById("result-star-label"),
+                resultScore: document.getElementById("result-score"),
+                resultBest: document.getElementById("result-best"),
+                newRecord: document.getElementById("new-record"),
+                resultMessage: document.getElementById("result-message"),
+                retryButton: document.getElementById("retry-button"),
+                resultTitleButton: document.getElementById("result-title-button")
+            };
+
+            const GAME_DURATION = 30000;
+            const RECORD_PREFIX = "starry-catch-power-";
+            const STAR_TYPES = {
+                kirakira: {
+                    name: "きらきらぼし",
+                    image: "assets/star-kirakira-v1.png"
+                },
+                kimagure: {
+                    name: "きまぐれぼし",
+                    image: "assets/star-kimagure-v1.png"
+                },
+                kirameki: {
+                    name: "きらめきほし",
+                    image: "assets/star-kirameki-v1.png"
+                },
+                kiseki: {
+                    name: "きせきのほし",
+                    image: "assets/star-kiseki-v1.png"
+                },
+                kikyu: {
+                    name: "ききゅうぼし",
+                    image: "assets/star-kikyu-v1.png"
+                }
+            };
+            const MOMON_CURSOR_RADIUS = 24;
+            const STAR_BODY_SCALE = 1.25;
+            const HIT_ASSIST_PX = 6;
+            const KISEKI_HIT_SCALE = 1.55;
+            const PRACTICE_REQUIREMENTS = [1300, 3400, 5200];
+            const PRACTICE_LINES = [
+                {
+                    text: "ぼくは みならいの ももん。 まずは ひかる ほしに ゆびを のせて、 そのまま すこし まってみよう。",
+                    button: "やってみる"
+                },
+                {
+                    text: "じょうず！ こんどは ゆっくり うごくよ。 ほしから ゆびが はなれないように おいかけてね。",
+                    button: "つぎへ"
+                },
+                {
+                    text: "さいごは すこしだけ はやくなるよ。 ながく おいかけると、 ほしパワーが たまっていくんだ。",
+                    button: "つぎへ"
+                }
+            ];
+
+            let viewWidth = window.innerWidth;
+            let viewHeight = window.innerHeight;
+            let pixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+            let audioContext = null;
+            let soundOn = true;
+            const savedBest = localStorage.getItem("starry-catch-shine-best-v2");
+            const oldBest = Number(localStorage.getItem("starry-catch-high-score") || 0);
+            const migratedNormal = savedBest === null
+                ? Math.min(100, Math.round(oldBest / 10))
+                : Number(savedBest || 0);
+            const migratedMiracle = Number(localStorage.getItem("starry-catch-miracle-best-v1") || 0);
+            const starRecords = {};
+            const starImages = {};
+
+            Object.entries(STAR_TYPES).forEach(([type, definition]) => {
+                const saved = localStorage.getItem(`${RECORD_PREFIX}${type}`);
+                const migrated = type === "kirakira"
+                    ? migratedNormal
+                    : (type === "kiseki" ? migratedMiracle : 0);
+                starRecords[type] = saved === null ? migrated : Number(saved || 0);
+                if (saved === null && migrated > 0) {
+                    localStorage.setItem(`${RECORD_PREFIX}${type}`, String(migrated));
+                }
+                const image = new Image();
+                image.src = definition.image;
+                starImages[type] = image;
+            });
+
+            if (savedBest === null && oldBest > 0) {
+                localStorage.setItem("starry-catch-shine-best-v2", String(migratedNormal));
+            }
+            let lastFrame = performance.now();
+
+            const game = {
+                state: "title",
+                mode: "challenge",
+                starType: "kirakira",
+                elapsed: 0,
+                caught: 0,
+                shine: 0,
+                motionTime: 0,
+                motionSeed: Math.random() * 1000,
+                target: { x: viewWidth / 2, y: viewHeight / 2, size: 42 },
+                input: { x: -999, y: -999, active: false, pointerType: "" },
+                catching: false,
+                targetTrail: [],
+                targetPath: [],
+                userPath: [],
+                sampleElapsed: 0,
+                milestone: 0,
+                countdownEnd: 0,
+                practiceStep: 0,
+                practiceHold: 0,
+                coachAction: "",
+                twinkles: []
+            };
+
+            function setScreen(name) {
+                elements.title.classList.toggle("hidden", name !== "title");
+                elements.select.classList.toggle("hidden", name !== "select");
+                elements.play.classList.toggle("hidden", name !== "play");
+                elements.result.classList.toggle("hidden", name !== "result");
+                document.body.classList.toggle("game-cursor-active", name === "play");
+            }
+
+            function ensureAudio() {
+                if (!audioContext) {
+                    const AudioClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioClass) audioContext = new AudioClass();
+                }
+                if (audioContext && audioContext.state === "suspended") {
+                    audioContext.resume();
+                }
+            }
+
+            function tone(frequency, duration = 0.1, volume = 0.05, delay = 0) {
+                if (!soundOn) return;
+                ensureAudio();
+                if (!audioContext) return;
+
+                const start = audioContext.currentTime + delay;
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(frequency, start);
+                gain.gain.setValueAtTime(Math.max(0.001, volume), start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.start(start);
+                oscillator.stop(start + duration);
+            }
+
+            function happySound() {
+                tone(660, 0.12, 0.055);
+                tone(880, 0.15, 0.05, 0.1);
+                tone(1100, 0.22, 0.045, 0.2);
+            }
+
+            function updateBestLabels() {
+                Object.keys(STAR_TYPES).forEach((type) => {
+                    const label = document.getElementById(`best-${type}`);
+                    if (label) label.textContent = String(Math.round(starRecords[type] || 0));
+                });
+            }
+
+            function resizeCanvas() {
+                viewWidth = window.innerWidth;
+                viewHeight = window.innerHeight;
+                pixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+                canvas.width = Math.round(viewWidth * pixelRatio);
+                canvas.height = Math.round(viewHeight * pixelRatio);
+                ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+                createTwinkles();
+            }
+
+            function createTwinkles() {
+                const amount = Math.max(28, Math.min(54, Math.round((viewWidth * viewHeight) / 18000)));
+                game.twinkles = Array.from({ length: amount }, (_, index) => ({
+                    x: Math.random() * viewWidth,
+                    y: Math.random() * viewHeight,
+                    size: 0.6 + Math.random() * 1.5,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.6 + Math.random() * 1.1,
+                    warm: index % 7 === 0
+                }));
+            }
+
+            function showCoach(line, action) {
+                game.state = "practice-pause";
+                game.coachAction = action;
+                elements.coachText.textContent = line.text;
+                elements.coachButton.textContent = line.button;
+                elements.coachLayer.classList.remove("hidden");
+            }
+
+            function hideCoach() {
+                elements.coachLayer.classList.add("hidden");
+            }
+
+            function resetSession() {
+                game.elapsed = 0;
+                game.caught = 0;
+                game.shine = 0;
+                game.motionTime = 0;
+                game.motionSeed = Math.random() * 1000;
+                game.catching = false;
+                game.input.active = false;
+                game.input.x = -999;
+                game.input.y = -999;
+                game.targetTrail = [];
+                game.targetPath = [];
+                game.userPath = [];
+                game.sampleElapsed = 0;
+                game.milestone = 0;
+                elements.hudShine.textContent = "0";
+                elements.progressFill.style.width = "0%";
+            }
+
+            function startPractice() {
+                ensureAudio();
+                resetSession();
+                game.mode = "practice";
+                game.starType = "kirakira";
+                game.practiceStep = 0;
+                game.practiceHold = 0;
+                setScreen("play");
+                elements.countdownLayer.classList.add("hidden");
+                elements.practiceProgress.classList.remove("hidden");
+                elements.hudTimeLabel.textContent = "れんしゅう";
+                elements.hudTime.textContent = "1／3";
+                elements.instruction.textContent = "ももんの おはなしを きいてね";
+                updatePracticeLabels();
+                showCoach(PRACTICE_LINES[0], "run-practice");
+                tone(620, 0.14, 0.05);
+            }
+
+            function runPracticeStep() {
+                hideCoach();
+                game.state = "practice";
+                game.practiceHold = 0;
+                game.motionTime = 0;
+                game.targetTrail = [];
+                game.input.active = false;
+                elements.instruction.textContent = game.practiceStep === 0
+                    ? "ほしに ゆびを のせて そのまままとう"
+                    : "ほしから ゆびを はなさず おいかけよう";
+                updatePracticeLabels();
+            }
+
+            function updatePracticeLabels() {
+                const step = game.practiceStep + 1;
+                const requirement = PRACTICE_REQUIREMENTS[game.practiceStep];
+                const progress = Math.min(100, (game.practiceHold / requirement) * 100);
+                elements.hudTime.textContent = `${step}／3`;
+                elements.hudShine.textContent = String(Math.round(progress));
+                elements.practiceProgressLabel.textContent = `れんしゅう ${step}／3`;
+                elements.progressFill.style.width = `${progress}%`;
+            }
+
+            function completePracticeStep() {
+                happySound();
+                if (game.practiceStep < 2) {
+                    game.practiceStep += 1;
+                    game.practiceHold = 0;
+                    game.shine = 0;
+                    updatePracticeLabels();
+                    showCoach(PRACTICE_LINES[game.practiceStep], "run-practice");
+                    return;
+                }
+
+                game.practiceHold = PRACTICE_REQUIREMENTS[2];
+                updatePracticeLabels();
+                showCoach({
+                    text: "やったあ！ ほしが ぴかぴかに なったよ。 これで れんしゅうは おしまい。 ほんばんも いっしょに がんばろう！",
+                    button: "ほんばんへ"
+                }, "start-challenge");
+            }
+
+            function openStarSelect() {
+                game.state = "select";
+                game.input.active = false;
+                updateBestLabels();
+                setScreen("select");
+                tone(660, 0.1, 0.045);
+            }
+
+            function startChallenge(type = "kirakira") {
+                ensureAudio();
+                resetSession();
+                game.mode = "challenge";
+                game.starType = STAR_TYPES[type] ? type : "kirakira";
+                game.state = "countdown";
+                setScreen("play");
+                hideCoach();
+                elements.practiceProgress.classList.add("hidden");
+                elements.hudTimeLabel.textContent = "のこり";
+                elements.hudTime.textContent = "30びょう";
+                elements.instruction.textContent = `${STAR_TYPES[game.starType].name}に ゆびを のせて そのまままとう`;
+                elements.countdownNumber.textContent = "3";
+                elements.countdownLayer.classList.remove("hidden");
+                game.countdownEnd = performance.now() + 3000;
+                tone(520, 0.11, 0.05);
+            }
+
+            function startPlaying(now) {
+                game.state = "playing";
+                game.elapsed = 0;
+                game.motionTime = 0;
+                elements.countdownLayer.classList.add("hidden");
+                elements.instruction.textContent = `${STAR_TYPES[game.starType].name}から ゆびを はなさず おいかけよう`;
+                tone(760, 0.11, 0.055);
+                tone(980, 0.18, 0.05, 0.11);
+                lastFrame = now;
+            }
+
+            function returnToTitle() {
+                game.state = "title";
+                game.input.active = false;
+                hideCoach();
+                elements.countdownLayer.classList.add("hidden");
+                setScreen("title");
+                updateBestLabels();
+            }
+
+            function getPlayArea() {
+                const top = Math.max(105, viewHeight * 0.18);
+                const bottomPadding = viewHeight < 520 ? 34 : 64;
+                const left = Math.max(30, viewWidth * 0.065);
+                const right = viewWidth - left;
+                const bottom = Math.max(top + 120, viewHeight - bottomPadding);
+                return {
+                    left,
+                    right,
+                    top,
+                    bottom,
+                    cx: (left + right) / 2,
+                    cy: (top + bottom) / 2,
+                    rx: (right - left) * 0.42,
+                    ry: (bottom - top) * 0.38
+                };
+            }
+
+            function setPracticeTarget(delta) {
+                const area = getPlayArea();
+                game.motionTime += delta / 1000;
+
+                if (game.practiceStep === 0) {
+                    game.target.x = area.cx;
+                    game.target.y = area.cy;
+                    game.target.size = Math.min(52, Math.max(38, Math.min(viewWidth, viewHeight) * 0.07));
+                } else if (game.practiceStep === 1) {
+                    const t = game.motionTime * 0.85;
+                    game.target.x = area.cx + area.rx * 0.65 * Math.cos(t);
+                    game.target.y = area.cy + area.ry * 0.42 * Math.sin(t);
+                    game.target.size = Math.min(49, Math.max(36, Math.min(viewWidth, viewHeight) * 0.065));
+                } else {
+                    const t = game.motionTime * 1.12;
+                    game.target.x = area.cx + area.rx * 0.72 * Math.sin(t);
+                    game.target.y = area.cy + area.ry * 0.55 * Math.sin(t * 2) * 0.75;
+                    game.target.size = Math.min(46, Math.max(33, Math.min(viewWidth, viewHeight) * 0.06));
+                }
+            }
+
+            function seededMotion(seed) {
+                const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+                return value - Math.floor(value);
+            }
+
+            function getKikyuRoute(index) {
+                const routeSeed = game.motionSeed + index * 7;
+                const direction = seededMotion(routeSeed + 1) < 0.5 ? -1 : 1;
+                return {
+                    bottomX: -direction * (0.44 + seededMotion(routeSeed + 2) * 0.28),
+                    bottomY: 0.5 + seededMotion(routeSeed + 3) * 0.18,
+                    topX: direction * (0.28 + seededMotion(routeSeed + 4) * 0.44),
+                    topY: -(0.44 + seededMotion(routeSeed + 5) * 0.24),
+                    upBend: (seededMotion(routeSeed + 6) - 0.5) * 0.28,
+                    downBend: (seededMotion(routeSeed + 7) - 0.5) * 0.22
+                };
+            }
+
+            function setChallengeTarget(delta) {
+                const area = getPlayArea();
+                const progress = Math.min(1, game.elapsed / GAME_DURATION);
+                const launch = Math.min(1, game.elapsed / 900);
+                const compact = Math.min(viewWidth, viewHeight) < 520;
+                let waveX = 0;
+                let waveY = 0;
+                let size = compact ? 40 : 47;
+
+                if (game.starType === "kimagure") {
+                    game.motionTime += (delta / 1000) * (1.15 + progress * 0.28);
+                    const t = game.motionTime;
+                    waveX = Math.sin(t) * 0.57
+                        + Math.sin(t * 2.7 + 0.4) * 0.28
+                        + Math.sin(t * 4.6) * 0.08;
+                    waveY = Math.sin(t * 1.65 + 0.8) * 0.48
+                        + Math.sin(t * 3.1) * 0.2;
+                    size = compact ? 38 : 45;
+                } else if (game.starType === "kirameki") {
+                    game.motionTime += (delta / 1000) * (0.98 + progress * 0.22);
+                    const t = game.motionTime;
+                    waveX = Math.sin(t) * 0.72;
+                    waveY = Math.sin(t * 2) * 0.48;
+                    const sizePulse = 0.72 + (Math.sin(t * 2.3) + 1) * 0.25;
+                    size = (compact ? 39 : 46) * sizePulse;
+                } else if (game.starType === "kiseki") {
+                    game.motionTime += (delta / 1000) * (1.38 + progress * 0.38);
+                    const t = game.motionTime;
+                    waveX = Math.sin(t) * (0.72 - progress * 0.08)
+                        + Math.sin(t * 2.55) * (0.12 + progress * 0.13);
+                    waveY = Math.sin(t * (1.18 + progress * 0.14)) * 0.62
+                        + Math.sin(t * 2.85 + 0.7) * (0.1 + progress * 0.12);
+                    size = Math.max(compact ? 22 : 25, (compact ? 31 : 36) - progress * 8);
+                } else if (game.starType === "kikyu") {
+                    game.motionTime += delta / 1000;
+                    const cycleLength = 3.9 - progress * 0.45;
+                    const cyclePosition = 0.375 + game.motionTime / cycleLength;
+                    const cycleIndex = Math.floor(cyclePosition);
+                    const cycle = cyclePosition - cycleIndex;
+                    const route = getKikyuRoute(cycleIndex);
+                    const nextRoute = getKikyuRoute(cycleIndex + 1);
+
+                    if (cycle < 0.74) {
+                        const position = cycle / 0.74;
+                        const eased = position * position * (3 - 2 * position);
+                        const curve = Math.sin(Math.PI * position);
+                        waveX = route.bottomX
+                            + (route.topX - route.bottomX) * eased
+                            + curve * route.upBend;
+                        waveY = route.bottomY
+                            + (route.topY - route.bottomY) * eased;
+                    } else {
+                        const position = (cycle - 0.74) / 0.26;
+                        const curve = Math.sin(Math.PI * position);
+                        waveX = route.topX
+                            + (nextRoute.bottomX - route.topX) * position
+                            + curve * route.downBend;
+                        waveY = route.topY
+                            + (nextRoute.bottomY - route.topY) * position;
+                    }
+                    size = compact ? 39 : 46;
+                } else {
+                    game.motionTime += (delta / 1000) * (0.84 + progress * 0.18);
+                    const t = game.motionTime;
+                    waveX = Math.sin(t) * 0.76;
+                    waveY = -Math.cos(t) * 0.58;
+                    size = compact ? 42 : 49;
+                }
+
+                game.target.x = Math.max(
+                    area.left,
+                    Math.min(area.right, area.cx + area.rx * waveX * launch)
+                );
+                game.target.y = Math.max(
+                    area.top,
+                    Math.min(area.bottom, area.cy + area.ry * waveY * launch)
+                );
+                game.target.size = size;
+            }
+
+            function getHitState() {
+                if (!game.input.active) return false;
+                const distance = Math.hypot(
+                    game.input.x - game.target.x,
+                    game.input.y - game.target.y
+                );
+                if (game.mode === "practice") {
+                    return distance <= game.target.size * 2.05;
+                }
+                if (game.starType === "kiseki") {
+                    return distance <= game.target.size * KISEKI_HIT_SCALE;
+                }
+                const starCircleRadius = game.target.size * STAR_BODY_SCALE;
+                return distance + MOMON_CURSOR_RADIUS <= starCircleRadius + HIT_ASSIST_PX;
+            }
+
+            function updatePractice(delta) {
+                setPracticeTarget(delta);
+                game.catching = getHitState();
+
+                if (game.catching) {
+                    game.practiceHold += delta;
+                } else {
+                    game.practiceHold = Math.max(0, game.practiceHold - delta * 0.16);
+                }
+
+                const requirement = PRACTICE_REQUIREMENTS[game.practiceStep];
+                game.shine = Math.min(100, (game.practiceHold / requirement) * 100);
+                updatePracticeLabels();
+                addTrailPoint();
+
+                if (game.practiceHold >= requirement) {
+                    completePracticeStep();
+                }
+            }
+
+            function updateCountdown(now) {
+                const remaining = Math.max(0, game.countdownEnd - now);
+                const number = Math.max(1, Math.ceil(remaining / 1000));
+                if (elements.countdownNumber.textContent !== String(number)) {
+                    elements.countdownNumber.textContent = String(number);
+                    tone(520 + (3 - number) * 90, 0.1, 0.045);
+                }
+
+                const area = getPlayArea();
+                game.target.x = area.cx;
+                game.target.y = area.cy;
+                const countdownSize = Math.min(48, Math.max(35, Math.min(viewWidth, viewHeight) * 0.065));
+                game.target.size = game.starType === "kiseki"
+                    ? countdownSize * 0.82
+                    : countdownSize;
+
+                if (remaining <= 0) startPlaying(now);
+            }
+
+            function updateChallenge(delta) {
+                game.elapsed += delta;
+                setChallengeTarget(delta);
+                game.catching = getHitState();
+
+                if (game.catching) {
+                    game.caught += delta;
+                }
+
+                game.shine = Math.min(100, (game.caught / GAME_DURATION) * 100);
+                const rounded = Math.round(game.shine);
+                const remainingSeconds = Math.max(0, Math.ceil((GAME_DURATION - game.elapsed) / 1000));
+                elements.hudTime.textContent = `${remainingSeconds}びょう`;
+                elements.hudShine.textContent = String(rounded);
+
+                const milestone = Math.floor(rounded / 10);
+                if (milestone > game.milestone && milestone > 0) {
+                    game.milestone = milestone;
+                    tone(640 + milestone * 35, 0.08, 0.035);
+                }
+
+                addTrailPoint(delta);
+                if (game.elapsed >= GAME_DURATION) finishChallenge();
+            }
+
+            function addTrailPoint(delta = 16) {
+                game.targetTrail.push({
+                    x: game.target.x,
+                    y: game.target.y,
+                    shine: game.shine
+                });
+                if (game.targetTrail.length > 24) game.targetTrail.shift();
+
+                if (game.mode !== "challenge") return;
+                game.sampleElapsed += delta;
+                if (game.sampleElapsed < 45) return;
+                game.sampleElapsed = 0;
+                game.targetPath.push({ x: game.target.x, y: game.target.y });
+                game.userPath.push(game.catching
+                    ? { x: game.input.x, y: game.input.y }
+                    : null
+                );
+            }
+
+            function finishChallenge() {
+                game.state = "result";
+                game.input.active = false;
+                const finalScore = Math.max(0, Math.min(100, Math.round(game.shine)));
+                const previousBest = starRecords[game.starType] || 0;
+                const isNewRecord = finalScore > previousBest;
+                if (isNewRecord) {
+                    starRecords[game.starType] = finalScore;
+                    localStorage.setItem(`${RECORD_PREFIX}${game.starType}`, String(finalScore));
+                }
+
+                const currentBest = starRecords[game.starType] || 0;
+                elements.resultTitle.textContent = `${STAR_TYPES[game.starType].name}の きろく`;
+                elements.resultScore.textContent = String(finalScore);
+                elements.resultBest.textContent = String(Math.round(currentBest));
+                elements.newRecord.classList.toggle("hidden", !isNewRecord);
+                elements.resultMessage.textContent = getResultMessage(finalScore, game.starType);
+                showFinalStar(finalScore);
+                setScreen("result");
+                drawResultMap();
+                updateBestLabels();
+
+                if (finalScore >= 80) {
+                    happySound();
+                } else {
+                    tone(620, 0.14, 0.05);
+                    tone(780, 0.2, 0.045, 0.13);
+                }
+            }
+
+            function showFinalStar(score) {
+                const classes = ["power-white", "power-yellow", "power-gold", "power-rainbow"];
+                elements.resultStarAura.classList.remove(...classes);
+                elements.resultStar.src = STAR_TYPES[game.starType].image;
+                elements.resultStar.alt = STAR_TYPES[game.starType].name;
+
+                if (score >= 82) {
+                    elements.resultStarAura.classList.add("power-rainbow");
+                    elements.resultStarLabel.textContent = "にじいろのひかり";
+                } else if (score >= 55) {
+                    elements.resultStarAura.classList.add("power-gold");
+                    elements.resultStarLabel.textContent = "きんいろのひかり";
+                } else if (score >= 25) {
+                    elements.resultStarAura.classList.add("power-yellow");
+                    elements.resultStarLabel.textContent = "きいろのひかり";
+                } else {
+                    elements.resultStarAura.classList.add("power-white");
+                    elements.resultStarLabel.textContent = "しろいひかり";
+                }
+            }
+
+            function getResultMessage(score, type) {
+                const starName = STAR_TYPES[type].name;
+                if (score < 25) {
+                    return `${starName}に ほしパワーが たまってきたよ。 もういちど いっしょに おいかけよう！`;
+                }
+                if (score < 55) {
+                    return `${starName}が きいろく ひかってきたよ！ よく おいかけたね。`;
+                }
+                if (score < 82) {
+                    return `${starName}が きんいろに ひかったよ！ すごい しゅうちゅうりょくだね！`;
+                }
+                return `${starName}が にじいろに ひかったよ！ ももんも びっくり。 さいこうの ほしもりだね！`;
+            }
+
+            function drawResultMap() {
+                const width = resultMap.width;
+                const height = resultMap.height;
+                resultCtx.clearRect(0, 0, width, height);
+
+                const gradient = resultCtx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, "#071945");
+                gradient.addColorStop(1, "#123a83");
+                resultCtx.fillStyle = gradient;
+                resultCtx.fillRect(0, 0, width, height);
+
+                resultCtx.fillStyle = "rgba(255,255,255,0.68)";
+                for (let index = 0; index < 34; index += 1) {
+                    const x = (index * 83 + 29) % width;
+                    const y = (index * 47 + 19) % height;
+                    resultCtx.beginPath();
+                    resultCtx.arc(x, y, index % 5 === 0 ? 1.7 : 1, 0, Math.PI * 2);
+                    resultCtx.fill();
+                }
+
+                if (game.targetPath.length < 2) return;
+
+                const padding = 18;
+                const scale = Math.min(
+                    (width - padding * 2) / Math.max(1, viewWidth),
+                    (height - padding * 2) / Math.max(1, viewHeight)
+                );
+                const offsetX = (width - viewWidth * scale) / 2;
+                const offsetY = (height - viewHeight * scale) / 2;
+                const toMap = (point) => ({
+                    x: offsetX + point.x * scale,
+                    y: offsetY + point.y * scale
+                });
+
+                resultCtx.save();
+                resultCtx.lineCap = "round";
+                resultCtx.lineJoin = "round";
+                resultCtx.strokeStyle = "rgba(142, 238, 255, 0.88)";
+                resultCtx.lineWidth = 7;
+                resultCtx.setLineDash([7, 9]);
+                resultCtx.beginPath();
+                game.targetPath.forEach((point, index) => {
+                    const mapped = toMap(point);
+                    if (index === 0) resultCtx.moveTo(mapped.x, mapped.y);
+                    else resultCtx.lineTo(mapped.x, mapped.y);
+                });
+                resultCtx.stroke();
+                resultCtx.setLineDash([]);
+
+                resultCtx.strokeStyle = "#ff82c8";
+                resultCtx.shadowBlur = 8;
+                resultCtx.shadowColor = "#ff82c8";
+                resultCtx.lineWidth = 4;
+                resultCtx.beginPath();
+                let drawing = false;
+                game.userPath.forEach((point) => {
+                    if (!point) {
+                        drawing = false;
+                        return;
+                    }
+                    const mapped = toMap(point);
+                    if (!drawing) {
+                        resultCtx.moveTo(mapped.x, mapped.y);
+                        drawing = true;
+                    } else {
+                        resultCtx.lineTo(mapped.x, mapped.y);
+                    }
+                });
+                resultCtx.stroke();
+                resultCtx.restore();
+            }
+
+            function starColor(shine, time) {
+                if (shine >= 82) {
+                    return `hsl(${(time * 80 + shine * 3) % 360}, 96%, 72%)`;
+                }
+                if (shine >= 55) return "#ffd84e";
+                if (shine >= 25) return "#fff184";
+                return "#effcff";
+            }
+
+            function starPath(x, y, outer, inner) {
+                ctx.beginPath();
+                for (let index = 0; index < 10; index += 1) {
+                    const radius = index % 2 === 0 ? outer : inner;
+                    const angle = -Math.PI / 2 + index * Math.PI / 5;
+                    const px = x + Math.cos(angle) * radius;
+                    const py = y + Math.sin(angle) * radius;
+                    if (index === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+            }
+
+            function drawStarImage(image, x, y, radius, alpha = 1) {
+                if (!image || !image.complete || !image.naturalWidth) return false;
+                const size = radius * 2.65;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.drawImage(image, x - size / 2, y - size / 2, size, size);
+                ctx.restore();
+                return true;
+            }
+
+            function drawTwinkles(now) {
+                game.twinkles.forEach((star) => {
+                    const alpha = 0.24 + (Math.sin(now / 1000 * star.speed + star.phase) + 1) * 0.24;
+                    ctx.fillStyle = star.warm
+                        ? `rgba(255, 231, 132, ${alpha})`
+                        : `rgba(225, 246, 255, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            function drawTarget(now) {
+                const color = starColor(game.shine, now / 1000);
+                const pulse = 1 + Math.sin(now / 130) * 0.04;
+                const image = starImages[game.starType] || starImages.kirakira;
+
+                game.targetTrail.forEach((point, index) => {
+                    const progress = (index + 1) / game.targetTrail.length;
+                    const trailRadius = game.target.size * progress * 0.58;
+                    if (!drawStarImage(image, point.x, point.y, trailRadius, progress * 0.24)) {
+                        ctx.save();
+                        ctx.globalAlpha = progress * 0.34;
+                        ctx.fillStyle = starColor(point.shine, now / 1000 - index * 0.02);
+                        starPath(point.x, point.y, trailRadius, trailRadius * 0.46);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                });
+
+                ctx.save();
+                ctx.shadowBlur = game.catching ? 34 : 22;
+                ctx.shadowColor = color;
+                if (!drawStarImage(
+                    image,
+                    game.target.x,
+                    game.target.y,
+                    game.target.size * pulse,
+                    game.catching ? 1 : 0.96
+                )) {
+                    ctx.fillStyle = game.catching ? "#ffffff" : color;
+                    starPath(
+                        game.target.x,
+                        game.target.y,
+                        game.target.size * pulse,
+                        game.target.size * 0.46 * pulse
+                    );
+                    ctx.fill();
+                    ctx.lineWidth = Math.max(2, game.target.size * 0.08);
+                    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                if (game.catching) {
+                    const feedbackRadius = game.mode === "challenge" && game.starType !== "kiseki"
+                        ? game.target.size * STAR_BODY_SCALE
+                        : game.target.size * 1.45;
+                    ctx.save();
+                    ctx.strokeStyle = "rgba(255, 240, 130, 0.78)";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(game.target.x, game.target.y, feedbackRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            function drawFrame(now) {
+                ctx.clearRect(0, 0, viewWidth, viewHeight);
+                drawTwinkles(now);
+
+                if (
+                    game.state === "playing"
+                    || game.state === "practice"
+                    || game.state === "practice-pause"
+                    || game.state === "countdown"
+                ) {
+                    drawTarget(now);
+                }
+            }
+
+            function animate(now) {
+                const delta = Math.min(34, Math.max(0, now - lastFrame || 16));
+                lastFrame = now;
+
+                if (game.state === "countdown") {
+                    updateCountdown(now);
+                } else if (game.state === "playing") {
+                    updateChallenge(delta);
+                } else if (game.state === "practice") {
+                    updatePractice(delta);
+                }
+
+                drawFrame(now);
+                requestAnimationFrame(animate);
+            }
+
+            function updatePointer(event) {
+                const rect = canvas.getBoundingClientRect();
+                game.input.x = event.clientX - rect.left;
+                game.input.y = event.clientY - rect.top;
+                game.input.pointerType = event.pointerType || "mouse";
+            }
+
+            canvas.addEventListener("pointerdown", (event) => {
+                updatePointer(event);
+                game.input.active = true;
+                ensureAudio();
+                if (canvas.setPointerCapture) {
+                    try {
+                        canvas.setPointerCapture(event.pointerId);
+                    } catch (error) {
+                        // つかえないたんまつでは そのままつづける
+                    }
+                }
+            });
+
+            canvas.addEventListener("pointermove", (event) => {
+                updatePointer(event);
+                if (event.pointerType === "mouse") game.input.active = true;
+            });
+
+            canvas.addEventListener("pointerup", (event) => {
+                if (event.pointerType !== "mouse") game.input.active = false;
+            });
+            canvas.addEventListener("pointercancel", () => {
+                game.input.active = false;
+            });
+            canvas.addEventListener("pointerleave", (event) => {
+                if (event.pointerType === "mouse") game.input.active = false;
+            });
+
+            elements.practiceButton.addEventListener("click", startPractice);
+            elements.startButton.addEventListener("click", openStarSelect);
+            elements.selectBack.addEventListener("click", returnToTitle);
+            document.querySelectorAll(".star-choice").forEach((button) => {
+                button.addEventListener("click", () => startChallenge(button.dataset.star));
+            });
+            elements.playBack.addEventListener("click", returnToTitle);
+            elements.retryButton.addEventListener("click", () => startChallenge(game.starType));
+            elements.resultTitleButton.addEventListener("click", returnToTitle);
+
+            elements.coachButton.addEventListener("click", () => {
+                ensureAudio();
+                if (game.coachAction === "run-practice") {
+                    runPracticeStep();
+                } else if (game.coachAction === "start-challenge") {
+                    openStarSelect();
+                }
+            });
+
+            elements.sound.addEventListener("click", () => {
+                soundOn = !soundOn;
+                elements.sound.textContent = soundOn ? "🔊" : "🔇";
+                elements.sound.setAttribute("aria-pressed", String(soundOn));
+                if (soundOn) tone(720, 0.12, 0.05);
+            });
+
+            window.addEventListener("resize", resizeCanvas);
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden && (game.state === "playing" || game.state === "practice")) {
+                    game.input.active = false;
+                }
+            });
+
+            updateBestLabels();
+            resizeCanvas();
+            requestAnimationFrame(animate);
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#171c55">
+    <title>おぼえて！いろゆうれい｜みならいみこの おはらい</title>
+    <link rel="preload" as="image" href="assets/ghost-apartment-night-square-v2.jpg">
+    <link rel="preload" as="image" href="assets/ghost-apartment-day-square-v2.jpg">
+    <link rel="preload" as="image" href="assets/miko-memorize-v1.png">
+    <link rel="preload" as="image" href="assets/miko-purify-v1.png">
+    <style>
+        :root {
+            --ink: #3f3154;
+            --night: #171c55;
+            --night-deep: #0d1039;
+            --day: #91d9ee;
+            --day-light: #e8fbff;
+            --paper: #fff8df;
+            --vermilion: #e75c50;
+            --gold: #f5c95d;
+            --wood: #57405e;
+            --wood-dark: #33263d;
+            --panel: rgba(255, 252, 238, 0.97);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            color: var(--ink);
+            background: var(--night);
+            font-family:
+                "Hiragino Maru Gothic ProN",
+                "Yu Gothic",
+                "Meiryo",
+                system-ui,
+                sans-serif;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            touch-action: manipulation;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            min-height: 100%;
+            min-height: 100svh;
+        }
+
+        .sound-button {
+            display: grid;
+            place-items: center;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.94);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 0 rgba(30, 24, 57, 0.3);
+            cursor: pointer;
+        }
+
+        .title-sound-button {
+            position: fixed;
+            z-index: 300;
+            top: max(10px, env(safe-area-inset-top));
+            left: max(10px, env(safe-area-inset-left));
+            width: 46px;
+            height: 46px;
+            font-size: 22px;
+        }
+
+        body[data-screen="game"] .title-sound-button {
+            display: none;
+        }
+
+        .game-sound-button {
+            width: 36px;
+            height: 36px;
+            align-self: end;
+            font-size: 17px;
+        }
+
+        /* タイトル */
+        .title-screen {
+            isolation: isolate;
+            overflow: hidden;
+            background: #171c55;
+        }
+
+        .title-art {
+            position: absolute;
+            z-index: -3;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 26% center;
+        }
+
+        .title-shade {
+            position: absolute;
+            z-index: -2;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(4, 7, 35, 0.28), transparent 38%),
+                linear-gradient(0deg, rgba(7, 8, 32, 0.72), transparent 48%);
+            pointer-events: none;
+        }
+
+        .title-best {
+            position: absolute;
+            z-index: 5;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(10px, env(safe-area-inset-right));
+            min-width: 112px;
+            padding: 8px 11px;
+            color: #68513e;
+            background: rgba(255, 250, 226, 0.95);
+            border: 3px solid #fff;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(7, 8, 32, 0.28);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 1000;
+        }
+
+        .title-best strong {
+            display: block;
+            color: #df574d;
+            font-size: 24px;
+            line-height: 1.05;
+        }
+
+        .title-logo {
+            position: absolute;
+            z-index: 3;
+            top: max(72px, calc(env(safe-area-inset-top) + 54px));
+            left: 50%;
+            width: min(96vw, 760px);
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .title-logo-art {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: min(31vh, 255px);
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(3, 5, 30, 0.52));
+        }
+
+        .title-subtitle {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 5px 14px;
+            color: #fff9e6;
+            background: rgba(41, 28, 66, 0.82);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 999px;
+            box-shadow: 0 5px 15px rgba(3, 5, 30, 0.35);
+            font-size: clamp(12px, 3.5vw, 17px);
+            font-weight: 1000;
+            letter-spacing: 0.06em;
+        }
+
+        .title-menu {
+            position: absolute;
+            z-index: 4;
+            left: 50%;
+            bottom: max(22px, calc(env(safe-area-inset-bottom) + 16px));
+            display: grid;
+            grid-template-columns: 1fr 1.18fr 1fr;
+            width: min(95vw, 610px);
+            gap: 8px;
+            transform: translateX(-50%);
+        }
+
+        .title-button,
+        .title-link {
+            display: grid;
+            min-height: 51px;
+            place-items: center;
+            padding: 7px 10px;
+            border: 3px solid #fff;
+            border-radius: 16px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 1000;
+            line-height: 1.12;
+            cursor: pointer;
+            transition: transform 120ms ease;
+        }
+
+        .title-button:active,
+        .title-link:active {
+            transform: translateY(4px);
+        }
+
+        .practice-button {
+            color: #4d6d67;
+            background: #effff5;
+            box-shadow: 0 7px 0 #76af95, 0 12px 22px rgba(4, 6, 29, 0.28);
+        }
+
+        .start-button {
+            min-height: 59px;
+            color: #fff;
+            background: linear-gradient(180deg, #ef7669, #d84f50);
+            border-color: #ffe3d8;
+            box-shadow: 0 8px 0 #8c343c, 0 14px 24px rgba(4, 6, 29, 0.32);
+            font-size: 23px;
+            text-shadow: 0 2px 0 rgba(94, 34, 44, 0.55);
+        }
+
+        .start-button small {
+            display: block;
+            margin-top: 2px;
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        .title-link {
+            color: #584c55;
+            background: rgba(255, 250, 230, 0.95);
+            box-shadow: 0 6px 0 rgba(75, 56, 67, 0.45);
+            font-size: 12px;
+        }
+
+        /* ゲーム */
+        .game-screen {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            background: var(--night);
+        }
+
+        .game-header {
+            position: relative;
+            z-index: 40;
+            display: grid;
+            grid-template-columns: 92px 1fr 118px;
+            gap: 8px;
+            align-items: center;
+            padding:
+                max(8px, env(safe-area-inset-top))
+                max(9px, env(safe-area-inset-right))
+                7px
+                max(9px, env(safe-area-inset-left));
+            background:
+                repeating-linear-gradient(135deg, rgba(167, 107, 81, 0.035) 0 7px, transparent 7px 14px),
+                rgba(255, 249, 224, 0.98);
+            border-bottom: 3px solid #e4b95a;
+            box-shadow:
+                inset 0 -1px 0 rgba(255,255,255,0.9),
+                0 5px 18px rgba(15, 13, 43, 0.26);
+        }
+
+        .hud-card {
+            min-width: 0;
+            padding: 5px 7px;
+            background: #fff;
+            border: 2px solid #f1dfc7;
+            border-radius: 13px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 1000;
+            line-height: 1.05;
+        }
+
+        .hud-card strong {
+            display: block;
+            margin-top: 2px;
+            color: #d84f50;
+            font-size: 20px;
+            white-space: nowrap;
+        }
+
+        .hud-message {
+            min-width: 0;
+            color: #4a3a58;
+            text-align: center;
+            font-size: clamp(12px, 3.5vw, 17px);
+            font-weight: 1000;
+            line-height: 1.25;
+        }
+
+        .exit-button {
+            min-height: 40px;
+            padding: 5px;
+            color: #6d5a61;
+            background: #eee8dd;
+            border: 2px solid #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 0 #cfc4b6;
+            font-size: 13px;
+            font-weight: 1000;
+            cursor: pointer;
+        }
+
+        .hud-actions {
+            display: grid;
+            gap: 3px;
+        }
+
+        .hud-buttons {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr);
+            gap: 5px;
+            align-items: end;
+        }
+
+        .miss-badge {
+            color: #736270;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 1000;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .miss-badge strong {
+            margin-left: 3px;
+            color: #d84f50;
+            font-size: 12px;
+        }
+
+        .game-main {
+            position: relative;
+            isolation: isolate;
+            min-height: 0;
+            overflow: hidden;
+            background-position: center;
+            background-size: cover;
+            transition: background-image 500ms ease;
+        }
+
+        .game-main.night {
+            background:
+                radial-gradient(circle at 12% 12%, rgba(255, 226, 146, 0.22), transparent 17%),
+                radial-gradient(circle at 82% 31%, rgba(94, 82, 191, 0.34), transparent 34%),
+                linear-gradient(155deg, #12194b 0%, #222465 44%, #10143e 72%, #080b27 100%);
+        }
+
+        .game-main.day {
+            background:
+                radial-gradient(circle at 14% 12%, rgba(255, 249, 190, 0.88), transparent 18%),
+                radial-gradient(circle at 76% 30%, rgba(241, 255, 255, 0.82), transparent 31%),
+                linear-gradient(160deg, #76cdea 0%, #b8edee 54%, #77cbd8 100%);
+        }
+
+        .scene-decor {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .celestial {
+            position: absolute;
+            top: clamp(20px, 5svh, 56px);
+            left: clamp(18px, 7vw, 100px);
+            width: clamp(42px, 8vw, 78px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            transition: background 600ms ease, box-shadow 600ms ease;
+        }
+
+        .night .celestial {
+            background:
+                radial-gradient(circle at 38% 35%, rgba(179, 142, 79, 0.36) 0 5%, transparent 6%),
+                radial-gradient(circle at 67% 61%, rgba(179, 142, 79, 0.28) 0 8%, transparent 9%),
+                radial-gradient(circle, #fffbd9 0 58%, #f7d986 70%, #dba955 100%);
+            box-shadow:
+                0 0 14px rgba(255, 226, 145, 0.92),
+                0 0 42px rgba(255, 211, 109, 0.58);
+        }
+
+        .day .celestial {
+            background: radial-gradient(circle, #fffbe1 0 52%, #ffd86f 72%, #f3aa3a 100%);
+            box-shadow:
+                0 0 18px rgba(255, 242, 164, 0.95),
+                0 0 48px rgba(255, 221, 103, 0.62);
+        }
+
+        .cloud {
+            position: absolute;
+            width: clamp(170px, 31vw, 420px);
+            height: 58px;
+            border-radius: 999px;
+            opacity: 0.18;
+            filter: blur(1px);
+            animation: cloudFloat 16s ease-in-out infinite alternate;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            left: 17%;
+            width: 38%;
+            aspect-ratio: 1.65;
+        }
+
+        .cloud::after {
+            right: 14%;
+            width: 31%;
+            aspect-ratio: 1.5;
+        }
+
+        .cloud-one {
+            top: 18%;
+            right: -7%;
+            background: #cfd7ff;
+        }
+
+        .cloud-two {
+            bottom: 11%;
+            left: -10%;
+            background: #f6fbff;
+            animation-delay: -8s;
+        }
+
+        .day .cloud {
+            opacity: 0.42;
+            background: #f7ffff;
+        }
+
+        .lantern {
+            position: absolute;
+            top: 9%;
+            width: 34px;
+            height: 50px;
+            background:
+                repeating-linear-gradient(90deg, transparent 0 7px, rgba(105, 34, 40, 0.2) 7px 9px),
+                linear-gradient(180deg, #ff8170, #e54c4e);
+            border: 3px solid #8f3540;
+            border-radius: 45% 45% 38% 38%;
+            box-shadow: 0 0 25px rgba(255, 117, 84, 0.58);
+            opacity: 0.92;
+            transform-origin: 50% -18px;
+            animation: lanternSway 3.4s ease-in-out infinite alternate;
+        }
+
+        .lantern::before {
+            content: "";
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            width: 3px;
+            height: 16px;
+            background: #7d2f39;
+            transform: translateX(-50%);
+        }
+
+        .lantern-left {
+            left: 2.5%;
+        }
+
+        .lantern-right {
+            right: 2.5%;
+            animation-delay: -1.7s;
+        }
+
+        .day .lantern {
+            opacity: 0.5;
+            box-shadow: 0 6px 16px rgba(91, 55, 49, 0.22);
+        }
+
+        .stars {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            opacity: 1;
+            background:
+                radial-gradient(circle at 8% 27%, rgba(255,255,255,0.9) 0 1px, transparent 1.8px),
+                radial-gradient(circle at 18% 62%, rgba(255,234,175,0.9) 0 1.2px, transparent 2px),
+                radial-gradient(circle at 31% 17%, rgba(255,255,255,0.82) 0 1px, transparent 1.8px),
+                radial-gradient(circle at 45% 76%, rgba(255,244,201,0.86) 0 1.1px, transparent 1.9px),
+                radial-gradient(circle at 61% 12%, rgba(255,255,255,0.94) 0 1.2px, transparent 2px),
+                radial-gradient(circle at 73% 63%, rgba(255,232,168,0.86) 0 1px, transparent 1.8px),
+                radial-gradient(circle at 89% 22%, rgba(255,255,255,0.88) 0 1.1px, transparent 1.9px),
+                radial-gradient(circle at 94% 79%, rgba(255,244,201,0.82) 0 1px, transparent 1.8px),
+                radial-gradient(circle at center, transparent 38%, rgba(7, 9, 34, 0.42) 100%);
+            transition: opacity 700ms ease;
+            pointer-events: none;
+        }
+
+        .game-main.day .stars {
+            opacity: 0.12;
+        }
+
+        .game-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding:
+                5px
+                max(5px, env(safe-area-inset-right))
+                max(5px, env(safe-area-inset-bottom))
+                max(5px, env(safe-area-inset-left));
+        }
+
+        .phase-message {
+            min-width: 0;
+            padding: 7px 10px;
+            color: #fff8de;
+            background: rgba(44, 31, 67, 0.88);
+            border: 2px solid rgba(255,255,255,0.72);
+            border-radius: 14px;
+            box-shadow: 0 5px 14px rgba(13, 12, 38, 0.24);
+            text-align: center;
+            font-size: clamp(12px, 3.5vw, 17px);
+            font-weight: 1000;
+            line-height: 1.2;
+        }
+
+        .day .phase-message {
+            color: #51425c;
+            background: rgba(255, 252, 232, 0.94);
+        }
+
+        .game-layout {
+            position: relative;
+            display: grid;
+            height: 100%;
+            min-height: 0;
+            grid-template-rows: minmax(0, 1fr) auto;
+            gap: 5px;
+        }
+
+        .apartment-wrap {
+            position: relative;
+            display: grid;
+            min-height: 0;
+            place-items: center;
+        }
+
+        .apartment-board {
+            position: relative;
+            z-index: 2;
+            width: min(96vw, 56svh, 640px);
+            aspect-ratio: 1;
+            overflow: hidden;
+            background-position: center;
+            background-size: cover;
+            border: 5px solid #3c2d45;
+            border-radius: 15px;
+            box-shadow:
+                inset 0 0 0 2px rgba(255, 244, 195, 0.18),
+                0 8px 0 rgba(22, 17, 34, 0.84),
+                0 18px 34px rgba(13, 10, 36, 0.55),
+                0 0 0 2px rgba(245, 201, 93, 0.5);
+        }
+
+        .apartment-board::before {
+            content: "";
+            position: absolute;
+            z-index: 4;
+            inset: 0;
+            border-radius: 9px;
+            box-shadow:
+                inset 0 0 0 2px rgba(255,255,255,0.12),
+                inset 0 0 28px rgba(12, 9, 29, 0.32);
+            pointer-events: none;
+        }
+
+        .apartment-board::after {
+            position: absolute;
+            z-index: 6;
+            top: 10px;
+            left: 50%;
+            padding: 5px 13px;
+            color: #fff8df;
+            background: rgba(50, 34, 63, 0.9);
+            border: 2px solid rgba(255, 243, 190, 0.82);
+            border-radius: 999px;
+            box-shadow: 0 4px 12px rgba(16, 11, 32, 0.32);
+            font-size: clamp(10px, 2.5vw, 14px);
+            font-weight: 1000;
+            letter-spacing: 0.08em;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .night .apartment-board {
+            background-image: url("assets/ghost-apartment-night-square-v2.jpg");
+        }
+
+        .night .apartment-board::after {
+            content: "きおくの よる";
+        }
+
+        .day .apartment-board {
+            background-image: url("assets/ghost-apartment-day-square-v2.jpg");
+            border-color: #6b4a43;
+            box-shadow:
+                inset 0 0 0 2px rgba(255, 255, 255, 0.32),
+                0 8px 0 rgba(87, 62, 49, 0.62),
+                0 18px 34px rgba(66, 46, 34, 0.28),
+                0 0 0 2px rgba(255, 240, 193, 0.74);
+        }
+
+        .day .apartment-board::after {
+            content: "おはらいの あさ";
+            color: #5a3c43;
+            background: rgba(255, 248, 219, 0.94);
+            border-color: rgba(168, 91, 80, 0.74);
+        }
+
+        .window-grid {
+            position: absolute;
+            z-index: 2;
+            inset: 0;
+        }
+
+        .window {
+            position: absolute;
+            overflow: hidden;
+            padding: 0;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            box-shadow: none;
+            cursor: default;
+            transition:
+                transform 130ms ease,
+                border-color 180ms ease;
+        }
+
+        .window.has-ghost {
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255, 235, 159, 0.34), transparent 72%);
+        }
+
+        .window.has-ghost::after {
+            content: "";
+            position: absolute;
+            z-index: 3;
+            inset: 0;
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent 23.5%,
+                    rgba(42, 30, 39, 0.78) 24% 26%,
+                    transparent 26.5% 48.5%,
+                    rgba(42, 30, 39, 0.78) 49% 51%,
+                    transparent 51.5% 73.5%,
+                    rgba(42, 30, 39, 0.78) 74% 76%,
+                    transparent 76.5%
+                ),
+                linear-gradient(
+                    180deg,
+                    transparent 31.5%,
+                    rgba(42, 30, 39, 0.72) 32% 35%,
+                    transparent 35.5% 64.5%,
+                    rgba(42, 30, 39, 0.72) 65% 68%,
+                    transparent 68.5%
+                );
+            box-shadow: inset 0 0 8px rgba(17, 13, 27, 0.28);
+            pointer-events: none;
+        }
+
+        .window:focus-visible {
+            outline: 3px solid #fff4a4;
+            outline-offset: 2px;
+        }
+
+        .window:not(:disabled) {
+            cursor: default;
+        }
+
+        .window.has-ofuda:not(:disabled) {
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .window.drop-target {
+            z-index: 5;
+            border-color: #ffe66f;
+            box-shadow:
+                inset 0 0 0 2px rgba(255,255,255,0.55),
+                0 0 0 4px rgba(255, 230, 111, 0.72),
+                0 5px 13px rgba(31, 24, 36, 0.42);
+            transform: scale(1.06);
+        }
+
+        .window.wrong {
+            border-color: #f05b58;
+            animation: windowShake 360ms ease;
+        }
+
+        .window.right {
+            border-color: #7fcf8a;
+        }
+
+        .ghost {
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            width: 92%;
+            aspect-ratio: 1;
+            background-image: url("assets/color-ghosts-sheet-v1.png");
+            background-repeat: no-repeat;
+            background-size: 200% 200%;
+            filter: drop-shadow(0 4px 4px rgba(31, 19, 44, 0.28));
+            transform: translate(-50%, -48%);
+            animation: ghostPeek 240ms cubic-bezier(.2,.9,.25,1.25) both;
+            pointer-events: none;
+        }
+
+        .ghost.color-1 { background-position: 0 0; }
+        .ghost.color-2 { background-position: 100% 0; }
+        .ghost.color-3 { background-position: 0 100%; }
+        .ghost.color-4 { background-position: 100% 100%; }
+
+        .window.success .ghost {
+            animation: ghostDepart 850ms ease-in both;
+        }
+
+        .ofuda {
+            position: absolute;
+            z-index: 4;
+            top: 50%;
+            left: 50%;
+            display: grid;
+            width: 39%;
+            min-width: 19px;
+            aspect-ratio: 0.48;
+            place-items: center;
+            background:
+                radial-gradient(circle at 50% 12%, var(--seal) 0 4%, transparent 4.5%),
+                repeating-linear-gradient(0deg, rgba(118,78,44,0.035) 0 2px, transparent 2px 5px),
+                linear-gradient(90deg, #f4dfb4, #fff8d9 15% 85%, #e7cc9b);
+            border: 1px solid #9f7047;
+            border-radius: 2px;
+            box-shadow:
+                0 4px 5px rgba(53, 35, 30, 0.35),
+                inset 0 0 0 2px rgba(255,255,255,0.42);
+            clip-path: polygon(6% 0, 94% 0, 100% 5%, 96% 12%, 100% 20%, 96% 28%, 100% 36%, 96% 44%, 100% 52%, 96% 60%, 100% 68%, 96% 76%, 100% 84%, 94% 100%, 6% 100%, 0 94%, 4% 86%, 0 78%, 4% 70%, 0 62%, 4% 54%, 0 46%, 4% 38%, 0 30%, 4% 22%, 0 14%, 4% 6%);
+            transform: translate(-50%, -50%) rotate(-2deg);
+            animation: stampIn 180ms ease-out both;
+            pointer-events: none;
+        }
+
+        .ofuda::before {
+            content: "祓";
+            position: relative;
+            z-index: 2;
+            color: var(--seal);
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+            font-size: clamp(14px, 4.3vw, 27px);
+            font-weight: 1000;
+            line-height: 1;
+            text-shadow: 0 1px 0 rgba(93, 47, 35, 0.25);
+        }
+
+        .ofuda::after {
+            content: "";
+            position: absolute;
+            inset: 8% 14%;
+            border: 1.5px solid var(--seal);
+            box-shadow:
+                inset 0 10px 0 -8px var(--seal),
+                inset 0 -10px 0 -8px var(--seal);
+        }
+
+        .ofuda.color-1 { --seal: #ef675d; }
+        .ofuda.color-2 { --seal: #50aee6; }
+        .ofuda.color-3 { --seal: #e9b91c; }
+        .ofuda.color-4 { --seal: #69b952; }
+
+        .helper-miko {
+            grid-area: miko;
+            display: block;
+            width: 64px;
+            height: 88px;
+            justify-self: center;
+            align-self: end;
+            object-fit: contain;
+            object-position: bottom;
+            transform-origin: 50% 100%;
+            filter: drop-shadow(0 7px 9px rgba(30, 21, 42, 0.25));
+            pointer-events: none;
+        }
+
+        .helper-miko.is-memorizing {
+            animation: mikoWatch 1800ms ease-in-out infinite;
+        }
+
+        .helper-miko.is-purifying {
+            animation: mikoPurify 520ms cubic-bezier(.2,.9,.25,1.2) both;
+        }
+
+        .game-panel {
+            position: relative;
+            isolation: isolate;
+            display: grid;
+            min-width: 0;
+            grid-template-columns: 64px minmax(0, 1fr) auto;
+            grid-template-areas:
+                "miko message timer"
+                "tools tools tools";
+            gap: 5px;
+            align-items: center;
+            padding: 5px;
+            overflow: hidden;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.08), transparent 45%),
+                rgba(37, 26, 54, 0.92);
+            border: 3px solid #d8ae5c;
+            border-radius: 18px;
+            box-shadow:
+                inset 0 0 0 2px rgba(255,255,255,0.1),
+                0 8px 0 rgba(25, 17, 39, 0.72),
+                0 14px 25px rgba(20, 13, 31, 0.38);
+            backdrop-filter: blur(7px);
+        }
+
+        .game-panel::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            opacity: 0.1;
+            background:
+                radial-gradient(circle at 0 100%, transparent 13px, #fff 14px 15px, transparent 16px) 0 0 / 28px 14px,
+                radial-gradient(circle at 50% 100%, transparent 13px, #fff 14px 15px, transparent 16px) 14px 7px / 28px 14px;
+            pointer-events: none;
+        }
+
+        .game-panel::after {
+            content: "";
+            position: absolute;
+            z-index: 3;
+            inset: 5px;
+            border: 1px solid rgba(255, 246, 209, 0.22);
+            border-radius: 11px;
+            pointer-events: none;
+        }
+
+        .game-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .day .game-panel {
+            background:
+                repeating-linear-gradient(0deg, rgba(150, 102, 68, 0.025) 0 2px, transparent 2px 5px),
+                rgba(255, 248, 217, 0.96);
+            border-color: #b8695e;
+            box-shadow:
+                inset 0 0 0 2px rgba(255,255,255,0.52),
+                0 8px 0 rgba(112, 63, 55, 0.54),
+                0 14px 25px rgba(72, 45, 42, 0.25);
+        }
+
+        .day .game-panel::before {
+            opacity: 0.07;
+            filter: invert(25%) sepia(25%);
+        }
+
+        .day .game-panel::after {
+            border-color: rgba(159, 88, 78, 0.2);
+        }
+
+        .game-panel .phase-message {
+            grid-area: message;
+        }
+
+        .answer-tools {
+            display: grid;
+            grid-area: tools;
+            grid-column: 1 / -1;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .palette {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .color-button {
+            position: relative;
+            display: grid;
+            min-width: 0;
+            min-height: 54px;
+            grid-template-columns: 31px minmax(0, 1fr);
+            gap: 3px;
+            align-items: center;
+            padding: 3px 5px;
+            color: #5c4a50;
+            background: rgba(255, 251, 232, 0.96);
+            border: 2px solid #fff;
+            border-radius: 11px;
+            box-shadow: 0 4px 0 rgba(79, 59, 65, 0.35);
+            font-size: 11px;
+            font-weight: 1000;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .color-button[aria-pressed="true"] {
+            border-color: var(--button-color);
+            box-shadow:
+                0 4px 0 color-mix(in srgb, var(--button-color) 60%, #5c3d45),
+                0 0 0 2px rgba(255,255,255,0.72);
+        }
+
+        .color-button:disabled {
+            opacity: 0.42;
+            cursor: default;
+            filter: grayscale(0.35);
+        }
+
+        .ofuda-label {
+            display: grid;
+            min-width: 0;
+            line-height: 1.05;
+        }
+
+        .ofuda-label strong {
+            font-size: 12px;
+        }
+
+        .ofuda-count {
+            margin-top: 2px;
+            color: #8b6b63;
+            font-size: 8px;
+            white-space: nowrap;
+        }
+
+        .mini-ofuda {
+            position: relative;
+            display: grid;
+            width: 28px;
+            height: 48px;
+            place-items: center;
+            color: var(--button-color);
+            background:
+                radial-gradient(circle at 50% 10%, var(--button-color) 0 3px, transparent 3.4px),
+                repeating-linear-gradient(0deg, rgba(118,78,44,0.035) 0 2px, transparent 2px 5px),
+                linear-gradient(90deg, #ecd4a5, #fff7d5 17% 83%, #e5c78f);
+            border: 1px solid #9f7047;
+            border-radius: 2px;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
+            clip-path: polygon(6% 0, 94% 0, 100% 7%, 96% 16%, 100% 25%, 96% 34%, 100% 43%, 96% 52%, 100% 61%, 96% 70%, 100% 79%, 94% 100%, 6% 100%, 0 93%, 4% 84%, 0 75%, 4% 66%, 0 57%, 4% 48%, 0 39%, 4% 30%, 0 21%, 4% 12%);
+        }
+
+        .mini-ofuda::before {
+            content: "祓";
+            position: relative;
+            z-index: 2;
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+            font-size: 17px;
+            font-weight: 1000;
+        }
+
+        .mini-ofuda::after {
+            content: "";
+            position: absolute;
+            inset: 5px 5px 4px;
+            border: 1px solid var(--button-color);
+        }
+
+        .drag-ofuda {
+            position: fixed;
+            z-index: 9999;
+            display: grid;
+            width: 55px;
+            height: 110px;
+            place-items: center;
+            color: var(--seal);
+            background:
+                radial-gradient(circle at 50% 10%, var(--seal) 0 5px, transparent 5.5px),
+                repeating-linear-gradient(0deg, rgba(118,78,44,0.04) 0 2px, transparent 2px 6px),
+                linear-gradient(90deg, #ecd4a5, #fff8da 14% 86%, #e3c48b);
+            border: 2px solid #986642;
+            box-shadow: 0 12px 22px rgba(26, 17, 25, 0.42);
+            clip-path: polygon(6% 0, 94% 0, 100% 5%, 96% 13%, 100% 21%, 96% 29%, 100% 37%, 96% 45%, 100% 53%, 96% 61%, 100% 69%, 96% 77%, 100% 85%, 94% 100%, 6% 100%, 0 94%, 4% 86%, 0 78%, 4% 70%, 0 62%, 4% 54%, 0 46%, 4% 38%, 0 30%, 4% 22%, 0 14%, 4% 6%);
+            transform: translate(-50%, -62%) rotate(-4deg);
+            pointer-events: none;
+        }
+
+        .drag-ofuda::before {
+            content: "祓";
+            position: relative;
+            z-index: 2;
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+            font-size: 32px;
+            font-weight: 1000;
+        }
+
+        .drag-ofuda::after {
+            content: "";
+            position: absolute;
+            inset: 10px 9px 8px;
+            border: 2px solid var(--seal);
+        }
+
+        .drag-ofuda.color-1 { --seal: #ef675d; }
+        .drag-ofuda.color-2 { --seal: #50aee6; }
+        .drag-ofuda.color-3 { --seal: #e9b91c; }
+        .drag-ofuda.color-4 { --seal: #69b952; }
+
+        .drag-hint {
+            min-width: 0;
+            color: #fff8de;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 1000;
+            line-height: 1.15;
+        }
+
+        .day .drag-hint {
+            color: #5a4755;
+        }
+
+        .check-button {
+            min-height: 44px;
+            padding: 6px 12px;
+            color: #fff;
+            background: linear-gradient(180deg, #ef7669, #d84f50);
+            border: 3px solid #ffe2d6;
+            border-radius: 15px;
+            box-shadow: 0 6px 0 #8c343c;
+            font-size: 19px;
+            font-weight: 1000;
+            cursor: pointer;
+        }
+
+        .check-button:disabled {
+            color: #93898a;
+            background: #ddd5ca;
+            border-color: #eee9df;
+            box-shadow: 0 4px 0 #b7aea4;
+            cursor: default;
+        }
+
+        .night-timer {
+            grid-area: timer;
+            display: grid;
+            width: 50px;
+            height: 50px;
+            place-items: center;
+            color: #51415a;
+            background: #fff7cf;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 5px 0 rgba(49, 36, 59, 0.35);
+            font-size: 18px;
+            font-weight: 1000;
+        }
+
+        /* ガイド・結果 */
+        .overlay {
+            position: fixed;
+            z-index: 100;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 16px;
+            background: rgba(25, 19, 49, 0.56);
+            backdrop-filter: blur(3px);
+        }
+
+        .guide-card,
+        .result-card {
+            display: grid;
+            width: min(94vw, 610px);
+            grid-template-columns: minmax(105px, 34%) 1fr;
+            align-items: end;
+            gap: 5px;
+            padding: 18px 18px 17px 7px;
+            background: var(--panel);
+            border: 5px solid #fff;
+            border-radius: 27px;
+            box-shadow: 0 14px 0 rgba(60, 42, 58, 0.26), 0 22px 46px rgba(18, 13, 39, 0.34);
+        }
+
+        .guide-miko,
+        .result-miko {
+            display: block;
+            width: 100%;
+            max-height: min(55vh, 390px);
+            object-fit: contain;
+            object-position: bottom;
+            filter: drop-shadow(0 7px 8px rgba(66, 43, 45, 0.2));
+        }
+
+        .guide-content,
+        .result-content {
+            min-width: 0;
+            align-self: center;
+            text-align: center;
+        }
+
+        .guide-content h2,
+        .result-content h2 {
+            margin: 0 0 9px;
+            color: #d6534d;
+            font-size: clamp(25px, 7vw, 38px);
+            font-weight: 1000;
+            line-height: 1.13;
+        }
+
+        .guide-content p,
+        .result-content p {
+            margin: 0 0 14px;
+            font-size: clamp(14px, 3.9vw, 18px);
+            font-weight: 800;
+            line-height: 1.65;
+            text-align: left;
+        }
+
+        .title-link,
+        .hud-message,
+        .phase-message,
+        .drag-hint,
+        .guide-content h2,
+        .guide-content p,
+        .result-content h2,
+        .result-content p {
+            overflow-wrap: normal;
+            word-break: keep-all;
+            line-break: strict;
+        }
+
+        .guide-action,
+        .result-action {
+            width: 100%;
+            min-height: 49px;
+            padding: 8px 14px;
+            color: #fff;
+            background: linear-gradient(180deg, #ef7669, #d84f50);
+            border: 3px solid #ffe1d5;
+            border-radius: 15px;
+            box-shadow: 0 6px 0 #91363e;
+            font-size: 18px;
+            font-weight: 1000;
+            cursor: pointer;
+        }
+
+        .countdown {
+            color: #fff4c0;
+            font-size: min(28vw, 170px);
+            font-weight: 1000;
+            line-height: 1;
+            -webkit-text-stroke: 3px #4d2e5a;
+            paint-order: stroke fill;
+            text-shadow: 0 9px 0 #d55253, 0 17px 35px rgba(8, 7, 31, 0.48);
+        }
+
+        .result-screen {
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            padding: max(60px, calc(env(safe-area-inset-top) + 48px)) 14px max(20px, env(safe-area-inset-bottom));
+            background:
+                radial-gradient(circle at 16% 16%, rgba(255,255,255,0.85) 0 3%, transparent 3.3%),
+                linear-gradient(180deg, #8bd8ec, #e4faff 56%, #f6ddb1);
+        }
+
+        .result-card {
+            width: min(94vw, 640px);
+        }
+
+        .result-score {
+            margin: 5px 0;
+            color: #d6534d;
+            font-size: clamp(44px, 13vw, 72px);
+            font-weight: 1000;
+            line-height: 1;
+        }
+
+        .result-score small {
+            font-size: 0.34em;
+        }
+
+        .result-best {
+            margin: 5px 0 13px;
+            color: #6c5961;
+            font-size: 14px;
+            font-weight: 1000;
+        }
+
+        .result-best.new {
+            color: #d58b17;
+            font-size: 17px;
+        }
+
+        .result-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .result-title {
+            color: #66565e;
+            background: #eee8dc;
+            border-color: #fff;
+            box-shadow: 0 6px 0 #cfc3b5;
+        }
+
+        @keyframes ghostPeek {
+            from { opacity: 0; transform: translate(-50%, 12%) scale(0.72); }
+            to { opacity: 1; transform: translate(-50%, -48%) scale(1); }
+        }
+
+        @keyframes ghostDepart {
+            0% { opacity: 1; transform: translate(-50%, -48%) scale(1); }
+            45% { opacity: 1; transform: translate(-50%, -62%) scale(1.08); }
+            100% { opacity: 0; transform: translate(-50%, -170%) scale(0.5) rotate(10deg); }
+        }
+
+        @keyframes stampIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(1.8) rotate(10deg); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+        }
+
+        @keyframes mikoWatch {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-3px) rotate(1deg); }
+        }
+
+        @keyframes mikoPurify {
+            from { opacity: 0.55; transform: translateY(7px) scale(0.86) rotate(-5deg); }
+            to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+        }
+
+        @keyframes cloudFloat {
+            from { transform: translateX(-10px) scale(0.98); }
+            to { transform: translateX(18px) scale(1.04); }
+        }
+
+        @keyframes lanternSway {
+            from { transform: rotate(-4deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        @keyframes windowShake {
+            0%, 100% { transform: translateX(0); }
+            30% { transform: translateX(-5px); }
+            70% { transform: translateX(5px); }
+        }
+
+        @media (orientation: landscape) and (max-height: 620px) {
+            .title-art {
+                object-position: center;
+            }
+
+            .title-logo {
+                top: max(15px, env(safe-area-inset-top));
+                left: 48%;
+                width: min(58vw, 620px);
+            }
+
+            .title-logo-art {
+                max-height: 43vh;
+            }
+
+            .title-subtitle {
+                margin-top: 1px;
+                font-size: 11px;
+            }
+
+            .title-menu {
+                bottom: max(13px, env(safe-area-inset-bottom));
+                width: min(78vw, 610px);
+            }
+
+            .title-button,
+            .title-link {
+                min-height: 41px;
+                padding: 4px 8px;
+                font-size: 14px;
+            }
+
+            .start-button {
+                min-height: 47px;
+                font-size: 19px;
+            }
+
+            .game-header {
+                grid-template-columns: 82px 1fr 110px;
+                padding-top: max(5px, env(safe-area-inset-top));
+                padding-bottom: 5px;
+            }
+
+            .hud-card {
+                padding: 3px 5px;
+            }
+
+            .hud-card strong {
+                font-size: 17px;
+            }
+
+            .game-content {
+                padding: 4px;
+            }
+
+            .phase-message {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .game-layout {
+                gap: 4px;
+            }
+
+            .apartment-board {
+                width: min(94vw, 48svh, 470px);
+            }
+
+            .answer-tools {
+                gap: 4px;
+            }
+
+            .palette {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .color-button {
+                min-height: 42px;
+                grid-template-columns: 24px 1fr;
+                padding: 2px 4px;
+            }
+
+            .mini-ofuda {
+                width: 21px;
+                height: 36px;
+            }
+
+            .mini-ofuda::before {
+                font-size: 13px;
+            }
+
+            .check-button {
+                min-height: 37px;
+                font-size: 14px;
+            }
+
+            .guide-card,
+            .result-card {
+                width: min(76vw, 620px);
+                grid-template-columns: minmax(100px, 28%) 1fr;
+                padding: 10px 14px 10px 4px;
+            }
+
+            .guide-miko,
+            .result-miko {
+                max-height: 76vh;
+            }
+
+            .guide-content h2,
+            .result-content h2 {
+                margin-bottom: 5px;
+                font-size: 27px;
+            }
+
+            .guide-content p,
+            .result-content p {
+                margin-bottom: 9px;
+                font-size: 13px;
+                line-height: 1.45;
+            }
+
+            .guide-action,
+            .result-action {
+                min-height: 42px;
+                font-size: 15px;
+            }
+
+            .result-score {
+                font-size: 46px;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .title-logo {
+                top: max(80px, calc(env(safe-area-inset-top) + 62px));
+                width: 97vw;
+            }
+
+            .title-logo-art {
+                max-height: 29vh;
+            }
+
+            .title-subtitle {
+                font-size: 11px;
+            }
+
+            .title-menu {
+                width: 97vw;
+                gap: 5px;
+            }
+
+            .title-button,
+            .title-link {
+                min-height: 46px;
+                padding: 5px 3px;
+                font-size: 13px;
+            }
+
+            .start-button {
+                min-height: 52px;
+                font-size: 20px;
+            }
+
+            .title-link {
+                font-size: 10px;
+            }
+
+            .game-header {
+                grid-template-columns: 82px 1fr 106px;
+                gap: 5px;
+            }
+
+            .hud-message {
+                font-size: 12px;
+            }
+
+            .apartment-board {
+                width: min(94vw, 51svh);
+            }
+
+            .color-button {
+                grid-template-columns: 21px 1fr;
+                padding: 3px;
+                font-size: 10px;
+            }
+
+            .mini-ofuda {
+                width: 19px;
+                height: 34px;
+            }
+
+            .guide-card,
+            .result-card {
+                grid-template-columns: 105px 1fr;
+                gap: 2px;
+                padding: 13px 12px 13px 3px;
+            }
+
+            .guide-content h2,
+            .result-content h2 {
+                font-size: 24px;
+            }
+
+            .guide-content p,
+            .result-content p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+        }
+
+        @media (min-width: 900px) and (min-height: 520px) {
+            .game-content {
+                padding:
+                    8px
+                    max(10px, env(safe-area-inset-right))
+                    max(8px, env(safe-area-inset-bottom))
+                    max(10px, env(safe-area-inset-left));
+            }
+
+            .game-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+                grid-template-rows: minmax(0, 1fr);
+                gap: 10px;
+            }
+
+            .apartment-board {
+                width: min(100%, calc(100svh - 108px), 680px);
+            }
+
+            .game-panel {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "miko"
+                    "message"
+                    "timer"
+                    "tools";
+                align-content: center;
+                gap: 10px;
+                padding: 13px;
+                border-radius: 22px;
+            }
+
+            .helper-miko {
+                width: min(72%, 170px);
+                height: min(27svh, 205px);
+                justify-self: center;
+            }
+
+            .phase-message {
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+
+            .night-timer {
+                width: 62px;
+                height: 62px;
+                justify-self: center;
+                font-size: 20px;
+            }
+
+            .answer-tools {
+                grid-column: auto;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .palette {
+                grid-column: auto;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 9px;
+            }
+
+            .color-button {
+                min-height: 74px;
+                grid-template-columns: 42px 1fr;
+                gap: 6px;
+                padding: 6px 8px;
+                font-size: 13px;
+            }
+
+            .mini-ofuda {
+                width: 37px;
+                height: 64px;
+            }
+
+            .mini-ofuda::before {
+                font-size: 22px;
+            }
+
+            .ofuda-label strong {
+                font-size: 15px;
+            }
+
+            .ofuda-count {
+                font-size: 10px;
+            }
+
+            .drag-hint {
+                font-size: 13px;
+            }
+
+            .check-button {
+                min-height: 53px;
+                font-size: 19px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 1ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-button title-sound-button" type="button" data-sound-toggle aria-label="音を切り替える" aria-pressed="true">🔊</button>
+
+    <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
+        <img class="title-art" src="assets/iro-miko-title-v1.jpg" alt="">
+        <div class="title-shade" aria-hidden="true"></div>
+
+        <div class="title-best">
+            さいこうきろく
+            <strong id="title-best">0たい</strong>
+        </div>
+
+        <div class="title-logo">
+            <h1 class="sr-only" id="game-title">おぼえて！いろゆうれい</h1>
+            <img class="title-logo-art" src="assets/obozete-iroyurei-logo-v1.png" alt="" aria-hidden="true">
+            <div class="title-subtitle">みならいみこの おはらい</div>
+        </div>
+
+        <div class="title-menu">
+            <button class="title-button practice-button" id="practice-button" type="button">れんしゅう</button>
+            <button class="title-button start-button" id="start-button" type="button">
+                スタート
+                <small>15かい・100たいに ちょうせん</small>
+            </button>
+            <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
+        </div>
+    </section>
+
+    <section class="screen game-screen" id="screen-game" aria-label="ゲーム画面" hidden>
+        <header class="game-header">
+            <div class="hud-card">
+                <span id="progress-label">れんしゅう</span>
+                <strong id="progress-display">1/3</strong>
+            </div>
+            <div class="hud-message" id="hud-message">いろと まどを おぼえてください！</div>
+            <div class="hud-actions">
+                <div class="miss-badge">ミス<strong id="mistake-display">なし</strong></div>
+                <div class="hud-buttons">
+                    <button class="sound-button game-sound-button" type="button" data-sound-toggle aria-label="音を切り替える" aria-pressed="true">🔊</button>
+                    <button class="exit-button" id="exit-button" type="button">やめる</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="game-main night" id="game-main">
+            <div class="scene-decor" aria-hidden="true">
+                <span class="celestial"></span>
+                <span class="cloud cloud-one"></span>
+                <span class="cloud cloud-two"></span>
+                <span class="lantern lantern-left"></span>
+                <span class="lantern lantern-right"></span>
+            </div>
+            <div class="stars" aria-hidden="true"></div>
+            <div class="game-content">
+                <div class="game-layout">
+                    <div class="apartment-wrap">
+                        <div class="apartment-board">
+                            <div class="window-grid" id="window-grid" role="grid" aria-label="アパートの12このまど"></div>
+                        </div>
+                    </div>
+
+                    <aside class="game-panel" aria-label="おはらいの じょうほう">
+                        <img class="helper-miko is-memorizing" id="helper-miko" src="assets/miko-memorize-v1.png" alt="" aria-hidden="true">
+                        <div class="phase-message" id="phase-message">よるです。 ゆうれいさんを おぼえてください！</div>
+                        <div class="night-timer" id="night-timer" aria-live="polite">1.0</div>
+
+                        <div class="answer-tools" id="answer-tools" hidden>
+                            <div class="palette" id="palette" aria-label="おふだのいろ">
+                                <button class="color-button" type="button" data-color="1" style="--button-color:#ef675d" aria-pressed="true">
+                                    <span class="mini-ofuda" aria-hidden="true"></span>
+                                    <span class="ofuda-label"><strong>あか</strong><small class="ofuda-count">あと 0まい</small></span>
+                                </button>
+                                <button class="color-button" type="button" data-color="2" style="--button-color:#50aee6" aria-pressed="false">
+                                    <span class="mini-ofuda" aria-hidden="true"></span>
+                                    <span class="ofuda-label"><strong>あお</strong><small class="ofuda-count">あと 0まい</small></span>
+                                </button>
+                                <button class="color-button" type="button" data-color="3" style="--button-color:#f4c842" aria-pressed="false">
+                                    <span class="mini-ofuda" aria-hidden="true"></span>
+                                    <span class="ofuda-label"><strong>きいろ</strong><small class="ofuda-count">あと 0まい</small></span>
+                                </button>
+                                <button class="color-button" type="button" data-color="4" style="--button-color:#7acb60" aria-pressed="false">
+                                    <span class="mini-ofuda" aria-hidden="true"></span>
+                                    <span class="ofuda-label"><strong>みどり</strong><small class="ofuda-count">あと 0まい</small></span>
+                                </button>
+                            </div>
+                            <div class="drag-hint">おふだを つかんで<br>まどへ はろう！</div>
+                            <button class="check-button" id="check-button" type="button" disabled>おはらいする！</button>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <div class="overlay" id="guide-overlay" hidden>
+        <div class="guide-card" role="dialog" aria-modal="true" aria-labelledby="guide-heading">
+            <img class="guide-miko" src="assets/miko-guide-v1.png" alt="">
+            <div class="guide-content">
+                <h2 id="guide-heading">れんしゅうです！</h2>
+                <p id="guide-copy">
+                    わたし、まだ みならいなのですが……<br>
+                    いっしょうけんめい がんばります！
+                </p>
+                <button class="guide-action" id="guide-action" type="button">おしえてください！</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="countdown-overlay" hidden>
+        <div class="countdown" id="countdown" aria-live="polite">3</div>
+    </div>
+
+    <section class="screen result-screen" id="screen-result" aria-labelledby="result-heading" hidden>
+        <div class="result-card">
+            <img class="result-miko" src="assets/miko-guide-v1.png" alt="">
+            <div class="result-content">
+                <h2 id="result-heading">がんばりました！</h2>
+                <p id="result-copy">ゆうれいさんを おくってあげられました！</p>
+                <div class="result-score"><span id="result-score">0</span><small>たい</small></div>
+                <div class="result-best" id="result-best">さいこう：0たい</div>
+                <div class="result-actions">
+                    <button class="result-action" id="retry-button" type="button">もういちど</button>
+                    <button class="result-action result-title" id="result-title-button" type="button">タイトルへ</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const COLOR_NAMES = ["", "あか", "あお", "きいろ", "みどり"];
+            const MIKO_ART = {
+                night: "assets/miko-memorize-v1.png",
+                day: "assets/miko-purify-v1.png"
+            };
+            const BEST_KEY = "colorGhost_best_v1";
+            const MAX_MISSES = 3;
+            const WINDOW_RECTS = [
+                { x: 9.4, y: 14.2, w: 11.7, h: 10.7 },
+                { x: 31.1, y: 14.2, w: 12.1, h: 10.7 },
+                { x: 57.3, y: 14.2, w: 12.0, h: 10.7 },
+                { x: 80.9, y: 14.2, w: 11.8, h: 10.7 },
+                { x: 9.4, y: 37.7, w: 11.7, h: 9.3 },
+                { x: 31.2, y: 37.7, w: 12.0, h: 9.3 },
+                { x: 57.3, y: 37.7, w: 12.0, h: 9.3 },
+                { x: 81.0, y: 37.7, w: 11.8, h: 9.3 },
+                { x: 9.4, y: 64.5, w: 11.7, h: 9.4 },
+                { x: 31.2, y: 64.5, w: 12.0, h: 9.4 },
+                { x: 57.3, y: 64.5, w: 12.0, h: 9.4 },
+                { x: 81.0, y: 64.5, w: 11.8, h: 9.4 }
+            ];
+            const WINDOW_COUNT = WINDOW_RECTS.length;
+            const PRACTICE_LEVELS = [
+                { ghosts: 1, colors: 1, seconds: 1 },
+                { ghosts: 2, colors: 2, seconds: 2 },
+                { ghosts: 3, colors: 3, seconds: 3 }
+            ];
+            const CHALLENGE_GHOST_COUNTS = [1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 10, 11, 12, 12, 12];
+            const CHALLENGE_LEVELS = CHALLENGE_GHOST_COUNTS.map((ghosts, index) => ({
+                ghosts,
+                colors: index < 2 ? 2 : index < 5 ? 3 : 4,
+                seconds: Math.min(ghosts, 10)
+            }));
+
+            const elements = {
+                title: document.querySelector("#screen-title"),
+                game: document.querySelector("#screen-game"),
+                result: document.querySelector("#screen-result"),
+                soundButtons: [...document.querySelectorAll("[data-sound-toggle]")],
+                titleBest: document.querySelector("#title-best"),
+                practice: document.querySelector("#practice-button"),
+                start: document.querySelector("#start-button"),
+                exit: document.querySelector("#exit-button"),
+                gameMain: document.querySelector("#game-main"),
+                helperMiko: document.querySelector("#helper-miko"),
+                windowGrid: document.querySelector("#window-grid"),
+                progressLabel: document.querySelector("#progress-label"),
+                progress: document.querySelector("#progress-display"),
+                mistakes: document.querySelector("#mistake-display"),
+                hudMessage: document.querySelector("#hud-message"),
+                phaseMessage: document.querySelector("#phase-message"),
+                nightTimer: document.querySelector("#night-timer"),
+                answerTools: document.querySelector("#answer-tools"),
+                paletteButtons: [...document.querySelectorAll(".color-button")],
+                check: document.querySelector("#check-button"),
+                guide: document.querySelector("#guide-overlay"),
+                guideHeading: document.querySelector("#guide-heading"),
+                guideCopy: document.querySelector("#guide-copy"),
+                guideAction: document.querySelector("#guide-action"),
+                countdownOverlay: document.querySelector("#countdown-overlay"),
+                countdown: document.querySelector("#countdown"),
+                resultHeading: document.querySelector("#result-heading"),
+                resultCopy: document.querySelector("#result-copy"),
+                resultScore: document.querySelector("#result-score"),
+                resultBest: document.querySelector("#result-best"),
+                retry: document.querySelector("#retry-button"),
+                resultTitle: document.querySelector("#result-title-button")
+            };
+
+            const state = {
+                screen: "title",
+                mode: "practice",
+                phase: "idle",
+                levelIndex: 0,
+                practiceIndex: 0,
+                currentLevel: PRACTICE_LEVELS[0],
+                target: [],
+                answer: [],
+                selectedColor: 1,
+                score: 0,
+                mistakes: 0,
+                best: 0,
+                soundOn: true,
+                audioContext: null,
+                nightEndsAt: 0,
+                animationFrame: null,
+                roundTimer: null,
+                timeouts: [],
+                drag: null
+            };
+
+            const Sound = {
+                init() {
+                    if (!state.soundOn) return null;
+                    if (!state.audioContext) {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContext) state.audioContext = new AudioContext();
+                    }
+                    if (state.audioContext?.state === "suspended") state.audioContext.resume();
+                    return state.audioContext;
+                },
+                tones(notes, type = "sine", volume = 0.1, spacing = 0.08, duration = 0.2) {
+                    const audio = this.init();
+                    if (!audio) return;
+                    const now = audio.currentTime;
+                    notes.forEach((frequency, index) => {
+                        const oscillator = audio.createOscillator();
+                        const gain = audio.createGain();
+                        const start = now + index * spacing;
+                        oscillator.type = type;
+                        oscillator.frequency.setValueAtTime(frequency, start);
+                        gain.gain.setValueAtTime(volume, start);
+                        gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                        oscillator.connect(gain);
+                        gain.connect(audio.destination);
+                        oscillator.start(start);
+                        oscillator.stop(start + duration + 0.03);
+                    });
+                },
+                click() { this.tones([440], "sine", 0.07, 0, 0.1); },
+                night() { this.tones([523.25, 659.25], "sine", 0.08, 0.12, 0.32); },
+                dawn() { this.tones([659.25, 783.99, 1046.5], "triangle", 0.08, 0.08, 0.22); },
+                stamp() { this.tones([240, 180], "triangle", 0.08, 0.025, 0.08); },
+                correct() { this.tones([659.25, 783.99, 987.77], "sine", 0.12, 0.07, 0.24); },
+                wrong() { this.tones([180, 145], "sawtooth", 0.055, 0.09, 0.2); },
+                finish() { this.tones([523.25, 659.25, 783.99, 1046.5], "triangle", 0.11, 0.11, 0.32); }
+            };
+
+            function schedule(callback, delay) {
+                const timer = window.setTimeout(callback, delay);
+                state.timeouts.push(timer);
+                return timer;
+            }
+
+            function clearRoundTiming() {
+                if (state.animationFrame !== null) {
+                    cancelAnimationFrame(state.animationFrame);
+                    state.animationFrame = null;
+                }
+                if (state.roundTimer !== null) {
+                    window.clearTimeout(state.roundTimer);
+                    state.roundTimer = null;
+                }
+            }
+
+            function clearAllTiming() {
+                clearRoundTiming();
+                cancelOfudaDrag();
+                state.timeouts.forEach(window.clearTimeout);
+                state.timeouts = [];
+            }
+
+            function shuffle(items) {
+                for (let index = items.length - 1; index > 0; index -= 1) {
+                    const other = Math.floor(Math.random() * (index + 1));
+                    [items[index], items[other]] = [items[other], items[index]];
+                }
+                return items;
+            }
+
+            function readBest() {
+                const value = Number(localStorage.getItem(BEST_KEY));
+                return Number.isFinite(value) && value > 0 ? value : 0;
+            }
+
+            function updateBest(score = state.best) {
+                if (score > state.best) {
+                    state.best = score;
+                    localStorage.setItem(BEST_KEY, String(score));
+                }
+                elements.titleBest.textContent = `${state.best}たい`;
+            }
+
+            function showScreen(name) {
+                elements.title.hidden = name !== "title";
+                elements.game.hidden = name !== "game";
+                elements.result.hidden = name !== "result";
+                document.body.dataset.screen = name;
+                state.screen = name;
+            }
+
+            function updateSoundButtons() {
+                elements.soundButtons.forEach((button) => {
+                    button.textContent = state.soundOn ? "🔊" : "🔇";
+                    button.setAttribute("aria-pressed", String(state.soundOn));
+                });
+            }
+
+            function setDaytime(daytime) {
+                elements.gameMain.classList.toggle("night", daytime === "night");
+                elements.gameMain.classList.toggle("day", daytime === "day");
+                const isNight = daytime === "night";
+                elements.helperMiko.src = MIKO_ART[daytime];
+                elements.helperMiko.classList.toggle("is-memorizing", isNight);
+                elements.helperMiko.classList.toggle("is-purifying", !isNight);
+            }
+
+            function currentLevels() {
+                return state.mode === "practice" ? PRACTICE_LEVELS : CHALLENGE_LEVELS;
+            }
+
+            function currentIndex() {
+                return state.mode === "practice" ? state.practiceIndex : state.levelIndex;
+            }
+
+            function createPattern(level) {
+                const positions = shuffle(Array.from({ length: WINDOW_COUNT }, (_, index) => index)).slice(0, level.ghosts);
+                const colors = shuffle(Array.from({ length: level.ghosts }, (_, index) => (index % level.colors) + 1));
+                const pattern = new Array(WINDOW_COUNT).fill(0);
+                positions.forEach((position, index) => {
+                    pattern[position] = colors[index];
+                });
+                return pattern;
+            }
+
+            function updateHud() {
+                if (state.mode === "practice") {
+                    elements.progressLabel.textContent = "れんしゅう";
+                    elements.progress.textContent = `${state.practiceIndex + 1}/${PRACTICE_LEVELS.length}`;
+                    elements.mistakes.textContent = "なし";
+                } else {
+                    const displayedStage = Math.min(state.levelIndex + 1, CHALLENGE_LEVELS.length);
+                    elements.progressLabel.textContent = `よる ${displayedStage}/${CHALLENGE_LEVELS.length}`;
+                    elements.progress.textContent = `${state.score}たい`;
+                    elements.mistakes.textContent = `${state.mistakes}/${MAX_MISSES}`;
+                }
+            }
+
+            function renderPalette() {
+                const colorCount = state.currentLevel.colors;
+                elements.paletteButtons.forEach((button) => {
+                    const color = Number(button.dataset.color);
+                    const needed = state.target.filter((value) => value === color).length;
+                    const used = state.answer.filter((value) => value === color).length;
+                    const remaining = Math.max(0, needed - used);
+                    button.hidden = color > colorCount;
+                    button.disabled = state.phase !== "answer" || remaining === 0;
+                    button.setAttribute("aria-pressed", String(color === state.selectedColor));
+                    button.setAttribute(
+                        "aria-label",
+                        `${COLOR_NAMES[color]}の おふだ、あと ${remaining}まい。つかんで まどへ はります`
+                    );
+                    button.querySelector(".ofuda-count").textContent = `あと ${remaining}まい`;
+                });
+            }
+
+            function renderBoard() {
+                elements.windowGrid.innerHTML = "";
+
+                state.target.forEach((targetColor, index) => {
+                    const answerColor = state.answer[index];
+                    const windowButton = document.createElement("button");
+                    windowButton.type = "button";
+                    windowButton.className = "window";
+                    windowButton.setAttribute("role", "gridcell");
+                    windowButton.setAttribute("aria-label", `${index + 1}ばんの まど`);
+                    windowButton.dataset.index = String(index);
+                    const rect = WINDOW_RECTS[index];
+                    windowButton.style.left = `${rect.x}%`;
+                    windowButton.style.top = `${rect.y}%`;
+                    windowButton.style.width = `${rect.w}%`;
+                    windowButton.style.height = `${rect.h}%`;
+                    windowButton.disabled = state.phase !== "answer";
+                    if (answerColor > 0) {
+                        windowButton.classList.add("has-ofuda");
+                        windowButton.setAttribute(
+                            "aria-label",
+                            `${index + 1}ばんの まど、${COLOR_NAMES[answerColor]}の おふだ。つかんで うごかせます`
+                        );
+                    }
+
+                    if (state.phase === "review") {
+                        const remembered = targetColor > 0 && targetColor === answerColor;
+                        if (remembered) {
+                            windowButton.classList.add("right", "success");
+                        } else if (targetColor > 0 || answerColor > 0) {
+                            windowButton.classList.add("wrong");
+                        }
+                    }
+                    if (state.phase === "success" && targetColor > 0) {
+                        windowButton.classList.add("success", "right");
+                    }
+
+                    const showGhost = ["night", "review", "success"].includes(state.phase) && targetColor > 0;
+                    const showOfuda = ["answer", "review", "success"].includes(state.phase) && answerColor > 0;
+
+                    if (showGhost) {
+                        windowButton.classList.add("has-ghost");
+                        const ghost = document.createElement("span");
+                        ghost.className = `ghost color-${targetColor}`;
+                        ghost.setAttribute("aria-hidden", "true");
+                        windowButton.appendChild(ghost);
+                    }
+
+                    if (showOfuda) {
+                        const ofuda = document.createElement("span");
+                        ofuda.className = `ofuda color-${answerColor}`;
+                        ofuda.setAttribute("aria-hidden", "true");
+                        windowButton.appendChild(ofuda);
+                    }
+
+                    if (answerColor > 0) {
+                        windowButton.addEventListener("pointerdown", (event) => {
+                            startOfudaDrag(event, answerColor, index);
+                        });
+                    }
+                    windowButton.addEventListener("click", (event) => {
+                        if (event.detail === 0) placeKeyboardOfuda(index);
+                    });
+                    elements.windowGrid.appendChild(windowButton);
+                });
+            }
+
+            function prepareRound(startAutomatically = true) {
+                clearRoundTiming();
+                const levels = currentLevels();
+                state.currentLevel = levels[currentIndex()];
+                state.target = createPattern(state.currentLevel);
+                state.answer = new Array(WINDOW_COUNT).fill(0);
+                state.selectedColor = 1;
+                state.phase = "waiting";
+                setDaytime("night");
+                elements.answerTools.hidden = true;
+                elements.nightTimer.hidden = false;
+                elements.check.disabled = true;
+                elements.nightTimer.textContent = state.currentLevel.seconds.toFixed(1);
+                elements.phaseMessage.textContent = "よるです。 ゆうれいさんの いろと まどを おぼえてください！";
+                elements.hudMessage.textContent = "いろと まどを おぼえてください！";
+                updateHud();
+                renderPalette();
+                renderBoard();
+
+                if (startAutomatically) {
+                    schedule(startNight, 320);
+                }
+            }
+
+            function startNight() {
+                if (document.hidden) {
+                    state.phase = "waiting";
+                    return;
+                }
+                state.phase = "night";
+                setDaytime("night");
+                renderBoard();
+                Sound.night();
+                elements.nightTimer.textContent = state.currentLevel.seconds.toFixed(1);
+                state.roundTimer = window.setTimeout(beginNightCountdown, 250);
+            }
+
+            function beginNightCountdown() {
+                if (state.phase !== "night") return;
+                state.nightEndsAt = performance.now() + state.currentLevel.seconds * 1000;
+                state.roundTimer = window.setTimeout(startMorning, state.currentLevel.seconds * 1000);
+                state.animationFrame = requestAnimationFrame(updateNightTimer);
+            }
+
+            function updateNightTimer(now) {
+                if (state.phase !== "night") return;
+                const remaining = Math.max(0, state.nightEndsAt - now);
+                elements.nightTimer.textContent = (remaining / 1000).toFixed(1);
+                if (remaining > 0) {
+                    state.animationFrame = requestAnimationFrame(updateNightTimer);
+                }
+            }
+
+            function startMorning() {
+                clearRoundTiming();
+                state.phase = "answer";
+                setDaytime("day");
+                elements.nightTimer.hidden = true;
+                elements.answerTools.hidden = false;
+                elements.phaseMessage.textContent = "あさです。 おふだを つかんで、 おなじいろだった まどへ はりましょう！";
+                elements.hudMessage.textContent = "おふだを まどまで ドラッグ！";
+                renderPalette();
+                renderBoard();
+                Sound.dawn();
+            }
+
+            function chooseColor(color) {
+                if (state.phase !== "answer") return;
+                const needed = state.target.filter((value) => value === color).length;
+                const used = state.answer.filter((value) => value === color).length;
+                if (used >= needed) return;
+                state.selectedColor = color;
+                renderPalette();
+                Sound.click();
+            }
+
+            function placedCount() {
+                return state.answer.filter(Boolean).length;
+            }
+
+            function remainingOfuda(color) {
+                const needed = state.target.filter((value) => value === color).length;
+                const used = state.answer.filter((value) => value === color).length;
+                return Math.max(0, needed - used);
+            }
+
+            function placeKeyboardOfuda(index) {
+                if (state.phase !== "answer") return;
+                if (state.answer[index] === state.selectedColor) {
+                    removeOfuda(index);
+                    return;
+                }
+                dropOfuda(index, state.selectedColor, null);
+            }
+
+            function dropOfuda(index, color, sourceIndex) {
+                if (state.phase !== "answer") return;
+
+                if (sourceIndex !== null) {
+                    if (sourceIndex === index) return;
+                    const targetColor = state.answer[index];
+                    state.answer[index] = color;
+                    state.answer[sourceIndex] = targetColor;
+                } else {
+                    const current = state.answer[index];
+                    if (current === color) return;
+                    if (remainingOfuda(color) <= 0) {
+                        elements.phaseMessage.textContent = `${COLOR_NAMES[color]}の おふだは ぜんぶ はりました。`;
+                        Sound.click();
+                        return;
+                    }
+                    if (current > 0 || placedCount() < state.currentLevel.ghosts) {
+                        state.answer[index] = color;
+                    } else {
+                        elements.phaseMessage.textContent = "はった おふだを つかんで、べつの まどへ うごかせます！";
+                        Sound.click();
+                        return;
+                    }
+                }
+
+                state.selectedColor = color;
+                Sound.stamp();
+                elements.check.disabled = placedCount() !== state.currentLevel.ghosts;
+                renderPalette();
+                renderBoard();
+            }
+
+            function windowAtPoint(x, y) {
+                const candidate = document.elementFromPoint(x, y);
+                const directWindow = candidate?.closest?.(".window");
+                if (directWindow && !directWindow.disabled) return directWindow;
+
+                const boardRect = elements.windowGrid.getBoundingClientRect();
+                const snapRadius = Math.min(76, Math.max(42, boardRect.width * 0.11));
+                const insideMagnetArea = (
+                    x >= boardRect.left - snapRadius
+                    && x <= boardRect.right + snapRadius
+                    && y >= boardRect.top - snapRadius
+                    && y <= boardRect.bottom + snapRadius
+                );
+                if (!insideMagnetArea) return null;
+
+                let nearestWindow = null;
+                let nearestDistance = Number.POSITIVE_INFINITY;
+                elements.windowGrid.querySelectorAll(".window").forEach((windowButton) => {
+                    if (windowButton.disabled) return;
+                    const rect = windowButton.getBoundingClientRect();
+                    const distanceX = Math.max(rect.left - x, 0, x - rect.right);
+                    const distanceY = Math.max(rect.top - y, 0, y - rect.bottom);
+                    const distance = Math.hypot(distanceX, distanceY);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestWindow = windowButton;
+                    }
+                });
+
+                return nearestDistance <= snapRadius ? nearestWindow : null;
+            }
+
+            function moveOfudaDrag(event) {
+                if (!state.drag || event.pointerId !== state.drag.pointerId) return;
+                event.preventDefault();
+                state.drag.preview.style.left = `${event.clientX}px`;
+                state.drag.preview.style.top = `${event.clientY}px`;
+
+                const nextTarget = windowAtPoint(event.clientX, event.clientY);
+                if (state.drag.target === nextTarget) return;
+                state.drag.target?.classList.remove("drop-target");
+                state.drag.target = nextTarget;
+                state.drag.target?.classList.add("drop-target");
+            }
+
+            function cancelOfudaDrag() {
+                if (!state.drag) return;
+                state.drag.target?.classList.remove("drop-target");
+                state.drag.preview.remove();
+                window.removeEventListener("pointermove", moveOfudaDrag);
+                window.removeEventListener("pointerup", finishOfudaDrag);
+                window.removeEventListener("pointercancel", cancelOfudaDrag);
+                state.drag = null;
+            }
+
+            function finishOfudaDrag(event) {
+                if (!state.drag || event.pointerId !== state.drag.pointerId) return;
+                event.preventDefault();
+                const drag = state.drag;
+                const target = windowAtPoint(event.clientX, event.clientY);
+                const targetIndex = target ? Number(target.dataset.index) : null;
+                cancelOfudaDrag();
+
+                if (targetIndex === null) {
+                    Sound.click();
+                    return;
+                }
+                dropOfuda(targetIndex, drag.color, drag.sourceIndex);
+            }
+
+            function startOfudaDrag(event, color, sourceIndex = null) {
+                if (
+                    state.phase !== "answer"
+                    || !event.isPrimary
+                    || (event.pointerType === "mouse" && event.button !== 0)
+                ) {
+                    return;
+                }
+                if (sourceIndex === null && remainingOfuda(color) <= 0) return;
+
+                event.preventDefault();
+                cancelOfudaDrag();
+                state.selectedColor = color;
+                renderPalette();
+
+                const preview = document.createElement("span");
+                preview.className = `drag-ofuda color-${color}`;
+                preview.setAttribute("aria-hidden", "true");
+                document.body.appendChild(preview);
+
+                state.drag = {
+                    pointerId: event.pointerId,
+                    color,
+                    sourceIndex,
+                    preview,
+                    target: null
+                };
+                moveOfudaDrag(event);
+                window.addEventListener("pointermove", moveOfudaDrag, { passive: false });
+                window.addEventListener("pointerup", finishOfudaDrag, { passive: false });
+                window.addEventListener("pointercancel", cancelOfudaDrag);
+                Sound.click();
+            }
+
+            function removeOfuda(index) {
+                if (state.phase !== "answer" || state.answer[index] === 0) return;
+                state.answer[index] = 0;
+                elements.check.disabled = true;
+                Sound.click();
+                renderPalette();
+                renderBoard();
+            }
+
+            function checkAnswer() {
+                if (state.phase !== "answer" || elements.check.disabled) return;
+                cancelOfudaDrag();
+                const rememberedGhosts = state.target.reduce((total, color, index) => {
+                    return total + (color > 0 && color === state.answer[index] ? 1 : 0);
+                }, 0);
+                const correct = rememberedGhosts === state.currentLevel.ghosts
+                    && state.target.every((color, index) => color === state.answer[index]);
+                state.phase = correct ? "success" : "review";
+                renderBoard();
+
+                if (correct) {
+                    handleCorrect(rememberedGhosts);
+                } else {
+                    handleWrong(rememberedGhosts);
+                }
+            }
+
+            function handleCorrect(rememberedGhosts) {
+                Sound.correct();
+                elements.answerTools.hidden = true;
+                elements.phaseMessage.textContent = `やったー！ ${rememberedGhosts}たい じょうぶつできました！`;
+                elements.hudMessage.textContent = "せいかいです！";
+
+                if (state.mode === "practice") {
+                    state.practiceIndex += 1;
+                    schedule(() => {
+                        if (state.practiceIndex >= PRACTICE_LEVELS.length) {
+                            showGuide(
+                                "ばっちりです！",
+                                "やったー！ 3かい できたのです！<br>ほんばんも、 いっしょうけんめい がんばります！",
+                                "タイトルへ",
+                                "practice-finish"
+                            );
+                        } else {
+                            showGuide(
+                                "やったー！",
+                                `できたのです！<br>つぎは ${PRACTICE_LEVELS[state.practiceIndex].ghosts}たいの ゆうれいさんです。`,
+                                "つぎへ",
+                                "practice-next"
+                            );
+                        }
+                    }, 760);
+                    return;
+                }
+
+                state.score += rememberedGhosts;
+                state.levelIndex += 1;
+                updateHud();
+
+                if (state.levelIndex >= CHALLENGE_LEVELS.length) {
+                    schedule(() => finishChallenge("complete"), 950);
+                } else {
+                    schedule(() => prepareRound(true), 840);
+                }
+            }
+
+            function handleWrong(rememberedGhosts) {
+                Sound.wrong();
+                elements.answerTools.hidden = true;
+
+                if (state.mode === "practice") {
+                    elements.phaseMessage.textContent = rememberedGhosts > 0
+                        ? `${rememberedGhosts}たいは じょうぶつできました。 あと すこしです！`
+                        : "あれれ……ちがう まどが あるみたいです。";
+                    elements.hudMessage.textContent = "こたえを たしかめています";
+                    schedule(() => {
+                        showGuide(
+                            "あれれ……",
+                            "ちがう まどが あるみたいです。<br>もういちど、 いっしょに やってみましょう！",
+                            "もういちど",
+                            "practice-retry"
+                        );
+                    }, 850);
+                } else {
+                    state.score += rememberedGhosts;
+                    state.mistakes += 1;
+                    state.levelIndex += 1;
+                    elements.phaseMessage.textContent = rememberedGhosts > 0
+                        ? `${rememberedGhosts}たいは じょうぶつできました！ ミス ${state.mistakes}/${MAX_MISSES}`
+                        : `こんかいは じょうぶつできませんでした。 ミス ${state.mistakes}/${MAX_MISSES}`;
+                    elements.hudMessage.textContent = "せいかいした ゆうれいは きろくされます";
+                    updateHud();
+
+                    if (state.mistakes >= MAX_MISSES) {
+                        schedule(() => finishChallenge("mistakes"), 1400);
+                    } else if (state.levelIndex >= CHALLENGE_LEVELS.length) {
+                        schedule(() => finishChallenge("complete"), 1100);
+                    } else {
+                        schedule(() => prepareRound(true), 1100);
+                    }
+                }
+            }
+
+            function showGuide(heading, copy, buttonText, action) {
+                elements.guideHeading.textContent = heading;
+                elements.guideCopy.innerHTML = copy;
+                elements.guideAction.textContent = buttonText;
+                elements.guideAction.dataset.action = action;
+                elements.guide.hidden = false;
+            }
+
+            function startCountdown() {
+                elements.countdownOverlay.hidden = false;
+                elements.countdown.textContent = "3";
+                ["2", "1", "スタート！"].forEach((text, index) => {
+                    schedule(() => {
+                        elements.countdown.textContent = text;
+                        elements.countdown.style.fontSize = text.includes("スタート") ? "min(17vw, 94px)" : "";
+                    }, (index + 1) * 650);
+                });
+                schedule(() => {
+                    elements.countdownOverlay.hidden = true;
+                    elements.countdown.style.fontSize = "";
+                    startNight();
+                }, 2600);
+            }
+
+            function resetSession(mode) {
+                clearAllTiming();
+                Sound.init();
+                state.mode = mode;
+                state.phase = "idle";
+                state.levelIndex = 0;
+                state.practiceIndex = 0;
+                state.score = 0;
+                state.mistakes = 0;
+                state.target = [];
+                state.answer = [];
+                elements.guide.hidden = true;
+                elements.countdownOverlay.hidden = true;
+                showScreen("game");
+            }
+
+            function startPractice() {
+                resetSession("practice");
+                prepareRound(false);
+                showGuide(
+                    "れんしゅうです！",
+                    "わたし、まだ みならいなのですが……<br>いっしょうけんめい がんばります！<br><br>よるに あらわれる ゆうれいさんの <b>いろと まど</b>を おぼえてください！ あさになったら、おふだを <b>ゆびで つかんで</b> おなじ まどまで はこびます。",
+                    "やってみます！",
+                    "practice-start"
+                );
+            }
+
+            function startChallenge() {
+                resetSession("challenge");
+                prepareRound(false);
+                startCountdown();
+            }
+
+            function finishChallenge(reason) {
+                clearRoundTiming();
+                const previousBest = state.best;
+                const isNew = state.score > previousBest;
+                updateBest(state.score);
+                Sound.finish();
+                elements.resultScore.textContent = String(state.score);
+                elements.resultBest.classList.toggle("new", isNew);
+                elements.resultBest.textContent = isNew
+                    ? "🏆 さいこうきろくです！"
+                    : `さいこう：${state.best}たい`;
+
+                if (reason === "complete" && state.score === 100) {
+                    elements.resultHeading.textContent = "100たい ぜんぶ じょうぶつ！";
+                    elements.resultCopy.innerHTML = "やったー！ みんなを おくってあげられたのです！<br>ありがとうございます！";
+                } else if (reason === "complete") {
+                    elements.resultHeading.textContent = "15の よるを おえました！";
+                    elements.resultCopy.innerHTML = `やったー！ ${state.score}たいを じょうぶつできたのです！<br>さいごまで ありがとうございます！`;
+                } else {
+                    elements.resultHeading.textContent = "ミスが 3かいに なりました";
+                    elements.resultCopy.innerHTML = `でも、${state.score}たいを じょうぶつできたのです！<br>つぎは もっと できそうです！`;
+                }
+                showScreen("result");
+            }
+
+            function returnToTitle() {
+                clearAllTiming();
+                state.phase = "idle";
+                elements.guide.hidden = true;
+                elements.countdownOverlay.hidden = true;
+                updateBest();
+                showScreen("title");
+            }
+
+            elements.practice.addEventListener("click", startPractice);
+            elements.start.addEventListener("click", startChallenge);
+            elements.exit.addEventListener("click", returnToTitle);
+            elements.check.addEventListener("click", checkAnswer);
+            elements.paletteButtons.forEach((button) => {
+                const color = Number(button.dataset.color);
+                button.addEventListener("pointerdown", (event) => startOfudaDrag(event, color));
+                button.addEventListener("click", () => chooseColor(color));
+            });
+            elements.guideAction.addEventListener("click", () => {
+                Sound.click();
+                const action = elements.guideAction.dataset.action;
+                elements.guide.hidden = true;
+
+                if (action === "practice-start") {
+                    startNight();
+                } else if (action === "practice-next" || action === "practice-retry") {
+                    prepareRound(true);
+                } else if (action === "practice-finish") {
+                    returnToTitle();
+                }
+            });
+            elements.retry.addEventListener("click", startChallenge);
+            elements.resultTitle.addEventListener("click", returnToTitle);
+            elements.soundButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.soundOn = !state.soundOn;
+                    updateSoundButtons();
+                    if (state.soundOn) Sound.correct();
+                });
+            });
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden && state.phase === "night") {
+                    clearRoundTiming();
+                    state.phase = "waiting";
+                    elements.nightTimer.textContent = state.currentLevel.seconds.toFixed(1);
+                    elements.phaseMessage.textContent = "画面に もどったら、 もういちど よるから はじめます。";
+                } else if (
+                    !document.hidden &&
+                    state.phase === "waiting" &&
+                    state.screen === "game" &&
+                    elements.guide.hidden &&
+                    elements.countdownOverlay.hidden
+                ) {
+                    schedule(startNight, 300);
+                }
+            });
+
+            state.best = readBest();
+            updateBest();
+            showScreen("title");
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s19-winter-snow-hot-spring-town",
+  "stageId": "s19",
+  "season": "winter",
+  "level": 4,
+  "theme": "雪の温泉街",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s19-t01",
+      "action": "足湯で温かい飲み物を飲んでいる",
+      "hitbox": {
+        "x": 35,
+        "y": 160,
+        "width": 125,
+        "height": 155
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s19-t02",
+      "action": "温泉まんじゅうの屋台で働いている",
+      "hitbox": {
+        "x": 1450,
+        "y": 295,
+        "width": 145,
+        "height": 170
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s19-t03",
+      "action": "温泉につかって湯気を楽しんでいる",
+      "hitbox": {
+        "x": 710,
+        "y": 365,
+        "width": 155,
+        "height": 155
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s19-t04",
+      "action": "温泉につかってびっくりしている",
+      "hitbox": {
+        "x": 815,
+        "y": 485,
+        "width": 150,
+        "height": 135
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s19-t05",
+      "action": "タオルと湯かごを持って歩いている",
+      "hitbox": {
+        "x": 1200,
+        "y": 750,
+        "width": 160,
+        "height": 165
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

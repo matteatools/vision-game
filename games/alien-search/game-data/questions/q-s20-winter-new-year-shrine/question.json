@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s20-winter-new-year-shrine",
+  "stageId": "s20",
+  "season": "winter",
+  "level": 5,
+  "theme": "お正月の神社",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s20-t01",
+      "action": "黄色い絵馬を持っている",
+      "hitbox": {
+        "x": 275,
+        "y": 185,
+        "width": 115,
+        "height": 150
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s20-t02",
+      "action": "カメラでお正月の景色を撮っている",
+      "hitbox": {
+        "x": 865,
+        "y": 375,
+        "width": 140,
+        "height": 150
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s20-t03",
+      "action": "羽根つきの羽子板を持っている",
+      "hitbox": {
+        "x": 1170,
+        "y": 390,
+        "width": 150,
+        "height": 165
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s20-t04",
+      "action": "橋の上でカメラをかまえている",
+      "hitbox": {
+        "x": 1125,
+        "y": 760,
+        "width": 140,
+        "height": 165
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s20-t05",
+      "action": "大きな年賀状を持っている",
+      "hitbox": {
+        "x": 535,
+        "y": 835,
+        "width": 160,
+        "height": 175
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

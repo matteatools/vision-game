@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s15-autumn-foliage-festival",
+  "stageId": "s15",
+  "season": "autumn",
+  "level": 5,
+  "theme": "紅葉まつり",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s15-t01",
+      "action": "展望台から双眼鏡をのぞいている",
+      "hitbox": {
+        "x": 420,
+        "y": 130,
+        "width": 120,
+        "height": 145
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s15-t02",
+      "action": "橋の上でカメラをかまえている",
+      "hitbox": {
+        "x": 170,
+        "y": 290,
+        "width": 135,
+        "height": 135
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s15-t03",
+      "action": "橋を元気に渡っている",
+      "hitbox": {
+        "x": 640,
+        "y": 525,
+        "width": 145,
+        "height": 180
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s15-t04",
+      "action": "落ち葉をほうきで集めている",
+      "hitbox": {
+        "x": 55,
+        "y": 755,
+        "width": 145,
+        "height": 165
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s15-t05",
+      "action": "紅葉を見ながら食事をしている",
+      "hitbox": {
+        "x": 935,
+        "y": 755,
+        "width": 155,
+        "height": 185
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}

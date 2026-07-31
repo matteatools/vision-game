@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#28a8dc">
+    <title>じゅんばんシャボン！</title>
+    <style>
+        :root {
+            --ink: #174567;
+            --sky: #39bff2;
+            --sky-dark: #168bc4;
+            --frog: #56bd48;
+            --frog-dark: #27883e;
+            --sun: #ffdf57;
+            --pink: #ff6fad;
+            --panel: rgba(255, 255, 255, 0.94);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        body {
+            color: var(--ink);
+            background: #8de5ff;
+            font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+            font-weight: 700;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .choice-copy,
+        .select-kicker,
+        .select-panel h2,
+        .select-label,
+        .mode-choice strong,
+        .count-choice,
+        .mode-banner,
+        .guide-card h2,
+        .guide-card p,
+        .result-panel h2,
+        .result-mode,
+        .result-best {
+            line-break: strict;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+
+        .meaning-phrase {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            min-height: 100dvh;
+        }
+
+        .sound-button {
+            position: fixed;
+            z-index: 500;
+            top: max(10px, env(safe-area-inset-top));
+            left: max(10px, env(safe-area-inset-left));
+            display: grid;
+            width: 44px;
+            height: 44px;
+            place-items: center;
+            padding: 0;
+            color: #fff;
+            background: rgba(19, 91, 122, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(18, 87, 119, 0.28);
+            font-size: 20px;
+        }
+
+        /* タイトル */
+        .title-screen {
+            isolation: isolate;
+            overflow: hidden;
+            background: #26aee3;
+        }
+
+        .title-art {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 50%;
+            pointer-events: none;
+        }
+
+        .title-scrim {
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 109, 172, 0.18) 0%, transparent 32%),
+                linear-gradient(180deg, transparent 72%, rgba(4, 81, 79, 0.38) 100%);
+            pointer-events: none;
+        }
+
+        .title-logo {
+            position: absolute;
+            z-index: 3;
+            top: max(7px, env(safe-area-inset-top));
+            left: 50%;
+            width: min(130vw, 920px);
+            text-align: center;
+            transform: translateX(-50%) rotate(-2deg);
+            pointer-events: none;
+        }
+
+        .title-logo-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            filter: drop-shadow(0 8px 12px rgba(7, 73, 119, 0.3));
+        }
+
+        .title-logo h1 {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .title-actions {
+            position: absolute;
+            z-index: 4;
+            top: 61%;
+            left: 33%;
+            display: grid;
+            width: min(62vw, 330px);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            padding: 7px;
+            background: rgba(8, 96, 137, 0.73);
+            border: 2px solid rgba(255, 255, 255, 0.48);
+            border-radius: 23px;
+            box-shadow: 0 14px 32px rgba(6, 72, 109, 0.36);
+            backdrop-filter: blur(8px);
+            transform: translate(-50%, -50%);
+        }
+
+        .main-choice {
+            display: flex;
+            min-height: 48px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 4px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .start-button {
+            color: #fff;
+            background: linear-gradient(180deg, #63d86a, #27ad4e);
+            border: 0;
+            box-shadow: 0 5px 0 #17853a;
+        }
+
+        .practice-button {
+            color: #176491;
+            background: linear-gradient(180deg, #fff, #e9fbff);
+            border: 3px solid #82ddf4;
+            box-shadow: 0 5px 0 #3eb3d5;
+        }
+
+        .main-choice:active {
+            box-shadow: 0 1px 0 #176b8d;
+            transform: translateY(4px);
+        }
+
+        .choice-icon {
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .choice-copy {
+            display: grid;
+            gap: 1px;
+        }
+
+        .choice-copy strong {
+            font-size: clamp(16px, 4.2vw, 21px);
+            font-weight: 900;
+            line-height: 1.05;
+        }
+
+        .choice-copy small {
+            font-size: clamp(8px, 2.3vw, 11px);
+        }
+
+        .title-links {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .title-link {
+            display: flex;
+            min-height: 34px;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 7px;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 12px;
+            font-size: 10px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .sound-credit {
+            position: absolute;
+            z-index: 4;
+            right: max(8px, env(safe-area-inset-right));
+            bottom: max(4px, env(safe-area-inset-bottom));
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 8px;
+            font-weight: 700;
+            text-shadow: 0 1px 4px rgba(0, 63, 99, 0.72);
+            text-decoration: none;
+        }
+
+        .sound-credit:hover,
+        .sound-credit:focus-visible {
+            color: #fff6a8;
+            text-decoration: underline;
+        }
+
+        /* モード・個数選択 */
+        .select-screen {
+            display: grid;
+            overflow: auto;
+            place-items: center;
+            padding:
+                max(65px, calc(env(safe-area-inset-top) + 56px))
+                14px
+                max(16px, env(safe-area-inset-bottom));
+            background:
+                radial-gradient(circle at 15% 16%, rgba(255,255,255,0.85) 0 3%, transparent 3.2%),
+                radial-gradient(circle at 87% 24%, rgba(255,255,255,0.7) 0 5%, transparent 5.2%),
+                linear-gradient(180deg, #86e3ff 0%, #dffaff 62%, #83dcbd 100%);
+        }
+
+        .select-panel {
+            width: min(94vw, 720px);
+            padding: 18px;
+            background: var(--panel);
+            border: 4px solid #fff;
+            border-radius: 28px;
+            box-shadow: 0 15px 38px rgba(18, 105, 139, 0.25);
+            text-align: center;
+        }
+
+        .select-kicker {
+            display: inline-block;
+            margin: 0 0 4px;
+            padding: 4px 11px;
+            color: #147a9d;
+            background: #dcf8ff;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .select-panel h2 {
+            margin: 0;
+            color: #17658c;
+            font-size: clamp(25px, 7vw, 36px);
+            font-weight: 900;
+        }
+
+        .select-label {
+            margin: 14px 0 7px;
+            color: #4d7690;
+            font-size: 12px;
+        }
+
+        .mode-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .mode-choice {
+            min-height: 77px;
+            padding: 8px 5px;
+            color: #426779;
+            background: #f2fbff;
+            border: 3px solid #bcebf7;
+            border-radius: 17px;
+            box-shadow: 0 4px 0 #8fd0e1;
+        }
+
+        .mode-choice.active {
+            color: #fff;
+            background: linear-gradient(180deg, #56cdeb, #249cc9);
+            border-color: #fff;
+            box-shadow: 0 5px 0 #157aa6;
+            transform: translateY(-2px);
+        }
+
+        .mode-choice span {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 21px;
+        }
+
+        .mode-choice strong {
+            display: block;
+            font-size: clamp(11px, 3.1vw, 15px);
+            line-height: 1.15;
+        }
+
+        .count-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .count-choice {
+            min-height: 91px;
+            padding: 8px 5px;
+            color: #17664f;
+            background: linear-gradient(180deg, #f8fff1, #e4f9d8);
+            border: 3px solid #a8dc77;
+            border-radius: 18px;
+            box-shadow: 0 5px 0 #78b957;
+        }
+
+        .count-choice:active {
+            box-shadow: 0 1px 0 #78b957;
+            transform: translateY(4px);
+        }
+
+        .count-choice strong {
+            display: block;
+            color: #25834f;
+            font-size: clamp(23px, 7vw, 32px);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .count-choice small,
+        .count-best {
+            display: block;
+            margin-top: 4px;
+            font-size: 10px;
+        }
+
+        .count-best {
+            color: #798f85;
+        }
+
+        .select-back {
+            margin-top: 14px;
+            padding: 8px 18px;
+            color: #63808d;
+            background: #e9f0f2;
+            border: 0;
+            border-radius: 13px;
+            box-shadow: 0 4px 0 #cddadd;
+            font-size: 12px;
+        }
+
+        /* ゲーム */
+        .game-screen {
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 16% 22%, rgba(255,255,255,0.84) 0 2%, transparent 2.2%),
+                radial-gradient(circle at 83% 68%, rgba(255,255,255,0.6) 0 3%, transparent 3.2%),
+                linear-gradient(180deg, #78dcff 0%, #d5f8ff 72%, #a0e6cd 100%);
+        }
+
+        .hud {
+            position: absolute;
+            z-index: 60;
+            top: 0;
+            left: 0;
+            display: grid;
+            width: 100%;
+            min-height: 82px;
+            grid-template-columns: 58px minmax(120px, 1fr) minmax(86px, 0.65fr);
+            align-items: center;
+            gap: 7px;
+            padding:
+                max(8px, env(safe-area-inset-top))
+                max(9px, env(safe-area-inset-right))
+                8px
+                max(9px, env(safe-area-inset-left));
+            background: linear-gradient(180deg, rgba(24, 145, 192, 0.95), rgba(32, 166, 206, 0.83));
+            border-bottom: 3px solid rgba(255,255,255,0.75);
+            box-shadow: 0 5px 18px rgba(14, 102, 145, 0.18);
+        }
+
+        .exit-button {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            color: #fff;
+            background: rgba(5, 96, 138, 0.68);
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 50%;
+            font-size: 24px;
+        }
+
+        .next-card,
+        .time-card {
+            min-height: 57px;
+            padding: 5px 9px;
+            background: rgba(255,255,255,0.93);
+            border: 2px solid #fff;
+            border-radius: 17px;
+            box-shadow: 0 4px 0 rgba(22, 111, 155, 0.25);
+            text-align: center;
+        }
+
+        .next-card span,
+        .time-card span {
+            display: block;
+            color: #4b829d;
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        .next-card strong {
+            display: block;
+            margin-top: 1px;
+            color: #ff568c;
+            font-size: 34px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .time-card strong {
+            display: block;
+            margin-top: 6px;
+            color: #136f9d;
+            font-size: clamp(18px, 5vw, 25px);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .play-area {
+            position: absolute;
+            z-index: 1;
+            top: 82px;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .play-area::before,
+        .play-area::after {
+            position: absolute;
+            z-index: 0;
+            bottom: -40px;
+            width: 180px;
+            height: 110px;
+            background: rgba(55, 174, 112, 0.33);
+            border-radius: 60% 60% 0 0;
+            content: "";
+            pointer-events: none;
+        }
+
+        .play-area::before {
+            left: -70px;
+            transform: rotate(12deg);
+        }
+
+        .play-area::after {
+            right: -70px;
+            transform: rotate(-12deg);
+        }
+
+        .mode-banner {
+            position: absolute;
+            z-index: 8;
+            top: 7px;
+            left: 50%;
+            max-width: 80vw;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #176a8c;
+            background: rgba(255,255,255,0.78);
+            border-radius: 999px;
+            font-size: 10px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .bubble-layer {
+            position: absolute;
+            z-index: 3;
+            inset: 30px 0 0;
+        }
+
+        .number-bubble {
+            position: absolute;
+            display: grid;
+            width: var(--size);
+            height: var(--size);
+            place-items: center;
+            padding: 0;
+            color: #153f65;
+            background:
+                radial-gradient(circle at 29% 24%, rgba(255,255,255,0.98) 0 7%, transparent 8%),
+                radial-gradient(circle at 65% 72%, hsla(var(--hue), 92%, 78%, 0.76), hsla(var(--hue), 90%, 70%, 0.27) 48%, rgba(255,255,255,0.64) 76%);
+            border: 2px solid rgba(255,255,255,0.93);
+            border-radius: 50%;
+            box-shadow:
+                inset -6px -7px 12px hsla(var(--hue), 80%, 57%, 0.18),
+                inset 5px 6px 12px rgba(255,255,255,0.65),
+                0 5px 12px rgba(22, 114, 156, 0.22);
+            font-size: calc(var(--size) * 0.42);
+            font-weight: 900;
+            line-height: 1;
+            text-shadow:
+                0 2px 0 #fff,
+                1px 0 0 #fff,
+                -1px 0 0 #fff;
+            transform: rotate(var(--tilt));
+            animation: bubbleBreathe 2.5s ease-in-out infinite alternate;
+            animation-delay: var(--delay);
+            will-change: transform;
+        }
+
+        .number-bubble::after {
+            position: absolute;
+            right: 13%;
+            bottom: 11%;
+            width: 16%;
+            height: 10%;
+            background: rgba(255,255,255,0.82);
+            border-radius: 50%;
+            content: "";
+            transform: rotate(-35deg);
+        }
+
+        .number-bubble.moving {
+            animation: bubbleMove var(--move-duration) cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+        }
+
+        .number-bubble.hint {
+            outline: 5px solid rgba(255, 235, 65, 0.93);
+            outline-offset: 4px;
+            box-shadow:
+                inset -6px -7px 12px hsla(var(--hue), 80%, 57%, 0.18),
+                0 0 0 9px rgba(255, 243, 99, 0.25),
+                0 5px 12px rgba(22, 114, 156, 0.22);
+        }
+
+        .number-bubble.popping {
+            pointer-events: none;
+            animation: bubblePop 330ms ease-out both;
+        }
+
+        .number-bubble.wrong {
+            animation: bubbleWrong 340ms ease-out both;
+        }
+
+        @keyframes bubbleBreathe {
+            from { transform: translateY(1px) rotate(var(--tilt)) scale(0.97); }
+            to { transform: translateY(-3px) rotate(var(--tilt)) scale(1.03); }
+        }
+
+        @keyframes bubbleMove {
+            0% {
+                transform: translate3d(0, 0, 0) rotate(var(--tilt)) scale(0.98);
+            }
+            24% {
+                transform: translate3d(var(--move-x1), var(--move-y1), 0)
+                    rotate(calc(var(--tilt) + 3deg)) scale(1.03);
+            }
+            49% {
+                transform: translate3d(var(--move-x2), var(--move-y2), 0)
+                    rotate(calc(var(--tilt) - 2deg)) scale(0.97);
+            }
+            75% {
+                transform: translate3d(var(--move-x3), var(--move-y3), 0)
+                    rotate(calc(var(--tilt) + 2deg)) scale(1.02);
+            }
+            100% {
+                transform: translate3d(var(--move-x4), var(--move-y4), 0)
+                    rotate(calc(var(--tilt) - 3deg)) scale(0.99);
+            }
+        }
+
+        @keyframes bubblePop {
+            0% { opacity: 1; transform: scale(1); }
+            54% { opacity: 1; transform: scale(1.28); }
+            100% { opacity: 0; transform: scale(0.08); }
+        }
+
+        @keyframes bubbleWrong {
+            0%, 100% { transform: translateX(0) scale(1); }
+            25% { transform: translateX(-8px) scale(1.05); }
+            50% { transform: translateX(8px) scale(1.05); }
+            75% { transform: translateX(-5px) scale(1.03); }
+        }
+
+        .feedback {
+            position: absolute;
+            z-index: 40;
+            top: 50%;
+            left: 50%;
+            color: #ff4c74;
+            font-size: clamp(30px, 9vw, 56px);
+            font-weight: 900;
+            opacity: 0;
+            white-space: nowrap;
+            -webkit-text-stroke: 2px #fff;
+            paint-order: stroke fill;
+            text-shadow: 0 4px 0 #bd2d55, 0 8px 17px rgba(99, 37, 71, 0.28);
+            transform: translate(-50%, -50%) scale(0.7);
+            pointer-events: none;
+        }
+
+        .feedback.show {
+            animation: feedbackPop 520ms ease-out both;
+        }
+
+        .feedback.good {
+            color: #55c95d;
+            text-shadow: 0 4px 0 #258e43, 0 8px 17px rgba(37, 111, 71, 0.25);
+        }
+
+        @keyframes feedbackPop {
+            0% { opacity: 0; transform: translate(-50%, -25%) scale(0.65); }
+            30% { opacity: 1; transform: translate(-50%, -55%) scale(1.06); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(0.9); }
+        }
+
+        /* 説明・カウントダウン */
+        .guide-layer {
+            position: absolute;
+            z-index: 100;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: rgba(17, 121, 163, 0.38);
+            backdrop-filter: blur(5px);
+        }
+
+        .guide-card {
+            width: min(88vw, 430px);
+            padding: 17px;
+            background: rgba(255,255,255,0.97);
+            border: 4px solid #fff;
+            border-radius: 27px;
+            box-shadow: 0 16px 42px rgba(7, 83, 121, 0.27);
+            text-align: center;
+        }
+
+        .guide-mascot {
+            width: 118px;
+            height: 118px;
+            margin: -76px auto 5px;
+            background-color: #7ddcff;
+            background-image: url("assets/keropon-title-v1.jpg");
+            background-position: 92% 69%;
+            background-size: 310%;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 7px 20px rgba(18, 115, 145, 0.24);
+        }
+
+        .guide-card h2 {
+            margin: 3px 0 8px;
+            color: #25884b;
+            font-size: clamp(25px, 7vw, 34px);
+            font-weight: 900;
+        }
+
+        .guide-card p {
+            margin: 0;
+            color: #426a7c;
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 800;
+            line-height: 1.65;
+            text-align: left;
+        }
+
+        .guide-action {
+            margin-top: 14px;
+            padding: 10px 28px;
+            color: #fff;
+            background: linear-gradient(180deg, #62d96d, #29aa50);
+            border: 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 0 #17833a;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .countdown-number {
+            color: #fff36f;
+            font-size: min(36vw, 190px);
+            font-weight: 900;
+            line-height: 1;
+            -webkit-text-stroke: 5px #fff;
+            paint-order: stroke fill;
+            text-shadow: 0 8px 0 #1684b1, 0 16px 30px rgba(8, 74, 116, 0.34);
+        }
+
+        /* 結果 */
+        .result-screen {
+            display: grid;
+            place-items: center;
+            padding:
+                max(66px, calc(env(safe-area-inset-top) + 54px))
+                16px
+                max(18px, env(safe-area-inset-bottom));
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.75) 0 4%, transparent 4.2%),
+                linear-gradient(180deg, #70dbff, #d8f9ff 68%, #92e2c7);
+        }
+
+        .result-panel {
+            width: min(92vw, 470px);
+            padding: 17px;
+            background: rgba(255,255,255,0.96);
+            border: 4px solid #fff;
+            border-radius: 29px;
+            box-shadow: 0 16px 42px rgba(10, 98, 137, 0.24);
+            text-align: center;
+        }
+
+        .result-mascot {
+            width: 132px;
+            height: 132px;
+            margin: -73px auto 4px;
+            background-color: #7ddcff;
+            background-image: url("assets/keropon-title-v1.jpg");
+            background-position: 92% 69%;
+            background-size: 310%;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 7px 20px rgba(18, 115, 145, 0.24);
+        }
+
+        .result-panel h2 {
+            margin: 0;
+            color: #2a9a52;
+            font-size: clamp(30px, 9vw, 43px);
+            font-weight: 900;
+        }
+
+        .result-mode {
+            margin: 4px 0 8px;
+            color: #5d8496;
+            font-size: 11px;
+        }
+
+        .result-time {
+            color: #ff5e98;
+            font-size: clamp(50px, 15vw, 75px);
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            text-shadow: 0 4px 0 #ffd5e6;
+        }
+
+        .result-time small {
+            font-size: 17px;
+        }
+
+        .result-best {
+            min-height: 2.8em;
+            margin: 8px 0 13px;
+            color: #5d7d8c;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .result-best.new {
+            color: #e6a000;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .result-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .result-actions button {
+            min-height: 49px;
+            padding: 7px;
+            border: 0;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .retry-button {
+            color: #fff;
+            background: #32b65b;
+            box-shadow: 0 5px 0 #1b8440;
+        }
+
+        .select-button {
+            color: #17698d;
+            background: #dff7ff;
+            box-shadow: 0 5px 0 #a5dbe8;
+        }
+
+        .result-title-button {
+            grid-column: 1 / -1;
+            color: #60747c;
+            background: #e9eef0;
+            box-shadow: 0 5px 0 #cdd8db;
+        }
+
+        @media (orientation: landscape) {
+            .title-logo {
+                top: max(6px, env(safe-area-inset-top));
+                width: min(82vw, 880px);
+            }
+
+            .title-logo-image {
+                width: auto;
+                max-width: 100%;
+                height: min(55vh, 360px);
+            }
+
+            .title-actions {
+                top: 69%;
+                left: 34%;
+                width: min(46vw, 420px);
+                gap: 6px;
+                padding: 6px;
+                border-radius: 18px;
+            }
+
+            .main-choice {
+                min-height: 40px;
+                flex-direction: row;
+                gap: 9px;
+                padding: 3px 9px;
+                text-align: center;
+            }
+
+            .choice-copy strong {
+                font-size: clamp(15px, 2.3vw, 19px);
+            }
+
+            .choice-copy small {
+                font-size: clamp(8px, 1.5vw, 11px);
+            }
+
+            .title-link {
+                min-height: 27px;
+            }
+
+            .select-screen {
+                place-items: start center;
+                padding-top: max(55px, calc(env(safe-area-inset-top) + 48px));
+            }
+
+            .select-panel {
+                padding: 11px 16px;
+            }
+
+            .select-label {
+                margin: 7px 0 4px;
+            }
+
+            .mode-choice {
+                min-height: 55px;
+                padding: 4px;
+            }
+
+            .mode-choice span {
+                display: inline;
+                margin: 0 4px 0 0;
+                font-size: 17px;
+            }
+
+            .mode-choice strong {
+                display: inline;
+            }
+
+            .count-choice {
+                min-height: 67px;
+                padding: 5px;
+            }
+
+            .count-choice strong {
+                font-size: clamp(20px, 4vw, 27px);
+            }
+
+            .count-choice small,
+            .count-best {
+                display: inline;
+                margin-left: 4px;
+            }
+
+            .select-back {
+                margin-top: 8px;
+                padding: 6px 16px;
+            }
+
+            .hud {
+                min-height: 70px;
+                grid-template-columns: 56px minmax(120px, 1fr) minmax(110px, 0.55fr);
+                padding-top: max(5px, env(safe-area-inset-top));
+                padding-bottom: 5px;
+            }
+
+            .play-area {
+                top: 70px;
+            }
+
+            .next-card,
+            .time-card {
+                min-height: 48px;
+                padding: 3px 8px;
+            }
+
+            .next-card strong {
+                font-size: 28px;
+            }
+
+            .time-card strong {
+                margin-top: 3px;
+                font-size: 20px;
+            }
+
+            .guide-card {
+                width: min(64vw, 480px);
+                padding: 12px;
+            }
+
+            .guide-mascot {
+                position: absolute;
+                width: 96px;
+                height: 96px;
+                margin: 0;
+                transform: translate(-230px, -38px);
+            }
+
+            .guide-card h2 {
+                font-size: 27px;
+            }
+
+            .guide-card p {
+                font-size: 14px;
+                line-height: 1.45;
+            }
+
+            .result-screen {
+                padding-top: max(54px, calc(env(safe-area-inset-top) + 47px));
+            }
+
+            .result-panel {
+                width: min(73vw, 600px);
+                padding: 11px 15px;
+            }
+
+            .result-mascot {
+                position: absolute;
+                width: 110px;
+                height: 110px;
+                margin: 0;
+                transform: translate(-295px, 7px);
+            }
+
+            .result-panel h2 {
+                font-size: 32px;
+            }
+
+            .result-time {
+                font-size: 52px;
+            }
+
+            .result-best {
+                min-height: 1.8em;
+                margin: 5px 0 8px;
+            }
+
+            .result-actions {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .result-title-button {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .title-actions {
+                left: 32%;
+                width: 60vw;
+            }
+
+            .mode-choice strong {
+                font-size: 10px;
+            }
+
+            .count-choice {
+                min-height: 84px;
+            }
+        }
+
+        @media (max-height: 620px) and (orientation: portrait) {
+            .title-logo {
+                top: 4px;
+            }
+
+            .title-logo-image {
+                max-height: 39vh;
+                object-fit: contain;
+            }
+
+            .title-actions {
+                gap: 6px;
+                padding: 7px;
+            }
+
+            .main-choice {
+                min-height: 47px;
+            }
+
+            .select-panel {
+                padding: 12px;
+            }
+
+            .select-label {
+                margin: 7px 0 4px;
+            }
+
+            .mode-choice {
+                min-height: 62px;
+            }
+
+            .count-choice {
+                min-height: 72px;
+            }
+
+            .select-back {
+                margin-top: 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .number-bubble {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-button" id="sound-button" type="button" aria-label="音を切り替える" aria-pressed="true">🔊</button>
+    <audio id="start-sound" src="assets/audio/otologic-fantasize08-3-high.mp3" preload="auto" hidden></audio>
+    <audio id="pop-sound" src="assets/audio/Onoma-Pop04-1(High-Dry).mp3" preload="auto" hidden></audio>
+
+    <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
+        <img class="title-art" src="assets/keropon-title-v1.jpg" alt="">
+        <div class="title-scrim" aria-hidden="true"></div>
+
+        <div class="title-logo">
+            <img class="title-logo-image" src="assets/title-logo-bubble-v1.png" alt="" aria-hidden="true">
+            <h1 id="game-title">じゅんばんシャボン！</h1>
+        </div>
+
+        <div class="title-actions">
+            <button class="main-choice start-button" id="start-button" type="button">
+                <span class="choice-icon" aria-hidden="true">▶</span>
+                <span class="choice-copy"><strong>スタート</strong><small>モードと かずを えらぶ</small></span>
+            </button>
+            <button class="main-choice practice-button" id="practice-button" type="button">
+                <span class="choice-icon" aria-hidden="true">🐸</span>
+                <span class="choice-copy"><strong>れんしゅう</strong></span>
+            </button>
+            <div class="title-links">
+                <a class="title-link" href="classic.html">クラシックモード</a>
+                <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
+            </div>
+        </div>
+        <a class="sound-credit" href="https://otologic.jp/" target="_blank" rel="noopener">音素材：OtoLogic「妄想08-3」「オノマトペ 弾ける04-1」（CC BY 4.0）</a>
+    </section>
+
+    <section class="screen select-screen" id="screen-select" aria-labelledby="select-heading" hidden>
+        <div class="select-panel">
+            <p class="select-kicker">じゅんばんシャボン！</p>
+            <h2 id="select-heading">あそびかたを えらぼう</h2>
+
+            <p class="select-label">① シャボンだまの うごき</p>
+            <div class="mode-options">
+                <button class="mode-choice active" type="button" data-mode="vanish">
+                    <span aria-hidden="true">✨</span>
+                    <strong>きえる<br>シャボンだま</strong>
+                </button>
+                <button class="mode-choice" type="button" data-mode="stay">
+                    <span aria-hidden="true">👀</span>
+                    <strong>きえない<br>シャボンだま</strong>
+                </button>
+                <button class="mode-choice" type="button" data-mode="move">
+                    <span aria-hidden="true">〰️</span>
+                    <strong>うごく<br>シャボンだま</strong>
+                </button>
+            </div>
+
+            <p class="select-label">② いくつまで？</p>
+            <div class="count-options">
+                <button class="count-choice" type="button" data-count="10">
+                    <strong>10こ</strong>
+                    <small>はじめて</small>
+                    <span class="count-best">さいこう <b id="best-10">--.--</b></span>
+                </button>
+                <button class="count-choice" type="button" data-count="20">
+                    <strong>20こ</strong>
+                    <small>おすすめ</small>
+                    <span class="count-best">さいこう <b id="best-20">--.--</b></span>
+                </button>
+                <button class="count-choice" type="button" data-count="30">
+                    <strong>30こ</strong>
+                    <small>すごい！</small>
+                    <span class="count-best">さいこう <b id="best-30">--.--</b></span>
+                </button>
+            </div>
+
+            <button class="select-back" id="select-back-button" type="button">← タイトルへ</button>
+        </div>
+    </section>
+
+    <section class="screen game-screen" id="screen-game" aria-label="じゅんばんシャボンのゲーム画面" hidden>
+        <header class="hud">
+            <button class="exit-button" id="exit-button" type="button" aria-label="タイトルへ戻る">×</button>
+            <div class="next-card">
+                <span>つぎは</span>
+                <strong id="next-number">1</strong>
+            </div>
+            <div class="time-card">
+                <span id="time-label">タイム</span>
+                <strong id="time-display">0.00</strong>
+            </div>
+        </header>
+
+        <main class="play-area" id="play-area">
+            <div class="mode-banner" id="mode-banner">きえる シャボンだま</div>
+            <div class="bubble-layer" id="bubble-layer" aria-label="数字のシャボン玉"></div>
+            <div class="feedback" id="feedback" aria-hidden="true">ちがうよ</div>
+
+            <div class="guide-layer" id="guide-layer" hidden>
+                <div class="guide-card" id="guide-card">
+                    <div class="guide-mascot" role="img" aria-label="ケロポン"></div>
+                    <h2 id="guide-heading">ケロポンと れんしゅう！</h2>
+                    <p id="guide-copy"><span class="meaning-phrase">ひかっている <b>1</b>から</span> <span class="meaning-phrase">じゅんばんに シャボンだまを</span> <span class="meaning-phrase">ポン！</span></p>
+                    <button class="guide-action" id="guide-action" type="button" hidden>スタートへ</button>
+                </div>
+                <div class="countdown-number" id="countdown-number" hidden>3</div>
+            </div>
+        </main>
+    </section>
+
+    <section class="screen result-screen" id="screen-result" aria-labelledby="result-heading" hidden>
+        <div class="result-panel">
+            <div class="result-mascot" role="img" aria-label="ケロポン"></div>
+            <h2 id="result-heading">ぜんぶ ポン！</h2>
+            <p class="result-mode" id="result-mode">きえるシャボンだま・20こ</p>
+            <div class="result-time"><span id="result-time">0.00</span><small>びょう</small></div>
+            <p class="result-best" id="result-best">さいこう：--.--びょう</p>
+            <div class="result-actions">
+                <button class="retry-button" id="retry-button" type="button">もういちど！</button>
+                <button class="select-button" id="result-select-button" type="button">えらびなおす</button>
+                <button class="result-title-button" id="result-title-button" type="button">タイトルへ</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const LEVELS = [10, 20, 30];
+            const MODE_NAMES = {
+                vanish: "きえるシャボンだま",
+                stay: "きえないシャボンだま",
+                move: "うごくシャボンだま"
+            };
+            const MODE_BANNERS = {
+                vanish: "きえる シャボンだま",
+                stay: "きえない シャボンだま",
+                move: "うごく シャボンだま"
+            };
+            const HUES = [190, 210, 275, 325, 18, 48, 145, 170];
+
+            const elements = {
+                title: document.querySelector("#screen-title"),
+                select: document.querySelector("#screen-select"),
+                game: document.querySelector("#screen-game"),
+                result: document.querySelector("#screen-result"),
+                sound: document.querySelector("#sound-button"),
+                startSound: document.querySelector("#start-sound"),
+                popSound: document.querySelector("#pop-sound"),
+                start: document.querySelector("#start-button"),
+                practice: document.querySelector("#practice-button"),
+                selectBack: document.querySelector("#select-back-button"),
+                modeChoices: [...document.querySelectorAll(".mode-choice")],
+                countChoices: [...document.querySelectorAll(".count-choice")],
+                levelBests: {
+                    10: document.querySelector("#best-10"),
+                    20: document.querySelector("#best-20"),
+                    30: document.querySelector("#best-30")
+                },
+                exit: document.querySelector("#exit-button"),
+                playArea: document.querySelector("#play-area"),
+                layer: document.querySelector("#bubble-layer"),
+                next: document.querySelector("#next-number"),
+                timeLabel: document.querySelector("#time-label"),
+                time: document.querySelector("#time-display"),
+                modeBanner: document.querySelector("#mode-banner"),
+                feedback: document.querySelector("#feedback"),
+                guide: document.querySelector("#guide-layer"),
+                guideCard: document.querySelector("#guide-card"),
+                guideHeading: document.querySelector("#guide-heading"),
+                guideCopy: document.querySelector("#guide-copy"),
+                guideAction: document.querySelector("#guide-action"),
+                countdown: document.querySelector("#countdown-number"),
+                resultMode: document.querySelector("#result-mode"),
+                resultTime: document.querySelector("#result-time"),
+                resultBest: document.querySelector("#result-best"),
+                retry: document.querySelector("#retry-button"),
+                resultSelect: document.querySelector("#result-select-button"),
+                resultTitle: document.querySelector("#result-title-button")
+            };
+
+            const state = {
+                screen: "title",
+                runMode: "challenge",
+                bubbleMode: "vanish",
+                count: 20,
+                current: 1,
+                playing: false,
+                locked: true,
+                startedAt: 0,
+                elapsed: 0,
+                animationFrame: null,
+                timers: [],
+                resizeTimer: null,
+                soundOn: true,
+                audioContext: null
+            };
+
+            function showScreen(name) {
+                elements.title.hidden = name !== "title";
+                elements.select.hidden = name !== "select";
+                elements.game.hidden = name !== "game";
+                elements.result.hidden = name !== "result";
+                elements.sound.hidden = name === "game";
+                state.screen = name;
+            }
+
+            function schedule(callback, delay) {
+                const timer = window.setTimeout(callback, delay);
+                state.timers.push(timer);
+                return timer;
+            }
+
+            function clearRunTimers() {
+                state.timers.forEach(window.clearTimeout);
+                state.timers = [];
+                if (state.animationFrame !== null) {
+                    cancelAnimationFrame(state.animationFrame);
+                    state.animationFrame = null;
+                }
+                stopStartSound();
+                stopPopSound();
+            }
+
+            function formatTime(seconds) {
+                return Number(seconds).toFixed(2);
+            }
+
+            function bestKey(count = state.count, mode = state.bubbleMode) {
+                return `junban_shabon_best_${mode}_${count}`;
+            }
+
+            function getBest(count = state.count, mode = state.bubbleMode) {
+                const value = Number(localStorage.getItem(bestKey(count, mode)));
+                return Number.isFinite(value) && value > 0 ? value : null;
+            }
+
+            function saveBest(time) {
+                const previous = getBest();
+                const isNew = previous === null || time < previous;
+                if (isNew) localStorage.setItem(bestKey(), String(time));
+                return { previous, isNew };
+            }
+
+            function updateBestDisplays() {
+                LEVELS.forEach((count) => {
+                    const best = getBest(count, state.bubbleMode);
+                    elements.levelBests[count].textContent = best === null ? "--.--" : `${formatTime(best)}びょう`;
+                });
+            }
+
+            function initAudio() {
+                if (!state.soundOn) return null;
+                if (!state.audioContext) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) state.audioContext = new AudioContext();
+                }
+                if (state.audioContext?.state === "suspended") state.audioContext.resume();
+                return state.audioContext;
+            }
+
+            function playTone(kind) {
+                const context = initAudio();
+                if (!context) return;
+                const now = context.currentTime;
+
+                if (kind === "clear") {
+                    [523.25, 659.25, 783.99, 1046.5].forEach((frequency, index) => {
+                        const oscillator = context.createOscillator();
+                        const gain = context.createGain();
+                        oscillator.connect(gain);
+                        gain.connect(context.destination);
+                        oscillator.type = "triangle";
+                        oscillator.frequency.value = frequency;
+                        const at = now + index * 0.08;
+                        gain.gain.setValueAtTime(0.001, at);
+                        gain.gain.exponentialRampToValueAtTime(0.2, at + 0.025);
+                        gain.gain.exponentialRampToValueAtTime(0.001, at + 0.5);
+                        oscillator.start(at);
+                        oscillator.stop(at + 0.52);
+                    });
+                    return;
+                }
+
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.type = kind === "wrong" ? "square" : "sine";
+                oscillator.frequency.setValueAtTime(kind === "wrong" ? 160 : 830, now);
+                if (kind !== "wrong") oscillator.frequency.exponentialRampToValueAtTime(240, now + 0.11);
+                gain.gain.setValueAtTime(kind === "wrong" ? 0.11 : 0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+                oscillator.start(now);
+                oscillator.stop(now + 0.14);
+            }
+
+            function stopStartSound() {
+                elements.startSound.pause();
+                elements.startSound.currentTime = 0;
+            }
+
+            function playStartSound() {
+                if (!state.soundOn) return;
+                stopStartSound();
+                elements.startSound.volume = 0.42;
+                const playback = elements.startSound.play();
+                if (playback?.catch) playback.catch(() => {});
+            }
+
+            function stopPopSound() {
+                elements.popSound.pause();
+                elements.popSound.currentTime = 0;
+            }
+
+            function playPopSound() {
+                if (!state.soundOn) return;
+                stopPopSound();
+                elements.popSound.volume = 0.42;
+                const playback = elements.popSound.play();
+                if (playback?.catch) playback.catch(() => {});
+            }
+
+            function primePopSound() {
+                if (!state.soundOn) return;
+                stopPopSound();
+                elements.popSound.volume = 0.001;
+                const playback = elements.popSound.play();
+                const finishPriming = () => {
+                    schedule(() => {
+                        stopPopSound();
+                        elements.popSound.volume = 0.42;
+                    }, 120);
+                };
+                if (playback?.then) {
+                    playback.then(finishPriming).catch(() => {});
+                } else {
+                    finishPriming();
+                }
+            }
+
+            function shuffle(items) {
+                for (let index = items.length - 1; index > 0; index -= 1) {
+                    const other = Math.floor(Math.random() * (index + 1));
+                    [items[index], items[other]] = [items[other], items[index]];
+                }
+                return items;
+            }
+
+            function findGrid(count, width, height) {
+                let best = { columns: 2, rows: Math.ceil(count / 2), size: 0 };
+                for (let columns = 2; columns <= count; columns += 1) {
+                    const rows = Math.ceil(count / columns);
+                    const cellSize = Math.min(width / columns, height / rows);
+                    if (cellSize > best.size) best = { columns, rows, size: cellSize };
+                }
+                return best;
+            }
+
+            function buildBubbles() {
+                elements.layer.replaceChildren();
+
+                const width = elements.layer.clientWidth;
+                const height = elements.layer.clientHeight;
+                if (width < 120 || height < 120) {
+                    schedule(buildBubbles, 80);
+                    return;
+                }
+
+                const labels = [];
+                for (let value = state.current; value <= state.count; value += 1) labels.push(value);
+                if (state.bubbleMode === "stay") {
+                    for (let value = 1; value < state.current; value += 1) labels.push(value);
+                }
+
+                const padding = state.count <= 10 ? 26 : 15;
+                const usableWidth = Math.max(100, width - padding * 2);
+                const usableHeight = Math.max(100, height - padding * 2);
+                const grid = findGrid(state.count, usableWidth, usableHeight);
+                const cellWidth = usableWidth / grid.columns;
+                const cellHeight = usableHeight / grid.rows;
+                const maxRadius = state.count <= 10 ? 52 : state.count <= 20 ? 42 : 34;
+                const radius = Math.max(21, Math.min(maxRadius, Math.min(cellWidth, cellHeight) * 0.34));
+
+                const cells = [];
+                for (let row = 0; row < grid.rows; row += 1) {
+                    for (let column = 0; column < grid.columns; column += 1) {
+                        cells.push({
+                            x: padding + cellWidth * (column + 0.5),
+                            y: padding + cellHeight * (row + 0.5)
+                        });
+                    }
+                }
+                shuffle(cells);
+
+                labels.forEach((value, index) => {
+                    const cell = cells[index];
+                    if (!cell) return;
+                    const jitterX = (Math.random() - 0.5) * cellWidth * 0.16;
+                    const jitterY = (Math.random() - 0.5) * cellHeight * 0.16;
+                    const bubbleLeft = cell.x + jitterX - radius;
+                    const bubbleTop = cell.y + jitterY - radius;
+                    const bubble = document.createElement("button");
+                    bubble.type = "button";
+                    bubble.className = "number-bubble";
+                    bubble.dataset.value = String(value);
+                    bubble.textContent = String(value);
+                    bubble.setAttribute("aria-label", `${value}のシャボンだま`);
+                    bubble.style.setProperty("--size", `${radius * 2}px`);
+                    bubble.style.setProperty("--hue", String(HUES[(value - 1) % HUES.length]));
+                    bubble.style.setProperty("--tilt", `${(Math.random() * 8 - 4).toFixed(1)}deg`);
+                    bubble.style.setProperty("--delay", `${(-Math.random() * 2.5).toFixed(2)}s`);
+                    bubble.style.left = `${bubbleLeft}px`;
+                    bubble.style.top = `${bubbleTop}px`;
+                    bubble.style.zIndex = String(state.count - value + 1);
+
+                    if (state.bubbleMode === "move" && state.runMode === "challenge") {
+                        bubble.classList.add("moving");
+                        const roamPadding = Math.max(4, radius * 0.16);
+                        const minLeft = roamPadding;
+                        const minTop = roamPadding;
+                        const maxLeft = Math.max(minLeft, width - radius * 2 - roamPadding);
+                        const maxTop = Math.max(minTop, height - radius * 2 - roamPadding);
+                        const leftRange = maxLeft - minLeft;
+                        const topRange = maxTop - minTop;
+                        const oppositeLeft = bubbleLeft < width / 2
+                            ? minLeft + leftRange * (0.58 + Math.random() * 0.42)
+                            : minLeft + leftRange * Math.random() * 0.42;
+                        const oppositeTop = bubbleTop < height / 2
+                            ? minTop + topRange * (0.56 + Math.random() * 0.44)
+                            : minTop + topRange * Math.random() * 0.44;
+                        const movePoints = [
+                            { x: oppositeLeft, y: minTop + topRange * Math.random() },
+                            { x: minLeft + leftRange * Math.random(), y: oppositeTop },
+                            { x: minLeft + leftRange * Math.random(), y: minTop + topRange * Math.random() },
+                            {
+                                x: minLeft + leftRange * (value % 2 === 0 ? 0.08 + Math.random() * 0.34 : 0.58 + Math.random() * 0.34),
+                                y: minTop + topRange * Math.random()
+                            }
+                        ];
+                        movePoints.forEach((point, pointIndex) => {
+                            bubble.style.setProperty(`--move-x${pointIndex + 1}`, `${(point.x - bubbleLeft).toFixed(1)}px`);
+                            bubble.style.setProperty(`--move-y${pointIndex + 1}`, `${(point.y - bubbleTop).toFixed(1)}px`);
+                        });
+                        bubble.style.setProperty("--move-duration", `${(14 + Math.random() * 8).toFixed(2)}s`);
+                    }
+
+                    if (state.runMode === "practice" && value === state.current) {
+                        bubble.classList.add("hint");
+                    }
+
+                    bubble.addEventListener("pointerdown", handleBubble);
+                    elements.layer.appendChild(bubble);
+                });
+            }
+
+            function showFeedback(text, style = "") {
+                elements.feedback.textContent = text;
+                elements.feedback.classList.remove("show", "good");
+                if (style) elements.feedback.classList.add(style);
+                void elements.feedback.offsetWidth;
+                elements.feedback.classList.add("show");
+            }
+
+            function handleBubble(event) {
+                if (!state.playing || state.locked) return;
+                event.preventDefault();
+                const bubble = event.currentTarget;
+                const value = Number(bubble.dataset.value);
+
+                if (value !== state.current) {
+                    bubble.classList.remove("wrong");
+                    void bubble.offsetWidth;
+                    bubble.classList.add("wrong");
+                    showFeedback(`つぎは ${state.current}`);
+                    playTone("wrong");
+                    schedule(() => bubble.classList.remove("wrong"), 360);
+                    return;
+                }
+
+                state.locked = true;
+                playPopSound();
+                bubble.classList.remove("wrong");
+
+                if (state.bubbleMode === "stay" && state.runMode === "challenge") {
+                    bubble.classList.remove("moving", "hint");
+                } else {
+                    bubble.classList.remove("moving", "hint");
+                    bubble.classList.add("popping");
+                    schedule(() => bubble.remove(), 330);
+                }
+
+                state.current += 1;
+                if (state.runMode === "practice") {
+                    elements.time.textContent = `${Math.min(state.current - 1, state.count)}/${state.count}`;
+                }
+
+                if (state.current > state.count) {
+                    elements.next.textContent = "✓";
+                    schedule(() => {
+                        if (state.runMode === "practice") finishPractice();
+                        else finishChallenge();
+                    }, 390);
+                    return;
+                }
+
+                elements.next.textContent = String(state.current);
+                if (state.runMode === "practice") {
+                    schedule(() => {
+                        elements.layer.querySelector(`[data-value="${state.current}"]`)?.classList.add("hint");
+                        state.locked = false;
+                    }, 220);
+                } else {
+                    state.locked = false;
+                }
+            }
+
+            function timerLoop(now) {
+                if (!state.playing || state.runMode !== "challenge") return;
+                state.elapsed = (now - state.startedAt) / 1000;
+                elements.time.textContent = formatTime(state.elapsed);
+                state.animationFrame = requestAnimationFrame(timerLoop);
+            }
+
+            function beginPlay() {
+                elements.guide.hidden = true;
+                state.playing = true;
+                state.locked = false;
+                state.startedAt = performance.now();
+                state.elapsed = 0;
+                if (state.runMode === "challenge") {
+                    state.animationFrame = requestAnimationFrame(timerLoop);
+                }
+            }
+
+            function runCountdown() {
+                elements.guide.hidden = false;
+                elements.guideCard.hidden = true;
+                elements.countdown.hidden = false;
+                elements.countdown.textContent = "3";
+                ["2", "1", "スタート！"].forEach((text, index) => {
+                    schedule(() => {
+                        elements.countdown.textContent = text;
+                        elements.countdown.style.fontSize = text === "スタート！" ? "min(18vw, 100px)" : "";
+                    }, (index + 1) * 650);
+                });
+                schedule(() => {
+                    elements.countdown.style.fontSize = "";
+                    elements.countdown.hidden = true;
+                    elements.guideCard.hidden = false;
+                    beginPlay();
+                }, 2600);
+            }
+
+            function resetRun(runMode, bubbleMode, count) {
+                clearRunTimers();
+                state.runMode = runMode;
+                state.bubbleMode = bubbleMode;
+                state.count = count;
+                state.current = 1;
+                state.playing = false;
+                state.locked = true;
+                state.startedAt = 0;
+                state.elapsed = 0;
+                elements.next.textContent = "1";
+                elements.feedback.classList.remove("show", "good");
+                elements.modeBanner.textContent = runMode === "practice" ? "れんしゅう・1から5まで" : MODE_BANNERS[bubbleMode];
+                elements.guide.hidden = true;
+                elements.guideCard.hidden = false;
+                elements.guideAction.hidden = true;
+                elements.countdown.hidden = true;
+
+                if (runMode === "practice") {
+                    elements.timeLabel.textContent = "できた";
+                    elements.time.textContent = `0/${count}`;
+                } else {
+                    elements.timeLabel.textContent = "タイム";
+                    elements.time.textContent = "0.00";
+                }
+
+                showScreen("game");
+                requestAnimationFrame(buildBubbles);
+            }
+
+            function startPractice() {
+                initAudio();
+                resetRun("practice", "vanish", 5);
+                primePopSound();
+                playStartSound();
+                elements.guideHeading.textContent = "ケロポンと れんしゅう！";
+                elements.guideCopy.innerHTML = '<span class="meaning-phrase">ひかっている <b>1</b>から</span> <span class="meaning-phrase">じゅんばんに シャボンだまを</span> <span class="meaning-phrase">ポン！</span>';
+                elements.guideAction.textContent = "やってみる！";
+                elements.guideAction.dataset.action = "begin-practice";
+                elements.guideAction.hidden = false;
+                elements.guide.hidden = false;
+            }
+
+            function startChallenge(count = state.count) {
+                initAudio();
+                resetRun("challenge", state.bubbleMode, Number(count));
+                primePopSound();
+                playStartSound();
+                runCountdown();
+            }
+
+            function finishPractice() {
+                state.playing = false;
+                state.locked = true;
+                playTone("clear");
+                showFeedback("できた！", "good");
+                schedule(() => {
+                    elements.guideHeading.textContent = "れんしゅう できた！";
+                    elements.guideCopy.textContent = "ほんばんも がんばって！";
+                    elements.guideAction.textContent = "スタートへ";
+                    elements.guideAction.dataset.action = "select";
+                    elements.guideAction.hidden = false;
+                    elements.guideCard.hidden = false;
+                    elements.countdown.hidden = true;
+                    elements.guide.hidden = false;
+                }, 420);
+            }
+
+            function finishChallenge() {
+                state.elapsed = (performance.now() - state.startedAt) / 1000;
+                state.playing = false;
+                state.locked = true;
+                if (state.animationFrame !== null) {
+                    cancelAnimationFrame(state.animationFrame);
+                    state.animationFrame = null;
+                }
+                playTone("clear");
+
+                const record = saveBest(state.elapsed);
+                elements.resultMode.textContent = `${MODE_NAMES[state.bubbleMode]}・${state.count}こ`;
+                elements.resultTime.textContent = formatTime(state.elapsed);
+                elements.resultBest.classList.toggle("new", record.isNew);
+                if (record.isNew) {
+                    elements.resultBest.textContent = "🏆 じこしんきろく！";
+                } else {
+                    elements.resultBest.innerHTML = `さいこう：${formatTime(record.previous)}びょう<br>あと ${formatTime(state.elapsed - record.previous)}びょう`;
+                }
+                updateBestDisplays();
+                showScreen("result");
+            }
+
+            function showSelect() {
+                clearRunTimers();
+                state.playing = false;
+                state.locked = true;
+                updateBestDisplays();
+                showScreen("select");
+            }
+
+            function returnToTitle() {
+                clearRunTimers();
+                state.playing = false;
+                state.locked = true;
+                elements.layer.replaceChildren();
+                elements.guide.hidden = true;
+                updateBestDisplays();
+                showScreen("title");
+            }
+
+            elements.start.addEventListener("click", showSelect);
+            elements.practice.addEventListener("click", startPractice);
+            elements.selectBack.addEventListener("click", returnToTitle);
+            elements.exit.addEventListener("click", returnToTitle);
+            elements.modeChoices.forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.bubbleMode = button.dataset.mode;
+                    elements.modeChoices.forEach((choice) => choice.classList.toggle("active", choice === button));
+                    updateBestDisplays();
+                    playTone("pop");
+                });
+            });
+            elements.countChoices.forEach((button) => {
+                button.addEventListener("click", () => startChallenge(Number(button.dataset.count)));
+            });
+            elements.guideAction.addEventListener("click", () => {
+                if (elements.guideAction.dataset.action === "begin-practice") {
+                    elements.guideAction.hidden = true;
+                    runCountdown();
+                    return;
+                }
+                showSelect();
+            });
+            elements.retry.addEventListener("click", () => startChallenge(state.count));
+            elements.resultSelect.addEventListener("click", showSelect);
+            elements.resultTitle.addEventListener("click", returnToTitle);
+
+            elements.sound.addEventListener("click", () => {
+                state.soundOn = !state.soundOn;
+                elements.sound.textContent = state.soundOn ? "🔊" : "🔇";
+                elements.sound.setAttribute("aria-pressed", String(state.soundOn));
+                if (state.soundOn) {
+                    playTone("pop");
+                } else {
+                    stopStartSound();
+                    stopPopSound();
+                }
+            });
+
+            window.addEventListener("resize", () => {
+                window.clearTimeout(state.resizeTimer);
+                state.resizeTimer = window.setTimeout(() => {
+                    if (state.screen === "game") buildBubbles();
+                }, 180);
+            });
+
+            window.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && state.screen !== "title") returnToTitle();
+            });
+
+            updateBestDisplays();
+            showScreen("title");
+        })();
+    </script>
+</body>
+</html>

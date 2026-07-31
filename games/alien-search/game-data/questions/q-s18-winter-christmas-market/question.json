@@ -1,0 +1,76 @@
+{
+  "version": 4,
+  "id": "q-s18-winter-christmas-market",
+  "stageId": "s18",
+  "season": "winter",
+  "level": 3,
+  "theme": "クリスマスマーケット",
+  "canvas": {
+    "width": 1600,
+    "height": 1200
+  },
+  "scene": "scene.webp",
+  "targetCount": 5,
+  "targets": [
+    {
+      "id": "s18-t01",
+      "action": "大きなツリーに飾りをつけている",
+      "hitbox": {
+        "x": 610,
+        "y": 160,
+        "width": 145,
+        "height": 180
+      },
+      "spriteIndex": 0
+    },
+    {
+      "id": "s18-t02",
+      "action": "大きなツリーへ飾りを差し出している",
+      "hitbox": {
+        "x": 890,
+        "y": 230,
+        "width": 150,
+        "height": 180
+      },
+      "spriteIndex": 1
+    },
+    {
+      "id": "s18-t03",
+      "action": "クリスマスプレゼントを包んでいる",
+      "hitbox": {
+        "x": 480,
+        "y": 550,
+        "width": 155,
+        "height": 200
+      },
+      "spriteIndex": 2
+    },
+    {
+      "id": "s18-t04",
+      "action": "おもちゃ屋台で積み木を持っている",
+      "hitbox": {
+        "x": 1260,
+        "y": 450,
+        "width": 165,
+        "height": 190
+      },
+      "spriteIndex": 3
+    },
+    {
+      "id": "s18-t05",
+      "action": "プレゼントをカメラで撮っている",
+      "hitbox": {
+        "x": 1095,
+        "y": 875,
+        "width": 145,
+        "height": 190
+      },
+      "spriteIndex": 4
+    }
+  ],
+  "targetSheet": {
+    "image": "targets.webp",
+    "columns": 5,
+    "tileSize": 224
+  }
+}
