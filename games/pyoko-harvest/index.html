@@ -621,10 +621,13 @@
             z-index: 15;
             top: 50%;
             left: 50%;
+            width: max-content;
+            max-width: calc(100% - 24px);
             color: #fff;
-            font-size: clamp(42px, 13vw, 76px);
+            font-size: clamp(32px, 10vw, 64px);
             font-weight: 900;
             opacity: 0;
+            white-space: nowrap;
             text-shadow: 0 4px 0 #e49713, 0 8px 18px rgba(30, 76, 43, 0.34);
             pointer-events: none;
             transform: translate(-50%, -50%) scale(0.7);
@@ -636,8 +639,7 @@
 
         .feedback.bad {
             color: #ff3030;
-            font-size: clamp(30px, 8.8vw, 58px);
-            white-space: nowrap;
+            font-size: clamp(24px, 7.4vw, 52px);
             -webkit-text-stroke: 2px #fff;
             paint-order: stroke fill;
             text-shadow: 0 4px 0 #a91e19, 0 8px 18px rgba(91, 30, 23, 0.38);
@@ -723,6 +725,13 @@
             font-size: min(31vw, 150px);
             font-weight: 900;
             text-shadow: 0 7px 0 var(--leaf-dark), 0 15px 35px rgba(5, 45, 26, 0.35);
+        }
+
+        .countdown-number.is-start {
+            max-width: calc(100vw - 32px);
+            font-size: clamp(38px, 15vw, 78px);
+            line-height: 1;
+            white-space: nowrap;
         }
 
         /* けっか */
@@ -1501,6 +1510,7 @@
                 elements.guide.hidden = false;
                 elements.guideCard.hidden = true;
                 elements.countdown.hidden = false;
+                elements.countdown.classList.remove("is-start");
                 let count = 3;
                 elements.countdown.textContent = String(count);
 
@@ -1512,10 +1522,12 @@
                         return;
                     }
                     elements.countdown.textContent = "スタート！";
+                    elements.countdown.classList.add("is-start");
                     state.countdownTimer = window.setTimeout(() => {
                         elements.guide.hidden = true;
                         elements.guideCard.hidden = false;
                         elements.countdown.hidden = true;
+                        elements.countdown.classList.remove("is-start");
                         beginChallenge();
                     }, 480);
                 };

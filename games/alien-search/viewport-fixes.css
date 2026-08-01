@@ -1,4 +1,96 @@
 /* Final playtest: keep the search scene visible and make it the visual priority. */
+@media (orientation: portrait) {
+  .title-page {
+    height: 100dvh;
+    min-height: 0;
+    align-content: stretch;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .title-shell {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .title-image {
+    position: absolute;
+    inset: 0;
+    content: url("./title-screen-portrait-v1.webp");
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 941 / 1672;
+    object-fit: contain;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .title-season-grid {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: max(56px, calc(env(safe-area-inset-bottom) + 56px));
+    width: min(calc(100% - 12px), 520px);
+    margin: 0;
+    padding: 5px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.82);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 7px 20px rgba(25, 47, 55, 0.18);
+    backdrop-filter: blur(6px);
+    transform: translateX(-50%);
+  }
+
+  .title-season-button {
+    min-height: 38px;
+    padding: 2px 3px;
+    border-width: 2px;
+    border-radius: 11px;
+    font-size: clamp(13px, 3.8vw, 17px);
+    box-shadow: 0 3px rgba(25, 47, 55, 0.12);
+  }
+
+  .title-season-button span {
+    margin-right: 2px;
+  }
+
+  .title-progress {
+    position: absolute;
+    z-index: 3;
+    left: max(8px, env(safe-area-inset-left));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    margin: 0;
+    padding: 5px 8px;
+    border: 1px solid rgba(183, 219, 225, 0.92);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 11px;
+    line-height: 1.15;
+    box-shadow: 0 3px 10px rgba(25, 47, 55, 0.12);
+  }
+
+  .title-progress strong {
+    font-size: 16px;
+  }
+
+  .title-page .park-back-link {
+    position: absolute;
+    z-index: 3;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(6px, env(safe-area-inset-bottom));
+    min-height: 36px;
+    margin: 0;
+    padding: 6px 11px;
+    font-size: 11px;
+  }
+}
+
 .game-page {
   display: flex;
   height: 100dvh;
