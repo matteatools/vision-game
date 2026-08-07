@@ -67,6 +67,7 @@
   max-height: 100%;
   align-self: center;
   justify-self: center;
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 .phase-playing .tap-hint,
@@ -133,6 +134,79 @@
   min-height: 0;
   flex: 1 1 auto;
   padding-block: 12px;
+}
+
+.jiwa-all-found-message {
+  z-index: 45;
+  position: fixed;
+  top: max(68px, calc(env(safe-area-inset-top) + 18px));
+  left: 50%;
+  margin: 0;
+  padding: 12px 22px;
+  border: 2px solid rgba(255, 109, 126, 0.88);
+  border-radius: 4px;
+  color: #fff4dc;
+  background: rgba(56, 5, 13, 0.94);
+  font-size: clamp(1.35rem, 5vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: jiwa-found-message-in 0.35s ease-out both;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+}
+
+.jiwa-checks-ended {
+  z-index: 60;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(7, 2, 4, 0.88);
+  backdrop-filter: blur(5px);
+}
+
+.jiwa-checks-ended-card {
+  width: min(100%, 520px);
+  padding: clamp(28px, 7vw, 50px);
+  border: 1px solid rgba(239, 51, 73, 0.7);
+  border-radius: 4px;
+  color: #eee1c9;
+  background: linear-gradient(145deg, rgba(43, 8, 14, 0.98), rgba(16, 5, 8, 0.99));
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75);
+}
+
+.jiwa-checks-ended-card h1 {
+  margin: 7px 0 0;
+  color: #eee1c9;
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 1.25;
+}
+
+.jiwa-checks-ended-card > p:last-of-type {
+  margin: 18px 0 26px;
+  color: #bbaa98;
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: clamp(0.8rem, 3.2vw, 1rem);
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+.jiwa-checks-ended-card .result-button {
+  margin-inline: auto;
+}
+
+@keyframes jiwa-found-message-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px) scale(0.94);
+  }
 }
 
 @media (max-width: 899px) and (orientation: portrait) {

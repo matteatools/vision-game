@@ -69,7 +69,7 @@
     }
   ],
   "targetSheet": {
-    "image": "targets.webp",
+    "image": "targets.png",
     "columns": 5,
     "tileSize": 224
   }
