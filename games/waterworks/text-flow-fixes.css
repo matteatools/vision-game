@@ -29,3 +29,32 @@
   align-items: center;
   justify-content: center;
 }
+
+.tool-buttons.has-hint {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tool-buttons .hint-button.is-active {
+  border-color: #e29432;
+  color: #854b18;
+  background: #fff0b5;
+  box-shadow: 0 0 0 3px rgba(255, 189, 65, 0.35);
+}
+
+.tool-buttons .hint-button strong {
+  font: inherit;
+}
+
+.board-cell.is-hinted {
+  z-index: 2;
+  background:
+    radial-gradient(circle, rgba(255, 239, 142, 0.96), rgba(255, 208, 72, 0.56)),
+    #fff8cf;
+  box-shadow:
+    0 0 0 5px rgba(255, 189, 65, 0.46),
+    0 0 24px rgba(255, 171, 34, 0.58);
+}
+
+.board-cell.is-hinted .hint-dot {
+  background: rgba(255, 255, 255, 0.72);
+}
