@@ -19,7 +19,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:title" content="このサイトについて｜めとあたまのゲームパーク">
-  <meta property="og:description" content="ゲームが、こどもの まなびの ちかくに とどくことを めざして。">
+  <meta property="og:description" content="子どもも大人も、目と頭を使って遊べる無料Webゲームサイトの目的と運営方針をご案内します。">
   <meta property="og:url" content="https://matteatools.github.io/vision-game/about/">
   <meta property="og:image" content="https://matteatools.github.io/vision-game/assets/home/og-image.png">
   <style>
@@ -177,7 +177,8 @@
 
     .intro-card,
     .info-card,
-    .contact-card {
+    .contact-card,
+    .qualification-disclosure {
       background: rgba(255, 253, 247, .98);
       border: 1px solid rgba(219, 232, 230, .9);
       border-radius: 28px;
@@ -334,6 +335,70 @@
       font-size: .85rem;
     }
 
+    .qualification-disclosure {
+      margin-top: 22px;
+      padding: clamp(28px, 6vw, 54px);
+      display: grid;
+      grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
+      align-items: center;
+      gap: clamp(24px, 5vw, 48px);
+    }
+
+    .qualification-mark-wrap {
+      padding: 20px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+    }
+
+    .qualification-mark {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .qualification-kicker {
+      margin: 0 0 8px;
+      color: var(--aqua-dark);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+    }
+
+    .qualification-copy h2 {
+      margin: 0 0 14px;
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      line-height: 1.45;
+    }
+
+    .qualification-copy p {
+      margin: 6px 0;
+    }
+
+    .qualification-association,
+    .qualification-name {
+      font-weight: 900;
+    }
+
+    .qualification-note {
+      margin-top: 15px !important;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .qualification-link {
+      min-height: 48px;
+      margin-top: 17px;
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      color: #fff;
+      background: var(--aqua-dark);
+      border-radius: 999px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
     footer {
       padding: 32px 18px 42px;
       color: rgba(255, 255, 255, .82);
@@ -390,8 +455,14 @@
 
       .intro-card,
       .info-card,
-      .contact-card {
+      .contact-card,
+      .qualification-disclosure {
         border-radius: 22px;
+      }
+
+      .qualification-disclosure {
+        grid-template-columns: 1fr;
+        padding: 22px;
       }
 
       .intro-card,
@@ -441,7 +512,7 @@
     <div class="hero-inner">
       <p class="eyebrow">おとなの方へ</p>
       <h1>このサイトについて</h1>
-      <p class="hero-message">ゲームが、こどもの まなびの ちかくに<br>とどくことを めざして。</p>
+      <p class="hero-message">子どもも大人も、目と頭を使って<br>遊べる場所をめざして。</p>
     </div>
   </section>
 
@@ -449,10 +520,11 @@
     <section class="intro-card" aria-labelledby="purpose-heading">
       <p class="section-label">つくった人と ねがい</p>
       <h2 id="purpose-heading">制作者と、このサイトの目的</h2>
-      <p>このサイトは、「ゲームが子どもの学びの近くに届くこと」を目指して作っています。</p>
+      <p>このサイトは、子どもも大人も、目と頭を使いながら夢中になって遊べる場所を目指して作っています。子ども専用や学習専用のサイトではありません。</p>
       <p>制作者は小学校で20年以上、遊びやゲームの仕組みを取り入れた教育を実践してきました。近年は特に、ボードゲームを教育に取り入れる活動を続けています。</p>
       <p>「おうちの人と一緒にゲームをしてくる」ことが宿題になるような、楽しく夢中になれる学びがもっとあってもよいと考えています。</p>
       <p>このサイトは、その入り口です。子どもが夢中になりながら頭や目を使う仕組みを、ひとりでも遊べるデジタルゲームとして形にしています。</p>
+      <p>ゲームづくりでは、目から情報を受け取り、頭で考え、指や手で操作するという、目・頭・体の連携を参考にしています。ただし、本サイトでは各ゲームをビジョントレーニング®として提供しておらず、能力の向上や特定の効果・改善を保証するものではありません。</p>
     </section>
 
     <div class="cards">
@@ -494,7 +566,25 @@
       <a class="mail-button" href="mailto:mattea198096@gmail.com">メールで おといあわせ</a>
       <span class="mail-address">mattea198096@gmail.com</span>
     </section>
-  </main>
+  <!-- qualification-disclosure:start -->
+      <section class="qualification-disclosure" aria-labelledby="about-qualification-heading">
+        <div class="qualification-mark-wrap">
+          <img class="qualification-mark" src="../assets/qualification/vision-training-trademark.png" alt="ビジョントレーニング®商標マーク" width="776" height="571" loading="lazy">
+        </div>
+        <div class="qualification-copy">
+          <p class="qualification-kicker">資格・商標表示</p>
+          <h2 id="about-qualification-heading">ビジョントレーニング®に関する制作背景</h2>
+          <p class="qualification-association">一般社団法人 ビジョントレーニング&#174;協会</p>
+          <p class="qualification-name">ビジョントレーニング&#174;インストラクターPRO</p>
+          <p class="qualification-registration"><strong>登録番号</strong> &#216;260214013V</p>
+          <p class="qualification-expiry">資格有効期限：2027年3月20日</p>
+          <p class="qualification-note">制作者は、眼から情報を受け取り、頭で判断し、体で操作するという考え方をゲーム制作の参考にしています。各ゲームをビジョントレーニング®として提供するものではなく、能力の向上や特定の効果・改善を保証するものではありません。</p>
+          <a class="qualification-link" href="../vision-training/" data-vision-training-link="about_to_information">資格とゲーム制作の考え方を詳しく見る</a>
+        </div>
+      </section>
+      <script src="../assets/vision-training-events.js"></script>
+<!-- qualification-disclosure:end -->
+    </main>
 
   <footer>
     <a href="../">めとあたまのゲームパークへ もどる</a>

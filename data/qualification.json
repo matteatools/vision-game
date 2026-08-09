@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "associationName": "一般社団法人 ビジョントレーニング®協会",
+  "associationUrl": "https://vision-training.org/",
+  "qualificationName": "ビジョントレーニング®インストラクターPRO",
+  "validUntil": "2027-03-20",
+  "registrationNumber": "Ø260214013V",
+  "markSha256": "2ED33C5E6591817FF12398C98B28DB35B378104961790FDC54CB6805BD288786",
+  "sourceAssets": {
+    "mark": "資格/ビジョントレーニング商標マーク_透明背景.png"
+  },
+  "publicAssets": {
+    "mark": "assets/qualification/vision-training-trademark.png",
+    "qualificationImage": ""
+  }
+}
