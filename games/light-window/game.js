@@ -185,8 +185,8 @@
             "screen-title", "screen-game", "title-best", "practice-button", "start-button",
             "screen-collection", "collection-button", "title-collection-count",
             "collection-back-button", "collection-count", "collection-grid", "collection-empty",
-            "title-button", "stage-label", "difficulty-label", "timer-label", "artist-line",
-            "window-message", "board", "piece-tray", "rotate-button", "flip-button",
+            "title-button", "stage-label", "difficulty-label", "timer-label", "window-panel",
+            "artist-line", "window-frame", "window-message", "board", "piece-tray", "rotate-button", "flip-button",
             "return-button", "hint-button", "reset-button", "sample-button", "drag-proxy",
             "overlay", "overlay-title", "overlay-message", "overlay-button"
         ].forEach((id) => {
@@ -632,6 +632,11 @@
         buildPieceInstances();
         buildTargetData();
         updateHud();
+        elements.windowMessage.textContent = "ブロックを えらんで まどへ はこぼう";
+        updateCellSize();
+        render();
+        // The mobile workbench gets its final height only after all tray pieces exist.
+        // Refit once against that settled layout so the board never flashes outside its panel.
         updateCellSize();
         render();
         state.stageStartedAt = Date.now();
@@ -737,22 +742,46 @@
     }
 
     function updateCellSize() {
-        if (!state.boardCols || !state.boardRows) return;
-        const isCompact = window.innerWidth <= 760 || window.innerWidth / window.innerHeight <= 0.8;
-        const maxWidth = isCompact
-            ? Math.max(220, window.innerWidth - 48)
-            : Math.max(260, window.innerWidth - 410);
-        const maxHeight = isCompact
-            ? Math.max(185, window.innerHeight * 0.46)
-            : Math.max(220, window.innerHeight - 165);
+        if (!state.boardCols || !state.boardRows || !elements.windowPanel) return;
+        const panelStyle = getComputedStyle(elements.windowPanel);
+        const frameStyle = getComputedStyle(elements.windowFrame);
+        const panelWidth = elements.windowPanel.clientWidth -
+            cssPixels(panelStyle, "paddingLeft") - cssPixels(panelStyle, "paddingRight");
+        const panelHeight = elements.windowPanel.clientHeight -
+            cssPixels(panelStyle, "paddingTop") - cssPixels(panelStyle, "paddingBottom");
+        const frameChromeWidth = cssPixels(frameStyle, "paddingLeft") +
+            cssPixels(frameStyle, "paddingRight") + cssPixels(frameStyle, "borderLeftWidth") +
+            cssPixels(frameStyle, "borderRightWidth");
+        const frameChromeHeight = cssPixels(frameStyle, "paddingTop") +
+            cssPixels(frameStyle, "paddingBottom") + cssPixels(frameStyle, "borderTopWidth") +
+            cssPixels(frameStyle, "borderBottomWidth");
+        const maxWidth = Math.max(1, panelWidth - frameChromeWidth);
+        const maxHeight = Math.max(
+            1,
+            panelHeight - outerHeight(elements.artistLine) - outerHeight(elements.windowMessage) - frameChromeHeight
+        );
         const size = Math.floor(Math.min(
             58,
             maxWidth / state.boardCols,
             maxHeight / state.boardRows
         ));
-        state.cellSize = Math.max(27, size);
+        state.cellSize = Math.max(8, size);
         document.documentElement.style.setProperty("--cell-size", `${state.cellSize}px`);
-        document.documentElement.style.setProperty("--tray-cell", `${Math.max(15, Math.min(20, state.cellSize * 0.42))}px`);
+        document.documentElement.style.setProperty("--tray-cell", `${Math.max(10, Math.min(20, state.cellSize * 0.42))}px`);
+    }
+
+    function cssPixels(style, property) {
+        return Number.parseFloat(style[property]) || 0;
+    }
+
+    function outerHeight(element) {
+        const style = getComputedStyle(element);
+        const borderHeight = cssPixels(style, "borderTopWidth") + cssPixels(style, "borderBottomWidth");
+        const renderedHeight = Math.max(
+            element.getBoundingClientRect().height,
+            element.scrollHeight + borderHeight
+        );
+        return renderedHeight + cssPixels(style, "marginTop") + cssPixels(style, "marginBottom");
     }
 
     function render() {
@@ -818,7 +847,6 @@
                 "aria-label",
                 `${piece.colorName}の ひかりブロック。 クリックで回転、 ダブルクリックで裏返し、 長押しでドラッグ`
             );
-            item.appendChild(makePieceElement(piece, getTrayCellSize(), "preview"));
             item.addEventListener("pointerdown", (event) => beginDrag(event, piece.id, "tray"));
             item.addEventListener("keydown", (event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -827,11 +855,25 @@
                 }
             });
             elements.pieceTray.appendChild(item);
+            item.appendChild(makePieceElement(piece, getTrayCellSize(piece, item), "preview"));
         });
     }
 
-    function getTrayCellSize() {
-        return Math.max(15, Math.min(20, state.cellSize * 0.42));
+    function getTrayCellSize(piece, item) {
+        const preferred = Math.max(10, Math.min(20, state.cellSize * 0.42));
+        if (!piece || !item) return preferred;
+        const style = getComputedStyle(item);
+        const availableWidth = item.clientWidth - cssPixels(style, "paddingLeft") -
+            cssPixels(style, "paddingRight") - 2;
+        const availableHeight = item.clientHeight - cssPixels(style, "paddingTop") -
+            cssPixels(style, "paddingBottom") - 2;
+        if (availableWidth <= 0 || availableHeight <= 0) return preferred;
+        const pieceBounds = bounds(pieceCoords(piece));
+        return Math.max(7, Math.min(
+            preferred,
+            availableWidth / pieceBounds.width,
+            availableHeight / pieceBounds.height
+        ));
     }
 
     function makePieceElement(piece, cellSize, kind) {
@@ -842,6 +884,9 @@
         container.style.width = `${pieceBounds.width * cellSize}px`;
         container.style.height = `${pieceBounds.height * cellSize}px`;
         container.style.setProperty("--piece-color", piece.color);
+        if (kind === "preview") {
+            container.style.setProperty("--preview-cell-size", `${cellSize}px`);
+        }
 
         coords.forEach(([x, y]) => {
             const cell = document.createElement("div");
@@ -1008,7 +1053,8 @@
 
     function beginDrag(event, pieceId, source) {
         if (state.inputLocked || (event.pointerType === "mouse" && event.button !== 0)) return;
-        event.preventDefault();
+        const isScrollableTrayTouch = source === "tray" && event.pointerType === "touch";
+        if (!isScrollableTrayTouch) event.preventDefault();
         ensureAudio();
         if (state.pendingBlockClick?.pieceId !== pieceId) {
             commitPendingBlockClick();
@@ -1024,6 +1070,7 @@
             source,
             originalPlacement,
             pointerId: event.pointerId,
+            pointerType: event.pointerType,
             startX: event.clientX,
             startY: event.clientY,
             lastX: event.clientX,
@@ -1077,13 +1124,27 @@
 
     function handlePointerMove(event) {
         if (!state.dragging || event.pointerId !== state.dragging.pointerId) return;
-        event.preventDefault();
+        const deltaX = event.clientX - state.dragging.startX;
+        const deltaY = event.clientY - state.dragging.startY;
         const distance = Math.hypot(
-            event.clientX - state.dragging.startX,
-            event.clientY - state.dragging.startY
+            deltaX,
+            deltaY
         );
         state.dragging.lastX = event.clientX;
         state.dragging.lastY = event.clientY;
+        if (state.dragging.source === "tray" && state.dragging.pointerType === "touch" && !state.dragging.active) {
+            if (distance < BLOCK_DRAG_THRESHOLD) return;
+            const touchAction = getComputedStyle(elements.pieceTray).touchAction;
+            const horizontal = Math.abs(deltaX) >= Math.abs(deltaY);
+            const isTrayScroll = (horizontal && touchAction.includes("pan-x")) ||
+                (!horizontal && touchAction.includes("pan-y"));
+            if (isTrayScroll) {
+                window.clearTimeout(state.dragging.holdTimerId);
+                state.dragging = null;
+                return;
+            }
+        }
+        event.preventDefault();
         if (!state.dragging.moved && distance >= BLOCK_DRAG_THRESHOLD) {
             state.dragging.moved = true;
             activateDrag(event.clientX, event.clientY);
@@ -1370,6 +1431,17 @@
         elements.overlayTitle.classList.remove("new-record");
     }
 
+    let resizeFrameId = null;
+    let layoutObserver = null;
+
+    function scheduleResize() {
+        if (resizeFrameId !== null) window.cancelAnimationFrame(resizeFrameId);
+        resizeFrameId = window.requestAnimationFrame(() => {
+            resizeFrameId = null;
+            handleResize();
+        });
+    }
+
     function handleResize() {
         if (elements.screenGame.classList.contains("hidden")) return;
         updateCellSize();
@@ -1409,7 +1481,15 @@
         window.addEventListener("pointermove", handlePointerMove, { passive: false });
         window.addEventListener("pointerup", handlePointerUp, { passive: false });
         window.addEventListener("pointercancel", handlePointerUp, { passive: false });
-        window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", scheduleResize);
+        window.visualViewport?.addEventListener("resize", scheduleResize);
+        if (typeof ResizeObserver === "function") {
+            layoutObserver = new ResizeObserver(scheduleResize);
+            layoutObserver.observe(elements.windowPanel);
+            layoutObserver.observe(elements.artistLine);
+            layoutObserver.observe(elements.windowMessage);
+        }
+        document.fonts?.ready.then(scheduleResize);
     }
 
     if (document.readyState === "loading") {

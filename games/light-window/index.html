@@ -54,6 +54,13 @@
             overflow: hidden;
         }
 
+        @supports (height: 100dvh) {
+            html,
+            body {
+                height: 100dvh;
+            }
+        }
+
         body {
             color: var(--ink);
             background: #4d3422;
@@ -451,7 +458,7 @@
             overflow: hidden;
             background: #4b3424;
             isolation: isolate;
-            touch-action: none;
+            touch-action: manipulation;
         }
 
         .game-screen::before {
@@ -786,6 +793,10 @@
             background: rgba(108, 68, 36, 0.13);
             border: 3px dashed rgba(115, 70, 36, 0.42);
             border-radius: 18px;
+            overscroll-behavior: contain;
+            scrollbar-color: rgba(91, 55, 30, 0.65) rgba(255, 255, 255, 0.35);
+            scrollbar-width: thin;
+            touch-action: pan-y;
         }
 
         .tray-piece {
@@ -799,7 +810,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 0 rgba(95, 58, 31, 0.25);
             cursor: grab;
-            touch-action: none;
+            touch-action: pan-y;
         }
 
         .tray-piece.selected {
@@ -827,12 +838,13 @@
         .piece-preview {
             position: relative;
             pointer-events: none;
+            --preview-cell-size: var(--tray-cell);
         }
 
         .preview-cell {
             position: absolute;
-            width: var(--tray-cell);
-            height: var(--tray-cell);
+            width: var(--preview-cell-size);
+            height: var(--preview-cell-size);
             border: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 3px;
             background:
@@ -1082,7 +1094,7 @@
 
             .game-layout {
                 display: flex;
-                padding: 7px;
+                padding: 7px 7px max(7px, env(safe-area-inset-bottom));
                 flex-direction: column;
                 gap: 7px;
             }
@@ -1119,8 +1131,8 @@
 
             .workbench {
                 flex: 0 0 auto;
-                max-height: 34vh;
-                padding: 7px;
+                max-height: min(38vh, 200px);
+                padding: 5px;
                 border-width: 3px;
                 border-radius: 18px;
             }
@@ -1131,36 +1143,47 @@
 
             .piece-tray {
                 display: flex;
-                min-height: 74px;
-                padding: 6px;
-                gap: 6px;
+                min-height: 60px;
+                padding: 5px;
+                gap: 5px;
                 overflow-x: auto;
                 overflow-y: hidden;
                 justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-x;
             }
 
             .tray-piece {
-                min-width: 96px;
-                min-height: 78px;
-                flex: 0 0 96px;
+                min-width: 88px;
+                min-height: 60px;
+                padding: 5px;
+                flex: 0 0 88px;
+                border-width: 2px;
+                touch-action: pan-x;
+            }
+
+            .block-controls-hint {
+                margin: 0 0 4px;
+                font-size: 9px;
+                line-height: 1.2;
             }
 
             .tool-row {
-                margin-top: 6px;
+                margin-top: 4px;
             }
 
             .tool-button {
-                min-height: 39px;
-                font-size: 11px;
+                min-height: 34px;
+                font-size: 10px;
             }
 
             .action-row {
-                margin-top: 6px;
+                margin-top: 4px;
             }
 
             .small-button {
-                min-height: 34px;
-                font-size: 10px;
+                min-height: 30px;
+                font-size: 9px;
             }
         }
 
@@ -1190,7 +1213,10 @@
             }
 
             .game-layout {
-                grid-template-columns: minmax(0, 1fr) minmax(245px, 320px);
+                display: grid;
+                padding: 7px;
+                flex-direction: initial;
+                grid-template-columns: minmax(0, 1fr) minmax(210px, 300px);
             }
 
             .game-hud {
@@ -1199,16 +1225,53 @@
             }
 
             .artist-line {
-                margin-bottom: 14px;
-                padding-block: 3px;
+                margin: 2px 0 10px;
+                padding: 2px 7px;
+                font-size: 10px;
+                line-height: 1.25;
+            }
+
+            .window-frame {
+                padding: 9px 5px 5px;
+                border-width: 3px;
+            }
+
+            .window-frame::before {
+                top: -10px;
+                width: 22px;
+                height: 15px;
+            }
+
+            .window-message {
+                min-height: 18px;
+                margin-top: 2px;
+                font-size: 10px;
             }
 
             .workbench {
+                max-height: none;
                 padding: 7px;
             }
 
+            .piece-tray {
+                display: grid;
+                min-height: 0;
+                padding: 6px;
+                flex: 1;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+                align-content: start;
+                overflow-x: hidden;
+                overflow-y: auto;
+                touch-action: pan-y;
+            }
+
             .tray-piece {
-                min-height: 72px;
+                min-width: 0;
+                min-height: 60px;
+                padding: 5px;
+                flex: initial;
+                touch-action: pan-y;
             }
         }
 
@@ -1282,9 +1345,9 @@
             </header>
 
             <div class="game-layout">
-                <section class="window-panel">
+                <section class="window-panel" id="window-panel">
                     <p class="artist-line" id="artist-line">すきまなく ひかりを はめるのさ</p>
-                    <div class="window-frame">
+                    <div class="window-frame" id="window-frame">
                         <div class="board" id="board" aria-label="ひかりのまど"></div>
                     </div>
                     <p class="window-message" id="window-message">ブロックを えらんで まどへ はこぼう</p>
@@ -1324,6 +1387,6 @@
 
     <script src="puzzle-shapes.js"></script>
     <script src="puzzle-bank.js"></script>
-    <script src="game.js"></script>
+    <script src="game.js?v=20260820-1"></script>
 </body>
 </html>
