@@ -63,10 +63,6 @@ def main() -> None:
         0.5,
         0.03,
     )
-    save_webp(
-        cover(ROOT / "games" / "kemono-karate" / "assets" / "dojo-landscape-v2.webp", (960, 600)),
-        HOME / "play-kemono-karate.webp",
-    )
 
     make_title(
         ROOT / "games" / "world-zoo" / "assets" / "ui" / "title-world-zoo-v3.webp",
@@ -76,10 +72,6 @@ def main() -> None:
         0.53,
         0.5,
         0.035,
-    )
-    save_webp(
-        cover(ROOT / "games" / "world-zoo" / "assets" / "scenes" / "area-forest-animals-v1.webp", (960, 600)),
-        HOME / "play-world-zoo.webp",
     )
 
     make_title(
@@ -91,10 +83,6 @@ def main() -> None:
         0.95,
         0.04,
     )
-    save_webp(
-        cover(ROOT / "games" / "warikiri-code" / "assets" / "title-bg-landscape.png", (960, 600)),
-        HOME / "play-warikiri-code.webp",
-    )
 
     make_title(
         ROOT / "games" / "mentaru-shindan" / "characters" / "all-characters-top.webp",
@@ -105,10 +93,9 @@ def main() -> None:
         0.5,
         0.035,
     )
-    save_webp(
-        cover(ROOT / "games" / "mentaru-shindan" / "og.png", (960, 600)),
-        HOME / "play-mentaru-shindan.webp",
-    )
+
+    # The four play images are browser-captured gameplay screens. Keep them as
+    # checked-in assets instead of rebuilding them from title illustrations.
 
 
 if __name__ == "__main__":

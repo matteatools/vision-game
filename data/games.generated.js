@@ -66,7 +66,7 @@ window.GAME_DATA = [
                         "chameleon-catch"
                     ],
         "sitemap":  true,
-        "popularRank":  null,
+        "popularRank":  3,
         "seo":  {
                     "playTitle":  "ピョコッとしゅうかく！｜めとあたまのゲームパーク",
                     "playDescription":  "畑から飛び出す野菜を見つけてタッチし、野菜うさぎは見送る、無料・登録不要のWebゲームです。",
@@ -105,7 +105,7 @@ window.GAME_DATA = [
                         "yarn-path"
                     ],
         "sitemap":  true,
-        "popularRank":  2,
+        "popularRank":  null,
         "seo":  {
                     "playTitle":  "じゅんばんシャボン！｜めとあたまのゲームパーク",
                     "playDescription":  "動いたり消えたりする数字のシャボン玉を追い、1から順番に見つけて選ぶ無料Webゲームです。",
@@ -299,7 +299,7 @@ window.GAME_DATA = [
                         "total-ten"
                     ],
         "sitemap":  true,
-        "popularRank":  3,
+        "popularRank":  null,
         "seo":  {
                     "playTitle":  "クジャーロせんせいの ひかりのまど｜めとあたまのゲームパーク",
                     "playDescription":  "図形のブロックを回したり裏返したりし、すき間なく組み合わせて窓を完成させる無料Webパズルです。",
@@ -414,6 +414,7 @@ window.GAME_DATA = [
                         "most-candy"
                     ],
         "sitemap":  true,
+        "popularRank":  2,
         "seo":  {
                     "playTitle":  "がっこうのジワふしぎ｜めとあたまのゲームパーク",
                     "playDescription":  "学校の風景を見ながら、時間をかけてゆっくり変わる三つの場所を見つける無料Webゲームです。",

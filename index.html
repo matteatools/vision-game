@@ -681,6 +681,12 @@
             text-align: right;
         }
 
+        .new-games-action {
+            display: inline-block;
+            white-space: nowrap;
+            font-weight: inherit;
+        }
+
         .new-game-grid {
             margin-top: 18px;
             display: grid;
@@ -2139,7 +2145,7 @@
                         <p>NEW GAMES</p>
                         <h3 id="new-games-title">あたらしいゲーム</h3>
                     </div>
-                    <span>4つの あたらしい あそびが ふえました。きになる えを タッチ！</span>
+                    <span>4つの あたらしい あそびが ふえました。<br><b class="new-games-action">きになる えを タッチ！</b></span>
                 </div>
                 <div class="new-game-grid" id="new-game-grid"></div>
             </section>
@@ -2238,7 +2244,7 @@
         </div>
     </dialog>
 
-    <script src="data/games.generated.js"></script>
+    <script src="data/games.generated.js?v=20260825-2"></script>
     <script>
         const games = (window.GAME_DATA ?? [])
             .filter((game) => game.published)
@@ -2503,7 +2509,7 @@
             dialogDescription.textContent = game.description;
             dialogSkills.innerHTML = skillMarkup(game.skills);
             dialogPlay.href = game.href;
-            dialogImage.src = game.playImage;
+            dialogImage.src = `${game.playImage}?v=20260825-2`;
             dialogImage.alt = `${game.title}の プレイがめん`;
 
             if (!dialog.open) {
