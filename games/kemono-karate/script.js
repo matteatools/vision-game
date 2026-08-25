@@ -504,7 +504,7 @@ function beginTraining() {
   if (state.mode !== 'practice') return;
   hideTrainingIntro();
   state.locked = false;
-  announce('わしの わざを\nよく みるのじゃ！');
+  announce('うえの わしの ことばを\nよく よむのじゃ');
   render();
 }
 
@@ -801,7 +801,7 @@ function resolveTurn() {
   const powers = [...state.ki];
   const winner = outcome(actions[0], actions[1], powers[0], powers[1]);
   showMatchup(actions, powers);
-  announce(actions[0] === 'attack' && actions[1] === 'attack' ? 'まんなかで ぶつかる！' : 'わざ はっこう！');
+  announce(actions[0] === 'attack' && actions[1] === 'attack' ? 'まんなかで ぶつかる！' : 'きあいを はなつ！');
   setFighterPose(0, actions[0]);
   setFighterPose(1, actions[1]);
   $('#p1Fighter').classList.add(actions[0]);
