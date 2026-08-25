@@ -8,7 +8,8 @@ $Warnings = [System.Collections.Generic.List[string]]::new()
 function Error([string]$Message) { $Errors.Add($Message) }
 function Warn([string]$Message) { $Warnings.Add($Message) }
 function Match-Value([string]$Html, [string]$Pattern) {
-    return [regex]::Match($Html, $Pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase).Groups[1].Value
+    $value = [regex]::Match($Html, $Pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase).Groups[1].Value
+    return [System.Net.WebUtility]::HtmlDecode($value)
 }
 
 $rawGames = Get-Content -Raw -Encoding UTF8 (Join-Path $Root "data\games.json") | ConvertFrom-Json
@@ -31,7 +32,7 @@ foreach ($set in @($playTitles, $playDescriptions, $guideTitles, $guideDescripti
 }
 
 $requiredFields = @("slug", "title", "group", "href", "guideHref", "titleImage", "playImage", "ogImage", "description", "guideSummary", "overview", "howToPlay")
-$allowedGroups = @("find", "remember", "follow", "compare", "think")
+$allowedGroups = @("find", "remember", "follow", "compare", "think", "communication")
 foreach ($game in $published) {
     foreach ($field in $requiredFields) {
         if ([string]::IsNullOrWhiteSpace([string]$game.$field)) { Error "$($game.slug): missing $field." }
@@ -197,7 +198,7 @@ if ($qualification.enabled -eq $true) {
 }
 
 $gitignorePath = Join-Path $Root ".gitignore"
-if (-not (Test-Path $gitignorePath) -or (Get-Content -Raw -Encoding UTF8 $gitignorePath) -notmatch '(?m)^資格/$') {
+if (-not (Test-Path $gitignorePath) -or (Get-Content -Raw -Encoding UTF8 $gitignorePath) -notmatch '(?m)^資格/\r?$') {
     Error "The private qualification source folder is not protected by .gitignore."
 }
 

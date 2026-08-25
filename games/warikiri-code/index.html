@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#041426">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="数字を割り切れるキーを選び、一になるまで割ってバグを修理する無料の算数Webゲームです。">
+  <title>わりきりコード｜めとあたまのゲームパーク</title>
+  <link rel="stylesheet" href="styles.css">
+    <link rel="canonical" href="https://matteatools.github.io/vision-game/games/warikiri-code/">
+    <meta property="og:site_name" content="めとあたまのゲームパーク">
+    <meta property="og:title" content="わりきりコード｜めとあたまのゲームパーク">
+    <meta property="og:description" content="数字を割り切れるキーを選び、一になるまで割ってバグを修理する無料の算数Webゲームです。">
+    <meta property="og:url" content="https://matteatools.github.io/vision-game/games/warikiri-code/">
+    <meta property="og:image" content="https://matteatools.github.io/vision-game/assets/og/warikiri-code.jpg">
+    <meta property="og:image:alt" content="わりきりコードのゲーム画面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="わりきりコード｜めとあたまのゲームパーク">
+    <meta name="twitter:description" content="数字を割り切れるキーを選び、一になるまで割ってバグを修理する無料の算数Webゲームです。">
+    <meta name="twitter:image" content="https://matteatools.github.io/vision-game/assets/og/warikiri-code.jpg">
+</head>
+<body data-view="title">
+  <a class="skip-link" href="#main-content">ないようへ すすむ</a>
+
+  <main id="main-content" class="app">
+    <section id="title-screen" class="screen title-screen is-first-visit" aria-labelledby="game-title">
+      <div class="title-noise" aria-hidden="true"></div>
+      <div class="title-inner">
+        <div class="logo-lockup">
+          <h1 id="game-title" class="game-logo">
+            <span class="visually-hidden">わりきりコード</span>
+            <span class="title-logo-crop" aria-hidden="true">
+              <img class="title-logo-image" src="assets/title-logo-sharp-condensed.png" alt="" width="1672" height="941">
+            </span>
+          </h1>
+        </div>
+
+        <nav class="title-menu" aria-label="あそびかたを えらぶ">
+          <button id="main-start-button" class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">▶</span>
+            <span><strong id="main-start-label">はじめる</strong><small id="main-start-note">エンドレス スコアアタック</small></span>
+          </button>
+          <button id="practice-start-button" class="menu-button menu-button-main" type="button">
+            <span class="menu-icon" aria-hidden="true">01</span>
+            <span><strong id="practice-start-label">れんしゅう</strong><small id="practice-start-note">ピコと じゅんばんに おぼえる</small></span>
+          </button>
+          <button id="fraction-start-button" class="menu-button menu-button-quiet" type="button">
+            <span class="menu-icon" aria-hidden="true">½</span>
+            <span><strong>やくぶんコード</strong><small>ふたつの かずを いっしょに わる</small></span>
+          </button>
+        </nav>
+
+        <aside class="title-record" aria-label="さいこうきろく">
+          <span>さいこう</span><strong id="title-best-score">0</strong><small>ポイント</small>
+        </aside>
+        <a class="park-link" href="../../">ゲームパークへ もどる</a>
+        <p class="audio-credit">おんげん：<a href="https://otologic.jp" target="_blank" rel="noopener noreferrer">OtoLogic</a>（<a href="https://otologic.jp/free/license" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>）</p>
+      </div>
+    </section>
+
+    <section id="play-screen" class="screen play-screen" aria-labelledby="mode-name" hidden>
+      <div class="play-backdrop" aria-hidden="true"></div>
+      <div class="play-layout">
+        <aside id="piko-panel" class="side-panel piko-panel">
+          <div class="wire-pico" aria-hidden="true">
+            <svg viewBox="0 0 180 126">
+              <path d="M30 73c3-28 28-48 62-48 28 0 49 12 59 33 8-6 17-7 26-4-3 8-8 13-16 17 8 3 13 8 15 15-12 1-22-3-29-11-13 10-31 16-53 16-35 0-61-7-64-18Z"/>
+              <path d="M72 84c11 16 23 26 36 29-5-16-15-28-30-36M67 27V14h-9V6m9 8h10V4"/>
+              <path d="M45 62h38l11-12h27m-47 12v13h25"/>
+              <circle cx="53" cy="48" r="4"/>
+            </svg>
+          </div>
+          <div class="illustrated-pico" aria-hidden="true"><img src="assets/pico-whale.png" alt=""></div>
+          <span class="panel-kicker">コードレスキュー</span>
+          <h2>ピコ</h2>
+          <p id="side-pico-message">われる かずを みつけよう。</p>
+          <div class="piko-life" aria-label="のこり ライフ">
+            <span>ライフ</span><strong id="side-lives">●●●</strong>
+          </div>
+        </aside>
+
+        <div class="play-column">
+          <div id="arena" class="arena">
+            <canvas id="game-canvas" aria-label="ひかっている すうじを じどうで ねらう ゲームがめん。すうじを タップすると ねらいを かえられます"></canvas>
+
+            <header class="mobile-hud" aria-label="きろく">
+              <div><small>タイム</small><strong id="mobile-time">00:00</strong></div>
+              <div><small>スコア</small><strong id="mobile-score">0</strong></div>
+              <div><small>のこり</small><strong id="mobile-lives">●●●</strong></div>
+            </header>
+
+            <div class="arena-tools">
+              <button id="sound-button" class="round-button" type="button" aria-label="こうかおんを きる" aria-pressed="true">SE</button>
+              <button id="bgm-button" class="round-button bgm-button" type="button" aria-label="BGMを きる" aria-pressed="true"><span aria-hidden="true">BGM</span></button>
+              <button id="pause-button" class="round-button" type="button" aria-label="いちじていし"><span class="pause-icon" aria-hidden="true"></span></button>
+            </div>
+
+            <div id="center-callout" class="center-callout" role="status" aria-live="polite" hidden></div>
+
+            <div id="boss-banner" class="boss-banner" hidden>
+              <span>ボス</span>
+              <div><i id="boss-progress"></i></div>
+            </div>
+
+            <div id="pico-tip" class="pico-tip" hidden>
+              <span class="pico-tip-mark" aria-hidden="true">ピ</span>
+              <span class="pico-tip-portrait" aria-hidden="true"><img src="assets/pico-whale.png" alt=""></span>
+              <p id="pico-tip-text"></p>
+            </div>
+
+            <div id="mission-overlay" class="overlay-layer" hidden>
+              <div class="mission-card" role="dialog" aria-modal="true" aria-labelledby="mission-title">
+                <div class="mission-pico-illustration" aria-hidden="true"><img src="assets/pico-whale.png" alt=""></div>
+                <span class="mission-kicker">ピコからの コード</span>
+                <h2 id="mission-title"></h2>
+                <p id="mission-text"></p>
+                <button id="mission-go-button" class="action-button action-button-main" type="button">やってみる</button>
+                <button id="mission-home-button" class="text-button" type="button">はじめの がめんへ</button>
+              </div>
+            </div>
+
+            <div id="pause-overlay" class="overlay-layer" hidden>
+              <div class="mission-card" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+                <span class="mission-kicker">いちじていし</span>
+                <h2 id="pause-title">ひとやすみ</h2>
+                <p>じゅんびが できたら つづけよう。</p>
+                <button id="resume-button" class="action-button action-button-main" type="button">つづける</button>
+                <button id="restart-button" class="action-button" type="button">はじめから</button>
+                <button id="home-from-pause-button" class="text-button" type="button">はじめの がめんへ</button>
+              </div>
+            </div>
+          </div>
+
+          <section id="mobile-pico-strip" class="mobile-pico-strip" aria-label="ピコからの メッセージ">
+            <span class="mobile-pico-portrait" aria-hidden="true"><img src="assets/pico-whale.png" alt=""></span>
+            <div class="mobile-pico-copy">
+              <strong id="mobile-pico-title">ピコ</strong>
+              <p id="mobile-pico-message">われる かずを みつけよう。</p>
+            </div>
+            <button id="mobile-pico-go-button" type="button" hidden>やってみる</button>
+          </section>
+
+          <section id="control-deck" class="control-deck" aria-labelledby="key-heading">
+            <div class="control-status">
+              <p id="mode-name">エンドレス</p>
+              <strong id="target-readout">ねらう すうじを まってね</strong>
+              <span id="next-boss-readout">ボスまで 30びょう</span>
+            </div>
+            <div class="key-heading-row">
+              <h2 id="key-heading">わる キー</h2>
+            </div>
+            <div id="factor-keys" class="factor-keys" role="group" aria-label="わる かずを えらぶ">
+              <button class="factor-key" type="button" data-factor="2" data-family="prime" aria-label="2で わる"><span>2</span></button>
+              <button class="factor-key" type="button" data-factor="3" data-family="prime" aria-label="3で わる"><span>3</span></button>
+              <button class="factor-key" type="button" data-factor="5" data-family="prime" aria-label="5で わる"><span>5</span></button>
+              <button class="factor-key" type="button" data-factor="7" data-family="prime" aria-label="7で わる"><span>7</span></button>
+              <button class="factor-key" type="button" data-factor="11" data-family="prime" aria-label="11で わる"><span>11</span></button>
+              <button class="factor-key" type="button" data-factor="13" data-family="prime" aria-label="13で わる"><span>13</span></button>
+              <button class="factor-key" type="button" data-factor="4" data-family="power" aria-label="4で わる"><span>4</span></button>
+              <button class="factor-key" type="button" data-factor="8" data-family="power" aria-label="8で わる"><span>8</span></button>
+              <button class="factor-key" type="button" data-factor="9" data-family="power" aria-label="9で わる"><span>9</span></button>
+              <button class="factor-key" type="button" data-factor="6" data-family="mixed" aria-label="6で わる"><span>6</span></button>
+              <button class="factor-key" type="button" data-factor="10" data-family="mixed" aria-label="10で わる"><span>10</span></button>
+              <button class="factor-key" type="button" data-factor="12" data-family="mixed" aria-label="12で わる"><span>12</span></button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-panel record-panel" aria-label="いまの きろく">
+          <span class="panel-kicker">プレイデータ</span>
+          <dl>
+            <div><dt>タイム</dt><dd id="desktop-time">00:00</dd></div>
+            <div><dt>スコア</dt><dd id="desktop-score">0</dd></div>
+            <div><dt>のこり</dt><dd id="desktop-lives">●●●</dd></div>
+            <div><dt>コンボ</dt><dd id="desktop-combo">0</dd></div>
+          </dl>
+          <div class="boss-clock">
+            <span>つぎの ボス</span>
+            <strong id="desktop-boss-time">30</strong>
+            <small>びょう</small>
+          </div>
+          <div class="family-note">
+            <p><i data-family="prime"></i><span><b>そすう</b>　２・３・５・７・１１・１３</span></p>
+            <p><i data-family="power"></i><span><b>くりかえし</b>　４・８・９</span></p>
+            <p><i data-family="mixed"></i><span><b>くみあわせ</b>　６・１０・１２</span></p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen result-screen" aria-labelledby="result-title" hidden>
+      <div class="result-card">
+        <img src="assets/pico-whale.png" alt="" class="result-pico">
+        <span id="result-kicker" class="result-kicker">コード バトル リザルト</span>
+        <h2 id="result-title">ナイス プレイ！</h2>
+        <p id="result-message">バグを つぎつぎ げきはした！</p>
+        <div class="result-score"><span id="result-score-label">スコア</span><strong id="result-score">0</strong></div>
+        <dl class="result-data">
+          <div><dt>タイム</dt><dd id="result-time">00:00</dd></div>
+          <div><dt>たおした バグ</dt><dd id="result-repaired">0</dd></div>
+          <div><dt>ボス</dt><dd id="result-bosses">0</dd></div>
+          <div><dt>さいだい コンボ</dt><dd id="result-combo">0</dd></div>
+        </dl>
+        <p id="new-record" class="new-record" hidden>さいこうきろく！</p>
+        <div class="result-actions">
+          <button id="result-retry-button" class="action-button action-button-main" type="button">もういちど</button>
+          <button id="result-home-button" class="action-button" type="button">はじめの がめんへ</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="live-region" class="visually-hidden" aria-live="assertive"></div>
+  <script src="stage-data.js"></script>
+  <script src="game-core.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

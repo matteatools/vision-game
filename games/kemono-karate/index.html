@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#291810">
+  <title>けもの空手 一手入魂！｜めとあたまのゲームパーク</title>
+  <link rel="icon" href="data:,">
+  <link rel="preload" as="image" href="assets/logo-kemono-karate-isshu-nyukon-v1.webp">
+  <link rel="preload" as="image" href="assets/title-landscape-v2.webp" media="(orientation:landscape)">
+  <link rel="preload" as="image" href="assets/title-portrait-v2.webp" media="(orientation:portrait)">
+  <link rel="stylesheet" href="style.css">
+    <link rel="canonical" href="https://matteatools.github.io/vision-game/games/kemono-karate/">
+    <meta name="description" content="ためる・まもる・はなつの三手から相手の考えを読み、先に三本を取る二人対戦・一人対戦対応の無料Webゲームです。">
+    <meta property="og:site_name" content="めとあたまのゲームパーク">
+    <meta property="og:title" content="けもの空手 一手入魂！｜めとあたまのゲームパーク">
+    <meta property="og:description" content="ためる・まもる・はなつの三手から相手の考えを読み、先に三本を取る二人対戦・一人対戦対応の無料Webゲームです。">
+    <meta property="og:url" content="https://matteatools.github.io/vision-game/games/kemono-karate/">
+    <meta property="og:image" content="https://matteatools.github.io/vision-game/assets/og/kemono-karate.jpg">
+    <meta property="og:image:alt" content="けもの空手 一手入魂！のゲーム画面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="けもの空手 一手入魂！｜めとあたまのゲームパーク">
+    <meta name="twitter:description" content="ためる・まもる・はなつの三手から相手の考えを読み、先に三本を取る二人対戦・一人対戦対応の無料Webゲームです。">
+    <meta name="twitter:image" content="https://matteatools.github.io/vision-game/assets/og/kemono-karate.jpg">
+</head>
+<body>
+  <main>
+    <section id="title" class="screen active" aria-labelledby="gameTitle" aria-describedby="gameCatch">
+      <div class="title-shade"></div>
+      <div class="title-content">
+        <header class="logo-lockup">
+          <h1 id="gameTitle" class="sr-only" aria-label="けものからて　いってにゅうこん！">けもの空手 一手入魂！</h1>
+          <p id="gameCatch" class="sr-only">よんで、ためて、はなて！</p>
+          <img class="title-logo" src="assets/logo-kemono-karate-isshu-nyukon-v1.webp" width="1520" height="882" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+          <p class="logo-reading" aria-hidden="true">けものからて　いってにゅうこん！</p>
+        </header>
+        <nav class="menu" aria-label="メニュー">
+          <button id="versusBtn" class="primary">ふたりで たいせん</button>
+          <div><button id="cpuBtn">ひとりで たいせん</button><button id="practiceBtn">れんしゅう</button></div>
+          <button id="parkBtn" class="text-btn">ゲームパークへ もどる</button>
+          <p class="audio-credit">おとの そざい：<a href="https://otologic.jp/" target="_blank" rel="noopener noreferrer">OtoLogic</a>（<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>）</p>
+        </nav>
+      </div>
+    </section>
+
+    <section id="fighterSelect" class="screen" aria-labelledby="fighterSelectTitle">
+      <button class="back top-back" data-back>← タイトル</button>
+      <div class="fighter-select-wrap">
+        <header class="fighter-select-heading">
+          <p>ふたりで たいせん</p>
+          <h2 id="fighterSelectTitle">たたかう けものを えらぼう！</h2>
+          <span>1Pは コタロウ！ 2Pの キャラクターを えらんでね</span>
+        </header>
+        <div class="versus-picks">
+          <section class="fighter-pick-side red-pick" aria-labelledby="versusP1Label">
+            <header class="fighter-pick-heading">
+              <i aria-hidden="true">あか</i>
+              <div><small id="versusP1Label">1Pの キャラクター</small><strong id="versusP1Name">コタロウ</strong></div>
+            </header>
+            <div class="fixed-fighter-preview" aria-label="1Pは コタロウで こてい">
+              <img src="assets/fighters/kotaro-charge-v1.webp" alt="コタロウ">
+              <div class="fixed-fighter-lock"><b>1P コタロウ こてい</b><span>あかの からてか</span></div>
+            </div>
+          </section>
+          <section class="fighter-pick-side blue-pick" aria-labelledby="versusP2Label">
+            <header class="fighter-pick-heading">
+              <i aria-hidden="true">あお</i>
+              <div><small id="versusP2Label">2Pの キャラクター</small><strong id="versusP2Name">レオン</strong></div>
+            </header>
+            <div class="fighter-choice-grid" role="group" aria-label="あおがわの キャラクター">
+              <button class="fighter-choice selected" data-versus-player="1" data-fighter-id="leon" aria-pressed="true">
+                <img src="assets/fighters/leon-charge-v1.webp" alt=""><span>レオン</span>
+              </button>
+              <button class="fighter-choice" data-versus-player="1" data-fighter-id="cheetah" aria-pressed="false">
+                <img src="assets/fighters/cheetah-charge-v1.webp" alt=""><span>チースケ</span>
+              </button>
+              <button class="fighter-choice" data-versus-player="1" data-fighter-id="jaguar" aria-pressed="false">
+                <img src="assets/fighters/jaguar-charge-v1.webp" alt=""><span>ジャック</span>
+              </button>
+              <button class="fighter-choice" data-versus-player="1" data-fighter-id="whiteTiger" aria-pressed="false">
+                <img src="assets/fighters/white-tiger-charge-v1.webp" alt=""><span>びゃっこ</span>
+              </button>
+            </div>
+          </section>
+        </div>
+        <button id="versusStartBtn" class="primary versus-start">このふたりで はじめる！</button>
+      </div>
+    </section>
+
+    <section id="game" class="screen" aria-label="たいせんがめん">
+      <header class="hud">
+        <button class="back" data-back>× やめる</button>
+        <div class="match-name"><span id="modeLabel">ふたりで たいせん</span><b id="roundLabel">1 てめ</b></div>
+        <button id="soundBtn" class="sound" aria-label="おとのオンオフ">♪</button>
+      </header>
+      <div class="scoreboard">
+        <div class="red-side"><span id="p1Name">コタロウ</span><b id="p1Score">○ ○ ○</b></div>
+        <p>さきに<br><strong>3</strong> ほん</p>
+        <div class="blue-side"><span id="p2Name">レオン</span><b id="p2Score">○ ○ ○</b></div>
+      </div>
+      <div id="coach" class="coach" aria-label="びゃっこからの おしえ" aria-live="polite">
+        <div class="sensei-mark" aria-hidden="true"><img src="assets/fighters/white-tiger-charge-v1.webp" alt=""></div>
+        <div class="coach-copy">
+          <div class="coach-meta"><b id="coachStep">けいこ 1 / 9</b><span id="coachScore" class="coach-score" hidden></span></div>
+          <p id="coachText">わしの わざを みて、いちばん よい わざを えらぶのじゃ。</p>
+          <div id="coachPips" class="coach-pips" aria-hidden="true"></div>
+        </div>
+        <div id="coachGuide" class="coach-guide" data-focus="all">
+          <div class="coach-rules" aria-label="ためる、まもる、はなつの ゆうりな かんけい">
+            <span class="coach-rule charge-rule" data-rule="charge"><b>ためる</b><small>きあい＋1</small></span>
+            <span class="coach-arrow" data-relation="charge"><i>→</i><small>まもる あいて</small></span>
+            <span class="coach-rule guard-rule" data-rule="guard"><b>まもる</b><small>はなつを ふせぐ</small></span>
+            <span class="coach-arrow" data-relation="guard"><i>→</i><small>はなつ あいて</small></span>
+            <span class="coach-rule attack-rule" data-rule="attack"><b>はなつ</b><small>いっぽん！</small></span>
+            <span class="coach-arrow loop-arrow" data-relation="attack"><i>↺</i><small>ためる あいて</small></span>
+          </div>
+          <p id="coachException" class="coach-exception"><b>きあいしょうぶ：</b>おおいほうが かつ　<span><b>MAXだけ：</b>まもるを やぶる</span></p>
+        </div>
+      </div>
+      <div id="trainingIntro" class="training-intro" hidden>
+        <div class="training-intro-card" role="dialog" aria-modal="true" aria-labelledby="trainingIntroTitle" aria-describedby="trainingIntroText">
+          <div class="training-sensei">
+            <img src="assets/fighters/white-tiger-guard-v1.webp" alt="びゃっこ">
+            <span>びゃっこ</span>
+          </div>
+          <div class="training-intro-copy">
+            <p class="kicker">びゃっこの じっせんけいこ</p>
+            <h2 id="trainingIntroTitle">3つの わざは<br>ぐるりと つながる！</h2>
+            <p id="trainingIntroText">わしの わざを よく みて、じぶんで えらぶのじゃ。まちがえても、おなじ かまえから もういちど ためせるぞ。</p>
+            <div class="training-cycle" aria-label="ためるは まもる あいてに ゆうり、まもるは はなつを ふせぐ、はなつは ためる あいてに いっぽん">
+              <span class="cycle-move charge"><b>ためる</b><small>きあい＋1</small></span>
+              <span class="cycle-link"><i>→</i><small>まもる あいて</small></span>
+              <span class="cycle-move guard"><b>まもる</b><small>はなつを ふせぐ</small></span>
+              <span class="cycle-link"><i>→</i><small>はなつ あいて</small></span>
+              <span class="cycle-move attack"><b>はなつ</b><small>ためるに いっぽん</small></span>
+              <span class="cycle-link cycle-return"><i>↺</i><small>ためる あいて</small></span>
+            </div>
+            <div class="training-exceptions"><span>はなつ どうしは <b>きあいが おおいほう</b></span><span>きあいMAXの はなつは <b>ガードはかい！</b></span></div>
+            <div class="training-intro-actions"><button id="trainingIntroBtn" class="primary">けいこを はじめる！</button><button class="soft" data-back>やめる</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="dojo">
+        <div id="p1Fighter" class="fighter p1-side" data-ki="0" data-fighter="kotaro">
+          <div class="fighter-visual">
+            <div class="ki-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <img id="p1Art" class="fighter-art" src="assets/fighters/kotaro-charge-v1.webp" alt="コタロウ">
+            <div class="guard-field" aria-hidden="true"></div>
+            <div class="guard-shards" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <h3 id="fighterP1Name">コタロウ</h3><div id="p1Ki" class="ki" aria-label="コタロウの きあい 0 / 5"></div>
+        </div>
+        <div class="center"><div id="countdown">かまえ！</div><div id="message">わざを えらぼう</div></div>
+        <div id="p2Fighter" class="fighter p2-side" data-ki="0" data-fighter="leon">
+          <div class="fighter-visual">
+            <div class="ki-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <img id="p2Art" class="fighter-art" src="assets/fighters/leon-charge-v1.webp" alt="レオン">
+            <div class="guard-field" aria-hidden="true"></div>
+            <div class="guard-shards" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <h3 id="fighterP2Name">レオン</h3><div id="p2Ki" class="ki" aria-label="レオンの きあい 0 / 5"></div>
+        </div>
+        <div id="battleFx" class="battle-fx" aria-hidden="true">
+          <div id="p1Shot" class="energy-shot p1-shot"></div>
+          <div id="p2Shot" class="energy-shot p2-shot"></div>
+          <div id="clashFx" class="clash-fx"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div id="breakthroughFx" class="breakthrough-fx"></div>
+          <div id="finishFx" class="finish-fx">
+            <div class="finish-core"></div>
+            <div class="finish-rings"><i></i><i></i><i></i></div>
+            <div class="finish-slashes"><i></i><i></i><i></i><i></i></div>
+            <div class="finish-fragments"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <strong id="finishFxText"></strong>
+          </div>
+        </div>
+        <div id="eventBanner" class="event-banner" role="status" aria-live="assertive" aria-atomic="true">
+          <span id="eventBannerName"></span><strong id="eventBannerText"></strong>
+        </div>
+      </div>
+      <div id="turnPanels" class="turn-panels">
+        <div class="turn-panel p1"><p><i>あか</i> <span id="panelP1Label">コタロウの ばん</span></p><div class="actions" data-player="1"></div></div>
+        <div class="turn-panel p2"><p><i>あお</i> <span id="panelP2Name">レオン</span>の ばん</p><div class="actions" data-player="2"></div></div>
+      </div>
+      <p id="keyHelp" class="key-help">キー：コタロウ A・S・D ／ レオン J・K・L</p>
+    </section>
+
+    <section id="result" class="screen" aria-labelledby="resultTitle">
+      <div class="result-card">
+        <div id="resultPoses" class="result-poses" aria-hidden="true">
+          <img id="resultWinnerArt" alt=""><img id="resultLoserArt" alt="">
+        </div>
+        <p class="kicker">しょうぶあり！</p><h2 id="resultTitle">コタロウの かち！</h2><p id="resultLine">みごとな いっぽん！</p>
+        <button id="rematchBtn" class="primary">もういちど</button><button class="soft" data-back>タイトルへ</button>
+      </div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -638,6 +638,128 @@
             box-shadow: var(--shadow-soft);
         }
 
+        .new-games {
+            margin-top: 34px;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 92% 8%, rgba(255, 255, 255, 0.28), transparent 14rem),
+                linear-gradient(135deg, #eb6f5b, #8f78d6);
+            border-radius: 26px;
+            box-shadow: 0 18px 40px rgba(74, 61, 130, 0.2);
+        }
+
+        .new-games[hidden] {
+            display: none;
+        }
+
+        .new-games-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 18px;
+            color: #fff;
+        }
+
+        .new-games-heading p {
+            margin: 0 0 4px;
+            font-size: 11px;
+            font-weight: 1000;
+            letter-spacing: 0.16em;
+        }
+
+        .new-games-heading h3 {
+            margin: 0;
+            font-size: clamp(22px, 3vw, 31px);
+            font-weight: 1000;
+        }
+
+        .new-games-heading span {
+            max-width: 320px;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.7;
+            text-align: right;
+        }
+
+        .new-game-grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .new-game-button {
+            min-width: 0;
+            display: block;
+            overflow: hidden;
+            color: var(--ink);
+            background: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 9px 21px rgba(43, 33, 78, 0.22);
+            text-decoration: none;
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .new-game-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 25px rgba(43, 33, 78, 0.3);
+        }
+
+        .new-game-button:focus-visible {
+            outline: 4px solid var(--yellow);
+            outline-offset: 3px;
+        }
+
+        .new-game-visual {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            display: block;
+            overflow: hidden;
+            background: var(--ink-deep);
+        }
+
+        .new-game-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .new-game-label {
+            min-height: 65px;
+            padding: 11px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .new-game-label strong {
+            font-size: 15px;
+            font-weight: 1000;
+            line-height: 1.35;
+        }
+
+        .new-game-label small {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        .new-game-mark {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 5px 8px;
+            color: var(--ink);
+            background: var(--yellow);
+            border: 2px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 4px 9px rgba(20, 47, 73, 0.2);
+            font-size: 9px;
+            font-weight: 1000;
+            line-height: 1;
+        }
+
         .quick-picker-heading {
             display: flex;
             align-items: baseline;
@@ -798,6 +920,12 @@
             --group-color: #61a96f;
             --group-soft: rgba(97, 169, 111, 0.3);
             --group-shadow: rgba(97, 169, 111, 0.22);
+        }
+
+        .game-group[data-game-group="communication"] {
+            --group-color: #d95c8a;
+            --group-soft: rgba(217, 92, 138, 0.28);
+            --group-shadow: rgba(217, 92, 138, 0.22);
         }
 
         .game-group-heading {
@@ -963,6 +1091,46 @@
             content: "▣";
             color: var(--yellow);
             font-size: 11px;
+        }
+
+        .feature-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            min-height: 27px;
+            padding: 4px 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #fff;
+            background: rgba(75, 52, 119, 0.92);
+            border: 2px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 5px 11px rgba(20, 47, 73, 0.24);
+            font-size: 10px;
+            font-weight: 1000;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 3;
+            min-height: 27px;
+            padding: 4px 9px;
+            display: inline-flex;
+            align-items: center;
+            color: #fff;
+            background: var(--coral);
+            border: 2px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 5px 11px rgba(20, 47, 73, 0.24);
+            font-size: 10px;
+            font-weight: 1000;
+            line-height: 1;
         }
 
         .open-hint {
@@ -1443,6 +1611,10 @@
                 grid-template-columns: repeat(8, minmax(0, 1fr));
             }
 
+            .new-game-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .game-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -1658,6 +1830,35 @@
                 border-radius: 19px;
             }
 
+            .new-games {
+                padding: 18px 12px 14px;
+                border-radius: 21px;
+            }
+
+            .new-games-heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .new-games-heading span {
+                text-align: left;
+            }
+
+            .new-game-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px 8px;
+            }
+
+            .new-game-label {
+                min-height: 58px;
+                padding: 9px 10px 10px;
+            }
+
+            .new-game-label strong {
+                font-size: 13px;
+            }
+
             .quick-picker-heading {
                 align-items: flex-start;
                 flex-direction: column;
@@ -1727,6 +1928,22 @@
 
             .device-badge::before {
                 font-size: 9px;
+            }
+
+            .feature-badge,
+            .new-badge {
+                top: 9px;
+                min-height: 25px;
+                padding: 4px 8px;
+                font-size: 9px;
+            }
+
+            .feature-badge {
+                right: 9px;
+            }
+
+            .new-badge {
+                left: 9px;
             }
 
             .creator {
@@ -1887,7 +2104,7 @@
                 <p class="section-kicker">あそびかたは かんたん</p>
                 <h2 class="section-title" id="intro-title">みて、かんがえて、<br>ひらめく。</h2>
                 <p class="section-copy">
-                    みつける。おぼえる。おいかける。くらべる。
+                    みつける。おぼえる。おいかける。くらべる。えらぶ。
                     ゲームごとに ちがう ちからを つかって、
                     じぶんの すきな あそびかたを みつけよう。
                 </p>
@@ -1916,6 +2133,17 @@
                 </p>
             </div>
 
+            <section class="new-games" id="new-games-section" aria-labelledby="new-games-title" hidden>
+                <div class="new-games-heading">
+                    <div>
+                        <p>NEW GAMES</p>
+                        <h3 id="new-games-title">あたらしいゲーム</h3>
+                    </div>
+                    <span>4つの あたらしい あそびが ふえました。きになる えを タッチ！</span>
+                </div>
+                <div class="new-game-grid" id="new-game-grid"></div>
+            </section>
+
             <div class="quick-picker" aria-labelledby="quick-picker-title">
                 <div class="quick-picker-heading">
                     <h3 class="quick-picker-title" id="quick-picker-title">ひとめで えらぶ</h3>
@@ -1937,6 +2165,7 @@
                 <button class="filter-button" type="button" data-filter="くらべる" aria-pressed="false">くらべる</button>
                 <button class="filter-button" type="button" data-filter="つなぐ" aria-pressed="false">つなぐ</button>
                 <button class="filter-button" type="button" data-filter="かんがえる" aria-pressed="false">かんがえる</button>
+                <button class="filter-button" type="button" data-filter="えらぶ" aria-pressed="false">えらぶ</button>
                 <button class="filter-button" type="button" data-filter="すばやく" aria-pressed="false">すばやく</button>
             </div>
             <p class="filter-status" id="filter-status" aria-live="polite">すべての ゲームを ひょうじしています</p>
@@ -2040,6 +2269,11 @@
                 id: "think",
                 title: "つないで かんがえる",
                 note: "つなぎかたを かんがえて ひらめこう"
+            },
+            {
+                id: "communication",
+                title: "コミュニケーションゲーム",
+                note: "いっしょに あそんだり、けっかを はなしたりしよう"
             }
         ].map((group) => ({
             ...group,
@@ -2047,6 +2281,8 @@
         }));
 
         const quickGameGrid = document.querySelector("#quick-game-grid");
+        const newGamesSection = document.querySelector("#new-games-section");
+        const newGameGrid = document.querySelector("#new-game-grid");
         const quickPickerTitle = document.querySelector("#quick-picker-title");
         const quickPickerNote = document.querySelector(".quick-picker-note");
         const mobileQuickQuery = window.matchMedia("(max-width: 700px)");
@@ -2076,6 +2312,23 @@
             return note
                 ? `<span class="device-badge">${note}</span>`
                 : "";
+        }
+
+        function featureBadgeMarkup(note) {
+            return note
+                ? `<span class="feature-badge">${note}</span>`
+                : "";
+        }
+
+        function isRecentlyPublished(game) {
+            if (!game.publishedAt) return false;
+            const publishedAt = new Date(`${game.publishedAt}T00:00:00+09:00`).getTime();
+            const eightWeeks = 56 * 24 * 60 * 60 * 1000;
+            return Number.isFinite(publishedAt) && Date.now() >= publishedAt && Date.now() < publishedAt + eightWeeks;
+        }
+
+        function newBadgeMarkup(game) {
+            return isRecentlyPublished(game) ? '<span class="new-badge">NEW</span>' : "";
         }
 
         function quickRankMarkup(rank) {
@@ -2120,6 +2373,30 @@
             `).join("");
         }
 
+        function renderNewGames() {
+            const newGames = games.filter(isRecentlyPublished);
+            newGamesSection.hidden = newGames.length === 0;
+            newGameGrid.innerHTML = newGames.map((game) => `
+                <article>
+                    <a
+                        class="new-game-button"
+                        href="${game.href}"
+                        data-open-game="${game.slug}"
+                        aria-label="${game.title}の せつめいを みる"
+                    >
+                        <span class="new-game-visual">
+                            <span class="new-game-mark">NEW</span>
+                            <img src="${game.titleImage}" alt="" width="960" height="600" loading="eager" decoding="async">
+                        </span>
+                        <span class="new-game-label">
+                            <strong>${game.title}</strong>
+                            <small>${game.featureNote ?? game.skills.join("・")}</small>
+                        </span>
+                    </a>
+                </article>
+            `).join("");
+        }
+
         function gameCardMarkup(game) {
             return `
                 <article class="game-card" data-slug="${game.slug}" data-skills="${game.skills.join(" ")}">
@@ -2130,7 +2407,9 @@
                         aria-label="${game.title}の せつめいを みる"
                     >
                         ${popularBadgeMarkup(game.popularRank)}
+                        ${newBadgeMarkup(game)}
                         ${deviceBadgeMarkup(game.deviceNote)}
+                        ${featureBadgeMarkup(game.featureNote)}
                         <span class="game-visual">
                             <img
                                 class="game-screen"
@@ -2156,6 +2435,7 @@
         }
 
         function renderGames() {
+            renderNewGames();
             renderQuickGames();
             gameGrid.innerHTML = gameGroups.map((group, index) => `
                 <section
@@ -2246,6 +2526,15 @@
         });
 
         quickGameGrid.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-open-game]");
+            if (button) {
+                event.preventDefault();
+                lastDialogTrigger = button;
+                openGame(button.dataset.openGame);
+            }
+        });
+
+        newGameGrid.addEventListener("click", (event) => {
             const button = event.target.closest("[data-open-game]");
             if (button) {
                 event.preventDefault();
