@@ -32,7 +32,7 @@
     <meta name="twitter:description" content="夜に現れた幽霊の色と窓の場所を覚え、朝に同じ場所を見つけてお札を貼る無料Webゲームです。">
     <meta name="twitter:image" content="https://matteatools.github.io/vision-game/assets/og/color-ghosts.jpg">
     <meta name="twitter:image:alt" content="おぼえて！いろゆうれいのゲーム紹介画像">
-    <link rel="preload" as="image" href="assets/ghost-apartment-night-square-v2.jpg">
+    <link rel="preload" as="image" href="assets/ghost-apartment-night-square-v3.jpg">
     <link rel="preload" as="image" href="assets/ghost-apartment-day-square-v2.jpg">
     <link rel="preload" as="image" href="assets/miko-memorize-v1.png">
     <link rel="preload" as="image" href="assets/miko-purify-v1.png">
@@ -126,15 +126,36 @@
             font-size: 22px;
         }
 
-        body[data-screen="game"] .title-sound-button {
+        .title-music-button {
+            position: fixed;
+            z-index: 300;
+            top: max(10px, env(safe-area-inset-top));
+            left: max(64px, calc(env(safe-area-inset-left) + 54px));
+            width: 46px;
+            height: 46px;
+            color: #554565;
+            font-size: 21px;
+            font-weight: 1000;
+        }
+
+        body[data-screen="game"] .title-sound-button,
+        body[data-screen="game"] .title-music-button,
+        body[data-screen="result"] .title-sound-button,
+        body[data-screen="result"] .title-music-button {
             display: none;
         }
 
-        .game-sound-button {
-            width: 36px;
-            height: 36px;
+        .game-sound-button,
+        .game-music-button {
+            width: 34px;
+            height: 34px;
             align-self: end;
-            font-size: 17px;
+            font-size: 16px;
+        }
+
+        .game-music-button {
+            color: #554565;
+            font-weight: 1000;
         }
 
         /* タイトル */
@@ -286,6 +307,25 @@
             font-size: 12px;
         }
 
+        .audio-credit {
+            grid-column: 1 / -1;
+            justify-self: center;
+            padding: 3px 9px;
+            color: #fff8df;
+            background: rgba(27, 21, 57, 0.78);
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 800;
+            line-height: 1.25;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .audio-credit:hover,
+        .audio-credit:focus-visible {
+            text-decoration: underline;
+        }
+
         /* ゲーム */
         .game-screen {
             display: grid;
@@ -298,7 +338,7 @@
             position: relative;
             z-index: 40;
             display: grid;
-            grid-template-columns: 92px 1fr 118px;
+            grid-template-columns: 92px 1fr 144px;
             gap: 8px;
             align-items: center;
             padding:
@@ -364,7 +404,7 @@
 
         .hud-buttons {
             display: grid;
-            grid-template-columns: 36px minmax(0, 1fr);
+            grid-template-columns: 34px 34px minmax(0, 1fr);
             gap: 5px;
             align-items: end;
         }
@@ -650,7 +690,7 @@
         }
 
         .night .apartment-board {
-            background-image: url("assets/ghost-apartment-night-square-v2.jpg");
+            background-image: url("assets/ghost-apartment-night-square-v3.jpg");
         }
 
         .night .apartment-board::after {
@@ -1354,7 +1394,7 @@
             }
 
             .game-header {
-                grid-template-columns: 82px 1fr 110px;
+                grid-template-columns: 82px 1fr 136px;
                 padding-top: max(5px, env(safe-area-inset-top));
                 padding-bottom: 5px;
             }
@@ -1484,7 +1524,7 @@
             }
 
             .game-header {
-                grid-template-columns: 82px 1fr 106px;
+                grid-template-columns: 82px 1fr 130px;
                 gap: 5px;
             }
 
@@ -1636,7 +1676,9 @@
     </style>
 </head>
 <body>
-    <button class="sound-button title-sound-button" type="button" data-sound-toggle aria-label="音を切り替える" aria-pressed="true">🔊</button>
+    <audio id="bgm-audio" src="assets/audio/shinrock-night-adventure.mp3" preload="metadata" loop></audio>
+    <button class="sound-button title-sound-button" type="button" data-sound-toggle aria-label="効果音を切る" aria-pressed="true">🔊</button>
+    <button class="sound-button title-music-button" type="button" data-music-toggle aria-label="BGMを切る" aria-pressed="true">♫</button>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
         <img class="title-art" src="assets/iro-miko-title-v1.jpg" alt="">
@@ -1654,6 +1696,7 @@
         </div>
 
         <div class="title-menu">
+            <a class="audio-credit" href="https://shinrockmusic.com/nightadventure/" target="_blank" rel="noopener noreferrer">BGM：真夜中の大冒険 / shinrock</a>
             <button class="title-button practice-button" id="practice-button" type="button">れんしゅう</button>
             <button class="title-button start-button" id="start-button" type="button">
                 スタート
@@ -1673,7 +1716,8 @@
             <div class="hud-actions">
                 <div class="miss-badge">ミス<strong id="mistake-display">なし</strong></div>
                 <div class="hud-buttons">
-                    <button class="sound-button game-sound-button" type="button" data-sound-toggle aria-label="音を切り替える" aria-pressed="true">🔊</button>
+                    <button class="sound-button game-sound-button" type="button" data-sound-toggle aria-label="効果音を切る" aria-pressed="true">🔊</button>
+                    <button class="sound-button game-music-button" type="button" data-music-toggle aria-label="BGMを切る" aria-pressed="true">♫</button>
                     <button class="exit-button" id="exit-button" type="button">やめる</button>
                 </div>
             </div>
@@ -1773,6 +1817,7 @@
                 day: "assets/miko-purify-v1.png"
             };
             const BEST_KEY = "colorGhost_best_v1";
+            const MUSIC_KEY = "colorGhost_music_v1";
             const MAX_MISSES = 3;
             const WINDOW_RECTS = [
                 { x: 9.4, y: 14.2, w: 11.7, h: 10.7 },
@@ -1801,11 +1846,29 @@
                 seconds: Math.min(ghosts, 10)
             }));
 
+            function readMusicPreference() {
+                try {
+                    return localStorage.getItem(MUSIC_KEY) !== "off";
+                } catch {
+                    return true;
+                }
+            }
+
+            function writeMusicPreference(enabled) {
+                try {
+                    localStorage.setItem(MUSIC_KEY, enabled ? "on" : "off");
+                } catch {
+                    // 保存できない環境でも、このプレイ中の設定は維持する。
+                }
+            }
+
             const elements = {
                 title: document.querySelector("#screen-title"),
                 game: document.querySelector("#screen-game"),
                 result: document.querySelector("#screen-result"),
                 soundButtons: [...document.querySelectorAll("[data-sound-toggle]")],
+                musicButtons: [...document.querySelectorAll("[data-music-toggle]")],
+                bgmAudio: document.querySelector("#bgm-audio"),
                 titleBest: document.querySelector("#title-best"),
                 practice: document.querySelector("#practice-button"),
                 start: document.querySelector("#start-button"),
@@ -1850,6 +1913,7 @@
                 mistakes: 0,
                 best: 0,
                 soundOn: true,
+                musicOn: readMusicPreference(),
                 audioContext: null,
                 nightEndsAt: 0,
                 animationFrame: null,
@@ -1893,6 +1957,22 @@
                 correct() { this.tones([659.25, 783.99, 987.77], "sine", 0.12, 0.07, 0.24); },
                 wrong() { this.tones([180, 145], "sawtooth", 0.055, 0.09, 0.2); },
                 finish() { this.tones([523.25, 659.25, 783.99, 1046.5], "triangle", 0.11, 0.11, 0.32); }
+            };
+
+            const Music = {
+                play() {
+                    if (!state.musicOn || state.screen !== "game" || document.hidden) return;
+                    elements.bgmAudio.volume = 0.14;
+                    const playback = elements.bgmAudio.play();
+                    if (playback?.catch) playback.catch(() => {});
+                },
+                pause() {
+                    elements.bgmAudio.pause();
+                },
+                stop() {
+                    elements.bgmAudio.pause();
+                    elements.bgmAudio.currentTime = 0;
+                }
             };
 
             function schedule(callback, delay) {
@@ -1946,12 +2026,28 @@
                 elements.result.hidden = name !== "result";
                 document.body.dataset.screen = name;
                 state.screen = name;
+                if (name === "game") {
+                    Music.play();
+                } else if (name === "title") {
+                    Music.stop();
+                } else {
+                    Music.pause();
+                }
             }
 
             function updateSoundButtons() {
                 elements.soundButtons.forEach((button) => {
                     button.textContent = state.soundOn ? "🔊" : "🔇";
                     button.setAttribute("aria-pressed", String(state.soundOn));
+                    button.setAttribute("aria-label", state.soundOn ? "効果音を切る" : "効果音を鳴らす");
+                });
+            }
+
+            function updateMusicButtons() {
+                elements.musicButtons.forEach((button) => {
+                    button.textContent = state.musicOn ? "♫" : "♫×";
+                    button.setAttribute("aria-pressed", String(state.musicOn));
+                    button.setAttribute("aria-label", state.musicOn ? "BGMを切る" : "BGMを流す");
                 });
             }
 
@@ -2536,8 +2632,26 @@
                     if (state.soundOn) Sound.correct();
                 });
             });
+            elements.musicButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.musicOn = !state.musicOn;
+                    writeMusicPreference(state.musicOn);
+                    updateMusicButtons();
+                    if (state.musicOn) {
+                        Music.play();
+                    } else {
+                        Music.pause();
+                    }
+                });
+            });
 
             document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    Music.pause();
+                } else {
+                    Music.play();
+                }
+
                 if (document.hidden && state.phase === "night") {
                     clearRoundTiming();
                     state.phase = "waiting";
@@ -2556,6 +2670,8 @@
 
             state.best = readBest();
             updateBest();
+            updateSoundButtons();
+            updateMusicButtons();
             showScreen("title");
         })();
     </script>
