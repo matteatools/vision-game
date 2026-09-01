@@ -246,9 +246,38 @@
         }
 
         .menu-button.park {
-            grid-column: 1 / -1;
             min-height: 39px;
             font-size: 12px;
+        }
+
+        .menu-button.music-toggle-button {
+            min-height: 39px;
+            color: #173d68;
+            background: linear-gradient(145deg, #fff4bd, #f4cc68);
+            font-size: 12px;
+        }
+
+        .menu-button.music-toggle-button[aria-pressed="false"] {
+            color: #eaf5fb;
+            background: linear-gradient(145deg, #60798b, #365568);
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.18), 0 4px 0 #203f52;
+        }
+
+        .audio-credit {
+            grid-column: 1 / -1;
+            padding: 2px 4px 0;
+            color: #f8e8bd;
+            font-size: 9px;
+            font-weight: 800;
+            line-height: 1.35;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .audio-credit:hover,
+        .audio-credit:focus-visible {
+            color: white;
+            text-decoration: underline;
         }
 
         .menu-button:active {
@@ -939,7 +968,7 @@
             display: grid;
             min-height: 42px;
             align-items: center;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto auto auto;
             gap: 9px;
             padding: 5px 4px 0;
         }
@@ -991,6 +1020,7 @@
             transform: scale(0.96);
         }
 
+        .game-music-button,
         .pause-button,
         .quit-button {
             justify-self: end;
@@ -1003,6 +1033,17 @@
             cursor: pointer;
             font-size: 10px;
             font-weight: 900;
+        }
+
+        .game-music-button {
+            min-width: 70px;
+            color: #173d68;
+            background: #fff0ad;
+        }
+
+        .game-music-button[aria-pressed="false"] {
+            color: white;
+            background: rgba(62, 82, 94, 0.9);
         }
 
         .pause-button {
@@ -1621,6 +1662,7 @@
                 display: none;
             }
 
+            .game-music-button,
             .pause-button,
             .quit-button {
                 justify-self: stretch;
@@ -1628,6 +1670,7 @@
                 padding: 4px;
             }
 
+            .game-music-button,
             .pause-button {
                 min-width: 0;
             }
@@ -1830,6 +1873,7 @@
     </style>
 </head>
 <body>
+    <audio id="bgm-audio" src="./assets/audio/otologic-oato-ga-yoroshiiyode-simple.mp3" preload="metadata" loop></audio>
     <main id="app">
         <section id="title-screen" class="screen title-screen active" aria-labelledby="game-title">
             <h1 id="game-title" class="visually-hidden">ぴったりゆうびんきょく</h1>
@@ -1842,7 +1886,9 @@
             <nav class="title-menu" aria-label="タイトルメニュー">
                 <button id="practice-button" class="menu-button" type="button">れんしゅう</button>
                 <button id="start-button" class="menu-button primary" type="button">スタート</button>
+                <button class="menu-button music-toggle-button" type="button" data-music-toggle aria-label="BGMを切る" aria-pressed="true">♫ BGM</button>
                 <a class="menu-button park" href="../../index.html">ゲームパークへ もどる</a>
+                <a class="audio-credit" href="https://otologic.jp/free/bgm/wood_mallet01.html" target="_blank" rel="noopener noreferrer">BGM：お後がよろしいようで-2（シンプル） / OtoLogic（CC BY 4.0）</a>
             </nav>
         </section>
 
@@ -1946,6 +1992,7 @@
 
             <footer class="game-footer">
                 <span class="footer-note">スペースキーでも OK</span>
+                <button class="game-music-button" type="button" data-music-toggle aria-label="BGMを切る" aria-pressed="true">♫ BGM</button>
                 <button id="pause-button" class="pause-button" type="button" aria-pressed="false">ストップ</button>
                 <button class="quit-button" type="button" data-action="title">やめる</button>
             </footer>
@@ -2080,6 +2127,7 @@
 
             const PAGE_PARAMS = new URLSearchParams(location.search);
             const DEBUG_MODE = PAGE_PARAMS.get("debug") === "1";
+            const MUSIC_KEY = "postoffice_music_v1";
             const debugWorkSeconds = Number(PAGE_PARAMS.get("work"));
             const WORK_DURATION = DEBUG_MODE && Number.isFinite(debugWorkSeconds) && debugWorkSeconds > 0
                 ? debugWorkSeconds * 1000
@@ -2121,6 +2169,8 @@
 
             const elements = {
                 screens: [...document.querySelectorAll(".screen")],
+                musicButtons: [...document.querySelectorAll("[data-music-toggle]")],
+                bgmAudio: document.getElementById("bgm-audio"),
                 titleBest: document.getElementById("title-best"),
                 practiceButton: document.getElementById("practice-button"),
                 startButton: document.getElementById("start-button"),
@@ -2166,7 +2216,7 @@
 
             let mails = [];
             let nextMailId = 1;
-            let mode = "game";
+            let mode = "title";
             let currentSpeed = 4000;
             let lastSpeed = 4000;
             let pendingSpeed = 4000;
@@ -2198,6 +2248,7 @@
             let gamePaused = false;
             let speechBeforePause = "";
             let audioContext = null;
+            let musicOn = readMusicPreference();
             let effectTimer = 0;
             let guideResetTimer = 0;
             let rivalCutInTimer = 0;
@@ -2239,6 +2290,46 @@
 
             function updateTitleBest() {
                 elements.titleBest.textContent = getBest();
+            }
+
+            function readMusicPreference() {
+                try {
+                    return localStorage.getItem(MUSIC_KEY) !== "off";
+                } catch {
+                    return true;
+                }
+            }
+
+            function writeMusicPreference(enabled) {
+                try {
+                    localStorage.setItem(MUSIC_KEY, enabled ? "on" : "off");
+                } catch {
+                    // 保存できない環境でも、このプレイ中の設定は維持する。
+                }
+            }
+
+            const Music = {
+                play() {
+                    if (!musicOn || gamePaused || document.hidden || (mode !== "game" && mode !== "practice")) return;
+                    elements.bgmAudio.volume = 0.12;
+                    const playback = elements.bgmAudio.play();
+                    if (playback?.catch) playback.catch(() => {});
+                },
+                pause() {
+                    elements.bgmAudio.pause();
+                },
+                stop() {
+                    elements.bgmAudio.pause();
+                    elements.bgmAudio.currentTime = 0;
+                }
+            };
+
+            function updateMusicButtons() {
+                elements.musicButtons.forEach((button) => {
+                    button.textContent = musicOn ? "♫ BGM" : "♫× BGM";
+                    button.setAttribute("aria-pressed", String(musicOn));
+                    button.setAttribute("aria-label", musicOn ? "BGMを切る" : "BGMを流す");
+                });
             }
 
             function initAudio() {
@@ -2672,6 +2763,7 @@
                 updatePauseUi();
 
                 if (gamePaused) {
+                    Music.pause();
                     speechBeforePause = elements.speech.textContent;
                     if (timerActive) {
                         roundTimerRemaining = Math.max(0, timerDeadline - performance.now());
@@ -2689,6 +2781,7 @@
                 }
 
                 setSpeech(speechBeforePause);
+                Music.play();
                 if (mode === "game") {
                     if (!transitioning && !inputLocked) {
                         startTimer(roundTimerRemaining > 0 ? roundTimerRemaining : currentSpeed);
@@ -2936,6 +3029,8 @@
                     ? "おおいそがし！ 1～3しょくの てがみを よくみよう！"
                     : "アルマより はやく 5つを みつけよう！");
                 showScreen("game-screen");
+                Music.stop();
+                Music.play();
                 startWorkTimer(WORK_DURATION);
                 advanceBoard();
             }
@@ -2984,6 +3079,8 @@
                 practiceStep = 0;
                 resetState();
                 showScreen("game-screen");
+                Music.stop();
+                Music.play();
                 setupPracticeStep();
             }
 
@@ -2994,6 +3091,7 @@
                 updatePauseUi();
                 cancelTimer();
                 cancelWorkTimer();
+                Music.stop();
                 clearTimeout(practiceWaitTimer);
                 inputLocked = true;
                 elements.whistles.forEach((button) => button.classList.remove("blowing"));
@@ -3022,6 +3120,7 @@
                 updatePauseUi();
                 cancelTimer();
                 cancelWorkTimer();
+                Music.stop();
                 clearTimeout(practiceWaitTimer);
                 clearTimeout(guideResetTimer);
                 hideRivalCutIn();
@@ -3084,6 +3183,26 @@
             elements.retry.addEventListener("click", () => startGame(lastSpeed, lastIncomingStyle));
             elements.whistles.forEach((button) => button.addEventListener("click", whistle));
             elements.pauseButton.addEventListener("click", togglePause);
+            elements.musicButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    musicOn = !musicOn;
+                    writeMusicPreference(musicOn);
+                    updateMusicButtons();
+                    if (musicOn) {
+                        Music.play();
+                    } else {
+                        Music.pause();
+                    }
+                });
+            });
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    Music.pause();
+                } else {
+                    Music.play();
+                }
+            });
 
             document.addEventListener("keydown", (event) => {
                 if (event.code === "Space") {
@@ -3096,9 +3215,11 @@
                 debugPaused = !debugPaused;
                 elements.debugPause.textContent = debugPaused ? "さいかい" : "とめる";
                 if (debugPaused) {
+                    Music.pause();
                     cancelTimer();
                     pauseWorkTimer();
                 } else if (mode === "game") {
+                    Music.play();
                     startTimer(currentSpeed);
                     startWorkTimer(workRemaining);
                 }
@@ -3132,6 +3253,7 @@
 
             updateTitleBest();
             updateHud();
+            updateMusicButtons();
         })();
     </script>
 </body>
