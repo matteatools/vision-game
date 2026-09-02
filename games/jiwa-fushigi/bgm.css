@@ -1,0 +1,81 @@
+.jiwa-music-toggle {
+  color: #bbaa98;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  background: #160a0dd9;
+  border: 1px solid #cab19752;
+  border-radius: 2px;
+  min-width: 96px;
+  min-height: 40px;
+  padding: 0 15px;
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  box-shadow: inset 0 1px #ffffff08;
+}
+
+.jiwa-music-toggle:hover,
+.jiwa-music-toggle:focus-visible {
+  color: #eadccb;
+  border-color: #ef3349b3;
+}
+
+.jiwa-music-toggle[aria-pressed="false"] {
+  color: #74645f;
+  border-color: #7e636240;
+}
+
+.jiwa-music-toggle--standalone {
+  display: block;
+  min-height: 38px;
+  margin: 14px auto 0;
+}
+
+.stage-footer-actions .jiwa-music-toggle {
+  margin-top: 26px;
+}
+
+.game-header .jiwa-music-toggle--header {
+  flex: 0 0 auto;
+  min-width: 72px;
+  min-height: 34px;
+  margin-left: 14px;
+  padding-inline: 10px;
+  font-size: 0.62rem;
+}
+
+.game-header > p {
+  margin-left: auto;
+}
+
+.jiwa-audio-credit {
+  display: block;
+  width: fit-content;
+  margin: 9px auto 0;
+  color: #62544f;
+  letter-spacing: 0.06em;
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 0.58rem;
+  line-height: 1.55;
+  text-decoration: none;
+}
+
+.jiwa-audio-credit:hover,
+.jiwa-audio-credit:focus-visible {
+  color: #b99d91;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .game-header .jiwa-music-toggle--header {
+    min-width: 62px;
+    min-height: 32px;
+    margin-left: 8px;
+    padding-inline: 7px;
+  }
+
+  .jiwa-audio-credit {
+    max-width: calc(100vw - 32px);
+    text-align: center;
+  }
+}

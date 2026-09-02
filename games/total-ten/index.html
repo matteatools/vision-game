@@ -218,6 +218,11 @@
             cursor: pointer;
         }
 
+        .audio-toggle-button {
+            font-size: 10px;
+            letter-spacing: 0;
+        }
+
         .hero {
             position: relative;
             z-index: 1;
@@ -319,6 +324,7 @@
         .primary-button:active,
         .secondary-button:active,
         .icon-button:active,
+        .music-button:active,
         .quit-button:active {
             transform: translateY(3px) scale(0.985);
             filter: brightness(0.95);
@@ -644,7 +650,7 @@
         .game-footer {
             z-index: 3;
             display: grid;
-            grid-template-columns: auto 1fr auto;
+            grid-template-columns: auto 1fr auto auto;
             align-items: center;
             gap: 10px;
             min-height: 49px;
@@ -661,7 +667,8 @@
             white-space: nowrap;
         }
 
-        .quit-button {
+        .quit-button,
+        .music-button {
             min-width: 54px;
             padding: 9px 12px;
             border-radius: 13px;
@@ -2470,7 +2477,7 @@
             min-height: 31px;
             margin: 0;
             padding: 4px 3px 0;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr auto auto;
             gap: 6px;
             background: transparent;
             border: 0;
@@ -2487,9 +2494,11 @@
             text-align: left;
         }
 
-        .game-footer .quit-button {
+        .game-footer .quit-button,
+        .game-footer .music-button {
             min-width: 48px;
             padding: 7px 9px;
+            font-size: 10px;
         }
 
         .pause-overlay {
@@ -2638,6 +2647,7 @@
 </head>
 <body>
     <div class="ambient"></div>
+    <audio id="bgm" src="./assets/audio/otologic-gb-rpg-a12-2.mp3" loop preload="auto" aria-hidden="true"></audio>
 
     <main id="app" aria-live="polite">
         <section id="title-screen" class="screen title-screen active" aria-label="タイトル">
@@ -2648,7 +2658,8 @@
                         <span>さいこう</span>
                         <strong id="high-score">0</strong>
                     </div>
-                    <button id="sound-button" class="icon-button" type="button" aria-label="サウンドを きりかえる" onclick="toggleSound()">♪</button>
+                    <button id="sound-button" class="icon-button audio-toggle-button" type="button" aria-label="こうかおんを きりかえる" onclick="toggleSound()">SE</button>
+                    <button class="icon-button audio-toggle-button music-toggle-button" type="button" aria-label="BGMを きりかえる" onclick="toggleMusic()">BGM</button>
                 </div>
             </div>
 
@@ -2666,7 +2677,7 @@
                     <a class="secondary-button park-link" href="../../index.html">ゲームパークへ もどる</a>
                 </div>
             </div>
-            <a class="audio-credit" href="https://otologic.jp/" target="_blank" rel="noopener">おんげん：OtoLogic（CC BY 4.0）</a>
+            <a class="audio-credit" href="https://otologic.jp/free/bgm/game-rpg-gb02.html" target="_blank" rel="noopener">BGM「GB RPG A12-2」・こうかおん：OtoLogic（CC BY 4.0）</a>
         </section>
 
         <section id="game-screen" class="screen game-screen" aria-label="ゲーム">
@@ -2707,6 +2718,7 @@
                 <footer class="game-footer">
                     <div class="footer-virus" aria-hidden="true">10</div>
                     <div id="hint" class="hint">スライムを つないで 10 または 20</div>
+                    <button class="music-button music-toggle-button" type="button" aria-label="BGMを きりかえる" onclick="toggleMusic()">BGM</button>
                     <button class="quit-button" type="button" onclick="showTitle()">やめる</button>
                 </footer>
             </div>
@@ -2810,6 +2822,7 @@
         const timerLabelEl = document.getElementById("timer-label");
         const pauseButtonEl = document.getElementById("pause-button");
         const pauseOverlayEl = document.getElementById("pause-overlay");
+        const bgmEl = document.getElementById("bgm");
         const mobilePerformance = window.matchMedia("(pointer: coarse)").matches
             || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
             || (navigator.deviceMemory && navigator.deviceMemory <= 4);
@@ -2828,6 +2841,7 @@
         let timerInterval = null;
         let audioCtx = null;
         let soundEnabled = localStorage.getItem("totalten_sound") !== "off";
+        let musicEnabled = localStorage.getItem("totalten_music_v1") !== "off";
         const audioSamples = {
             cut: new Audio("./Cut01-1.mp3"),
             smash: new Audio("./assets/audio/smash-impact.mp3"),
@@ -2847,6 +2861,8 @@
             sample.preload = "auto";
             sample.playsInline = true;
         });
+        bgmEl.volume = 0.12;
+        bgmEl.playsInline = true;
 
         const practiceChallenges = [
             {
@@ -2962,6 +2978,7 @@
             drawPath();
             updateSumDisplay();
             Object.values(audioSamples).forEach((sample) => sample.pause());
+            pauseMusic();
             if (audioCtx?.state === "running") audioCtx.suspend().catch(() => {});
             gameScreenEl.classList.add("paused");
             pauseButtonEl.disabled = true;
@@ -2977,6 +2994,7 @@
             if (soundEnabled && audioCtx?.state === "suspended") audioCtx.resume().catch(() => {});
             resumeScheduledTasks();
             startPenaltyTimer();
+            syncMusic();
         }
 
         function switchScreen(screenId) {
@@ -2985,6 +3003,7 @@
             document.querySelectorAll(".screen").forEach((screen) => {
                 screen.classList.toggle("active", screen.id === screenId);
             });
+            syncMusic();
         }
 
         function showTitle() {
@@ -3044,8 +3063,47 @@
 
         function updateSoundButton() {
             const button = document.getElementById("sound-button");
-            button.textContent = soundEnabled ? "♪" : "×";
-            button.setAttribute("aria-label", soundEnabled ? "サウンドをオフにする" : "サウンドをオンにする");
+            button.textContent = soundEnabled ? "SE" : "SE×";
+            button.setAttribute("aria-label", soundEnabled ? "こうかおんをオフにする" : "こうかおんをオンにする");
+            button.setAttribute("aria-pressed", String(soundEnabled));
+        }
+
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem("totalten_music_v1", musicEnabled ? "on" : "off");
+            updateMusicButtons();
+            syncMusic();
+        }
+
+        function updateMusicButtons() {
+            document.querySelectorAll(".music-toggle-button").forEach((button) => {
+                button.textContent = musicEnabled ? "BGM" : "BGM×";
+                button.setAttribute("aria-label", musicEnabled ? "BGMをオフにする" : "BGMをオンにする");
+                button.setAttribute("aria-pressed", String(musicEnabled));
+            });
+        }
+
+        function playMusic() {
+            if (!musicEnabled || !gameIsActive || isPaused || document.hidden) return;
+            bgmEl.play().catch(() => {});
+        }
+
+        function pauseMusic(reset = false) {
+            bgmEl.pause();
+            if (!reset) return;
+            try {
+                bgmEl.currentTime = 0;
+            } catch (_error) {
+                // よみこみまえなら、ていしだけでよい
+            }
+        }
+
+        function syncMusic() {
+            if (musicEnabled && gameIsActive && !isPaused && !document.hidden) {
+                playMusic();
+            } else {
+                pauseMusic(!gameIsActive);
+            }
         }
 
         function initAudio() {
@@ -3795,8 +3853,13 @@
             if (gameIsActive) event.preventDefault();
         }, { passive: false });
         document.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) pauseMusic();
+            else syncMusic();
+        });
 
         updateSoundButton();
+        updateMusicButtons();
         showTitle();
     </script>
 </body>
