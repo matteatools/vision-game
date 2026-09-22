@@ -2509,7 +2509,9 @@
             dialogDescription.textContent = game.description;
             dialogSkills.innerHTML = skillMarkup(game.skills);
             dialogPlay.href = game.href;
-            dialogImage.src = `${game.playImage}${game.playImage.includes("?") ? "&" : "?"}v=20260922`;
+            dialogImage.src = game.playImage.includes("?v=")
+                ? game.playImage
+                : `${game.playImage}?v=20260922`;
             dialogImage.alt = `${game.title}の プレイがめん`;
 
             if (!dialog.open) {
