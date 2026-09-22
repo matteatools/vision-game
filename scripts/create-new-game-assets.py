@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageFilter, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +43,18 @@ def save_jpeg(image: Image.Image, path: Path) -> None:
     image.convert("RGB").save(path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
+def contain_over_blur(path: Path, size: tuple[int, int]) -> Image.Image:
+    """Keep the whole captured screen visible while filling non-matching ratios."""
+    source = Image.open(path).convert("RGB")
+    background = cover(path, size).convert("RGB")
+    background = background.filter(ImageFilter.GaussianBlur(max(size) * 0.025))
+    foreground = ImageOps.contain(source, size, Image.Resampling.LANCZOS)
+    left = (size[0] - foreground.width) // 2
+    top = (size[1] - foreground.height) // 2
+    background.paste(foreground, (left, top))
+    return background
+
+
 def make_title(background: Path, logo: Path, home_name: str, og_name: str, width: float, x: float, y: float) -> None:
     home = cover(background, (960, 600))
     add_logo(home, logo, width, x, y)
@@ -51,6 +63,15 @@ def make_title(background: Path, logo: Path, home_name: str, og_name: str, width
     social = cover(background, (1200, 630))
     add_logo(social, logo, width, x, y)
     save_jpeg(social, OG / og_name)
+
+
+def make_complete_title(screen: Path) -> None:
+    title = contain_over_blur(screen, (960, 600))
+    play = contain_over_blur(screen, (960, 600))
+    social = contain_over_blur(screen, (1200, 630))
+    save_webp(title, HOME / "title-mentaru-shindan.webp")
+    save_webp(play, HOME / "play-mentaru-shindan.webp")
+    save_jpeg(social, OG / "mentaru-shindan.jpg")
 
 
 def main() -> None:
@@ -84,18 +105,12 @@ def main() -> None:
         0.04,
     )
 
-    make_title(
-        ROOT / "games" / "mentaru-shindan" / "characters" / "all-characters-top.webp",
-        ROOT / "games" / "mentaru-shindan" / "brand" / "mentaru-shindan-logo.webp",
-        "title-mentaru-shindan.webp",
-        "mentaru-shindan.jpg",
-        0.43,
-        0.5,
-        0.035,
+    make_complete_title(
+        ROOT / "games" / "mentaru-shindan" / "previews" / "title-screen-current.png"
     )
 
-    # The four play images are browser-captured gameplay screens. Keep them as
-    # checked-in assets instead of rebuilding them from title illustrations.
+    # The other three play images are browser-captured gameplay screens. Keep
+    # them checked in instead of rebuilding them from title illustrations.
 
 
 if __name__ == "__main__":
