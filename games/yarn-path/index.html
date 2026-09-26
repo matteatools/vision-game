@@ -115,6 +115,20 @@
             cursor: pointer;
         }
 
+        .music-credit {
+            position: absolute;
+            z-index: 4;
+            top: max(66px, calc(env(safe-area-inset-top) + 56px));
+            left: max(12px, env(safe-area-inset-left));
+            padding: 4px 8px;
+            color: #60483a;
+            background: rgba(255, 253, 245, 0.82);
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
         /* タイトル */
         .title-screen {
             isolation: isolate;
@@ -202,8 +216,8 @@
             left: 50%;
             bottom: max(24px, calc(env(safe-area-inset-bottom) + 18px));
             display: grid;
-            grid-template-columns: 0.9fr 0.9fr 1.18fr 1fr;
-            width: min(98vw, 760px);
+            grid-template-columns: 0.85fr 0.85fr 1fr 1.18fr 1fr;
+            width: min(98vw, 940px);
             gap: 8px;
             transform: translateX(-50%);
         }
@@ -662,6 +676,818 @@
             box-shadow: 0 6px 0 #d3c9ba;
         }
 
+        .collection-button {
+            color: #77451f;
+            background: linear-gradient(180deg, #fff0a8, #f5bd58);
+            border: 3px solid #fff8da;
+            box-shadow: 0 7px 0 #c98237, 0 12px 22px rgba(70, 48, 31, 0.18);
+        }
+
+        .collection-button small {
+            display: block;
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        .reward-button {
+            grid-column: 1 / -1;
+            color: #734714;
+            background: linear-gradient(180deg, #ffe978, #f5b53d);
+            box-shadow: 0 6px 0 #c87c24;
+        }
+
+        .sub-screen {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(255,255,255,0.75) 0 3%, transparent 3.2%),
+                linear-gradient(180deg, #f8ddb0 0%, #fff5dc 55%, #bfe2d2 100%);
+        }
+
+        .sub-header {
+            position: relative;
+            z-index: 20;
+            display: grid;
+            grid-template-columns: 92px 1fr 92px;
+            align-items: center;
+            min-height: 62px;
+            padding: max(8px, env(safe-area-inset-top)) 10px 8px;
+            background: rgba(255, 252, 242, 0.95);
+            border-bottom: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(83, 59, 43, 0.14);
+        }
+
+        .sub-header h2 {
+            margin: 0;
+            color: #4b897e;
+            text-align: center;
+            font-size: clamp(21px, 5vw, 31px);
+            font-weight: 1000;
+        }
+
+        .back-button,
+        .header-action {
+            min-height: 40px;
+            padding: 7px 8px;
+            color: #684f42;
+            background: #f1ebe1;
+            border: 2px solid #fff;
+            border-radius: 13px;
+            box-shadow: 0 4px 0 #d4c9bb;
+            font-size: 12px;
+            font-weight: 1000;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #house-back-button {
+            padding-inline: 4px;
+            font-size: 11px;
+        }
+
+        .header-action {
+            color: #fff;
+            background: #e99555;
+            box-shadow: 0 4px 0 #b76836;
+        }
+
+        /* ごほうびの毛糸引き */
+        .gacha-screen {
+            display: grid;
+            grid-template-rows: 1fr auto;
+            overflow: hidden;
+            background: #321f2b;
+        }
+
+        .gacha-stage {
+            position: relative;
+            display: grid;
+            grid-template-rows: clamp(96px, 17vh, 138px) 1fr;
+            min-height: 0;
+            overflow: hidden;
+            padding: max(8px, env(safe-area-inset-top)) 12px 0;
+            background-image:
+                linear-gradient(180deg, rgba(48, 23, 31, 0.18), rgba(77, 39, 29, 0.02) 48%, rgba(45, 27, 30, 0.2)),
+                url("assets/collection/gacha/festival-stage-v1.png");
+            background-position: center;
+            background-size: cover;
+        }
+
+        .gacha-stage::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 62%, rgba(255, 241, 164, 0.35), transparent 35%),
+                linear-gradient(90deg, rgba(44, 21, 26, 0.18), transparent 18% 82%, rgba(44, 21, 26, 0.18));
+            pointer-events: none;
+        }
+
+        .gacha-copy {
+            position: relative;
+            z-index: 8;
+            align-self: start;
+            width: min(88vw, 660px);
+            margin: 0 auto;
+            padding: 9px 18px 10px;
+            background: linear-gradient(180deg, rgba(67, 34, 35, 0.94), rgba(91, 44, 39, 0.9));
+            border: 3px solid #ffd77e;
+            border-top: 0;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 7px 0 rgba(52, 25, 28, 0.4), 0 12px 24px rgba(44, 24, 25, 0.25);
+        }
+
+        .gacha-heading {
+            position: relative;
+            margin: 0;
+            color: #fff7db;
+            text-align: center;
+            font-size: clamp(23px, 5.3vw, 37px);
+            font-weight: 1000;
+            letter-spacing: 0.04em;
+            text-shadow: 0 3px 0 #8e4438, 0 0 16px rgba(255, 222, 126, 0.55);
+        }
+
+        .gacha-tier {
+            margin: 5px 0 0;
+            color: #ffe9a8;
+            text-align: center;
+            font-size: clamp(11px, 2.8vw, 15px);
+            font-weight: 1000;
+            letter-spacing: 0.02em;
+        }
+
+        .gacha-yarns {
+            --cord-length: min(20vh, 145px);
+            position: relative;
+            z-index: 4;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            min-height: 0;
+            gap: clamp(4px, 2vw, 22px);
+            align-items: start;
+            justify-items: center;
+            padding: clamp(10px, 2.5vh, 24px) max(4px, 2vw) 0;
+        }
+
+        .gacha-yarn {
+            --pull: 0px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+            padding: 0;
+            overflow: visible;
+            background: transparent;
+            border: 0;
+            cursor: grab;
+            touch-action: none;
+            transition: opacity 450ms ease, filter 450ms ease, transform 180ms ease;
+        }
+
+        .gacha-yarn:active {
+            cursor: grabbing;
+        }
+
+        .gacha-yarn::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: 10px;
+            left: 50%;
+            width: min(32vw, 260px);
+            height: min(48vh, 380px);
+            background: radial-gradient(ellipse, rgba(255, 233, 143, 0.58), rgba(255, 221, 110, 0.12) 48%, transparent 72%);
+            opacity: 0;
+            transform: translateX(-50%) scale(0.7);
+            transition: opacity 500ms ease, transform 700ms ease;
+            pointer-events: none;
+        }
+
+        .gacha-yarn.chosen::before {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.2);
+        }
+
+        .gacha-anchor {
+            position: absolute;
+            z-index: 5;
+            top: 0;
+            left: 50%;
+            width: 54px;
+            height: 54px;
+            background:
+                radial-gradient(circle, #6a3e2c 0 30%, #f2b85d 32% 48%, #8d5233 50% 68%, #ffe7a7 70%);
+            border: 3px solid #fff0bd;
+            border-radius: 50%;
+            box-shadow: 0 6px 0 #653522, 0 0 18px rgba(255, 220, 117, 0.85);
+            transform: translateX(-50%);
+        }
+
+        .gacha-anchor::after {
+            content: "★";
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: #fff0a8;
+            font-size: 18px;
+            text-shadow: 0 2px 0 #7a432e;
+        }
+
+        .gacha-cord {
+            position: absolute;
+            top: 44px;
+            left: 50%;
+            width: 13px;
+            height: calc(var(--cord-length) + var(--pull));
+            background:
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.35) 0 2px, transparent 2px 5px),
+                var(--yarn-color);
+            border: 2px solid rgba(70, 35, 34, 0.26);
+            border-radius: 999px;
+            box-shadow: 2px 0 0 rgba(255,255,255,0.55), 0 7px 12px rgba(54, 29, 28, 0.28);
+            transform: translateX(-50%);
+            transition: height 180ms ease-out;
+        }
+
+        .gacha-handle {
+            position: absolute;
+            z-index: 6;
+            top: calc(var(--cord-length) + var(--pull) + 28px);
+            left: 50%;
+            display: grid;
+            width: clamp(82px, 20vw, 116px);
+            min-height: 58px;
+            place-items: center;
+            padding: 7px;
+            color: #63372d;
+            background: linear-gradient(180deg, #fff8dc, #f3c97c);
+            border: 4px solid var(--yarn-color);
+            border-radius: 18px 18px 50% 50%;
+            box-shadow: 0 7px 0 rgba(79, 42, 34, 0.34), inset 0 2px 0 #fff;
+            transform: translate(-50%, -10px);
+            font-size: clamp(12px, 3.2vw, 16px);
+            font-weight: 1000;
+            transition: top 180ms ease-out, transform 180ms ease-out;
+            animation: handleBounce 1.45s ease-in-out infinite;
+        }
+
+        .gacha-yarn:nth-child(2) .gacha-handle { animation-delay: 0.18s; }
+        .gacha-yarn:nth-child(3) .gacha-handle { animation-delay: 0.36s; }
+
+        .gacha-yarn.pulling .gacha-handle {
+            animation: none;
+            transform: translate(-50%, -4px) scale(1.08);
+        }
+
+        .gacha-prize {
+            position: absolute;
+            z-index: 12;
+            top: 55%;
+            left: 50%;
+            width: min(36vw, 270px);
+            max-height: 40vh;
+            object-fit: contain;
+            opacity: 0;
+            filter: drop-shadow(0 16px 12px rgba(54, 28, 28, 0.38));
+            transform: translate(-50%, -190%) rotate(-5deg) scale(0.55);
+            pointer-events: none;
+        }
+
+        .gacha-yarns.has-choice .gacha-yarn:not(.chosen) {
+            opacity: 0.1;
+            filter: grayscale(0.65);
+            pointer-events: none;
+        }
+
+        .gacha-yarn.chosen .gacha-cord {
+            height: min(8vh, 58px);
+        }
+
+        .gacha-yarn.chosen .gacha-handle {
+            opacity: 0;
+            animation: none;
+        }
+
+        .gacha-stage.revealed .gacha-prize {
+            animation: plushDrop 1.15s cubic-bezier(.2,.9,.24,1.18) forwards;
+        }
+
+        .gacha-sparkles {
+            position: absolute;
+            z-index: 6;
+            inset: 30% 5% auto;
+            color: #ffe46f;
+            opacity: 0;
+            text-align: center;
+            font-size: clamp(28px, 8vw, 58px);
+            letter-spacing: 0.3em;
+            text-shadow: 0 0 10px #fff, 0 3px 0 #ad5d37;
+            pointer-events: none;
+        }
+
+        .gacha-stage.revealed .gacha-sparkles {
+            animation: sparkleBurst 1.25s ease-out 0.35s both;
+        }
+
+        .gacha-rarity {
+            position: absolute;
+            z-index: 14;
+            top: 82%;
+            left: 50%;
+            min-width: 126px;
+            padding: 7px 16px;
+            color: #fff8d4;
+            background: linear-gradient(180deg, rgba(103, 47, 41, 0.96), rgba(62, 29, 34, 0.96));
+            border: 3px solid #ffd974;
+            border-radius: 999px;
+            box-shadow: 0 5px 0 rgba(54, 26, 30, 0.5), 0 0 18px rgba(255, 221, 111, 0.65);
+            text-align: center;
+            font-size: clamp(15px, 3.8vw, 21px);
+            font-weight: 1000;
+            letter-spacing: 0.08em;
+            text-shadow: 0 2px 0 #7b3e31;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .gacha-stage.revealed .gacha-rarity:not([hidden]) {
+            animation: rarityPop 620ms cubic-bezier(.2,.9,.3,1.3) 500ms both;
+        }
+
+        @keyframes plushDrop {
+            0% { opacity: 0; transform: translate(-50%, -190%) rotate(-8deg) scale(0.55); }
+            58% { opacity: 1; transform: translate(-50%, -43%) rotate(6deg) scale(1.06); }
+            76% { transform: translate(-50%, -53%) rotate(-3deg) scale(0.98); }
+            100% { opacity: 1; transform: translate(-50%, -48%) rotate(0) scale(1); }
+        }
+
+        @keyframes sparkleBurst {
+            0% { opacity: 0; transform: scale(0.3) rotate(-12deg); }
+            45% { opacity: 1; transform: scale(1.18) rotate(5deg); }
+            100% { opacity: 0; transform: scale(1.65) rotate(10deg); }
+        }
+
+        @keyframes handleBounce {
+            0%, 100% { transform: translate(-50%, -10px); }
+            50% { transform: translate(-50%, -3px); }
+        }
+
+        @keyframes rarityPop {
+            0% { opacity: 0; transform: translate(-50%, -35%) scale(0.55); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .gacha-footer {
+            position: relative;
+            z-index: 10;
+            min-height: 115px;
+            padding: 12px 14px max(15px, env(safe-area-inset-bottom));
+            background: linear-gradient(180deg, #4d292f, #321e29);
+            border-top: 4px solid #f2c46d;
+            box-shadow: 0 -8px 20px rgba(43, 23, 27, 0.35);
+            text-align: center;
+        }
+
+        .gacha-message {
+            min-height: 1.5em;
+            margin: 0 0 10px;
+            color: #fff5d6;
+            font-size: clamp(15px, 4vw, 21px);
+            font-weight: 1000;
+            text-shadow: 0 2px 0 rgba(71, 34, 33, 0.8);
+        }
+
+        .gacha-owned {
+            display: inline-block;
+            margin-left: 0.35em;
+            white-space: nowrap;
+        }
+
+        .gacha-actions {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            width: min(96vw, 560px);
+            margin: 0 auto;
+            gap: 8px;
+        }
+
+        .gacha-action {
+            min-height: 47px;
+            color: #fff;
+            background: linear-gradient(180deg, #58c6b3, #379b8c);
+            border: 2px solid #fff4cf;
+            border-radius: 14px;
+            box-shadow: 0 5px 0 #236e67, 0 0 12px rgba(255, 224, 133, 0.2);
+            font-size: 13px;
+            font-weight: 1000;
+            cursor: pointer;
+        }
+
+        .gacha-action.secondary {
+            color: #6e574b;
+            background: #eee8de;
+            box-shadow: 0 5px 0 #cfc4b7;
+        }
+
+        /* コレクション */
+        .collection-main {
+            width: 100%;
+            min-width: 0;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 13px max(10px, 3vw) max(22px, env(safe-area-inset-bottom));
+        }
+
+        .collection-summary {
+            display: flex;
+            width: min(100%, 980px);
+            margin: 0 auto 12px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: #624a3d;
+            font-weight: 1000;
+        }
+
+        .collection-progress {
+            padding: 7px 13px;
+            background: rgba(255,255,255,0.8);
+            border: 3px solid #fff;
+            border-radius: 999px;
+        }
+
+        .house-open-button {
+            min-height: 44px;
+            padding: 8px 15px;
+            color: #fff;
+            background: linear-gradient(180deg, #f6a868, #dd754a);
+            border: 3px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 0 #a95638;
+            font-weight: 1000;
+            cursor: pointer;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+            width: min(100%, 980px);
+            margin: 0 auto;
+            gap: 10px;
+        }
+
+        .collection-card {
+            position: relative;
+            min-height: 170px;
+            padding: 8px 7px 9px;
+            overflow: hidden;
+            color: #654a3d;
+            background: rgba(255, 253, 245, 0.94);
+            border: 3px solid #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 0 rgba(126, 88, 57, 0.2);
+            text-align: center;
+        }
+
+        .collection-card img,
+        .collection-silhouette {
+            display: block;
+            width: 100%;
+            height: 115px;
+            object-fit: contain;
+        }
+
+        .collection-silhouette {
+            display: grid;
+            place-items: center;
+            color: rgba(95, 76, 67, 0.42);
+            font-size: 54px;
+            filter: grayscale(1);
+        }
+
+        .collection-name {
+            display: block;
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 1000;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .collection-rarity {
+            display: block;
+            margin-top: 2px;
+            color: #d59228;
+            font-size: 12px;
+            font-weight: 1000;
+            letter-spacing: 0.08em;
+            text-shadow: 0 1px 0 #fff;
+        }
+
+        .collection-number {
+            position: absolute;
+            top: 7px;
+            left: 8px;
+            color: #8b7568;
+            font-size: 10px;
+            font-weight: 1000;
+        }
+
+        .collection-count {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            min-width: 32px;
+            padding: 3px 6px;
+            color: #fff;
+            background: #ee7863;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 1000;
+        }
+
+        .collection-card.locked {
+            background: rgba(230, 224, 213, 0.9);
+            filter: saturate(0.45);
+        }
+
+        /* ぬいぐるみハウス */
+        .house-main {
+            display: grid;
+            width: 100%;
+            min-width: 0;
+            grid-template-rows: minmax(310px, 1fr) auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .house-stage {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            min-height: 310px;
+            overflow: hidden;
+            background: #e8c89e url("assets/collection/house/plush-room-landscape-v1.png") center / 100% 100% no-repeat;
+        }
+
+        .house-stage::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            height: auto;
+            background: linear-gradient(180deg, rgba(255, 248, 224, 0.04), transparent 35% 78%, rgba(73, 42, 25, 0.11));
+            border: 0;
+            box-shadow: inset 0 0 28px rgba(78, 46, 27, 0.12);
+            pointer-events: none;
+        }
+
+        .house-window,
+        .house-desk,
+        .house-chair,
+        .house-rug,
+        .house-basket {
+            display: none;
+        }
+
+        .house-window {
+            position: absolute;
+            z-index: 1;
+            top: 5%;
+            left: 55%;
+            width: min(31vw, 250px);
+            height: 24%;
+            background: linear-gradient(180deg, #aee1e5, #f6f2c6);
+            border: 9px solid #fff7e6;
+            border-radius: 50% 50% 10px 10px;
+            box-shadow: 0 7px 0 rgba(110, 73, 49, 0.18);
+            transform: translateX(-50%);
+        }
+
+        .house-window::before,
+        .house-window::after {
+            content: "";
+            position: absolute;
+            background: rgba(255,255,255,0.75);
+        }
+
+        .house-window::before {
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 5px;
+        }
+
+        .house-window::after {
+            top: 56%;
+            right: 0;
+            left: 0;
+            height: 5px;
+        }
+
+        .house-desk {
+            position: absolute;
+            z-index: 2;
+            top: 43%;
+            left: 6%;
+            width: 38%;
+            height: 25%;
+            background:
+                linear-gradient(90deg, #95603e 0 8%, transparent 8% 92%, #95603e 92%) 0 16px / 100% 100% no-repeat;
+            border-top: 17px solid #b9784d;
+            border-radius: 7px;
+            box-shadow: 0 -5px 0 #e7ad73, 0 8px 8px rgba(82, 49, 29, 0.2);
+        }
+
+        .house-chair {
+            position: absolute;
+            z-index: 1;
+            top: 37%;
+            right: 8%;
+            width: 20%;
+            height: 35%;
+            background: linear-gradient(90deg, #8f5b3c 0 9%, transparent 9% 91%, #8f5b3c 91%);
+            border: 9px solid #ad7049;
+            border-bottom: 0;
+            border-radius: 40% 40% 8px 8px;
+        }
+
+        .house-chair::after {
+            content: "";
+            position: absolute;
+            top: 48%;
+            right: -15%;
+            left: -15%;
+            height: 19%;
+            background: #e39769;
+            border: 6px solid #a86643;
+            border-radius: 12px;
+            box-shadow: 0 7px 0 rgba(91, 53, 33, 0.2);
+        }
+
+        .house-rug {
+            position: absolute;
+            z-index: 1;
+            right: 18%;
+            bottom: -7%;
+            width: 52%;
+            height: 34%;
+            background: repeating-radial-gradient(ellipse, #f6dfb2 0 12px, #e8b68d 13px 23px);
+            border: 7px solid #fff0cf;
+            border-radius: 50%;
+            box-shadow: 0 8px 0 rgba(94, 56, 36, 0.16);
+        }
+
+        .house-basket {
+            position: absolute;
+            z-index: 2;
+            bottom: 3%;
+            left: 5%;
+            width: 24%;
+            height: 17%;
+            background: repeating-linear-gradient(90deg, #c88945 0 9px, #daa35e 9px 17px);
+            border: 7px solid #9f6334;
+            border-radius: 8px 8px 45% 45%;
+            box-shadow: 0 7px 0 rgba(80, 47, 29, 0.18);
+        }
+
+        .house-slot {
+            position: absolute;
+            z-index: var(--layer, 3);
+            display: grid;
+            width: clamp(68px, 11vw, 125px);
+            height: clamp(76px, 13vw, 142px);
+            place-items: end center;
+            padding: 0;
+            background: transparent;
+            border: 3px dashed transparent;
+            border-radius: 50% 50% 18px 18px;
+            transform: translate(-50%, -100%) scale(var(--cat-scale, 1));
+            transition: opacity 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+            cursor: pointer;
+        }
+
+        .house-slot:not(.filled) {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .house-stage.placing .house-slot:not(.filled) {
+            opacity: 1;
+            pointer-events: auto;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0 25%, rgba(255,224,111,0.5) 45%, rgba(255,255,255,0.12) 72%);
+            border-color: #fff8cf;
+            box-shadow: 0 0 0 4px rgba(244, 163, 76, 0.5), 0 0 24px 8px rgba(255, 224, 121, 0.72);
+            animation: houseSlotGlow 720ms ease-in-out infinite alternate;
+        }
+
+        .house-slot img {
+            width: 126%;
+            height: 126%;
+            object-fit: contain;
+            filter: drop-shadow(0 7px 5px rgba(72, 43, 29, 0.25));
+            pointer-events: none;
+        }
+
+        .house-slot::after {
+            content: "+";
+            color: rgba(105, 75, 56, 0.34);
+            font-size: 30px;
+            font-weight: 1000;
+            align-self: center;
+        }
+
+        .house-slot.filled {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .house-slot.filled::after { display: none; }
+
+        @keyframes houseSlotGlow {
+            from { filter: brightness(0.96); }
+            to { filter: brightness(1.14); }
+        }
+
+        .house-inventory-panel {
+            position: relative;
+            z-index: 10;
+            min-width: 0;
+            padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+            background: rgba(255, 252, 242, 0.97);
+            border-top: 3px solid #fff;
+            box-shadow: 0 -5px 18px rgba(79, 50, 33, 0.12);
+        }
+
+        .house-help {
+            margin: 0 0 6px;
+            color: #684f42;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 1000;
+            line-height: 1.35;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .house-inventory {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+            min-height: 88px;
+            gap: 7px;
+            overflow-x: auto;
+            padding: 2px 2px 6px;
+        }
+
+        .house-pick {
+            position: relative;
+            flex: 0 0 76px;
+            padding: 3px;
+            background: #fff;
+            border: 3px solid #ead7b7;
+            border-radius: 13px;
+            cursor: pointer;
+        }
+
+        .house-pick.selected {
+            border-color: #f0965e;
+            box-shadow: 0 0 0 3px #ffe3a7;
+        }
+
+        .house-pick:disabled {
+            opacity: 0.34;
+            filter: grayscale(1);
+        }
+
+        .house-pick img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+
+        .house-pick span {
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+            min-width: 23px;
+            padding: 2px 4px;
+            color: #fff;
+            background: #e77860;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 1000;
+        }
+
         @media (orientation: portrait) {
             .title-logo {
                 top: max(4.5vh, calc(env(safe-area-inset-top) + 25px));
@@ -701,6 +1527,67 @@
             .start-button small {
                 font-size: 9px;
             }
+
+            .start-button {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            .gacha-yarn {
+                min-height: 360px;
+            }
+
+            .gacha-prize {
+                width: min(42vw, 220px);
+            }
+
+            .collection-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                min-width: 0;
+            }
+
+            .collection-summary {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                min-width: 0;
+            }
+
+            .collection-progress,
+            .house-open-button {
+                width: 100%;
+                text-align: center;
+                white-space: normal;
+            }
+
+            .collection-card {
+                min-height: 150px;
+            }
+
+            .collection-card img,
+            .collection-silhouette {
+                height: 95px;
+            }
+
+            .house-main {
+                grid-template-rows: minmax(300px, 1fr) auto;
+            }
+
+            .house-stage {
+                background-image: url("assets/collection/house/plush-room-portrait-v1.png");
+            }
+
+            .house-slot[data-slot="0"] { left: 25% !important; top: 31% !important; }
+            .house-slot[data-slot="1"] { left: 48% !important; top: 31% !important; }
+            .house-slot[data-slot="2"] { left: 84% !important; top: 52% !important; }
+            .house-slot[data-slot="3"] { left: 39% !important; top: 70% !important; }
+            .house-slot[data-slot="4"] { left: 57% !important; top: 72% !important; }
+            .house-slot[data-slot="5"] { left: 73% !important; top: 68% !important; }
+            .house-slot[data-slot="6"] { left: 67% !important; top: 35% !important; }
+
+            .house-slot {
+                width: clamp(58px, 18vw, 92px);
+                height: clamp(66px, 20vw, 104px);
+            }
         }
 
         @media (orientation: landscape) and (max-height: 620px) {
@@ -718,7 +1605,7 @@
                 right: auto;
                 bottom: max(13px, env(safe-area-inset-bottom));
                 left: 50%;
-                width: min(94vw, 760px);
+                width: min(96vw, 940px);
                 transform: translateX(-50%);
             }
 
@@ -785,6 +1672,69 @@
             .result-score {
                 font-size: 55px;
             }
+
+            .gacha-stage {
+                padding-top: max(7px, env(safe-area-inset-top));
+                grid-template-rows: 82px 1fr;
+            }
+
+            .gacha-copy {
+                padding-top: 4px;
+                padding-bottom: 5px;
+            }
+
+            .gacha-heading {
+                font-size: clamp(20px, 4vw, 28px);
+            }
+
+            .gacha-yarn {
+                min-height: 250px;
+            }
+
+            .gacha-yarns {
+                --cord-length: min(14vh, 76px);
+            }
+
+            .gacha-cord {
+                height: calc(var(--cord-length) + var(--pull));
+            }
+
+            .gacha-handle {
+                top: calc(var(--cord-length) + var(--pull) + 28px);
+                min-height: 43px;
+            }
+
+            .gacha-prize {
+                top: 55%;
+                width: min(22vw, 180px);
+                max-height: 31vh;
+            }
+
+            .gacha-footer {
+                min-height: 92px;
+                padding-top: 7px;
+            }
+
+            .house-main {
+                grid-template-columns: minmax(0, 1fr) 180px;
+                grid-template-rows: 1fr;
+            }
+
+            .house-inventory-panel {
+                overflow-y: auto;
+                border-top: 0;
+                border-left: 3px solid #fff;
+            }
+
+            .house-inventory {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                overflow: visible;
+            }
+
+            .house-pick {
+                width: 74px;
+            }
         }
 
         @media (max-width: 370px) {
@@ -826,7 +1776,7 @@
     </style>
 </head>
 <body>
-    <button class="sound-button" id="sound-button" type="button" aria-label="音を切り替える" aria-pressed="true">🔊</button>
+    <button class="sound-button" id="sound-button" type="button" aria-label="おとを きりかえる" aria-pressed="true">🔊</button>
     <img id="pom-sprite" src="assets/pom-pom-white-v1.png" alt="" hidden>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
@@ -835,6 +1785,7 @@
             <img class="title-art" src="assets/koneko-yarn-title-v2.png" alt="">
         </picture>
         <div class="title-shade" aria-hidden="true"></div>
+        <a class="music-credit" href="https://otologic.jp/" target="_blank" rel="noopener">おんがく：OtoLogic</a>
 
         <div class="title-best">
             さいこうタイム
@@ -849,6 +1800,10 @@
         <div class="title-menu">
             <button class="title-button practice-button" id="practice-button" type="button">れんしゅう</button>
             <button class="title-button training-button" id="training-button" type="button">とっくん</button>
+            <button class="title-button collection-button" id="collection-button" type="button">
+                コレクション
+                <small id="title-collection-count">0 / 30</small>
+            </button>
             <button class="title-button start-button" id="start-button" type="button">
                 スタート
                 <small>10ぽん タイムアタック</small>
@@ -871,7 +1826,7 @@
         </div>
     </section>
 
-    <section class="screen game-screen" id="screen-game" aria-label="ゲーム画面" hidden>
+    <section class="screen game-screen" id="screen-game" aria-label="ゲームがめん" hidden>
         <header class="hud">
             <div class="hud-card">
                 <span id="score-label">みつけたニャ！</span>
@@ -883,13 +1838,13 @@
 
         <main class="play-area" id="play-area">
             <div class="workshop" aria-hidden="true"></div>
-            <canvas id="yarn-canvas" role="img" aria-label="絡まった毛糸。左右で同じ色のポンポンをつなぐ毛糸を探します"></canvas>
+            <canvas id="yarn-canvas" role="img" aria-label="からまった けいと。さゆうで おなじいろの ポンポンを つなぐ けいとを さがします"></canvas>
             <div class="difficulty-chip" id="difficulty-chip">けいと 3ぼん</div>
             <div class="feedback" id="feedback" aria-hidden="true">みつけたニャ！</div>
 
             <div class="overlay" id="guide-overlay" hidden>
                 <div class="guide-card" id="guide-card">
-                    <div class="kitten-portrait" role="img" aria-label="毛糸屋さんのこねこ"></div>
+                    <div class="kitten-portrait" role="img" aria-label="けいとやさんの こねこ"></div>
                     <h2 id="guide-heading">れんしゅうニャ！</h2>
                     <p id="guide-copy">
                         <span class="meaning-line">ポンポンから けいとを</span>
@@ -906,16 +1861,97 @@
 
     <section class="screen result-screen" id="screen-result" aria-labelledby="result-heading" hidden>
         <div class="result-card">
-            <div class="kitten-portrait" role="img" aria-label="毛糸屋さんのこねこ"></div>
+            <div class="kitten-portrait" role="img" aria-label="けいとやさんの こねこ"></div>
             <h2 id="result-heading">10ぽん みつけたニャ！</h2>
             <div class="result-score-label">かかった じかん</div>
             <div class="result-score"><span id="result-score">0.0</span><small>びょう</small></div>
             <div class="result-best" id="result-best">さいこう：--.-びょう</div>
             <div class="result-actions">
+                <button class="result-button reward-button" id="reward-button" type="button">ごほうびの けいとを ひく！</button>
                 <button class="result-button" id="retry-button" type="button">もういちどニャ！</button>
                 <button class="result-button result-title-button" id="result-title-button" type="button">タイトルへ</button>
             </div>
         </div>
+    </section>
+
+    <section class="screen gacha-screen" id="screen-gacha" aria-labelledby="gacha-heading" hidden>
+        <div class="gacha-stage" id="gacha-stage">
+            <div class="gacha-copy">
+                <h2 class="gacha-heading" id="gacha-heading">どの けいとに する？</h2>
+                <p class="gacha-tier" id="gacha-tier">すきな けいとを ひっぱってね</p>
+            </div>
+            <div class="gacha-yarns" id="gacha-yarns">
+                <button class="gacha-yarn" type="button" data-index="0" style="--yarn-color:#ef7181" aria-label="あかい けいとを ひく">
+                    <span class="gacha-anchor" aria-hidden="true"></span>
+                    <span class="gacha-cord" aria-hidden="true"></span>
+                    <span class="gacha-handle">↓ ひっぱる</span>
+                </button>
+                <button class="gacha-yarn" type="button" data-index="1" style="--yarn-color:#58aade" aria-label="あおい けいとを ひく">
+                    <span class="gacha-anchor" aria-hidden="true"></span>
+                    <span class="gacha-cord" aria-hidden="true"></span>
+                    <span class="gacha-handle">↓ ひっぱる</span>
+                </button>
+                <button class="gacha-yarn" type="button" data-index="2" style="--yarn-color:#eabf45" aria-label="きいろい けいとを ひく">
+                    <span class="gacha-anchor" aria-hidden="true"></span>
+                    <span class="gacha-cord" aria-hidden="true"></span>
+                    <span class="gacha-handle">↓ ひっぱる</span>
+                </button>
+            </div>
+            <img class="gacha-prize" id="gacha-prize" alt="">
+            <div class="gacha-rarity" id="gacha-rarity" hidden>レア：☆</div>
+            <div class="gacha-sparkles" aria-hidden="true">★ ✦ ★ ✦ ★</div>
+        </div>
+        <footer class="gacha-footer">
+            <p class="gacha-message" id="gacha-message">3ぼんから ひとつ えらぶニャ！</p>
+            <div class="gacha-actions" id="gacha-actions" hidden>
+                <button class="gacha-action" id="gacha-collection-button" type="button">コレクション</button>
+                <button class="gacha-action" id="gacha-retry-button" type="button">もういちど</button>
+                <button class="gacha-action secondary" id="gacha-title-button" type="button">タイトル</button>
+            </div>
+        </footer>
+    </section>
+
+    <section class="screen sub-screen" id="screen-collection" aria-labelledby="collection-heading" hidden>
+        <header class="sub-header">
+            <button class="back-button" id="collection-back-button" type="button">← タイトル</button>
+            <h2 id="collection-heading">こねこコレクション</h2>
+            <span aria-hidden="true"></span>
+        </header>
+        <main class="collection-main">
+            <div class="collection-summary">
+                <span class="collection-progress" id="collection-progress">0 / 30しゅるい</span>
+                <button class="house-open-button" id="house-open-button" type="button">🏠 ぬいぐるみハウス</button>
+            </div>
+            <div class="collection-grid" id="collection-grid" aria-live="polite"></div>
+        </main>
+    </section>
+
+    <section class="screen sub-screen" id="screen-house" aria-labelledby="house-heading" hidden>
+        <header class="sub-header">
+            <button class="back-button" id="house-back-button" type="button">← コレクション</button>
+            <h2 id="house-heading">ぬいぐるみハウス</h2>
+            <button class="header-action" id="house-clear-button" type="button">ぜんぶもどす</button>
+        </header>
+        <main class="house-main">
+            <div class="house-stage" id="house-stage">
+                <div class="house-window" aria-hidden="true"></div>
+                <div class="house-desk" aria-hidden="true"></div>
+                <div class="house-chair" aria-hidden="true"></div>
+                <div class="house-rug" aria-hidden="true"></div>
+                <div class="house-basket" aria-hidden="true"></div>
+                <button class="house-slot" type="button" data-slot="0" data-location="つくえの ひだりがわ" style="left:15%;top:45%;--layer:4;--cat-scale:.92" aria-label="つくえの ひだりがわ"></button>
+                <button class="house-slot" type="button" data-slot="1" data-location="つくえの みぎがわ" style="left:34%;top:45%;--layer:4;--cat-scale:.92" aria-label="つくえの みぎがわ"></button>
+                <button class="house-slot" type="button" data-slot="2" data-location="いすの うえ" style="left:88%;top:62%;--layer:4" aria-label="いすの うえ"></button>
+                <button class="house-slot" type="button" data-slot="3" data-location="ラグの ひだりがわ" style="left:43%;top:84%;--layer:4;--cat-scale:.92" aria-label="ラグの ひだりがわ"></button>
+                <button class="house-slot" type="button" data-slot="4" data-location="ラグの まんなか" style="left:56%;top:89%;--layer:6" aria-label="ラグの まんなか"></button>
+                <button class="house-slot" type="button" data-slot="5" data-location="ラグの みぎがわ" style="left:69%;top:83%;--layer:5;--cat-scale:.9" aria-label="ラグの みぎがわ"></button>
+                <button class="house-slot" type="button" data-slot="6" data-location="まどべ" style="left:62%;top:47%;--layer:4;--cat-scale:.82" aria-label="まどべ"></button>
+            </div>
+            <div class="house-inventory-panel">
+                <p class="house-help" id="house-help">したから こねこを えらんで、おきたい ばしょを タッチするニャ</p>
+                <div class="house-inventory" id="house-inventory"></div>
+            </div>
+        </main>
     </section>
 
     <script>
@@ -932,18 +1968,63 @@
                 { fill: "#32bdc1", dark: "#177b84", light: "#a5f0eb", name: "みずいろ" }
             ];
             const BEST_KEY = "rope_yarn_best_time_v2";
+            const COLLECTION_KEY = "rope_yarn_collection_v1";
+            const HOUSE_KEY = "rope_yarn_house_v1";
+            const SOUND_KEY = "rope_yarn_sound_v1";
             const CHALLENGE_COUNTS = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7];
             const PRACTICE_COUNTS = [3, 3, 4];
+            const CAT_DATA = [
+                ["みけねこ", "cat-01-calico.webp"],
+                ["ハチワレ", "cat-02-tuxedo-repaired-v2.webp"],
+                ["ちゃトラ", "cat-03-orange-tabby.webp"],
+                ["ブルーグレー", "cat-04-blue-gray.webp"],
+                ["しろい ちょうもう", "cat-05-white-longhair.webp"],
+                ["シャム", "cat-06-siamese.webp"],
+                ["ベンガル", "cat-07-bengal.webp"],
+                ["シルバータビー", "cat-08-silver-tabby.webp"],
+                ["サビねこ", "cat-09-tortoiseshell.webp"],
+                ["くろねこ", "cat-10-solid-black.webp"],
+                ["ラグドール", "cat-11-ragdoll.webp"],
+                ["メインクーン", "cat-12-maine-coon.webp"],
+                ["スコティッシュフォールド", "cat-13-scottish-fold.webp"],
+                ["クリームペルシャ", "cat-14-cream-persian.webp"],
+                ["アビシニアン", "cat-15-abyssinian.webp"],
+                ["ノルウェージャンフォレスト", "cat-16-norwegian-forest.webp"],
+                ["スフィンクス", "cat-17-sphynx-plush.webp"],
+                ["デボンレックス", "cat-18-devon-rex.webp"],
+                ["ヒマラヤン", "cat-19-himalayan.webp"],
+                ["うしがら", "cat-20-cow-pattern.webp"],
+                ["パステルみけ", "cat-21-dilute-calico.webp"],
+                ["チョコレート", "cat-22-chocolate.webp"],
+                ["ライラックポイント", "cat-23-lilac-point.webp"],
+                ["クリームタビー", "cat-24-cream-tabby.webp"],
+                ["オッドアイの しろねこ", "cat-25-odd-eyed-white.webp"],
+                ["ゴールデンシェーデッド", "cat-26-golden-shaded.webp"],
+                ["しろソックスの グレータビー", "cat-27-gray-tabby-socks.webp"],
+                ["シナモンスポット", "cat-28-cinnamon-spotted.webp"],
+                ["スノーシュー", "cat-29-snowshoe.webp"],
+                ["ブラックスモーク", "cat-30-black-smoke.webp"]
+            ].map(([name, file], index) => ({
+                id: index,
+                name,
+                rarity: Math.floor(index / 10) + 1,
+                src: `assets/collection/cats/clean/${file.replace(".webp", ".png")}`
+            }));
 
             const elements = {
                 title: document.querySelector("#screen-title"),
                 game: document.querySelector("#screen-game"),
                 result: document.querySelector("#screen-result"),
+                gacha: document.querySelector("#screen-gacha"),
+                collection: document.querySelector("#screen-collection"),
+                house: document.querySelector("#screen-house"),
                 sound: document.querySelector("#sound-button"),
                 pomSprite: document.querySelector("#pom-sprite"),
                 titleBest: document.querySelector("#title-best"),
+                titleCollectionCount: document.querySelector("#title-collection-count"),
                 practice: document.querySelector("#practice-button"),
                 training: document.querySelector("#training-button"),
+                collectionButton: document.querySelector("#collection-button"),
                 trainingPicker: document.querySelector("#training-picker"),
                 trainingChoices: [...document.querySelectorAll(".training-choice")],
                 trainingClose: document.querySelector("#training-close"),
@@ -965,7 +2046,29 @@
                 resultScore: document.querySelector("#result-score"),
                 resultBest: document.querySelector("#result-best"),
                 retry: document.querySelector("#retry-button"),
-                resultTitle: document.querySelector("#result-title-button")
+                resultTitle: document.querySelector("#result-title-button"),
+                reward: document.querySelector("#reward-button"),
+                gachaStage: document.querySelector("#gacha-stage"),
+                gachaPrize: document.querySelector("#gacha-prize"),
+                gachaRarity: document.querySelector("#gacha-rarity"),
+                gachaTier: document.querySelector("#gacha-tier"),
+                gachaYarns: document.querySelector("#gacha-yarns"),
+                gachaYarnButtons: [...document.querySelectorAll(".gacha-yarn")],
+                gachaMessage: document.querySelector("#gacha-message"),
+                gachaActions: document.querySelector("#gacha-actions"),
+                gachaCollection: document.querySelector("#gacha-collection-button"),
+                gachaRetry: document.querySelector("#gacha-retry-button"),
+                gachaTitle: document.querySelector("#gacha-title-button"),
+                collectionBack: document.querySelector("#collection-back-button"),
+                collectionProgress: document.querySelector("#collection-progress"),
+                collectionGrid: document.querySelector("#collection-grid"),
+                houseOpen: document.querySelector("#house-open-button"),
+                houseBack: document.querySelector("#house-back-button"),
+                houseClear: document.querySelector("#house-clear-button"),
+                houseStage: document.querySelector("#house-stage"),
+                houseSlots: [...document.querySelectorAll(".house-slot")],
+                houseHelp: document.querySelector("#house-help"),
+                houseInventory: document.querySelector("#house-inventory")
             };
 
             const context = elements.canvas.getContext("2d");
@@ -975,8 +2078,15 @@
                 mode: "practice",
                 playing: false,
                 locked: true,
-                soundOn: true,
+                soundOn: localStorage.getItem(SOUND_KEY) !== "off",
                 audioContext: null,
+                masterGain: null,
+                sfxGain: null,
+                audioLimiter: null,
+                musicTrack: "",
+                musicElement: null,
+                musicMedia: new Map(),
+                musicDuckTimer: null,
                 score: 0,
                 practiceStep: 0,
                 trainingCount: 3,
@@ -988,7 +2098,12 @@
                 finishedAt: 0,
                 animationFrame: null,
                 timers: [],
-                resizeTimer: null
+                resizeTimer: null,
+                lastElapsed: 0,
+                rewardChoices: [],
+                rewardClaimed: false,
+                pull: null,
+                selectedHouseCat: null
             };
 
             function schedule(callback, delay) {
@@ -1010,8 +2125,12 @@
                 elements.title.hidden = name !== "title";
                 elements.game.hidden = name !== "game";
                 elements.result.hidden = name !== "result";
-                elements.sound.hidden = name === "game";
+                elements.gacha.hidden = name !== "gacha";
+                elements.collection.hidden = name !== "collection";
+                elements.house.hidden = name !== "house";
+                elements.sound.hidden = ["game", "gacha", "collection", "house"].includes(name);
                 state.screen = name;
+                syncMusicForScreen(name);
             }
 
             function readBest() {
@@ -1047,40 +2166,437 @@
                 return { previous, isNew };
             }
 
+            function readCollection() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "[]");
+                    return CAT_DATA.map((_, index) => {
+                        const count = Number(saved[index]);
+                        return Number.isInteger(count) && count > 0 ? count : 0;
+                    });
+                } catch (error) {
+                    return CAT_DATA.map(() => 0);
+                }
+            }
+
+            function saveCollection(collection) {
+                localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+            }
+
+            function addCat(catId) {
+                const collection = readCollection();
+                collection[catId] += 1;
+                saveCollection(collection);
+                updateCollectionCount();
+                return collection[catId];
+            }
+
+            function readHouse() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(HOUSE_KEY) || "[]");
+                    const house = Array.from({ length: elements.houseSlots.length }, (_, index) => {
+                        const id = saved[index];
+                        return Number.isInteger(id) && id >= 0 && id < CAT_DATA.length ? id : null;
+                    });
+                    if (Array.isArray(saved) && saved.length !== house.length) saveHouse(house);
+                    return house;
+                } catch (error) {
+                    return elements.houseSlots.map(() => null);
+                }
+            }
+
+            function saveHouse(house) {
+                localStorage.setItem(HOUSE_KEY, JSON.stringify(house));
+            }
+
+            function countPlaced(house, catId) {
+                return house.filter((id) => id === catId).length;
+            }
+
+            function updateCollectionCount() {
+                const collection = readCollection();
+                const kinds = collection.filter((count) => count > 0).length;
+                elements.titleCollectionCount.textContent = `${kinds} / ${CAT_DATA.length}`;
+            }
+
+            function renderCollection() {
+                const collection = readCollection();
+                const kinds = collection.filter((count) => count > 0).length;
+                const total = collection.reduce((sum, count) => sum + count, 0);
+                elements.collectionProgress.textContent = `${kinds} / ${CAT_DATA.length}しゅるい・ぜんぶで${total}たい`;
+                elements.collectionGrid.replaceChildren();
+
+                CAT_DATA.forEach((cat, index) => {
+                    const count = collection[index];
+                    const card = document.createElement("article");
+                    card.className = `collection-card${count ? "" : " locked"}`;
+                    const number = document.createElement("span");
+                    number.className = "collection-number";
+                    number.textContent = `No.${String(index + 1).padStart(2, "0")}`;
+                    card.append(number);
+
+                    if (count) {
+                        const badge = document.createElement("span");
+                        badge.className = "collection-count";
+                        badge.textContent = `× ${count}`;
+                        const image = document.createElement("img");
+                        image.src = cat.src;
+                        image.alt = `${cat.name}のこねこぬいぐるみ`;
+                        image.loading = "lazy";
+                        const name = document.createElement("strong");
+                        name.className = "collection-name";
+                        name.textContent = cat.name;
+                        const rarity = document.createElement("span");
+                        rarity.className = "collection-rarity";
+                        rarity.textContent = "☆".repeat(cat.rarity);
+                        rarity.setAttribute("aria-label", `レア ${cat.rarity}`);
+                        card.append(badge, image, name, rarity);
+                    } else {
+                        const silhouette = document.createElement("span");
+                        silhouette.className = "collection-silhouette";
+                        silhouette.textContent = "?";
+                        silhouette.setAttribute("aria-label", "まだ であっていない こねこ");
+                        const name = document.createElement("strong");
+                        name.className = "collection-name";
+                        name.textContent = "？？？";
+                        card.append(silhouette, name);
+                    }
+                    elements.collectionGrid.append(card);
+                });
+            }
+
+            function openCollection() {
+                state.selectedHouseCat = null;
+                renderCollection();
+                showScreen("collection");
+            }
+
+            function renderHouse() {
+                const collection = readCollection();
+                const house = readHouse();
+                let changed = false;
+
+                CAT_DATA.forEach((_, catId) => {
+                    let excess = countPlaced(house, catId) - collection[catId];
+                    if (excess <= 0) return;
+                    for (let index = house.length - 1; index >= 0 && excess > 0; index -= 1) {
+                        if (house[index] === catId) {
+                            house[index] = null;
+                            excess -= 1;
+                            changed = true;
+                        }
+                    }
+                });
+                if (changed) saveHouse(house);
+
+                const isPlacing = state.selectedHouseCat !== null;
+                elements.houseStage.classList.toggle("placing", isPlacing);
+                elements.houseSlots.forEach((slot, index) => {
+                    slot.replaceChildren();
+                    slot.classList.toggle("filled", house[index] !== null);
+                    slot.disabled = house[index] === null && !isPlacing;
+                    if (house[index] !== null) {
+                        const cat = CAT_DATA[house[index]];
+                        const image = document.createElement("img");
+                        image.src = cat.src;
+                        image.alt = `${cat.name}のこねこぬいぐるみ`;
+                        slot.append(image);
+                        slot.setAttribute("aria-label", `${slot.dataset.location}に おいた ${cat.name}。タッチで もどす`);
+                    } else {
+                        slot.setAttribute("aria-label", `あいている ${slot.dataset.location}`);
+                    }
+                });
+
+                elements.houseInventory.replaceChildren();
+                CAT_DATA.forEach((cat, catId) => {
+                    if (collection[catId] === 0) return;
+                    const available = collection[catId] - countPlaced(house, catId);
+                    const button = document.createElement("button");
+                    button.className = `house-pick${state.selectedHouseCat === catId ? " selected" : ""}`;
+                    button.type = "button";
+                    button.disabled = available <= 0;
+                    button.dataset.catId = String(catId);
+                    button.setAttribute("aria-label", `${cat.name}、おける かず ${available}`);
+                    const image = document.createElement("img");
+                    image.src = cat.src;
+                    image.alt = "";
+                    const badge = document.createElement("span");
+                    badge.textContent = `×${available}`;
+                    button.append(image, badge);
+                    button.addEventListener("click", () => {
+                        state.selectedHouseCat = state.selectedHouseCat === catId ? null : catId;
+                        elements.houseHelp.textContent = state.selectedHouseCat === null
+                            ? "こねこを えらぶか、おいてある こねこを タッチするニャ"
+                            : `${cat.name}を おきたい ばしょに タッチするニャ`;
+                        renderHouse();
+                    });
+                    elements.houseInventory.append(button);
+                });
+
+                if (!elements.houseInventory.children.length) {
+                    elements.houseHelp.textContent = "まずは ごほうびで こねこを あつめるニャ！";
+                }
+            }
+
+            function openHouse() {
+                state.selectedHouseCat = null;
+                elements.houseHelp.textContent = "したから こねこを えらんで、おきたい ばしょを タッチするニャ";
+                renderHouse();
+                showScreen("house");
+            }
+
             function initAudio() {
                 if (!state.soundOn) return null;
                 if (!state.audioContext) {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (AudioContext) state.audioContext = new AudioContext();
+                    if (AudioContext) {
+                        state.audioContext = new AudioContext();
+                        state.masterGain = state.audioContext.createGain();
+                        state.sfxGain = state.audioContext.createGain();
+                        state.audioLimiter = state.audioContext.createDynamicsCompressor();
+                        state.masterGain.gain.value = 0.68;
+                        state.sfxGain.gain.value = 0.52;
+                        state.audioLimiter.threshold.value = -20;
+                        state.audioLimiter.knee.value = 22;
+                        state.audioLimiter.ratio.value = 5;
+                        state.audioLimiter.attack.value = 0.004;
+                        state.audioLimiter.release.value = 0.24;
+                        state.sfxGain.connect(state.audioLimiter);
+                        state.audioLimiter.connect(state.masterGain);
+                        state.masterGain.connect(state.audioContext.destination);
+                    }
                 }
                 if (state.audioContext?.state === "suspended") state.audioContext.resume();
                 return state.audioContext;
             }
 
+            const MUSIC_VOLUME = 0.1;
+            const MUSIC_TRACKS = {
+                calm: "assets/audio/bgm/odayakana-hitotoki-slow.mp3",
+                walk: "assets/audio/bgm/osampo-biyori-simple-slow.mp3"
+            };
+
+            function stopMusic() {
+                if (state.musicDuckTimer !== null) {
+                    window.clearTimeout(state.musicDuckTimer);
+                    state.musicDuckTimer = null;
+                }
+                if (state.musicElement) {
+                    state.musicElement.pause();
+                    state.musicElement.currentTime = 0;
+                    state.musicElement = null;
+                }
+                state.musicTrack = "";
+            }
+
+            function startMusic(trackName) {
+                if (!MUSIC_TRACKS[trackName]) return;
+                if (state.musicTrack === trackName) {
+                    if (state.musicElement?.paused) {
+                        state.musicElement.volume = MUSIC_VOLUME;
+                        state.musicElement.play().catch(() => { /* つぎの タッチで さいせい */ });
+                    }
+                    return;
+                }
+                stopMusic();
+                let media = state.musicMedia.get(trackName);
+                if (!media) {
+                    const element = document.createElement("audio");
+                    element.src = MUSIC_TRACKS[trackName];
+                    element.hidden = true;
+                    element.loop = true;
+                    element.preload = "auto";
+                    document.body.append(element);
+                    media = { element };
+                    state.musicMedia.set(trackName, media);
+                }
+                state.musicTrack = trackName;
+                state.musicElement = media.element;
+                media.element.volume = MUSIC_VOLUME;
+                media.element.play().catch(() => { /* つぎの タッチで さいせい */ });
+            }
+
+            function syncMusicForScreen(screen = state.screen) {
+                if (!state.soundOn) return;
+                const track = ["gacha", "collection", "house"].includes(screen) ? "walk" : "calm";
+                startMusic(track);
+            }
+
+            function duckMusic(kind, sound) {
+                const music = state.musicElement;
+                if (!music || !state.musicTrack) return;
+                const soundLength = sound.duration + sound.gap * Math.max(0, sound.notes.length - 1);
+                const isAccent = ["correct", "finish", "reward", "go"].includes(kind);
+                const lowLevel = isAccent ? 0.022 : 0.042;
+                music.volume = lowLevel;
+                if (state.musicDuckTimer !== null) window.clearTimeout(state.musicDuckTimer);
+                state.musicDuckTimer = window.setTimeout(() => {
+                    if (state.soundOn && state.musicElement === music) music.volume = MUSIC_VOLUME;
+                    state.musicDuckTimer = null;
+                }, (Math.min(0.8, soundLength + 0.06) + 0.16) * 1000);
+            }
+
             function playSound(kind) {
                 const audio = initAudio();
-                if (!audio) return;
+                if (!audio || !state.sfxGain) return;
                 const now = audio.currentTime;
-                const notes = kind === "correct"
-                    ? [659.25, 783.99, 987.77]
-                    : kind === "finish"
-                        ? [523.25, 659.25, 783.99, 1046.5]
-                        : [185];
+                const sounds = {
+                    tap: { notes: [880], gap: 0, duration: 0.055, volume: 0.05, type: "triangle" },
+                    count: { notes: [523.25], gap: 0, duration: 0.11, volume: 0.11, type: "sine" },
+                    go: { notes: [783.99, 1046.5], gap: 0.07, duration: 0.16, volume: 0.13, type: "triangle" },
+                    pull: { notes: [246.94, 329.63], gap: 0.045, duration: 0.11, volume: 0.07, type: "triangle" },
+                    place: { notes: [523.25, 659.25], gap: 0.06, duration: 0.14, volume: 0.1, type: "sine" },
+                    correct: { notes: [659.25, 783.99, 987.77], gap: 0.065, duration: 0.18, volume: 0.15, type: "sine" },
+                    wrong: { notes: [185, 155.56], gap: 0.055, duration: 0.12, volume: 0.08, type: "square" },
+                    finish: { notes: [523.25, 659.25, 783.99, 1046.5], gap: 0.11, duration: 0.2, volume: 0.14, type: "sine" },
+                    reward: { notes: [523.25, 659.25, 783.99, 1046.5, 1318.51], gap: 0.11, duration: 0.22, volume: 0.15, type: "sine" }
+                };
+                const sound = sounds[kind] || sounds.tap;
+                duckMusic(kind, sound);
 
-                notes.forEach((frequency, index) => {
+                sound.notes.forEach((frequency, index) => {
                     const oscillator = audio.createOscillator();
                     const gain = audio.createGain();
                     oscillator.connect(gain);
-                    gain.connect(audio.destination);
-                    oscillator.type = kind === "wrong" ? "square" : "sine";
-                    oscillator.frequency.setValueAtTime(frequency, now);
-                    const start = now + index * (kind === "finish" ? 0.11 : 0.065);
-                    const duration = kind === "wrong" ? 0.12 : 0.18;
-                    gain.gain.setValueAtTime(kind === "wrong" ? 0.08 : 0.15, start);
-                    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                    gain.connect(state.sfxGain);
+                    oscillator.type = sound.type;
+                    const start = now + index * sound.gap;
+                    oscillator.frequency.setValueAtTime(frequency, start);
+                    gain.gain.setValueAtTime(0.001, start);
+                    gain.gain.linearRampToValueAtTime(sound.volume, start + 0.008);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + sound.duration);
                     oscillator.start(start);
-                    oscillator.stop(start + duration + 0.02);
+                    oscillator.stop(start + sound.duration + 0.02);
                 });
+            }
+
+            function rewardTier(elapsed) {
+                if (elapsed > 0 && elapsed <= 45000) {
+                    return {
+                        name: "きんいろチャンス！ レアな こねこが でやすいニャ",
+                        weights: [0.15, 0.35, 0.5]
+                    };
+                }
+                if (elapsed > 0 && elapsed <= 80000) {
+                    return {
+                        name: "ぎんいろチャンス！ ちょっぴり レアりつアップニャ",
+                        weights: [0.35, 0.4, 0.25]
+                    };
+                }
+                return {
+                    name: "ごほうびチャンス！ 3ぼんからえらぶニャ",
+                    weights: [0.55, 0.3, 0.15]
+                };
+            }
+
+            function weightedCat(weights, excluded) {
+                const roll = Math.random();
+                const group = roll < weights[0] ? 0 : roll < weights[0] + weights[1] ? 1 : 2;
+                const start = group * 10;
+                const candidates = CAT_DATA
+                    .slice(start, start + 10)
+                    .map((cat) => cat.id)
+                    .filter((id) => !excluded.has(id));
+                if (candidates.length) return candidates[Math.floor(Math.random() * candidates.length)];
+                const fallback = CAT_DATA.map((cat) => cat.id).filter((id) => !excluded.has(id));
+                return fallback[Math.floor(Math.random() * fallback.length)];
+            }
+
+            function makeRewardChoices() {
+                const tier = rewardTier(state.lastElapsed);
+                const chosen = new Set();
+                while (chosen.size < 3) chosen.add(weightedCat(tier.weights, chosen));
+                return [...chosen];
+            }
+
+            function resetGachaView() {
+                elements.gachaStage.classList.remove("revealed");
+                elements.gachaYarns.classList.remove("has-choice");
+                elements.gachaActions.hidden = true;
+                elements.gachaRarity.hidden = true;
+                elements.gachaRarity.textContent = "レア：☆";
+                elements.gachaMessage.textContent = "3ぼんから ひとつ えらぶニャ！";
+                elements.gachaYarnButtons.forEach((button) => {
+                    button.classList.remove("chosen", "pulling");
+                    button.style.setProperty("--pull", "0px");
+                });
+                elements.gachaPrize.removeAttribute("src");
+                elements.gachaPrize.alt = "";
+            }
+
+            function openGacha() {
+                if (!state.lastElapsed) return;
+                if (!state.rewardChoices.length) state.rewardChoices = makeRewardChoices();
+                state.rewardClaimed = false;
+                state.pull = null;
+                resetGachaView();
+                elements.gachaTier.textContent = rewardTier(state.lastElapsed).name;
+                state.rewardChoices.forEach((catId) => {
+                    const preload = new Image();
+                    preload.src = CAT_DATA[catId].src;
+                });
+                showScreen("gacha");
+            }
+
+            function revealReward(index) {
+                if (state.rewardClaimed || index < 0 || index >= state.rewardChoices.length) return;
+                state.rewardClaimed = true;
+                const cat = CAT_DATA[state.rewardChoices[index]];
+                const owned = addCat(cat.id);
+                const button = elements.gachaYarnButtons[index];
+                elements.gachaPrize.src = cat.src;
+                elements.gachaPrize.alt = `${cat.name}のこねこぬいぐるみ`;
+                elements.gachaRarity.textContent = `レア：${"☆".repeat(cat.rarity)}`;
+                elements.gachaRarity.setAttribute("aria-label", `レア ${cat.rarity}`);
+                elements.gachaRarity.hidden = false;
+                button.classList.add("chosen");
+                button.style.setProperty("--pull", "105px");
+                elements.gachaYarns.classList.add("has-choice");
+                elements.gachaStage.classList.add("revealed");
+                const ownedLabel = document.createElement("span");
+                ownedLabel.className = "gacha-owned";
+                ownedLabel.textContent = `（${owned}たいめ）`;
+                elements.gachaMessage.replaceChildren(
+                    document.createTextNode(`${cat.name}の ぬいぐるみを てにいれた！`),
+                    ownedLabel
+                );
+                playSound("reward");
+                schedule(() => {
+                    elements.gachaActions.hidden = false;
+                }, 900);
+            }
+
+            function startYarnPull(event) {
+                if (state.rewardClaimed) return;
+                const button = event.currentTarget;
+                state.pull = {
+                    index: Number(button.dataset.index),
+                    startY: event.clientY,
+                    amount: 0,
+                    pointerId: event.pointerId
+                };
+                button.classList.add("pulling");
+                button.setPointerCapture?.(event.pointerId);
+                playSound("pull");
+            }
+
+            function moveYarnPull(event) {
+                if (!state.pull || event.pointerId !== state.pull.pointerId || state.rewardClaimed) return;
+                const amount = Math.max(0, Math.min(125, event.clientY - state.pull.startY));
+                state.pull.amount = amount;
+                elements.gachaYarnButtons[state.pull.index].style.setProperty("--pull", `${amount}px`);
+            }
+
+            function endYarnPull(event) {
+                if (!state.pull || event.pointerId !== state.pull.pointerId) return;
+                const { index, amount } = state.pull;
+                state.pull = null;
+                elements.gachaYarnButtons[index].classList.remove("pulling");
+                if (amount >= 95) {
+                    revealReward(index);
+                } else if (!state.rewardClaimed) {
+                    elements.gachaYarnButtons[index].style.setProperty("--pull", "0px");
+                    elements.gachaMessage.textContent = "もっと したまで ぐーっと ひっぱるニャ！";
+                }
             }
 
             function shuffle(items) {
@@ -1539,10 +3055,12 @@
                 elements.guideCard.hidden = true;
                 elements.countdown.hidden = false;
                 elements.countdown.textContent = "3";
+                playSound("count");
                 ["2", "1", "スタートニャ！"].forEach((text, index) => {
                     schedule(() => {
                         elements.countdown.textContent = text;
                         elements.countdown.style.fontSize = text.includes("スタート") ? "min(17vw, 96px)" : "";
+                        playSound(text.includes("スタート") ? "go" : "count");
                     }, (index + 1) * 650);
                 });
                 schedule(() => {
@@ -1639,6 +3157,9 @@
                 }
                 playSound("finish");
                 const elapsed = Math.max(0, state.finishedAt - state.startedAt);
+                state.lastElapsed = elapsed;
+                state.rewardChoices = [];
+                state.rewardClaimed = false;
                 const record = saveBest(elapsed);
                 elements.resultScore.textContent = formatSeconds(elapsed);
                 elements.resultBest.classList.toggle("new", record.isNew);
@@ -1658,11 +3179,13 @@
                 elements.guide.hidden = true;
                 closeTrainingPicker();
                 updateBest();
+                updateCollectionCount();
                 showScreen("title");
             }
 
             elements.practice.addEventListener("click", startPractice);
             elements.training.addEventListener("click", openTrainingPicker);
+            elements.collectionButton.addEventListener("click", openCollection);
             elements.trainingClose.addEventListener("click", closeTrainingPicker);
             elements.trainingChoices.forEach((button) => {
                 button.addEventListener("click", () => {
@@ -1688,16 +3211,92 @@
             });
             elements.retry.addEventListener("click", startChallenge);
             elements.resultTitle.addEventListener("click", returnToTitle);
+            elements.reward.addEventListener("click", openGacha);
+            elements.gachaCollection.addEventListener("click", openCollection);
+            elements.gachaRetry.addEventListener("click", startChallenge);
+            elements.gachaTitle.addEventListener("click", returnToTitle);
+            elements.collectionBack.addEventListener("click", returnToTitle);
+            elements.houseOpen.addEventListener("click", openHouse);
+            elements.houseBack.addEventListener("click", openCollection);
+            elements.houseClear.addEventListener("click", () => {
+                saveHouse(elements.houseSlots.map(() => null));
+                state.selectedHouseCat = null;
+                elements.houseHelp.textContent = "みんなを コレクションに もどしたニャ";
+                renderHouse();
+            });
+            elements.houseSlots.forEach((slot, slotIndex) => {
+                slot.addEventListener("click", () => {
+                    const house = readHouse();
+                    if (state.selectedHouseCat === null) {
+                        if (house[slotIndex] === null) {
+                            elements.houseHelp.textContent = "さきに したから こねこを えらぶニャ";
+                            return;
+                        }
+                        const removed = CAT_DATA[house[slotIndex]];
+                        house[slotIndex] = null;
+                        saveHouse(house);
+                        elements.houseHelp.textContent = `${removed.name}を コレクションに もどしたニャ`;
+                        renderHouse();
+                        return;
+                    }
+
+                    const catId = state.selectedHouseCat;
+                    const collection = readCollection();
+                    const isSameCat = house[slotIndex] === catId;
+                    const available = collection[catId] - countPlaced(house, catId);
+                    if (!isSameCat && available <= 0) {
+                        state.selectedHouseCat = null;
+                        elements.houseHelp.textContent = "その こねこは みんな おへやに いるニャ";
+                        renderHouse();
+                        return;
+                    }
+                    house[slotIndex] = catId;
+                    saveHouse(house);
+                    state.selectedHouseCat = null;
+                    elements.houseHelp.textContent = `${CAT_DATA[catId].name}を かざったニャ！`;
+                    playSound("place");
+                    renderHouse();
+                });
+            });
+            elements.gachaYarnButtons.forEach((button) => {
+                button.addEventListener("pointerdown", startYarnPull);
+                button.addEventListener("pointermove", moveYarnPull);
+                button.addEventListener("pointerup", endYarnPull);
+                button.addEventListener("pointercancel", endYarnPull);
+                button.addEventListener("click", (event) => {
+                    if (event.detail === 0) revealReward(Number(button.dataset.index));
+                });
+            });
             elements.sound.addEventListener("click", () => {
                 state.soundOn = !state.soundOn;
+                localStorage.setItem(SOUND_KEY, state.soundOn ? "on" : "off");
                 elements.sound.textContent = state.soundOn ? "🔊" : "🔇";
                 elements.sound.setAttribute("aria-pressed", String(state.soundOn));
-                if (state.soundOn) playSound("correct");
+                elements.sound.setAttribute("aria-label", state.soundOn ? "おとを けす" : "おとを だす");
+                if (state.soundOn) {
+                    initAudio();
+                    syncMusicForScreen();
+                    playSound("correct");
+                } else {
+                    stopMusic();
+                }
+            });
+
+            document.addEventListener("click", (event) => {
+                const button = event.target.closest("button");
+                if (!button || button === elements.sound || button.classList.contains("gacha-yarn")) return;
+                initAudio();
+                syncMusicForScreen();
+                playSound("tap");
             });
 
             document.addEventListener("keydown", (event) => {
                 if (event.key === "Escape" && !elements.trainingPicker.hidden) {
                     closeTrainingPicker();
+                } else if (event.key === "Escape" && state.screen === "house") {
+                    openCollection();
+                } else if (event.key === "Escape" && state.screen === "collection") {
+                    returnToTitle();
                 }
             });
 
@@ -1707,6 +3306,10 @@
             });
 
             updateBest();
+            updateCollectionCount();
+            elements.sound.textContent = state.soundOn ? "🔊" : "🔇";
+            elements.sound.setAttribute("aria-pressed", String(state.soundOn));
+            elements.sound.setAttribute("aria-label", state.soundOn ? "おとを けす" : "おとを だす");
             showScreen("title");
         })();
     </script>
