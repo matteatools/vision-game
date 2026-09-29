@@ -405,6 +405,10 @@
             line-height: 1.1;
         }
 
+        .score-unit {
+            margin-left: 0.08em;
+        }
+
         .hud-rule {
             min-width: 0;
             color: #654a3b;
@@ -1491,6 +1495,13 @@
         }
 
         @media (orientation: portrait) {
+            #score-display .score-unit {
+                display: block;
+                margin-left: 0;
+                font-size: 0.72em;
+                line-height: 1;
+            }
+
             #retry-button {
                 padding-right: 8px;
                 padding-left: 8px;
@@ -3022,7 +3033,7 @@
                     return;
                 }
 
-                elements.score.textContent = `${state.score}/10ほん`;
+                elements.score.innerHTML = `<span>${state.score}/10</span><span class="score-unit">ほん</span>`;
                 if (state.score >= CHALLENGE_COUNTS.length) {
                     state.finishedAt = performance.now();
                     state.playing = false;
@@ -3159,7 +3170,7 @@
             function startChallenge() {
                 resetGame("challenge");
                 elements.scoreLabel.textContent = "0.0びょう";
-                elements.score.textContent = "0/10ほん";
+                elements.score.innerHTML = '<span>0/10</span><span class="score-unit">ほん</span>';
                 elements.hudRule.textContent = "おなじいろを つなぐ けいとを タッチするニャ！";
                 startCountdown(beginChallenge);
             }
