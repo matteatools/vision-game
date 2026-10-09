@@ -57,6 +57,63 @@
   let toastTimer = null;
   let lastFocus = null;
   let resizeTimer = null;
+  const bgm = new Audio("assets/audio/yousei-no-mori-2.mp3");
+  bgm.loop = true;
+  bgm.preload = "none";
+  bgm.volume = 0.3;
+  let practiceBgmComplete = false;
+  const BGM_KEY = "worldZooBgmOnV1";
+  let bgmOn = true;
+  let bgmPending = false;
+  let bgmAttempt = 0;
+  try { bgmOn = localStorage.getItem(BGM_KEY) !== "false"; } catch {}
+  function renderBgmButton() {
+      app.querySelectorAll("[data-bgm-button]").forEach((button) => {
+          button.textContent = bgmOn ? "BGM ON" : "BGM OFF";
+          button.setAttribute("aria-pressed", String(bgmOn));
+      });
+  }
+  function wantsBgm() {
+      return bgmOn && !document.hidden && Boolean(game) &&
+          !modalRoot.querySelector("#game-roster-title") &&
+          ((currentView === "practice" && !practiceBgmComplete) ||
+          (currentView === "game" &&
+          (game.foundTargetIds.size < game.targets.length || game.searchAfterClear)));
+  }
+  function stopBgm() {
+      bgmAttempt += 1;
+      bgmPending = false;
+      bgm.pause();
+      try { bgm.currentTime = 0; } catch {}
+  }
+  function syncBgm() {
+      if (!wantsBgm()) { stopBgm(); return; }
+      if (!bgm.paused || bgmPending) return;
+      const attempt = ++bgmAttempt;
+      bgmPending = true;
+      const play = bgm.play();
+      if (play) play.then(() => {
+          if (attempt === bgmAttempt) bgmPending = false;
+          if (!wantsBgm()) stopBgm();
+      }).catch(() => {
+          if (attempt === bgmAttempt) bgmPending = false;
+      });
+      else bgmPending = false;
+  }
+  app.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-bgm-button]")) return;
+      bgmOn = !bgmOn;
+      try { localStorage.setItem(BGM_KEY, String(bgmOn)); } catch {}
+      renderBgmButton();
+      syncBgm();
+  });
+  // Retry a blocked play only on a subsequent user gesture.
+  document.addEventListener("pointerdown", syncBgm);
+  document.addEventListener("keydown", syncBgm);
+  document.addEventListener("visibilitychange", syncBgm);
+  window.addEventListener("pagehide", stopBgm);
+  window.addEventListener("pageshow", syncBgm);
+  renderBgmButton();
 
   function animalById(id) {
     return DISCOVERABLE_ANIMALS.find((animal) => animal.id === id);
@@ -181,6 +238,8 @@
     else if (currentView === "practice") renderGame();
     else if (currentView === "zoo") renderZoo();
     else if (currentView === "completion") renderCompletion();
+    renderBgmButton();
+    syncBgm();
   }
 
   function mogutanCard(message) {
@@ -192,10 +251,13 @@
   }
 
   function soundToggleButton(extraClass = "") {
-    const label = save.sound ? "おとを きる" : "おとを だす";
-    return `<button class="sound-toggle ${extraClass}" data-sound-button type="button" aria-label="${label}" aria-pressed="${save.sound}" title="${label}">${save.sound ? "♪" : "×"}</button>`;
+    const label = save.sound ? "効果音を きる" : "効果音を だす";
+    return '<span class="audio-controls"><button class="sound-toggle ' + extraClass +
+      '" data-sound-button type="button" aria-label="' + label + '" aria-pressed="' +
+      save.sound + '" title="' + label + '">' + (save.sound ? "♪" : "×") +
+      '</button><button class="bgm-toggle" data-bgm-button type="button" aria-label="BGMを切り替える" aria-pressed="' +
+      bgmOn + '">' + (bgmOn ? "BGM ON" : "BGM OFF") + '</button></span>';
   }
-
   function renderTitle() {
     app.innerHTML = `
       <section class="screen title-screen" aria-labelledby="title-heading">
@@ -217,6 +279,7 @@
           <button class="title-list-button" id="zooButton" type="button">どうぶつリスト <span>${save.revived.length} / ${ROSTER_SIZE}</span></button>
           <button class="title-park-link" id="parkButton" type="button">← ゲームパークへ もどる</button>
           ${soundToggleButton("title-sound-toggle")}
+          <p class="bgm-credit">BGM：<a href="https://otologic.jp/free/bgm/other01.html" target="_blank" rel="noopener noreferrer">OtoLogic「妖精の森2」</a><br><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p>
         </nav>
       </section>`;
     document.getElementById("startButton").addEventListener("click", () => {
@@ -404,6 +467,8 @@
   }
 
   function startPractice() {
+    practiceBgmComplete = false;
+    stopBgm();
     resetPagePosition();
     ensureAudio();
     const board = Core.createPracticeBoard();
@@ -619,6 +684,7 @@
         return;
       }
       game.foundTargetIds.add(animal.id);
+      syncBgm();
       game.foundPaths.push(path);
       updateBoardClasses();
       drawPaths();
@@ -843,6 +909,7 @@
 
   function keepSearching() {
     game.searchAfterClear = true;
+    syncBgm();
     const message = document.getElementById("gameMessage");
     if (message) message.textContent = "ひみつの どうぶつが いるかも？ いつでも つぎへ すすめるよ。";
     document.getElementById("keepSearchingButton").disabled = true;
@@ -1096,6 +1163,8 @@
   }
 
   function showPracticeComplete() {
+    practiceBgmComplete = true;
+    stopBgm();
     selectionLocked = true;
     return new Promise((resolve) => {
       openModal(`
@@ -1115,6 +1184,7 @@
     lastFocus = document.activeElement;
     modalRoot.innerHTML = `<div class="modal-backdrop">${html}</div>`;
     modalRoot._onClose = onClose;
+    syncBgm();
     const backdrop = modalRoot.firstElementChild;
     if (closeOnBackdrop) backdrop.addEventListener("pointerdown", (event) => { if (event.target === backdrop) closeModal(); });
     modalRoot.querySelectorAll(".modal-close").forEach((button) => button.addEventListener("click", () => closeModal()));
@@ -1129,6 +1199,7 @@
     modalRoot._onClose = null;
     if (restoreFocus) lastFocus?.focus?.();
     if (typeof callback === "function") callback();
+    syncBgm();
   }
 
   function showConfirm({ title, message, confirmText, onConfirm, danger = false }) {
@@ -1200,7 +1271,7 @@
   }
 
   function updateSoundButtons() {
-    const label = save.sound ? "おとを きる" : "おとを だす";
+    const label = save.sound ? "効果音を きる" : "効果音を だす";
     app.querySelectorAll("[data-sound-button]").forEach((button) => {
       button.textContent = save.sound ? "♪" : "×";
       button.setAttribute("aria-label", label);

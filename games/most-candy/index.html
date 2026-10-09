@@ -1144,10 +1144,37 @@
                 transition-duration: 1ms !important;
             }
         }
+        .bgm-button {
+            position: fixed; z-index: 300;
+            top: max(12px, env(safe-area-inset-top));
+            left: max(64px, calc(env(safe-area-inset-left) + 64px));
+            min-height: 44px; padding: 8px 10px;
+            color: #244136; background: rgba(255,255,255,.96);
+            border: 2px solid #fff; border-radius: 14px; font-size: 13px;
+        }
+        .bgm-credit {
+            position: absolute; z-index: 8;
+            left: 50%; transform: translateX(-50%);
+            bottom: max(88px, calc(env(safe-area-inset-bottom) + 88px));
+            width: max-content; max-width: 94vw; margin: 0; padding: 5px 9px;
+            color: #244136; background: rgba(255,255,255,.96);
+            border-radius: 9px; font-size: 12px; line-height: 1.5; text-align: center;
+        }
+        .bgm-credit a { text-decoration: underline; }
+        .quit-controls { display: grid; gap: 5px; }
+        .bgm-slot { height: 44px; }
+        @media (orientation: landscape) {
+            .quit-controls { display: flex; align-items: center; }
+            .quit-controls .quit-button { flex: 1; }
+            .quit-controls .bgm-slot { width: 65px; flex-shrink: 0; }
+            .game-header { grid-template-columns: 140px 1fr auto; }
+            .bgm-credit { bottom: max(88px, calc(env(safe-area-inset-bottom) + 88px)); }
+        }
     </style>
 </head>
 <body>
-    <button class="sound-button" id="sound-button" type="button" aria-label="おとを きりかえる" aria-pressed="true">🔊</button>
+    <button class="bgm-button" id="bgm-button" type="button" aria-label="BGMを切り替える" aria-pressed="true">BGM ON</button>
+    <button class="sound-button" id="sound-button" type="button" aria-label="効果音を切り替える" aria-pressed="true">🔊</button>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
         <img class="title-art" src="assets/candy-factory-title-v1.jpg" alt="">
@@ -1171,11 +1198,12 @@
             </button>
             <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
         </div>
+        <p class="bgm-credit">BGM：<a href="https://otologic.jp/free/bgm/pop-music-piano01.html" target="_blank" rel="noopener noreferrer">OtoLogic「らららラグタイム3」</a>（<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>）</p>
     </section>
 
     <section class="screen game-screen" id="screen-game" aria-label="ゲームがめん" hidden>
         <header class="game-header">
-            <button class="quit-button" id="quit-button" type="button">やめる</button>
+            <div class="quit-controls"><button class="quit-button" id="quit-button" type="button">やめる</button><span class="bgm-slot" aria-hidden="true"></span></div>
             <div class="header-message" id="header-message">いちばん おおい とくちょうは どれ？</div>
             <div class="hud">
                 <div class="hud-card">
@@ -1518,11 +1546,78 @@
                     : "まだないよ";
             }
 
+            const bgm = new Audio("assets/rarara-ragtime-3.mp3");
+            bgm.loop = true;
+            bgm.preload = "none";
+            bgm.volume = 0.3;
+            const bgmButton = document.querySelector("#bgm-button");
+            const BGM_KEY = "mostCandyBgmOnV1";
+            let bgmOn = true;
+            let bgmFinished = false;
+            let bgmPending = false;
+            let bgmAttempt = 0;
+            try { bgmOn = localStorage.getItem(BGM_KEY) !== "false"; } catch {}
+            function renderBgmButton() {
+                bgmButton.textContent = bgmOn ? "BGM ON" : "BGM OFF";
+                bgmButton.setAttribute("aria-pressed", String(bgmOn));
+            }
+            function wantsBgm() {
+                return bgmOn && state.screen === "game" && !bgmFinished && !document.hidden;
+            }
+            function stopBgm() {
+                bgmAttempt += 1;
+                bgmPending = false;
+                bgm.pause();
+                try { bgm.currentTime = 0; } catch {}
+            }
+            function syncBgm() {
+                if (!wantsBgm()) { stopBgm(); return; }
+                if (!bgm.paused || bgmPending) return;
+                const attempt = ++bgmAttempt;
+                bgmPending = true;
+                const play = bgm.play();
+                if (play) play.then(() => {
+                    if (attempt === bgmAttempt) bgmPending = false;
+                    if (!wantsBgm()) stopBgm();
+                }).catch(() => {
+                    if (attempt === bgmAttempt) bgmPending = false;
+                });
+                else bgmPending = false;
+            }
+            bgmButton.addEventListener("click", () => {
+                bgmOn = !bgmOn;
+                try { localStorage.setItem(BGM_KEY, String(bgmOn)); } catch {}
+                renderBgmButton();
+                syncBgm();
+            });
+            // Retry a blocked play only on a subsequent user gesture.
+            document.addEventListener("pointerdown", syncBgm);
+            document.addEventListener("keydown", syncBgm);
+            document.addEventListener("visibilitychange", syncBgm);
+            window.addEventListener("pagehide", stopBgm);
+            window.addEventListener("pageshow", syncBgm);
+            renderBgmButton();
+
+            // Keep the control above guide overlays, aligned to its reserved header slot.
+            function positionBgmButton() {
+                if (state.screen !== "game") {
+                    bgmButton.removeAttribute("style");
+                    return;
+                }
+                const slot = document.querySelector(".bgm-slot").getBoundingClientRect();
+                Object.assign(bgmButton.style, {
+                    left: slot.left + "px", top: slot.top + "px",
+                    width: slot.width + "px", padding: "6px 2px", fontSize: "11px"
+                });
+            }
+            window.addEventListener("resize", positionBgmButton);
             function showScreen(name) {
                 elements.title.hidden = name !== "title";
                 elements.game.hidden = name !== "game";
                 elements.result.hidden = name !== "result";
                 state.screen = name;
+                positionBgmButton();
+                syncBgm();
             }
 
             function startTimer() {
@@ -1692,6 +1787,8 @@
                 if (state.mode === "practice") {
                     state.practiceIndex += 1;
                     if (state.practiceIndex >= PRACTICE_TYPES.length) {
+                        bgmFinished = true;
+                        stopBgm();
                         showGuide(
                             "ばっちりなのです！",
                             "おおきさ・いろ・かたちを くらべると、 いちばんおとくな びんが わかるのです！ ほんばんも きっちり いきましょう！",
@@ -1718,6 +1815,8 @@
             }
 
             function resetSession(mode) {
+                bgmFinished = false;
+                stopBgm();
                 clearTiming();
                 Sound.init();
                 state.mode = mode;

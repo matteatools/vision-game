@@ -129,6 +129,30 @@
             font-size: 21px;
         }
 
+        .bgm-button {
+            position: fixed;
+            z-index: 100;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
+            min-height: 44px;
+            padding: 8px 12px;
+            border: 2px solid #fff;
+            border-radius: 16px;
+            background: rgba(255,255,255,.94);
+            font-size: 14px;
+        }
+        .bgm-credit {
+            grid-column: 1 / -1;
+            margin: 8px 0 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            color: #244136;
+            background: rgba(255,255,255,.94);
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .bgm-credit a { text-decoration: underline; }
         /* タイトル */
         .title-screen {
             isolation: isolate;
@@ -451,7 +475,7 @@
             gap: 8px;
             padding:
                 max(8px, env(safe-area-inset-top))
-                max(10px, env(safe-area-inset-right))
+                max(100px, env(safe-area-inset-right))
                 7px
                 max(10px, env(safe-area-inset-left));
             background: rgba(255, 253, 237, 0.96);
@@ -1037,10 +1061,14 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        @media (orientation: portrait) and (max-height: 650px) {
+            .title-actions { top: 62%; }
+        }
     </style>
 </head>
 <body>
-    <button class="sound-button" id="sound-button" type="button" aria-label="音を切り替える" aria-pressed="true">🔊</button>
+    <button class="bgm-button" id="bgm-button" type="button" aria-label="BGMを切り替える" aria-pressed="true">BGM ON</button>
+    <button class="sound-button" id="sound-button" type="button" aria-label="効果音を切り替える" aria-pressed="true">🔊</button>
 
     <section class="screen title-screen" id="screen-title" aria-labelledby="game-title">
         <img class="title-art" src="assets/harvest-title-v1.jpg" alt="">
@@ -1064,6 +1092,7 @@
                 <a class="title-link" href="classic.html">クラシックモード</a>
                 <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
             </div>
+            <p class="bgm-credit">BGM：<a href="https://otologic.jp/free/bgm/wood_mallet01.html" target="_blank" rel="noopener noreferrer">OtoLogic「ドタバタパニック-2（遅い）」</a><br><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p>
         </div>
     </section>
 
@@ -1270,7 +1299,59 @@
                 elements.result.hidden = name !== "result";
                 elements.sound.hidden = name === "game";
                 state.screen = name;
+                syncBgm();
             }
+
+            const bgm = new Audio("assets/dotabata-panic-2-slow.mp3");
+            bgm.loop = true;
+            bgm.preload = "none";
+            bgm.volume = 0.3;
+            const bgmButton = document.querySelector("#bgm-button");
+            const BGM_KEY = "pyokoHarvestBgmOnV1";
+            let bgmOn = true;
+            let bgmPending = false;
+            let bgmAttempt = 0;
+            try { bgmOn = localStorage.getItem(BGM_KEY) !== "false"; } catch {}
+            function renderBgmButton() {
+                bgmButton.textContent = bgmOn ? "BGM ON" : "BGM OFF";
+                bgmButton.setAttribute("aria-pressed", String(bgmOn));
+            }
+            function wantsBgm() {
+                return bgmOn && state.screen === "game" && !document.hidden;
+            }
+            function stopBgm() {
+                bgmAttempt += 1;
+                bgmPending = false;
+                bgm.pause();
+                try { bgm.currentTime = 0; } catch {}
+            }
+            function syncBgm() {
+                if (!wantsBgm()) { stopBgm(); return; }
+                if (!bgm.paused || bgmPending) return;
+                const attempt = ++bgmAttempt;
+                bgmPending = true;
+                const play = bgm.play();
+                if (play) play.then(() => {
+                    if (attempt === bgmAttempt) bgmPending = false;
+                    if (!wantsBgm()) stopBgm();
+                }).catch(() => {
+                    if (attempt === bgmAttempt) bgmPending = false;
+                });
+                else bgmPending = false;
+            }
+            bgmButton.addEventListener("click", () => {
+                bgmOn = !bgmOn;
+                try { localStorage.setItem(BGM_KEY, String(bgmOn)); } catch {}
+                renderBgmButton();
+                syncBgm();
+            });
+            // Retry a blocked play only on a subsequent user gesture.
+            document.addEventListener("pointerdown", syncBgm);
+            document.addEventListener("keydown", syncBgm);
+            document.addEventListener("visibilitychange", syncBgm);
+            window.addEventListener("pagehide", stopBgm);
+            window.addEventListener("pageshow", syncBgm);
+            renderBgmButton();
 
             function clearTimers() {
                 window.clearTimeout(state.spawnTimer);
