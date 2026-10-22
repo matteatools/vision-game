@@ -1,0 +1,85 @@
+/* Flat paper illustration. Bottles remain legible at every capacity. */
+:root{color-scheme:light;--ink:#514c46;--muted:#736b60;--gold:#867047}
+body{background:#f7f1e3 url('assets/background-story-v1.webp') center/cover fixed no-repeat;color:var(--ink)}
+body:before{background:#fffaf033}
+.game-heading h1{text-shadow:none;color:#514c46}
+.eyebrow,.chapter{color:#867047}
+.stage-meta{background:#fffaf0d9;border-color:#c9bb9d;color:#635a4b}
+.board,.board.few{background:none}
+.tube-glass{width:calc(var(--tall)*.34);filter:none;border:3px solid #8f9f96;border-top:0;border-radius:5px 5px 22px 22px;background:#fffdf48c;box-shadow:none}
+.tube-glass:before{content:'';position:absolute;left:-5px;right:-5px;top:-3px;height:7px;border:2px solid #8f9f96;border-radius:5px;background:#e3e9db;z-index:3}
+.glass-art{display:none}
+.tube-glass.selected{filter:none;transform:translateY(-3px);outline:3px solid #d9b66f;outline-offset:5px}
+.tube-cursed{border-color:#a092ad;background:#ede5ef99;border-style:dashed;border-top:0}
+.tube-cursed:before{border-color:#9b87a6;background:#dcd0e4}
+.ball-stack,.cap-2 .ball-stack,.cap-1 .ball-stack{inset:8px 2px 3px;gap:0}
+.ball,.empty-slot{width:100%;height:calc((var(--tall) - 17px)/4);flex:none}
+.ball{background-image:url('assets/souls-story-v1.webp');filter:none;transform:scale(1.1)}
+.ball-selected{filter:none;transform:translateY(-2px) scale(1.1)}
+.ball-selected:after{border:2px dashed #85632c;inset:0;border-radius:45%}
+.empty-slot:after{border-color:#b6b9a377;width:12%;height:12%;margin:30% auto}
+.cap-2{height:calc((var(--tall) - 17px)/2 + 17px)}
+.cap-1{height:calc((var(--tall) - 17px)/4 + 17px)}
+.tube-label,.tube-label.curse{color:#75677d;font-weight:600}
+.selection{color:#81612d}
+.control{background:#fffaf0;border:1px solid #c3b696;color:#665b49;box-shadow:0 2px 0 #ddd1ba}
+.control.primary{background:#ebd5a2;color:#59492f}
+.move-count,.move-count strong{color:#786748}
+.guide img{filter:none}
+.guide-speech{background:#fffaf0b8;border-color:#cfbea3;color:#675f53}
+.guide-speech strong{color:#8c7550}
+.message{color:#a1664f}
+.footer,.footer .pass{color:#887e6e}
+.complete{background:#e9dfc6cc;backdrop-filter:blur(3px)}
+.complete-card{background:#fffcf3;border-color:#cbbb9c;box-shadow:0 8px 30px #877b5826;color:#615a4d}
+.complete-card h2{color:#897044}
+button:focus-visible,a:focus-visible{outline-color:#ab8751}
+.game-heading{justify-content:flex-end;height:30px}.stage-meta{font-size:11px;padding:5px 10px}
+.tube-glass{border-color:#ad9b72;background:#fffdf2b0;border-radius:10px 10px 24px 24px}
+.tube-glass:before{height:9px;background:#e8d8a7;border-color:#ae9664}
+.bottle-charm{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);z-index:4;border:1px solid #af9664;background:#fff4d3;border-radius:50%;width:20px;height:20px;line-height:17px;color:#a18850;font-size:19px}
+.tube-cursed{border-color:#a092ad}.tube-cursed .bottle-charm{color:#93809d;border-color:#ab95b6;background:#f0e7f3}
+.tube-cursed:before{background:#ded1e6;border-color:#9c87a6}
+.ball-stack,.cap-2 .ball-stack,.cap-1 .ball-stack{inset:10px 2px 4px}
+.ball{transform:none;background-size:300% 200%;background-position:50% 0}
+/* Whole atlas cells: never zoom/crop the blue, yellow or full fourth soul. */
+.ball-red{background-position:1.3% 0}.ball-blue{background-position:50% 0}.ball-yellow{background-position:100% 0}.ball-white{background-position:0 100%}.ball-black{background-position:50% 100%}.ball-purple{background-position:100% 100%}
+.ball-selected{transform:none}.ball-selected:after{inset:0;border-color:#a98a4a}
+.tube-label{margin-top:13px}.tube-slot{height:calc(var(--tall) + 46px)}
+.guide{height:135px;max-width:600px}.guide img{height:135px;width:110px}.guide-speech{font-size:12px}
+.tube-button:disabled{opacity:1;cursor:wait}
+.pour-layer{position:fixed;inset:0;z-index:20;pointer-events:none;overflow:hidden}
+.pour-bottle{transition:none!important;outline:0!important}.pour-bottle .ball-selected:after{display:none}
+.pour-spirit{z-index:2;pointer-events:none;transition:none!important}
+.sending-away{background:#fff2bf!important;border-color:#c3a05a!important;box-shadow:0 0 16px #f3d68988}
+.sending-away:before{background:#fff2bf;border-color:#c3a05a}
+.sending-away .bottle-charm{background:#fff2bf;color:#a47832}
+@media(orientation:landscape) and (min-height:621px){:root{--tall:min(44dvh,30vw,430px)}.guide{height:125px}.guide img{height:125px;width:105px}.board{margin:5px auto;padding:4px 8px}.play-area{padding:0}.message{min-height:14px}}
+@media(orientation:portrait){:root{--tall:min(30dvh,55vw,320px)}.guide{height:95px}.guide img{height:95px;width:78px}.guide-speech{font-size:10px}.tube-slot{height:calc(var(--tall) + 36px)}.tube-label{margin-top:10px}.game-scene{padding-top:6px}.board{gap:4px;margin:4px auto}.play-area{padding:0}}
+@media(orientation:portrait) and (max-height:700px){:root{--tall:25dvh}.guide{height:70px}.guide img{height:70px;width:57px}.guide-speech{font-size:9px}.message{min-height:10px}.tube-slot{height:calc(var(--tall) + 32px)}}
+@media(orientation:landscape) and (max-height:620px){:root{--tall:38dvh}.guide{height:85px;width:67px;bottom:25px}.guide img{height:85px;width:67px}.tube-slot{height:calc(var(--tall) + 32px)}.tube-label{margin-top:9px}.bottle-charm{width:15px;height:15px;font-size:14px;line-height:13px;bottom:-9px}.message{min-height:10px}.game-heading{height:24px}}
+
+/* Reserve fixed room for all four cells; flex must not squeeze the lantern. */
+.tube-slot{height:calc(var(--tall) + 48px)}
+.tube-glass{flex-shrink:0;border-radius:18px 18px 28px 28px;background:linear-gradient(90deg,#ecdeb844,transparent 25%,#fffdf2c9 50%,transparent 75%,#ecdeb844),#fffdf2b0}
+.tube-glass:after{content:'';position:absolute;left:16%;right:16%;bottom:-4px;height:5px;border:1px solid #ae9664;border-radius:4px;background:#e8d8a7;pointer-events:none}
+.tube-cursed{background:#ede5ef99}
+.tube-cursed:after{border-color:#9c87a6;background:#ded1e6}
+.selection{flex-shrink:0;height:20px;line-height:20px;font-size:12px;font-weight:bold;color:#654821}
+.tube-label{flex-shrink:0;height:18px;margin-top:10px}
+.ball-stack,.cap-2 .ball-stack,.cap-1 .ball-stack{inset:10px 2px 4px}
+.ball,.empty-slot{height:calc((var(--tall) - 17px)/4)}
+.ball-selected{filter:none}
+.ball-selected:after{inset:15% auto 15% -2px;width:3px;border:0;border-radius:3px;background:#735323;box-shadow:none}
+.ball-selected:before{content:'✓';position:absolute;right:0;top:0;z-index:3;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#735323;color:#fffdf0;font-size:12px;font-weight:bold;line-height:1}
+.tube-glass.selected{outline:2px solid #a97b32;outline-offset:4px;transform:none}
+.pour-bottle .ball-selected:before{display:none}
+@media(orientation:portrait) and (max-height:700px){:root{--tall:22dvh}}
+@media(orientation:landscape) and (max-height:380px){:root{--tall:33dvh}.tube-slot{height:calc(var(--tall) + 44px)}.selection{height:18px;line-height:18px;font-size:10px}.tube-label{height:16px}.board{min-height:0}}
+.game-heading{justify-content:space-between;height:44px;flex-shrink:0}
+.stage-meta{margin-left:auto}
+.test-pass{min-height:44px;padding:6px 10px;font-size:11px;border-style:dashed;touch-action:manipulation}
+/* Readable guidance on small screens without changing lantern geometry. */
+.guide-speech{color:#51483c}.guide-speech strong{color:#655337;font-size:11px}
+@media(orientation:portrait){.guide-speech{font-size:12px}}
+@media(orientation:portrait) and (max-height:700px){.guide-speech{font-size:11px}}

@@ -928,6 +928,12 @@
             --group-shadow: rgba(97, 169, 111, 0.22);
         }
 
+        .game-group[data-game-group="logic"] {
+            --group-color: #3f8fa4;
+            --group-soft: rgba(63, 143, 164, 0.3);
+            --group-shadow: rgba(63, 143, 164, 0.22);
+        }
+
         .game-group[data-game-group="communication"] {
             --group-color: #d95c8a;
             --group-soft: rgba(217, 92, 138, 0.28);
@@ -2145,7 +2151,7 @@
                         <p>NEW GAMES</p>
                         <h3 id="new-games-title">あたらしいゲーム</h3>
                     </div>
-                    <span>4つの あたらしい あそびが ふえました。<br><b class="new-games-action">きになる えを タッチ！</b></span>
+                    <span>2つの あたらしい あそびが ふえました。<br><b class="new-games-action">きになる えを タッチ！</b></span>
                 </div>
                 <div class="new-game-grid" id="new-game-grid"></div>
             </section>
@@ -2244,7 +2250,7 @@
         </div>
     </dialog>
 
-    <script src="data/games.generated.js?v=20260922"></script>
+    <script src="data/games.generated.js?v=20261021"></script>
     <script>
         const games = (window.GAME_DATA ?? [])
             .filter((game) => game.published)
@@ -2275,6 +2281,11 @@
                 id: "think",
                 title: "つないで かんがえる",
                 note: "つなぎかたを かんがえて ひらめこう"
+            },
+            {
+                id: "logic",
+                title: "ろんりてきに かんがえる",
+                note: "ヒントを くらべて、じゅんばんや こたえを すじみちだてて かんがえよう"
             },
             {
                 id: "communication",
@@ -2511,7 +2522,7 @@
             dialogPlay.href = game.href;
             dialogImage.src = game.playImage.includes("?v=")
                 ? game.playImage
-                : `${game.playImage}?v=20260922`;
+                : `${game.playImage}?v=20261021`;
             dialogImage.alt = `${game.title}の プレイがめん`;
 
             if (!dialog.open) {

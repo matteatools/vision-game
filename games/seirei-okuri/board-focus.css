@@ -1,0 +1,24 @@
+/* Foreground-first composition. Orientation determines the six-bottle layout. */
+body{background-image:linear-gradient(#152431b8,#172534b8),url('assets/background-story-v1.webp')}
+body:before{background:radial-gradient(ellipse at center,#14253622,#101b3066)}
+.game-scene{max-width:1600px;padding:18px 28px}
+.content{display:flex;flex-direction:column;justify-content:center;gap:0}
+.play-area{order:0;width:100%;padding:8px 0}
+.guide{order:1;display:flex;align-items:center;align-self:center;width:auto;max-width:540px;height:80px;padding:0}
+.guide img{order:-1;width:64px;height:80px;object-fit:contain}
+.guide-speech{margin:0;padding:8px 12px;font-size:11px;background:#182936b0;border-color:#d8c9a333;line-height:1.6}
+.guide-speech strong{font-size:10px;margin:0}
+.board,.board.few{max-width:none;gap:12px;margin:12px auto;min-height:0;padding:12px 8px;border-radius:28px;background:radial-gradient(ellipse,#142835aa,#14283533 75%,transparent);grid-template-columns:repeat(6,minmax(0,1fr))}
+.tube-slot{height:calc(var(--tall) + 44px)}
+.tube-glass{filter:drop-shadow(0 6px 8px #0008)}
+.glass-art img{opacity:1}
+.ball-stack{inset:5% 5% 7%}
+.ball{filter:drop-shadow(0 0 3px #ffe4a644)}
+.tube-label{font-size:12px;white-space:nowrap}
+.controls{margin:8px 0 0}.move-count{margin-top:6px}.message{margin-top:4px;min-height:18px}.footer{padding-top:4px}
+@media(orientation:landscape){:root{--tall:min(39dvh,30vw,400px);--glass:calc(var(--tall)*.44);--soul:calc(var(--tall)*.215)}.board.few{grid-template-columns:repeat(3,minmax(0,1fr));max-width:740px}.guide-speech{display:block}.selection{height:22px;line-height:22px}}
+@media(orientation:portrait){:root{--tall:min(29dvh,51vw,300px);--glass:calc(var(--tall)*.44);--soul:calc(var(--tall)*.215)}.game-scene{padding:12px 16px}.board,.board.few{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px auto;padding:4px 0}.tube-slot{height:calc(var(--tall) + 34px)}.selection{height:18px;line-height:18px;font-size:11px}.tube-label{font-size:10px;height:20px;margin-top:3px}.guide{height:62px}.guide img{height:62px;width:50px}.guide-speech{font-size:10px}.game-heading h1{font-size:22px}.eyebrow{display:none}.play-area{padding:6px 0 0}.message{min-height:16px}.guide-speech strong{display:none}.control{font-size:12px;padding:8px 10px}.footer .pass{padding:5px}.chapter{font-size:11px}}
+@media(orientation:portrait) and (max-height:700px){:root{--tall:24dvh}.guide{height:44px}.guide img{height:44px;width:38px}.guide-speech{font-size:9px;padding:4px 8px}.tube-slot{height:calc(var(--tall) + 30px)}.board{gap:4px}.move-count{font-size:10px}.move-count strong{font-size:16px}.stage-meta{font-size:10px;padding:6px 8px}.game-heading h1{font-size:20px}}
+@media(orientation:landscape) and (max-height:620px){:root{--tall:34dvh}.game-scene{padding:8px 14px}.guide{position:absolute;left:14px;bottom:28px;width:52px;height:64px}.guide img{width:52px;height:64px}.guide-speech{display:none}.board,.board.few{gap:6px;padding:0;margin:4px auto}.tube-slot{height:calc(var(--tall) + 32px)}.tube-label{font-size:9px;height:18px;margin-top:3px}.controls{margin:4px 0}.move-count{margin:0;font-size:10px}.move-count strong{font-size:14px}.message{min-height:14px;margin:0}.eyebrow{display:none}.selection{height:16px;line-height:16px;font-size:10px}.control{min-height:34px}.footer .pass{padding:4px}.guide{pointer-events:none}}
+
+

@@ -32,7 +32,7 @@ foreach ($set in @($playTitles, $playDescriptions, $guideTitles, $guideDescripti
 }
 
 $requiredFields = @("slug", "title", "group", "href", "guideHref", "titleImage", "playImage", "ogImage", "description", "guideSummary", "overview", "howToPlay")
-$allowedGroups = @("find", "remember", "follow", "compare", "think", "communication")
+$allowedGroups = @("find", "remember", "follow", "compare", "think", "logic", "communication")
 foreach ($game in $published) {
     foreach ($field in $requiredFields) {
         if ([string]::IsNullOrWhiteSpace([string]$game.$field)) { Error "$($game.slug): missing $field." }
@@ -45,7 +45,8 @@ foreach ($game in $published) {
     if ($game.isVisionTraining -ne $false) { Error "$($game.slug): games must not be classified as vision training without an explicit new decision." }
 
     foreach ($relative in @($game.titleImage, $game.playImage, $game.ogImage)) {
-        if (-not (Test-Path (Join-Path $Root ([string]$relative).Replace('/', '\')))) { Error "$($game.slug): missing image $relative." }
+        $assetPath = ([string]$relative).Split('?')[0].Split('#')[0]
+        if (-not (Test-Path (Join-Path $Root $assetPath.Replace('/', '\')))) { Error "$($game.slug): missing image $relative." }
     }
 
     $gamePath = Join-Path $Root ("games\" + $game.slug + "\index.html")

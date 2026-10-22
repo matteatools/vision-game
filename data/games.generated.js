@@ -66,7 +66,7 @@ window.GAME_DATA = [
                         "chameleon-catch"
                     ],
         "sitemap":  true,
-        "popularRank":  3,
+        "popularRank":  null,
         "seo":  {
                     "playTitle":  "ピョコッとしゅうかく！｜めとあたまのゲームパーク",
                     "playDescription":  "畑から飛び出す野菜を見つけてタッチし、野菜うさぎは見送る、無料・登録不要のWebゲームです。",
@@ -685,6 +685,7 @@ window.GAME_DATA = [
                         "light-window"
                     ],
         "sitemap":  true,
+        "popularRank":  3,
         "featureNote":  "中・高学年向け",
         "seo":  {
                     "playTitle":  "わりきりコード｜めとあたまのゲームパーク",
@@ -730,6 +731,89 @@ window.GAME_DATA = [
                     "playDescription":  "十二の場面で自分に近い行動を選び、三十六種類のめんキャラから結果を見る無料の診断ゲームです。",
                     "guideTitle":  "めんタルしんだん｜答えを選んで結果を話せる無料ゲーム",
                     "guideDescription":  "十二の場面で自分に近い行動を選び、三十六種類のめんキャラの結果を家族や友達と話せるゲームを紹介します。"
+                }
+    },
+    {
+        "slug":  "seirei-okuri",
+        "title":  "せいれいおくり",
+        "published":  true,
+        "publishedAt":  "2026-10-21",
+        "href":  "games/seirei-okuri/",
+        "guideHref":  "guide/seirei-okuri/",
+        "titleImage":  "assets/home/title-seirei-okuri.webp",
+        "playImage":  "assets/home/play-seirei-okuri.webp",
+        "ogImage":  "assets/og/seirei-okuri.jpg",
+        "description":  "ランタンの せいれいを うつして おなじ なかまを そろえ、うごかす じゅんばんを かんがえて そらへ おくろう。",
+        "skills":  [
+                       "つなぐ",
+                       "かんがえる"
+                   ],
+        "group":  "logic",
+        "activities":  [
+                           "ランタンのせいれいを同じ仲間にそろえる",
+                           "空き場所と移す順番を考える"
+                       ],
+        "guideSummary":  "ランタンのせいれいを移し、同じ仲間をそろえて空へ送るパズルゲームです。",
+        "overview":  "ランタンに入ったせいれいを別のランタンへ移し、同じ仲間だけの組み合わせを作ります。空き場所をどのように使うか、どの順番で移すかを考えながら、五十のステージに挑戦します。",
+        "howToPlay":  "ランタンを押して上にいるせいれいを選び、移したいランタンを押します。同じ仲間を三つそろえるとランタンと一緒に空へ送れます。練習で基本を確かめてから、少しずつ増えるルールに挑戦できます。",
+        "seeingGuide":  true,
+        "isVisionTraining":  false,
+        "related":  [
+                        "peko-bento",
+                        "waterworks",
+                        "total-ten"
+                    ],
+        "sitemap":  true,
+        "featureNote":  "全50ステージ",
+        "seo":  {
+                    "playTitle":  "せいれいおくり｜めとあたまのゲームパーク",
+                    "playDescription":  "ランタンのせいれいを移して同じ仲間をそろえ、空へ送る順番を考える無料のWebパズルゲームです。",
+                    "guideTitle":  "せいれいおくり｜移す順番を考える無料パズルゲーム",
+                    "guideDescription":  "ランタンのせいれいを同じ仲間にそろえ、空き場所と移す順番を考えて五十のステージに挑戦する遊び方を紹介します。"
+                }
+    },
+    {
+        "slug":  "peko-bento",
+        "title":  "ペコのひみつのおべんとう",
+        "dialogTitleLines":  [
+                                 "ペコのひみつの",
+                                 "おべんとう"
+                             ],
+        "published":  true,
+        "publishedAt":  "2026-10-21",
+        "href":  "games/peko-bento/",
+        "guideHref":  "guide/peko-bento/",
+        "titleImage":  "assets/home/title-peko-bento.webp",
+        "playImage":  "assets/home/play-peko-bento.webp",
+        "ogImage":  "assets/og/peko-bento.jpg",
+        "description":  "○と△の ヒントと これまでの きろくを くらべ、3つの おかずと ばしょを すいりして ひみつの ふたを あけよう。",
+        "skills":  [
+                       "くらべる",
+                       "かんがえる",
+                       "えらぶ"
+                   ],
+        "group":  "logic",
+        "activities":  [
+                           "○と△のヒントを読み取る",
+                           "これまでの記録を比べておかずと場所を推理する"
+                       ],
+        "guideSummary":  "○と△のヒントから、三つのおかずと入っている場所を推理するゲームです。",
+        "overview":  "候補のおかずから三つを選んでおべんとうに入れ、○と△で示される結果を確かめます。これまでに試した並びを見比べながら、ひみつのおべんとうのおかずと場所を筋道立てて考えます。",
+        "howToPlay":  "三つのおかずを選んで、左・真ん中・右のおべんとうへ入れます。○はおかずも場所も正解、△はおかずだけが正解です。練習でヒントの読み方を覚えたら、やさしい・ふつう・むずかしいから選んで何度でも挑戦できます。",
+        "seeingGuide":  true,
+        "isVisionTraining":  false,
+        "related":  [
+                        "seirei-okuri",
+                        "most-candy",
+                        "post-office"
+                    ],
+        "sitemap":  true,
+        "featureNote":  "○△で推理",
+        "seo":  {
+                    "playTitle":  "ペコのひみつのおべんとう｜めとあたまのゲームパーク",
+                    "playDescription":  "○と△のヒントとこれまでの記録を比べ、三つのおかずと場所を推理する無料のWebゲームです。",
+                    "guideTitle":  "ペコのひみつのおべんとう｜○△で推理する無料ゲーム",
+                    "guideDescription":  "○と△のヒントを読み取り、これまでに試したおべんとうを比べて三つのおかずと場所を推理する遊び方を紹介します。"
                 }
     }
 ];
