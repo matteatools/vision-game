@@ -934,6 +934,18 @@
             --group-shadow: rgba(63, 143, 164, 0.22);
         }
 
+        .game-group[data-game-group="language"] {
+            --group-color: #b75c7e;
+            --group-soft: rgba(183, 92, 126, 0.28);
+            --group-shadow: rgba(183, 92, 126, 0.2);
+        }
+
+        .game-group[data-game-group="math"] {
+            --group-color: #d97f32;
+            --group-soft: rgba(217, 127, 50, 0.3);
+            --group-shadow: rgba(217, 127, 50, 0.22);
+        }
+
         .game-group[data-game-group="communication"] {
             --group-color: #d95c8a;
             --group-soft: rgba(217, 92, 138, 0.28);
@@ -2151,7 +2163,7 @@
                         <p>NEW GAMES</p>
                         <h3 id="new-games-title">あたらしいゲーム</h3>
                     </div>
-                    <span>2つの あたらしい あそびが ふえました。<br><b class="new-games-action">きになる えを タッチ！</b></span>
+                    <span><span id="new-games-copy">あたらしい あそびが ふえました。</span><br><b class="new-games-action">きになる えを タッチ！</b></span>
                 </div>
                 <div class="new-game-grid" id="new-game-grid"></div>
             </section>
@@ -2250,7 +2262,7 @@
         </div>
     </dialog>
 
-    <script src="data/games.generated.js?v=20261021"></script>
+    <script src="data/games.generated.js?v=20261101"></script>
     <script>
         const games = (window.GAME_DATA ?? [])
             .filter((game) => game.published)
@@ -2288,6 +2300,16 @@
                 note: "ヒントを くらべて、じゅんばんや こたえを すじみちだてて かんがえよう"
             },
             {
+                id: "language",
+                title: "こくごのちから",
+                note: "もじを よんだり、かいたり、ことばを みつけよう"
+            },
+            {
+                id: "math",
+                title: "さんすうのちから",
+                note: "すうじや けいさんの しくみを たのしく かんがえよう"
+            },
+            {
                 id: "communication",
                 title: "コミュニケーションゲーム",
                 note: "いっしょに あそんだり、けっかを はなしたりしよう"
@@ -2300,6 +2322,7 @@
         const quickGameGrid = document.querySelector("#quick-game-grid");
         const newGamesSection = document.querySelector("#new-games-section");
         const newGameGrid = document.querySelector("#new-game-grid");
+        const newGamesCopy = document.querySelector("#new-games-copy");
         const quickPickerTitle = document.querySelector("#quick-picker-title");
         const quickPickerNote = document.querySelector(".quick-picker-note");
         const mobileQuickQuery = window.matchMedia("(max-width: 700px)");
@@ -2391,8 +2414,11 @@
         }
 
         function renderNewGames() {
-            const newGames = games.filter(isRecentlyPublished);
+            const newGames = games
+                .filter(isRecentlyPublished)
+                .sort((first, second) => second.publishedAt.localeCompare(first.publishedAt));
             newGamesSection.hidden = newGames.length === 0;
+            newGamesCopy.textContent = `${newGames.length}つの あたらしい あそびが ふえました。`;
             newGameGrid.innerHTML = newGames.map((game) => `
                 <article>
                     <a

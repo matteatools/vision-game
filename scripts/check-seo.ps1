@@ -32,7 +32,7 @@ foreach ($set in @($playTitles, $playDescriptions, $guideTitles, $guideDescripti
 }
 
 $requiredFields = @("slug", "title", "group", "href", "guideHref", "titleImage", "playImage", "ogImage", "description", "guideSummary", "overview", "howToPlay")
-$allowedGroups = @("find", "remember", "follow", "compare", "think", "logic", "communication")
+$allowedGroups = @("find", "remember", "follow", "compare", "think", "logic", "language", "math", "communication")
 foreach ($game in $published) {
     foreach ($field in $requiredFields) {
         if ([string]::IsNullOrWhiteSpace([string]$game.$field)) { Error "$($game.slug): missing $field." }

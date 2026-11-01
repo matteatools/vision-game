@@ -1,819 +1,907 @@
 window.GAME_DATA = [
-    {
-        "slug":  "magic-gems",
-        "title":  "へびしょうにんの まほうせき",
-        "published":  true,
-        "href":  "games/magic-gems/",
-        "guideHref":  "guide/magic-gems/",
-        "titleImage":  "assets/home/title-magic-gems.webp",
-        "playImage":  "assets/home/play-magic-gems.webp",
-        "ogImage":  "assets/og/magic-gems.jpg",
-        "description":  "ふたつの うつわを みくらべて、おおきさや むきが ちがっても おなじ まほうせきを みつけよう。",
-        "skills":  [
-                       "みつける",
-                       "くらべる"
-                   ],
-        "group":  "find",
-        "activities":  [
-                           "動く宝石を見比べる",
-                           "大きさや向きが違っても同じ形を見つける"
-                       ],
-        "guideSummary":  "動き回る宝石の中から、見本と同じ形を見つけるゲームです。",
-        "overview":  "二つの器を行き来する宝石を見比べ、見本と同じ形の一つを探します。宝石は大きさや向きが変わるため、輪郭や特徴を確かめながら選びます。",
-        "howToPlay":  "見本の宝石を確認し、動いている宝石の中から同じ形を選びます。練習で見比べ方を試してから本番に進めます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "alien-search",
-                        "most-candy",
-                        "robot-factory"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "へびしょうにんの まほうせき｜めとあたまのゲームパーク",
-                    "playDescription":  "動き回る宝石を見比べ、大きさや向きが違っても見本と同じ形を見つける、無料・登録不要のWebゲームです。",
-                    "guideTitle":  "へびしょうにんの まほうせき｜動く形を見比べて探す無料ゲーム",
-                    "guideDescription":  "動き回る宝石の輪郭や特徴を見比べ、見本と同じ形を探すゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "pyoko-harvest",
-        "title":  "ピョコッとしゅうかく！",
-        "published":  true,
-        "href":  "games/pyoko-harvest/",
-        "guideHref":  "guide/pyoko-harvest/",
-        "titleImage":  "assets/home/title-pyoko-harvest.webp",
-        "playImage":  "assets/home/play-pyoko-harvest.webp",
-        "ogImage":  "assets/og/pyoko-harvest.jpg",
-        "description":  "じめんから とびだす おやさいを すばやく タッチ。やさいうさぎは さわらず、しっかり みおくろう。",
-        "skills":  [
-                       "みつける",
-                       "すばやく"
-                   ],
-        "group":  "find",
-        "activities":  [
-                           "飛び出すものを見つける",
-                           "野菜とうさぎを見分けて操作する"
-                       ],
-        "guideSummary":  "畑から飛び出す野菜を見つけ、うさぎを避けて収穫するゲームです。",
-        "overview":  "畑から次々に飛び出す野菜を見つけて収穫します。野菜に似たうさぎも現れるため、何が出てきたかを確かめてからタッチします。",
-        "howToPlay":  "野菜が見えたらタッチし、うさぎはそのまま見送ります。練習で見分け方と操作を確認してから遊べます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "star-walk",
-                        "post-office",
-                        "chameleon-catch"
-                    ],
-        "sitemap":  true,
-        "popularRank":  null,
-        "seo":  {
-                    "playTitle":  "ピョコッとしゅうかく！｜めとあたまのゲームパーク",
-                    "playDescription":  "畑から飛び出す野菜を見つけてタッチし、野菜うさぎは見送る、無料・登録不要のWebゲームです。",
-                    "guideTitle":  "ピョコッとしゅうかく！｜動く野菜を見つけて選ぶ無料ゲーム",
-                    "guideDescription":  "畑から飛び出す野菜とうさぎを見分け、野菜だけを選んで収穫するゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "number-bubbles",
-        "title":  "じゅんばんシャボン！",
-        "published":  true,
-        "href":  "games/number-bubbles/",
-        "guideHref":  "guide/number-bubbles/",
-        "titleImage":  "assets/home/title-number-bubbles.webp",
-        "playImage":  "assets/home/play-number-bubbles.webp",
-        "ogImage":  "assets/og/number-bubbles.jpg",
-        "description":  "きえたり うごいたりする シャボンだまを、1から じゅんばんに みつけて すばやく ポンしよう。",
-        "skills":  [
-                       "おいかける",
-                       "かんがえる",
-                       "すばやく"
-                   ],
-        "group":  "follow",
-        "activities":  [
-                           "数字を順番に探す",
-                           "動いたり消えたりする位置を追う"
-                       ],
-        "guideSummary":  "動くシャボン玉から数字を順番に探し、1から選んでいくゲームです。",
-        "overview":  "数字が書かれたシャボン玉を、1から順番に見つけて割ります。シャボン玉は動いたり消えたりするため、次の数字と位置を確かめながら進めます。",
-        "howToPlay":  "表示された数字の中から次の順番を探してタッチします。モードや数を選べるので、練習してから自分に合う遊び方へ進めます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "star-walk",
-                        "total-ten",
-                        "yarn-path"
-                    ],
-        "sitemap":  true,
-        "popularRank":  null,
-        "seo":  {
-                    "playTitle":  "じゅんばんシャボン！｜めとあたまのゲームパーク",
-                    "playDescription":  "動いたり消えたりする数字のシャボン玉を追い、1から順番に見つけて選ぶ無料Webゲームです。",
-                    "guideTitle":  "じゅんばんシャボン！｜数字を順番に探して選ぶ無料ゲーム",
-                    "guideDescription":  "動く数字のシャボン玉から次の数字を探し、1から順番に選んでいくゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "chameleon-catch",
-        "title":  "カメレオンキャッチ！",
-        "published":  true,
-        "href":  "games/chameleon-catch/",
-        "guideHref":  "guide/chameleon-catch/",
-        "titleImage":  "assets/home/title-chameleon-catch.webp",
-        "playImage":  "assets/home/play-chameleon-catch.webp",
-        "ogImage":  "assets/og/chameleon-catch.jpg",
-        "description":  "カメレオンの いろごとの ルールを おぼえて、すきまの むきや タイミングを みて つかまえよう。",
-        "skills":  [
-                       "おぼえる",
-                       "かんがえる",
-                       "すばやく"
-                   ],
-        "group":  "remember",
-        "activities":  [
-                           "色ごとのルールを覚える",
-                           "向きとタイミングを見分けて操作する"
-                       ],
-        "guideSummary":  "色ごとのルールを覚え、カメレオンの向きを見て捕まえるゲームです。",
-        "overview":  "カメレオンの色に対応する捕まえ方を覚え、体の向きやすき間を見てグローブを動かします。色・向き・タイミングを順に確かめる遊びです。",
-        "howToPlay":  "練習で色ごとのルールを確認し、現れたカメレオンに合う方向を選びます。ルールと向きが合ったタイミングで捕まえます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "color-ghosts",
-                        "pyoko-harvest",
-                        "post-office"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "カメレオンキャッチ！｜めとあたまのゲームパーク",
-                    "playDescription":  "カメレオンの色ごとのルールを覚え、向きとタイミングを見分けて捕まえる無料Webゲームです。",
-                    "guideTitle":  "カメレオンキャッチ！｜色のルールと向きを判断する無料ゲーム",
-                    "guideDescription":  "カメレオンの色に対応するルールを覚え、体の向きやタイミングを見て捕まえるゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "yarn-path",
-        "title":  "こねこと けいとあそび このいっぽん！",
-        "published":  true,
-        "href":  "games/yarn-path/",
-        "guideHref":  "guide/yarn-path/",
-        "titleImage":  "assets/home/title-yarn-path.webp",
-        "playImage":  "assets/home/play-yarn-path.webp",
-        "ogImage":  "assets/og/yarn-path.jpg",
-        "description":  "からまった けいとを ポンポンから ゆっくり たどり、おなじいろに つながる いっぽんを みつけよう。",
-        "skills":  [
-                       "みつける",
-                       "おいかける",
-                       "つなぐ"
-                   ],
-        "group":  "follow",
-        "activities":  [
-                           "絡まった線を目でたどる",
-                           "同じ色につながる一本を見つける"
-                       ],
-        "guideSummary":  "絡まった毛糸を目でたどり、同じ色へつながる一本を探すゲームです。",
-        "overview":  "たくさんの毛糸が交差する中から、選んだポンポンにつながる一本を目でたどります。線が重なる場所でも道筋を確かめ、同じ色の先を見つけます。",
-        "howToPlay":  "始点のポンポンから毛糸をゆっくりたどり、つながっている先を選びます。練習と特訓で線の見方を試せます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "star-walk",
-                        "waterworks",
-                        "alien-search"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "こねこと けいとあそび このいっぽん！｜めとあたまのゲームパーク",
-                    "playDescription":  "絡まった毛糸を目でたどり、同じ色のポンポンにつながる一本を見つける無料Webゲームです。",
-                    "guideTitle":  "このいっぽん！｜絡まった毛糸を目でたどる無料ゲーム",
-                    "guideDescription":  "交差する毛糸の道筋を目でたどり、同じ色につながる一本を見つけるゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "color-ghosts",
-        "title":  "おぼえて！いろゆうれい",
-        "published":  true,
-        "href":  "games/color-ghosts/",
-        "guideHref":  "guide/color-ghosts/",
-        "titleImage":  "assets/home/title-color-ghosts.webp",
-        "playImage":  "assets/home/play-color-ghosts.webp",
-        "ogImage":  "assets/og/color-ghosts.jpg",
-        "description":  "よるに あらわれる ゆうれいの いろと まどを おぼえ、あさに おなじ ばしょへ おふだを はろう。",
-        "skills":  [
-                       "おぼえる",
-                       "みつける"
-                   ],
-        "group":  "remember",
-        "activities":  [
-                           "色と場所を覚える",
-                           "覚えた場所を画面から見つける"
-                       ],
-        "guideSummary":  "夜に見た幽霊の色と場所を覚え、朝に同じ窓を探すゲームです。",
-        "overview":  "夜のアパートに現れる幽霊の色と窓の場所を覚え、朝になったら同じ場所へお札を貼ります。見た情報をいったん覚えてから探す遊びです。",
-        "howToPlay":  "夜の画面で幽霊の色と位置を確認します。朝の画面に変わったら、覚えている窓を見つけて順に選びます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "jiwa-fushigi",
-                        "chameleon-catch",
-                        "alien-search"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "おぼえて！いろゆうれい｜めとあたまのゲームパーク",
-                    "playDescription":  "夜に現れた幽霊の色と窓の場所を覚え、朝に同じ場所を見つけてお札を貼る無料Webゲームです。",
-                    "guideTitle":  "おぼえて！いろゆうれい｜色と場所を覚えて探す無料記憶ゲーム",
-                    "guideDescription":  "夜に見た幽霊の色と窓の場所を覚え、朝の画面で同じ場所を探すゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "most-candy",
-        "title":  "いちばんおおいキャンディは？",
-        "dialogTitleLines":  [
-                                 "いちばんおおい",
-                                 "キャンディは？"
-                             ],
-        "published":  true,
-        "href":  "games/most-candy/",
-        "guideHref":  "guide/most-candy/",
-        "titleImage":  "assets/home/title-most-candy.webp",
-        "playImage":  "assets/home/play-most-candy.webp",
-        "ogImage":  "assets/og/most-candy.jpg",
-        "description":  "9この キャンディを おおきさ・いろ・かたちで くらべ、いちばん おおい なかまの びんを えらぼう。",
-        "skills":  [
-                       "みつける",
-                       "くらべる",
-                       "かんがえる"
-                   ],
-        "group":  "compare",
-        "activities":  [
-                           "色・形・大きさを見比べる",
-                           "最も多い仲間を数えて選ぶ"
-                       ],
-        "guideSummary":  "キャンディを色・形・大きさで見比べ、最も多い仲間を探すゲームです。",
-        "overview":  "並んだキャンディを色・形・大きさなどの特徴で見比べ、同じ仲間がいくつあるかを確かめます。その中から最も多い仲間の瓶を選びます。",
-        "howToPlay":  "問題ごとに注目する特徴を確認し、九つのキャンディを見比べます。仲間ごとの数を確かめて、一番多いものを選びます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "magic-gems",
-                        "post-office",
-                        "robot-factory"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "いちばんおおいキャンディは？｜めとあたまのゲームパーク",
-                    "playDescription":  "キャンディを色・形・大きさで見比べ、同じ仲間の数を確かめて最も多いものを選ぶ無料Webゲームです。",
-                    "guideTitle":  "いちばんおおいキャンディは？｜特徴を比べて多い仲間を探すゲーム",
-                    "guideDescription":  "キャンディの色・形・大きさを見比べ、同じ仲間を数えて最も多いものを選ぶゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "light-window",
-        "title":  "クジャーロせんせいの ひかりのまど",
-        "published":  true,
-        "href":  "games/light-window/",
-        "guideHref":  "guide/light-window/",
-        "titleImage":  "assets/home/title-light-window.webp",
-        "playImage":  "assets/home/play-light-window.webp",
-        "ogImage":  "assets/og/light-window.jpg",
-        "description":  "ひかりブロックを くるっと まわしたり うらがえしたりして、すきまなく まどに はめて かんせいさせよう。",
-        "skills":  [
-                       "くらべる",
-                       "つなぐ",
-                       "かんがえる"
-                   ],
-        "group":  "think",
-        "activities":  [
-                           "図形の向きや裏表を見比べる",
-                           "ブロックを回してすき間なく組み合わせる"
-                       ],
-        "guideSummary":  "光のブロックを回したり裏返したりして、窓を完成させるパズルです。",
-        "overview":  "いくつかの光のブロックを回転・反転させ、決められた窓の形へすき間なくはめます。形の辺や向きを見比べ、置く場所を考えるパズルです。",
-        "howToPlay":  "ブロックを選び、回転や裏返しを使って窓へ配置します。すべてのブロックが重ならずに収まる組み合わせを探します。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "waterworks",
-                        "robot-factory",
-                        "total-ten"
-                    ],
-        "sitemap":  true,
-        "popularRank":  null,
-        "seo":  {
-                    "playTitle":  "クジャーロせんせいの ひかりのまど｜めとあたまのゲームパーク",
-                    "playDescription":  "図形のブロックを回したり裏返したりし、すき間なく組み合わせて窓を完成させる無料Webパズルです。",
-                    "guideTitle":  "ひかりのまど｜図形を回して組み合わせる無料パズル",
-                    "guideDescription":  "光のブロックの向きや裏表を見比べ、回転・反転させて窓へすき間なく組み合わせるパズルを紹介します。"
-                }
-    },
-    {
-        "slug":  "total-ten",
-        "title":  "ぽんすけの あわせて10",
-        "published":  true,
-        "href":  "games/total-ten/",
-        "guideHref":  "guide/total-ten/",
-        "titleImage":  "assets/home/title-total-ten.webp",
-        "playImage":  "assets/home/play-total-ten.webp",
-        "ogImage":  "assets/og/total-ten.jpg",
-        "description":  "となりあう すうじスライムを つないで、ごうけいを ぴったり10か20にして まちを まもろう。",
-        "skills":  [
-                       "くらべる",
-                       "つなぐ",
-                       "かんがえる"
-                   ],
-        "group":  "think",
-        "activities":  [
-                           "数字の組み合わせを考える",
-                           "隣り合う数字をつないで合計を作る"
-                       ],
-        "guideSummary":  "隣り合う数字をつなぎ、合計を10や20にするゲームです。",
-        "overview":  "数字が書かれたスライムを隣同士でつなぎ、合計をぴったり10または20にします。盤面を見て、使える数字とつなぐ順番を考えます。",
-        "howToPlay":  "隣り合う数字を指やマウスでつなぎ、指定された合計になったところで確定します。練習でつなぎ方を確認できます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "number-bubbles",
-                        "waterworks",
-                        "light-window"
-                    ],
-        "sitemap":  true,
-        "popularRank":  1,
-        "seo":  {
-                    "playTitle":  "ぽんすけの あわせて10｜めとあたまのゲームパーク",
-                    "playDescription":  "隣り合う数字をつないで合計をぴったり10や20にし、スライムを切る無料・登録不要のWebゲームです。",
-                    "guideTitle":  "ぽんすけの あわせて10｜数字をつないで合計を考える無料ゲーム",
-                    "guideDescription":  "隣り合う数字の組み合わせを考え、つないだ合計を10や20にするゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "star-walk",
-        "title":  "ほしぞらの くうちゅうさんぽ",
-        "published":  true,
-        "href":  "games/star-walk/",
-        "guideHref":  "guide/star-walk/",
-        "titleImage":  "assets/home/title-star-walk.webp",
-        "playImage":  "assets/home/play-star-walk.webp",
-        "ogImage":  "assets/og/star-walk.jpg",
-        "description":  "うごきかたの ちがう ほしを えらび、ゆびを のせたまま ほしの うごきを しっかり おいかけよう。",
-        "skills":  [
-                       "おいかける",
-                       "すばやく"
-                   ],
-        "group":  "follow",
-        "activities":  [
-                           "動く星を目で追う",
-                           "星の位置に合わせて指やマウスを動かす"
-                       ],
-        "guideSummary":  "動き方の違う星を選び、その動きを指やマウスで追うゲームです。",
-        "overview":  "空を動き回る星を選び、指やマウスを星に合わせたまま進みます。星ごとに動き方が違うため、画面上の位置を見ながら操作します。",
-        "howToPlay":  "追いかける星を選び、星に触れたまま動きに合わせて指やマウスを動かします。練習で操作を試してから始められます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "yarn-path",
-                        "number-bubbles",
-                        "pyoko-harvest"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "ほしぞらの くうちゅうさんぽ｜めとあたまのゲームパーク",
-                    "playDescription":  "動き方の違う星を選び、その位置を目で追いながら指やマウスでたどる無料Webゲームです。",
-                    "guideTitle":  "ほしぞらの くうちゅうさんぽ｜動く星を目で追う無料ゲーム",
-                    "guideDescription":  "空を動く星の位置を見ながら、指やマウスを合わせて動きをたどるゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "jiwa-fushigi",
-        "title":  "がっこうのジワふしぎ",
-        "published":  true,
-        "href":  "games/jiwa-fushigi/",
-        "guideHref":  "guide/jiwa-fushigi/",
-        "titleImage":  "assets/home/title-jiwa-fushigi.webp",
-        "playImage":  "assets/home/play-jiwa-fushigi.webp",
-        "ogImage":  "assets/og/jiwa-fushigi.jpg",
-        "description":  "がっこうの けしきが じかんを かけて ジワっと かわるよ。よく みて、3つの へんかを みつけよう。",
-        "skills":  [
-                       "みつける",
-                       "おぼえる",
-                       "くらべる"
-                   ],
-        "group":  "remember",
-        "activities":  [
-                           "画面の変化を見つける",
-                           "変化する前後の様子を見比べる"
-                       ],
-        "guideSummary":  "学校の風景でゆっくり起きる三つの変化を見つけるゲームです。",
-        "overview":  "学校の教室や廊下などの風景を見ながら、時間をかけて少しずつ変わる場所を探します。最初の様子を覚え、現在の画面と見比べます。",
-        "howToPlay":  "風景をよく見て、変わったと思う場所を選びます。一つの場面には三つの変化があり、練習では変わり方を確かめられます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "color-ghosts",
-                        "alien-search",
-                        "most-candy"
-                    ],
-        "sitemap":  true,
-        "popularRank":  2,
-        "seo":  {
-                    "playTitle":  "がっこうのジワふしぎ｜めとあたまのゲームパーク",
-                    "playDescription":  "学校の風景を見ながら、時間をかけてゆっくり変わる三つの場所を見つける無料Webゲームです。",
-                    "guideTitle":  "がっこうのジワふしぎ｜ゆっくり変わる場所を見つける無料ゲーム",
-                    "guideDescription":  "学校の風景で少しずつ変化する場所を探し、変化する前後の様子を見比べるゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "alien-search",
-        "title":  "うちゅうじんをさがせ！",
-        "published":  true,
-        "href":  "games/alien-search/",
-        "guideHref":  "guide/alien-search/",
-        "titleImage":  "assets/home/title-alien-search.webp",
-        "playImage":  "assets/home/play-alien-search.webp",
-        "ogImage":  "assets/og/alien-search.jpg",
-        "description":  "はる・なつ・あき・ふゆの にぎやかな えのなかから、みほんと おなじ 5にんの うちゅうじんを さがそう。",
-        "skills":  [
-                       "みつける",
-                       "くらべる"
-                   ],
-        "group":  "find",
-        "activities":  [
-                           "見本の特徴を確かめる",
-                           "にぎやかな絵の中から同じものを見つける"
-                       ],
-        "guideSummary":  "季節のにぎやかな絵から、見本と同じ宇宙人を探すゲームです。",
-        "overview":  "春夏秋冬の風景にまぎれた宇宙人を、見本の姿と見比べながら探します。色・形・持ち物などの特徴を確かめ、同じ五人を見つけます。",
-        "howToPlay":  "画面に示される見本を確認し、風景の中で同じ宇宙人を見つけて選びます。季節ごとに異なる場面で遊べます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "magic-gems",
-                        "jiwa-fushigi",
-                        "yarn-path"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "うちゅうじんをさがせ！｜めとあたまのゲームパーク",
-                    "playDescription":  "春夏秋冬のにぎやかな絵の中から、見本と同じ特徴を持つ五人の宇宙人を探す無料Webゲームです。",
-                    "guideTitle":  "うちゅうじんをさがせ！｜絵の中から見本と同じものを探すゲーム",
-                    "guideDescription":  "季節のにぎやかな風景から、色や形などを見比べて見本と同じ宇宙人を探すゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "post-office",
-        "title":  "ぴったりゆうびんきょく",
-        "published":  true,
-        "href":  "games/post-office/",
-        "guideHref":  "guide/post-office/",
-        "titleImage":  "assets/home/title-post-office.webp",
-        "playImage":  "assets/home/play-post-office.webp",
-        "ogImage":  "assets/og/post-office.jpg",
-        "description":  "ながれてくる てがみを よく みて、おなじいろが ちょうど5つに なった しゅんかんに ふえを ふこう。",
-        "skills":  [
-                       "みつける",
-                       "くらべる",
-                       "すばやく"
-                   ],
-        "group":  "compare",
-        "activities":  [
-                           "流れる手紙の色を見分ける",
-                           "同じ色が五通になる瞬間を判断する"
-                       ],
-        "guideSummary":  "流れる手紙を見て、同じ色が五通そろう瞬間に笛を鳴らすゲームです。",
-        "overview":  "ベルトを流れる手紙の色を見分け、同じ色がちょうど五通そろった瞬間を探します。手紙が増える様子を見比べながらタイミングを決めます。",
-        "howToPlay":  "流れてくる手紙を確認し、同じ色が五通になったと思ったら笛のボタンを押します。練習で数え方とタイミングを試せます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "most-candy",
-                        "pyoko-harvest",
-                        "chameleon-catch"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "ぴったりゆうびんきょく｜めとあたまのゲームパーク",
-                    "playDescription":  "流れる手紙の色を見分け、同じ色がちょうど五通そろう瞬間に笛を鳴らす無料Webゲームです。",
-                    "guideTitle":  "ぴったりゆうびんきょく｜手紙の色と数を見比べる無料ゲーム",
-                    "guideDescription":  "流れる手紙の色と数を見比べ、同じ色が五通そろう瞬間を判断するゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "waterworks",
-        "title":  "ビーバーおやかたの すいどうこうじ",
-        "published":  true,
-        "href":  "games/waterworks/",
-        "guideHref":  "guide/waterworks/",
-        "titleImage":  "assets/home/title-waterworks.webp",
-        "playImage":  "assets/home/play-waterworks.webp",
-        "ogImage":  "assets/og/waterworks.jpg",
-        "description":  "パイプの むきと つながりを かんがえて、すべての いえに みずが とどく すいどうを つくろう。",
-        "skills":  [
-                       "くらべる",
-                       "つなぐ",
-                       "かんがえる"
-                   ],
-        "group":  "compare",
-        "activities":  [
-                           "パイプの向きと接続を見比べる",
-                           "すべての家へ届く道をつなぐ"
-                       ],
-        "guideSummary":  "パイプの向きを考え、すべての家へ水が届く道を作るパズルです。",
-        "overview":  "さまざまな形のパイプを回し、取水口からすべての家へ水が届くようにつなぎます。パイプの入口と出口、全体の道筋を見比べて考えます。",
-        "howToPlay":  "パイプを選んで向きを変え、切れ目のない水道を作ります。条件に合う道が完成したら、水が流れるかを確認します。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "light-window",
-                        "total-ten",
-                        "yarn-path"
-                    ],
-        "sitemap":  true,
-        "seo":  {
-                    "playTitle":  "ビーバーおやかたの すいどうこうじ｜めとあたまのゲームパーク",
-                    "playDescription":  "パイプの向きとつながりを考え、すべての家へ水が届く道を作る無料・登録不要のWebパズルです。",
-                    "guideTitle":  "すいどうこうじ｜パイプの向きを考えて道をつなぐ無料パズル",
-                    "guideDescription":  "パイプの入口と出口を見比べて向きを変え、すべての家へ水が届く道をつなぐパズルの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "robot-factory",
-        "title":  "よみがえれ！ ロボこうじょう",
-        "published":  true,
-        "href":  "games/robot-factory/",
-        "guideHref":  "guide/robot-factory/",
-        "titleImage":  "assets/home/title-robot-factory.webp",
-        "playImage":  "assets/home/play-robot-factory.webp",
-        "ogImage":  "assets/og/robot-factory.jpg",
-        "description":  "いろと かたちが あう パーツを みつけて いきものロボを くみたて、ねむった こうじょうを よみがえらせよう。",
-        "skills":  [
-                       "みつける",
-                       "くらべる",
-                       "つなぐ"
-                   ],
-        "group":  "think",
-        "activities":  [
-                           "見本の色と形を見分ける",
-                           "条件に合うパーツを探して組み合わせる"
-                       ],
-        "guideSummary":  "見本と同じ色・形のパーツを探し、動物ロボを組み立てるゲームです。",
-        "overview":  "注文に示された色と形を確かめ、パーツ置き場から条件に合う部品を探します。正しいパーツを組み合わせ、動物ロボを完成させます。",
-        "howToPlay":  "見本のパーツを確認し、色と形の両方が合うものを選んで組み立てます。注文を順に完成させると工場が動き始めます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "magic-gems",
-                        "most-candy",
-                        "light-window"
-                    ],
-        "sitemap":  true,
-        "deviceNote":  "タブレットがおすすめ",
-        "seo":  {
-                    "playTitle":  "よみがえれ！ ロボこうじょう｜めとあたまのゲームパーク",
-                    "playDescription":  "見本と同じ色・形のパーツを見つけて組み合わせ、動物ロボを完成させる無料Webゲームです。",
-                    "guideTitle":  "ロボこうじょう｜色と形を見分けてパーツを組み合わせるゲーム",
-                    "guideDescription":  "見本の色と形を確かめ、条件に合うパーツを探して動物ロボを組み立てるゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "world-zoo",
-        "title":  "せかいどうぶつえん",
-        "published":  true,
-        "publishedAt":  "2026-08-25",
-        "href":  "games/world-zoo/",
-        "guideHref":  "guide/world-zoo/",
-        "titleImage":  "assets/home/title-world-zoo.webp",
-        "playImage":  "assets/home/play-world-zoo.webp",
-        "ogImage":  "assets/og/world-zoo.jpg",
-        "description":  "5×5の せきばんから もじを つないで どうぶつの なまえを みつけ、100しゅるいの なかまを よみがえらせよう。",
-        "skills":  [
-                       "みつける",
-                       "つなぐ",
-                       "かんがえる"
-                   ],
-        "group":  "find",
-        "activities":  [
-                           "五×五の文字盤から動物の名前を見つける",
-                           "上下左右につながる文字を順番になぞる"
-                       ],
-        "guideSummary":  "文字盤の中から動物の名前を見つけ、百種類の仲間をよみがえらせるゲームです。",
-        "overview":  "五×五の石板に並んだ文字を見て、上下左右につながる文字をなぞり、動物の名前を探します。見つけた動物は八つのエリアにある動物リストへ記録されます。",
-        "howToPlay":  "石板から動物の名前になる文字の道を見つけ、最初の文字から最後の文字まで指やマウスでなぞります。練習では道の見方とヒントの使い方を順に試せます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "alien-search",
-                        "yarn-path",
-                        "robot-factory"
-                    ],
-        "sitemap":  true,
-        "featureNote":  "100しゅるい",
-        "seo":  {
-                    "playTitle":  "せかいどうぶつえん｜めとあたまのゲームパーク",
-                    "playDescription":  "五×五の文字盤から上下左右につながる動物の名前を見つけ、百種類の仲間を集める無料Webゲームです。",
-                    "guideTitle":  "せかいどうぶつえん｜文字をつないで動物を探す無料ゲーム",
-                    "guideDescription":  "五×五の文字盤から動物の名前を探し、上下左右につながる文字をなぞって百種類の仲間を集める遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "kemono-karate",
-        "title":  "けもの空手 一手入魂！",
-        "published":  true,
-        "publishedAt":  "2026-08-25",
-        "href":  "games/kemono-karate/",
-        "guideHref":  "guide/kemono-karate/",
-        "titleImage":  "assets/home/title-kemono-karate.webp",
-        "playImage":  "assets/home/play-kemono-karate.webp",
-        "ogImage":  "assets/og/kemono-karate.jpg",
-        "description":  "ためる・まもる・はなつから いってを えらび、あいての かんがえを よんで さきに3ぼん とろう。",
-        "skills":  [
-                       "えらぶ",
-                       "かんがえる"
-                   ],
-        "group":  "communication",
-        "activities":  [
-                           "三つの技から一手を選ぶ",
-                           "相手の気合いや選び方を見て次の手を考える"
-                       ],
-        "guideSummary":  "ためる・まもる・はなつの三手で、相手の考えを読み合う対戦ゲームです。",
-        "overview":  "ためる・まもる・はなつの関係と気合いの量を使い、相手が次に選ぶ手を予想します。二人対戦では、同じ画面を囲んで互いの考えを読み合います。一人でCPUへ挑戦することもできます。",
-        "howToPlay":  "二人対戦または一人対戦を選び、毎手ごとに三つの技から一つを決めます。ためると気合いが増え、はなつには気合いが必要です。技の関係を考えながら、先に三本を取ると勝ちです。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "chameleon-catch",
-                        "total-ten",
-                        "post-office"
-                    ],
-        "sitemap":  true,
-        "featureNote":  "2人で心理戦",
-        "seo":  {
-                    "playTitle":  "けもの空手 一手入魂！｜めとあたまのゲームパーク",
-                    "playDescription":  "ためる・まもる・はなつの三手から相手の考えを読み、先に三本を取る二人対戦・一人対戦対応の無料Webゲームです。",
-                    "guideTitle":  "けもの空手 一手入魂！｜相手の考えを読む心理戦ゲーム",
-                    "guideDescription":  "ためる・まもる・はなつの関係と気合いを使い、相手の次の一手を考えて対戦するゲームの遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "warikiri-code",
-        "title":  "わりきりコード",
-        "published":  true,
-        "publishedAt":  "2026-08-25",
-        "href":  "games/warikiri-code/",
-        "guideHref":  "guide/warikiri-code/",
-        "titleImage":  "assets/home/title-warikiri-code.webp",
-        "playImage":  "assets/home/play-warikiri-code.webp",
-        "ogImage":  "assets/og/warikiri-code.jpg",
-        "description":  "バグった すうじを わりきれる キーで 1まで なおし、コンボを つないで スコアを のばそう。",
-        "skills":  [
-                       "くらべる",
-                       "かんがえる",
-                       "すばやく"
-                   ],
-        "group":  "think",
-        "activities":  [
-                           "数字を割り切れる数を判断する",
-                           "大きな数を一まで割る順番を考える"
-                       ],
-        "guideSummary":  "数字を割り切れるキーで一まで直し、スコアを伸ばす数のゲームです。",
-        "overview":  "画面に現れる数字のバグを見て、二・三・五などのキーから割り切れる数を選びます。数字を一まで小さくして修理し、ボスや二つの数を一緒に割る問題にも挑戦します。",
-        "howToPlay":  "修理する数字を確認し、割り切れる数のキーを選びます。答えが整数になるキーを続けて使い、数字を一にすると修理完了です。練習、エンドレス、約分の三つの遊び方があります。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "total-ten",
-                        "number-bubbles",
-                        "light-window"
-                    ],
-        "sitemap":  true,
-        "popularRank":  3,
-        "featureNote":  "中・高学年向け",
-        "seo":  {
-                    "playTitle":  "わりきりコード｜めとあたまのゲームパーク",
-                    "playDescription":  "数字を割り切れるキーを選び、一になるまで割ってバグを修理する無料の算数Webゲームです。",
-                    "guideTitle":  "わりきりコード｜割り切れる数を考える無料算数ゲーム",
-                    "guideDescription":  "数字を割り切れるキーを判断し、一になるまで割る順番を考えるゲームの内容と遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "mentaru-shindan",
-        "title":  "めんタルしんだん",
-        "published":  true,
-        "publishedAt":  "2026-08-25",
-        "href":  "games/mentaru-shindan/",
-        "guideHref":  "guide/mentaru-shindan/",
-        "titleImage":  "assets/home/title-mentaru-shindan.webp?v=20260922",
-        "playImage":  "assets/home/play-mentaru-shindan.webp?v=20260922",
-        "ogImage":  "assets/og/mentaru-shindan.jpg?v=20260922",
-        "description":  "12の ばめんで じぶんに ちかい こうどうを えらび、36しゅるいの めんキャラから けっかを みて はなそう。",
-        "skills":  [
-                       "えらぶ",
-                       "かんがえる"
-                   ],
-        "group":  "communication",
-        "activities":  [
-                           "十二の場面で自分に近い行動を選ぶ",
-                           "結果を家族や友達と見せ合って話す"
-                       ],
-        "guideSummary":  "十二の場面で行動を選び、三十六種類のめんキャラの結果を見て話せる診断ゲームです。",
-        "overview":  "学校や家で起こる十二の場面を読み、自分の行動に一番近い答えを選びます。結果は六つのめん族と六つの味わいを組み合わせた三十六種類です。家族や友達と結果を見せ合い、違いやよさを話すきっかけにできます。",
-        "howToPlay":  "ひらがなまたは三年生までの漢字を選び、十二の質問へ順番に答えます。最後にめんキャラと今回よく選んだ行動が表示されます。正解・不正解はなく、医学や心理学の検査、能力の点数ではありません。",
-        "seeingGuide":  false,
-        "isVisionTraining":  false,
-        "related":  [
-                        "kemono-karate",
-                        "most-candy",
-                        "color-ghosts"
-                    ],
-        "sitemap":  true,
-        "featureNote":  "正解なし・36タイプ",
-        "seo":  {
-                    "playTitle":  "めんタルしんだん｜めとあたまのゲームパーク",
-                    "playDescription":  "十二の場面で自分に近い行動を選び、三十六種類のめんキャラから結果を見る無料の診断ゲームです。",
-                    "guideTitle":  "めんタルしんだん｜答えを選んで結果を話せる無料ゲーム",
-                    "guideDescription":  "十二の場面で自分に近い行動を選び、三十六種類のめんキャラの結果を家族や友達と話せるゲームを紹介します。"
-                }
-    },
-    {
-        "slug":  "seirei-okuri",
-        "title":  "せいれいおくり",
-        "published":  true,
-        "publishedAt":  "2026-10-21",
-        "href":  "games/seirei-okuri/",
-        "guideHref":  "guide/seirei-okuri/",
-        "titleImage":  "assets/home/title-seirei-okuri.webp",
-        "playImage":  "assets/home/play-seirei-okuri.webp",
-        "ogImage":  "assets/og/seirei-okuri.jpg",
-        "description":  "ランタンの せいれいを うつして おなじ なかまを そろえ、うごかす じゅんばんを かんがえて そらへ おくろう。",
-        "skills":  [
-                       "つなぐ",
-                       "かんがえる"
-                   ],
-        "group":  "logic",
-        "activities":  [
-                           "ランタンのせいれいを同じ仲間にそろえる",
-                           "空き場所と移す順番を考える"
-                       ],
-        "guideSummary":  "ランタンのせいれいを移し、同じ仲間をそろえて空へ送るパズルゲームです。",
-        "overview":  "ランタンに入ったせいれいを別のランタンへ移し、同じ仲間だけの組み合わせを作ります。空き場所をどのように使うか、どの順番で移すかを考えながら、五十のステージに挑戦します。",
-        "howToPlay":  "ランタンを押して上にいるせいれいを選び、移したいランタンを押します。同じ仲間を三つそろえるとランタンと一緒に空へ送れます。練習で基本を確かめてから、少しずつ増えるルールに挑戦できます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "peko-bento",
-                        "waterworks",
-                        "total-ten"
-                    ],
-        "sitemap":  true,
-        "featureNote":  "全50ステージ",
-        "seo":  {
-                    "playTitle":  "せいれいおくり｜めとあたまのゲームパーク",
-                    "playDescription":  "ランタンのせいれいを移して同じ仲間をそろえ、空へ送る順番を考える無料のWebパズルゲームです。",
-                    "guideTitle":  "せいれいおくり｜移す順番を考える無料パズルゲーム",
-                    "guideDescription":  "ランタンのせいれいを同じ仲間にそろえ、空き場所と移す順番を考えて五十のステージに挑戦する遊び方を紹介します。"
-                }
-    },
-    {
-        "slug":  "peko-bento",
-        "title":  "ペコのひみつのおべんとう",
-        "dialogTitleLines":  [
-                                 "ペコのひみつの",
-                                 "おべんとう"
-                             ],
-        "published":  true,
-        "publishedAt":  "2026-10-21",
-        "href":  "games/peko-bento/",
-        "guideHref":  "guide/peko-bento/",
-        "titleImage":  "assets/home/title-peko-bento.webp",
-        "playImage":  "assets/home/play-peko-bento.webp",
-        "ogImage":  "assets/og/peko-bento.jpg",
-        "description":  "○と△の ヒントと これまでの きろくを くらべ、3つの おかずと ばしょを すいりして ひみつの ふたを あけよう。",
-        "skills":  [
-                       "くらべる",
-                       "かんがえる",
-                       "えらぶ"
-                   ],
-        "group":  "logic",
-        "activities":  [
-                           "○と△のヒントを読み取る",
-                           "これまでの記録を比べておかずと場所を推理する"
-                       ],
-        "guideSummary":  "○と△のヒントから、三つのおかずと入っている場所を推理するゲームです。",
-        "overview":  "候補のおかずから三つを選んでおべんとうに入れ、○と△で示される結果を確かめます。これまでに試した並びを見比べながら、ひみつのおべんとうのおかずと場所を筋道立てて考えます。",
-        "howToPlay":  "三つのおかずを選んで、左・真ん中・右のおべんとうへ入れます。○はおかずも場所も正解、△はおかずだけが正解です。練習でヒントの読み方を覚えたら、やさしい・ふつう・むずかしいから選んで何度でも挑戦できます。",
-        "seeingGuide":  true,
-        "isVisionTraining":  false,
-        "related":  [
-                        "seirei-okuri",
-                        "most-candy",
-                        "post-office"
-                    ],
-        "sitemap":  true,
-        "featureNote":  "○△で推理",
-        "seo":  {
-                    "playTitle":  "ペコのひみつのおべんとう｜めとあたまのゲームパーク",
-                    "playDescription":  "○と△のヒントとこれまでの記録を比べ、三つのおかずと場所を推理する無料のWebゲームです。",
-                    "guideTitle":  "ペコのひみつのおべんとう｜○△で推理する無料ゲーム",
-                    "guideDescription":  "○と△のヒントを読み取り、これまでに試したおべんとうを比べて三つのおかずと場所を推理する遊び方を紹介します。"
-                }
+  {
+    "slug": "magic-gems",
+    "title": "へびしょうにんの まほうせき",
+    "published": true,
+    "href": "games/magic-gems/",
+    "guideHref": "guide/magic-gems/",
+    "titleImage": "assets/home/title-magic-gems.webp",
+    "playImage": "assets/home/play-magic-gems.webp",
+    "ogImage": "assets/og/magic-gems.jpg",
+    "description": "ふたつの うつわを みくらべて、おおきさや むきが ちがっても おなじ まほうせきを みつけよう。",
+    "skills": [
+      "みつける",
+      "くらべる"
+    ],
+    "group": "find",
+    "activities": [
+      "動く宝石を見比べる",
+      "大きさや向きが違っても同じ形を見つける"
+    ],
+    "guideSummary": "動き回る宝石の中から、見本と同じ形を見つけるゲームです。",
+    "overview": "二つの器を行き来する宝石を見比べ、見本と同じ形の一つを探します。宝石は大きさや向きが変わるため、輪郭や特徴を確かめながら選びます。",
+    "howToPlay": "見本の宝石を確認し、動いている宝石の中から同じ形を選びます。練習で見比べ方を試してから本番に進めます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "alien-search",
+      "most-candy",
+      "robot-factory"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "へびしょうにんの まほうせき｜めとあたまのゲームパーク",
+      "playDescription": "動き回る宝石を見比べ、大きさや向きが違っても見本と同じ形を見つける、無料・登録不要のWebゲームです。",
+      "guideTitle": "へびしょうにんの まほうせき｜動く形を見比べて探す無料ゲーム",
+      "guideDescription": "動き回る宝石の輪郭や特徴を見比べ、見本と同じ形を探すゲームの内容と遊び方を紹介します。"
     }
+  },
+  {
+    "slug": "pyoko-harvest",
+    "title": "ピョコッとしゅうかく！",
+    "published": true,
+    "href": "games/pyoko-harvest/",
+    "guideHref": "guide/pyoko-harvest/",
+    "titleImage": "assets/home/title-pyoko-harvest.webp",
+    "playImage": "assets/home/play-pyoko-harvest.webp",
+    "ogImage": "assets/og/pyoko-harvest.jpg",
+    "description": "じめんから とびだす おやさいを すばやく タッチ。やさいうさぎは さわらず、しっかり みおくろう。",
+    "skills": [
+      "みつける",
+      "すばやく"
+    ],
+    "group": "find",
+    "activities": [
+      "飛び出すものを見つける",
+      "野菜とうさぎを見分けて操作する"
+    ],
+    "guideSummary": "畑から飛び出す野菜を見つけ、うさぎを避けて収穫するゲームです。",
+    "overview": "畑から次々に飛び出す野菜を見つけて収穫します。野菜に似たうさぎも現れるため、何が出てきたかを確かめてからタッチします。",
+    "howToPlay": "野菜が見えたらタッチし、うさぎはそのまま見送ります。練習で見分け方と操作を確認してから遊べます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "star-walk",
+      "post-office",
+      "chameleon-catch"
+    ],
+    "sitemap": true,
+    "popularRank": null,
+    "seo": {
+      "playTitle": "ピョコッとしゅうかく！｜めとあたまのゲームパーク",
+      "playDescription": "畑から飛び出す野菜を見つけてタッチし、野菜うさぎは見送る、無料・登録不要のWebゲームです。",
+      "guideTitle": "ピョコッとしゅうかく！｜動く野菜を見つけて選ぶ無料ゲーム",
+      "guideDescription": "畑から飛び出す野菜とうさぎを見分け、野菜だけを選んで収穫するゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "number-bubbles",
+    "title": "じゅんばんシャボン！",
+    "published": true,
+    "href": "games/number-bubbles/",
+    "guideHref": "guide/number-bubbles/",
+    "titleImage": "assets/home/title-number-bubbles.webp",
+    "playImage": "assets/home/play-number-bubbles.webp",
+    "ogImage": "assets/og/number-bubbles.jpg",
+    "description": "きえたり うごいたりする シャボンだまを、1から じゅんばんに みつけて すばやく ポンしよう。",
+    "skills": [
+      "おいかける",
+      "かんがえる",
+      "すばやく"
+    ],
+    "group": "follow",
+    "activities": [
+      "数字を順番に探す",
+      "動いたり消えたりする位置を追う"
+    ],
+    "guideSummary": "動くシャボン玉から数字を順番に探し、1から選んでいくゲームです。",
+    "overview": "数字が書かれたシャボン玉を、1から順番に見つけて割ります。シャボン玉は動いたり消えたりするため、次の数字と位置を確かめながら進めます。",
+    "howToPlay": "表示された数字の中から次の順番を探してタッチします。モードや数を選べるので、練習してから自分に合う遊び方へ進めます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "star-walk",
+      "total-ten",
+      "yarn-path"
+    ],
+    "sitemap": true,
+    "popularRank": null,
+    "seo": {
+      "playTitle": "じゅんばんシャボン！｜めとあたまのゲームパーク",
+      "playDescription": "動いたり消えたりする数字のシャボン玉を追い、1から順番に見つけて選ぶ無料Webゲームです。",
+      "guideTitle": "じゅんばんシャボン！｜数字を順番に探して選ぶ無料ゲーム",
+      "guideDescription": "動く数字のシャボン玉から次の数字を探し、1から順番に選んでいくゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "chameleon-catch",
+    "title": "カメレオンキャッチ！",
+    "published": true,
+    "href": "games/chameleon-catch/",
+    "guideHref": "guide/chameleon-catch/",
+    "titleImage": "assets/home/title-chameleon-catch.webp",
+    "playImage": "assets/home/play-chameleon-catch.webp",
+    "ogImage": "assets/og/chameleon-catch.jpg",
+    "description": "カメレオンの いろごとの ルールを おぼえて、すきまの むきや タイミングを みて つかまえよう。",
+    "skills": [
+      "おぼえる",
+      "かんがえる",
+      "すばやく"
+    ],
+    "group": "remember",
+    "activities": [
+      "色ごとのルールを覚える",
+      "向きとタイミングを見分けて操作する"
+    ],
+    "guideSummary": "色ごとのルールを覚え、カメレオンの向きを見て捕まえるゲームです。",
+    "overview": "カメレオンの色に対応する捕まえ方を覚え、体の向きやすき間を見てグローブを動かします。色・向き・タイミングを順に確かめる遊びです。",
+    "howToPlay": "練習で色ごとのルールを確認し、現れたカメレオンに合う方向を選びます。ルールと向きが合ったタイミングで捕まえます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "color-ghosts",
+      "pyoko-harvest",
+      "post-office"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "カメレオンキャッチ！｜めとあたまのゲームパーク",
+      "playDescription": "カメレオンの色ごとのルールを覚え、向きとタイミングを見分けて捕まえる無料Webゲームです。",
+      "guideTitle": "カメレオンキャッチ！｜色のルールと向きを判断する無料ゲーム",
+      "guideDescription": "カメレオンの色に対応するルールを覚え、体の向きやタイミングを見て捕まえるゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "yarn-path",
+    "title": "こねこと けいとあそび このいっぽん！",
+    "published": true,
+    "href": "games/yarn-path/",
+    "guideHref": "guide/yarn-path/",
+    "titleImage": "assets/home/title-yarn-path.webp",
+    "playImage": "assets/home/play-yarn-path.webp",
+    "ogImage": "assets/og/yarn-path.jpg",
+    "description": "からまった けいとを ポンポンから ゆっくり たどり、おなじいろに つながる いっぽんを みつけよう。",
+    "skills": [
+      "みつける",
+      "おいかける",
+      "つなぐ"
+    ],
+    "group": "follow",
+    "activities": [
+      "絡まった線を目でたどる",
+      "同じ色につながる一本を見つける"
+    ],
+    "guideSummary": "絡まった毛糸を目でたどり、同じ色へつながる一本を探すゲームです。",
+    "overview": "たくさんの毛糸が交差する中から、選んだポンポンにつながる一本を目でたどります。線が重なる場所でも道筋を確かめ、同じ色の先を見つけます。",
+    "howToPlay": "始点のポンポンから毛糸をゆっくりたどり、つながっている先を選びます。練習と特訓で線の見方を試せます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "star-walk",
+      "waterworks",
+      "alien-search"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "こねこと けいとあそび このいっぽん！｜めとあたまのゲームパーク",
+      "playDescription": "絡まった毛糸を目でたどり、同じ色のポンポンにつながる一本を見つける無料Webゲームです。",
+      "guideTitle": "このいっぽん！｜絡まった毛糸を目でたどる無料ゲーム",
+      "guideDescription": "交差する毛糸の道筋を目でたどり、同じ色につながる一本を見つけるゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "color-ghosts",
+    "title": "おぼえて！いろゆうれい",
+    "published": true,
+    "href": "games/color-ghosts/",
+    "guideHref": "guide/color-ghosts/",
+    "titleImage": "assets/home/title-color-ghosts.webp",
+    "playImage": "assets/home/play-color-ghosts.webp",
+    "ogImage": "assets/og/color-ghosts.jpg",
+    "description": "よるに あらわれる ゆうれいの いろと まどを おぼえ、あさに おなじ ばしょへ おふだを はろう。",
+    "skills": [
+      "おぼえる",
+      "みつける"
+    ],
+    "group": "remember",
+    "activities": [
+      "色と場所を覚える",
+      "覚えた場所を画面から見つける"
+    ],
+    "guideSummary": "夜に見た幽霊の色と場所を覚え、朝に同じ窓を探すゲームです。",
+    "overview": "夜のアパートに現れる幽霊の色と窓の場所を覚え、朝になったら同じ場所へお札を貼ります。見た情報をいったん覚えてから探す遊びです。",
+    "howToPlay": "夜の画面で幽霊の色と位置を確認します。朝の画面に変わったら、覚えている窓を見つけて順に選びます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "jiwa-fushigi",
+      "chameleon-catch",
+      "alien-search"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "おぼえて！いろゆうれい｜めとあたまのゲームパーク",
+      "playDescription": "夜に現れた幽霊の色と窓の場所を覚え、朝に同じ場所を見つけてお札を貼る無料Webゲームです。",
+      "guideTitle": "おぼえて！いろゆうれい｜色と場所を覚えて探す無料記憶ゲーム",
+      "guideDescription": "夜に見た幽霊の色と窓の場所を覚え、朝の画面で同じ場所を探すゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "most-candy",
+    "title": "いちばんおおいキャンディは？",
+    "dialogTitleLines": [
+      "いちばんおおい",
+      "キャンディは？"
+    ],
+    "published": true,
+    "href": "games/most-candy/",
+    "guideHref": "guide/most-candy/",
+    "titleImage": "assets/home/title-most-candy.webp",
+    "playImage": "assets/home/play-most-candy.webp",
+    "ogImage": "assets/og/most-candy.jpg",
+    "description": "9この キャンディを おおきさ・いろ・かたちで くらべ、いちばん おおい なかまの びんを えらぼう。",
+    "skills": [
+      "みつける",
+      "くらべる",
+      "かんがえる"
+    ],
+    "group": "compare",
+    "activities": [
+      "色・形・大きさを見比べる",
+      "最も多い仲間を数えて選ぶ"
+    ],
+    "guideSummary": "キャンディを色・形・大きさで見比べ、最も多い仲間を探すゲームです。",
+    "overview": "並んだキャンディを色・形・大きさなどの特徴で見比べ、同じ仲間がいくつあるかを確かめます。その中から最も多い仲間の瓶を選びます。",
+    "howToPlay": "問題ごとに注目する特徴を確認し、九つのキャンディを見比べます。仲間ごとの数を確かめて、一番多いものを選びます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "magic-gems",
+      "post-office",
+      "robot-factory"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "いちばんおおいキャンディは？｜めとあたまのゲームパーク",
+      "playDescription": "キャンディを色・形・大きさで見比べ、同じ仲間の数を確かめて最も多いものを選ぶ無料Webゲームです。",
+      "guideTitle": "いちばんおおいキャンディは？｜特徴を比べて多い仲間を探すゲーム",
+      "guideDescription": "キャンディの色・形・大きさを見比べ、同じ仲間を数えて最も多いものを選ぶゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "light-window",
+    "title": "クジャーロせんせいの ひかりのまど",
+    "published": true,
+    "href": "games/light-window/",
+    "guideHref": "guide/light-window/",
+    "titleImage": "assets/home/title-light-window.webp",
+    "playImage": "assets/home/play-light-window.webp",
+    "ogImage": "assets/og/light-window.jpg",
+    "description": "ひかりブロックを くるっと まわしたり うらがえしたりして、すきまなく まどに はめて かんせいさせよう。",
+    "skills": [
+      "くらべる",
+      "つなぐ",
+      "かんがえる"
+    ],
+    "group": "think",
+    "activities": [
+      "図形の向きや裏表を見比べる",
+      "ブロックを回してすき間なく組み合わせる"
+    ],
+    "guideSummary": "光のブロックを回したり裏返したりして、窓を完成させるパズルです。",
+    "overview": "いくつかの光のブロックを回転・反転させ、決められた窓の形へすき間なくはめます。形の辺や向きを見比べ、置く場所を考えるパズルです。",
+    "howToPlay": "ブロックを選び、回転や裏返しを使って窓へ配置します。すべてのブロックが重ならずに収まる組み合わせを探します。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "waterworks",
+      "robot-factory",
+      "total-ten"
+    ],
+    "sitemap": true,
+    "popularRank": null,
+    "seo": {
+      "playTitle": "クジャーロせんせいの ひかりのまど｜めとあたまのゲームパーク",
+      "playDescription": "図形のブロックを回したり裏返したりし、すき間なく組み合わせて窓を完成させる無料Webパズルです。",
+      "guideTitle": "ひかりのまど｜図形を回して組み合わせる無料パズル",
+      "guideDescription": "光のブロックの向きや裏表を見比べ、回転・反転させて窓へすき間なく組み合わせるパズルを紹介します。"
+    }
+  },
+  {
+    "slug": "total-ten",
+    "title": "ぽんすけの あわせて10",
+    "published": true,
+    "href": "games/total-ten/",
+    "guideHref": "guide/total-ten/",
+    "titleImage": "assets/home/title-total-ten.webp",
+    "playImage": "assets/home/play-total-ten.webp",
+    "ogImage": "assets/og/total-ten.jpg",
+    "description": "となりあう すうじスライムを つないで、ごうけいを ぴったり10か20にして まちを まもろう。",
+    "skills": [
+      "くらべる",
+      "つなぐ",
+      "かんがえる"
+    ],
+    "group": "math",
+    "activities": [
+      "数字の組み合わせを考える",
+      "隣り合う数字をつないで合計を作る"
+    ],
+    "guideSummary": "隣り合う数字をつなぎ、合計を10や20にするゲームです。",
+    "overview": "数字が書かれたスライムを隣同士でつなぎ、合計をぴったり10または20にします。盤面を見て、使える数字とつなぐ順番を考えます。",
+    "howToPlay": "隣り合う数字を指やマウスでつなぎ、指定された合計になったところで確定します。練習でつなぎ方を確認できます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "number-bubbles",
+      "waterworks",
+      "light-window"
+    ],
+    "sitemap": true,
+    "popularRank": 1,
+    "seo": {
+      "playTitle": "ぽんすけの あわせて10｜めとあたまのゲームパーク",
+      "playDescription": "隣り合う数字をつないで合計をぴったり10や20にし、スライムを切る無料・登録不要のWebゲームです。",
+      "guideTitle": "ぽんすけの あわせて10｜数字をつないで合計を考える無料ゲーム",
+      "guideDescription": "隣り合う数字の組み合わせを考え、つないだ合計を10や20にするゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "star-walk",
+    "title": "ほしぞらの くうちゅうさんぽ",
+    "published": true,
+    "href": "games/star-walk/",
+    "guideHref": "guide/star-walk/",
+    "titleImage": "assets/home/title-star-walk.webp",
+    "playImage": "assets/home/play-star-walk.webp",
+    "ogImage": "assets/og/star-walk.jpg",
+    "description": "うごきかたの ちがう ほしを えらび、ゆびを のせたまま ほしの うごきを しっかり おいかけよう。",
+    "skills": [
+      "おいかける",
+      "すばやく"
+    ],
+    "group": "follow",
+    "activities": [
+      "動く星を目で追う",
+      "星の位置に合わせて指やマウスを動かす"
+    ],
+    "guideSummary": "動き方の違う星を選び、その動きを指やマウスで追うゲームです。",
+    "overview": "空を動き回る星を選び、指やマウスを星に合わせたまま進みます。星ごとに動き方が違うため、画面上の位置を見ながら操作します。",
+    "howToPlay": "追いかける星を選び、星に触れたまま動きに合わせて指やマウスを動かします。練習で操作を試してから始められます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "yarn-path",
+      "number-bubbles",
+      "pyoko-harvest"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "ほしぞらの くうちゅうさんぽ｜めとあたまのゲームパーク",
+      "playDescription": "動き方の違う星を選び、その位置を目で追いながら指やマウスでたどる無料Webゲームです。",
+      "guideTitle": "ほしぞらの くうちゅうさんぽ｜動く星を目で追う無料ゲーム",
+      "guideDescription": "空を動く星の位置を見ながら、指やマウスを合わせて動きをたどるゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "jiwa-fushigi",
+    "title": "がっこうのジワふしぎ",
+    "published": true,
+    "href": "games/jiwa-fushigi/",
+    "guideHref": "guide/jiwa-fushigi/",
+    "titleImage": "assets/home/title-jiwa-fushigi.webp",
+    "playImage": "assets/home/play-jiwa-fushigi.webp",
+    "ogImage": "assets/og/jiwa-fushigi.jpg",
+    "description": "がっこうの けしきが じかんを かけて ジワっと かわるよ。よく みて、3つの へんかを みつけよう。",
+    "skills": [
+      "みつける",
+      "おぼえる",
+      "くらべる"
+    ],
+    "group": "remember",
+    "activities": [
+      "画面の変化を見つける",
+      "変化する前後の様子を見比べる"
+    ],
+    "guideSummary": "学校の風景でゆっくり起きる三つの変化を見つけるゲームです。",
+    "overview": "学校の教室や廊下などの風景を見ながら、時間をかけて少しずつ変わる場所を探します。最初の様子を覚え、現在の画面と見比べます。",
+    "howToPlay": "風景をよく見て、変わったと思う場所を選びます。一つの場面には三つの変化があり、練習では変わり方を確かめられます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "color-ghosts",
+      "alien-search",
+      "most-candy"
+    ],
+    "sitemap": true,
+    "popularRank": 2,
+    "seo": {
+      "playTitle": "がっこうのジワふしぎ｜めとあたまのゲームパーク",
+      "playDescription": "学校の風景を見ながら、時間をかけてゆっくり変わる三つの場所を見つける無料Webゲームです。",
+      "guideTitle": "がっこうのジワふしぎ｜ゆっくり変わる場所を見つける無料ゲーム",
+      "guideDescription": "学校の風景で少しずつ変化する場所を探し、変化する前後の様子を見比べるゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "alien-search",
+    "title": "うちゅうじんをさがせ！",
+    "published": true,
+    "href": "games/alien-search/",
+    "guideHref": "guide/alien-search/",
+    "titleImage": "assets/home/title-alien-search.webp",
+    "playImage": "assets/home/play-alien-search.webp",
+    "ogImage": "assets/og/alien-search.jpg",
+    "description": "はる・なつ・あき・ふゆの にぎやかな えのなかから、みほんと おなじ 5にんの うちゅうじんを さがそう。",
+    "skills": [
+      "みつける",
+      "くらべる"
+    ],
+    "group": "find",
+    "activities": [
+      "見本の特徴を確かめる",
+      "にぎやかな絵の中から同じものを見つける"
+    ],
+    "guideSummary": "季節のにぎやかな絵から、見本と同じ宇宙人を探すゲームです。",
+    "overview": "春夏秋冬の風景にまぎれた宇宙人を、見本の姿と見比べながら探します。色・形・持ち物などの特徴を確かめ、同じ五人を見つけます。",
+    "howToPlay": "画面に示される見本を確認し、風景の中で同じ宇宙人を見つけて選びます。季節ごとに異なる場面で遊べます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "magic-gems",
+      "jiwa-fushigi",
+      "yarn-path"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "うちゅうじんをさがせ！｜めとあたまのゲームパーク",
+      "playDescription": "春夏秋冬のにぎやかな絵の中から、見本と同じ特徴を持つ五人の宇宙人を探す無料Webゲームです。",
+      "guideTitle": "うちゅうじんをさがせ！｜絵の中から見本と同じものを探すゲーム",
+      "guideDescription": "季節のにぎやかな風景から、色や形などを見比べて見本と同じ宇宙人を探すゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "post-office",
+    "title": "ぴったりゆうびんきょく",
+    "published": true,
+    "href": "games/post-office/",
+    "guideHref": "guide/post-office/",
+    "titleImage": "assets/home/title-post-office.webp",
+    "playImage": "assets/home/play-post-office.webp",
+    "ogImage": "assets/og/post-office.jpg",
+    "description": "ながれてくる てがみを よく みて、おなじいろが ちょうど5つに なった しゅんかんに ふえを ふこう。",
+    "skills": [
+      "みつける",
+      "くらべる",
+      "すばやく"
+    ],
+    "group": "compare",
+    "activities": [
+      "流れる手紙の色を見分ける",
+      "同じ色が五通になる瞬間を判断する"
+    ],
+    "guideSummary": "流れる手紙を見て、同じ色が五通そろう瞬間に笛を鳴らすゲームです。",
+    "overview": "ベルトを流れる手紙の色を見分け、同じ色がちょうど五通そろった瞬間を探します。手紙が増える様子を見比べながらタイミングを決めます。",
+    "howToPlay": "流れてくる手紙を確認し、同じ色が五通になったと思ったら笛のボタンを押します。練習で数え方とタイミングを試せます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "most-candy",
+      "pyoko-harvest",
+      "chameleon-catch"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "ぴったりゆうびんきょく｜めとあたまのゲームパーク",
+      "playDescription": "流れる手紙の色を見分け、同じ色がちょうど五通そろう瞬間に笛を鳴らす無料Webゲームです。",
+      "guideTitle": "ぴったりゆうびんきょく｜手紙の色と数を見比べる無料ゲーム",
+      "guideDescription": "流れる手紙の色と数を見比べ、同じ色が五通そろう瞬間を判断するゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "waterworks",
+    "title": "ビーバーおやかたの すいどうこうじ",
+    "published": true,
+    "href": "games/waterworks/",
+    "guideHref": "guide/waterworks/",
+    "titleImage": "assets/home/title-waterworks.webp",
+    "playImage": "assets/home/play-waterworks.webp",
+    "ogImage": "assets/og/waterworks.jpg",
+    "description": "パイプの むきと つながりを かんがえて、すべての いえに みずが とどく すいどうを つくろう。",
+    "skills": [
+      "くらべる",
+      "つなぐ",
+      "かんがえる"
+    ],
+    "group": "compare",
+    "activities": [
+      "パイプの向きと接続を見比べる",
+      "すべての家へ届く道をつなぐ"
+    ],
+    "guideSummary": "パイプの向きを考え、すべての家へ水が届く道を作るパズルです。",
+    "overview": "さまざまな形のパイプを回し、取水口からすべての家へ水が届くようにつなぎます。パイプの入口と出口、全体の道筋を見比べて考えます。",
+    "howToPlay": "パイプを選んで向きを変え、切れ目のない水道を作ります。条件に合う道が完成したら、水が流れるかを確認します。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "light-window",
+      "total-ten",
+      "yarn-path"
+    ],
+    "sitemap": true,
+    "seo": {
+      "playTitle": "ビーバーおやかたの すいどうこうじ｜めとあたまのゲームパーク",
+      "playDescription": "パイプの向きとつながりを考え、すべての家へ水が届く道を作る無料・登録不要のWebパズルです。",
+      "guideTitle": "すいどうこうじ｜パイプの向きを考えて道をつなぐ無料パズル",
+      "guideDescription": "パイプの入口と出口を見比べて向きを変え、すべての家へ水が届く道をつなぐパズルの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "robot-factory",
+    "title": "よみがえれ！ ロボこうじょう",
+    "published": true,
+    "href": "games/robot-factory/",
+    "guideHref": "guide/robot-factory/",
+    "titleImage": "assets/home/title-robot-factory.webp",
+    "playImage": "assets/home/play-robot-factory.webp",
+    "ogImage": "assets/og/robot-factory.jpg",
+    "description": "いろと かたちが あう パーツを みつけて いきものロボを くみたて、ねむった こうじょうを よみがえらせよう。",
+    "skills": [
+      "みつける",
+      "くらべる",
+      "つなぐ"
+    ],
+    "group": "think",
+    "activities": [
+      "見本の色と形を見分ける",
+      "条件に合うパーツを探して組み合わせる"
+    ],
+    "guideSummary": "見本と同じ色・形のパーツを探し、動物ロボを組み立てるゲームです。",
+    "overview": "注文に示された色と形を確かめ、パーツ置き場から条件に合う部品を探します。正しいパーツを組み合わせ、動物ロボを完成させます。",
+    "howToPlay": "見本のパーツを確認し、色と形の両方が合うものを選んで組み立てます。注文を順に完成させると工場が動き始めます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "magic-gems",
+      "most-candy",
+      "light-window"
+    ],
+    "sitemap": true,
+    "deviceNote": "タブレットがおすすめ",
+    "seo": {
+      "playTitle": "よみがえれ！ ロボこうじょう｜めとあたまのゲームパーク",
+      "playDescription": "見本と同じ色・形のパーツを見つけて組み合わせ、動物ロボを完成させる無料Webゲームです。",
+      "guideTitle": "ロボこうじょう｜色と形を見分けてパーツを組み合わせるゲーム",
+      "guideDescription": "見本の色と形を確かめ、条件に合うパーツを探して動物ロボを組み立てるゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "world-zoo",
+    "title": "せかいどうぶつえん",
+    "published": true,
+    "publishedAt": "2026-08-25",
+    "href": "games/world-zoo/",
+    "guideHref": "guide/world-zoo/",
+    "titleImage": "assets/home/title-world-zoo.webp",
+    "playImage": "assets/home/play-world-zoo.webp",
+    "ogImage": "assets/og/world-zoo.jpg",
+    "description": "5×5の せきばんから もじを つないで どうぶつの なまえを みつけ、100しゅるいの なかまを よみがえらせよう。",
+    "skills": [
+      "みつける",
+      "つなぐ",
+      "かんがえる"
+    ],
+    "group": "language",
+    "activities": [
+      "五×五の文字盤から動物の名前を見つける",
+      "上下左右につながる文字を順番になぞる"
+    ],
+    "guideSummary": "文字盤の中から動物の名前を見つけ、百種類の仲間をよみがえらせるゲームです。",
+    "overview": "五×五の石板に並んだ文字を見て、上下左右につながる文字をなぞり、動物の名前を探します。見つけた動物は八つのエリアにある動物リストへ記録されます。",
+    "howToPlay": "石板から動物の名前になる文字の道を見つけ、最初の文字から最後の文字まで指やマウスでなぞります。練習では道の見方とヒントの使い方を順に試せます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "alien-search",
+      "yarn-path",
+      "robot-factory"
+    ],
+    "sitemap": true,
+    "featureNote": "100しゅるい",
+    "seo": {
+      "playTitle": "せかいどうぶつえん｜めとあたまのゲームパーク",
+      "playDescription": "五×五の文字盤から上下左右につながる動物の名前を見つけ、百種類の仲間を集める無料Webゲームです。",
+      "guideTitle": "せかいどうぶつえん｜文字をつないで動物を探す無料ゲーム",
+      "guideDescription": "五×五の文字盤から動物の名前を探し、上下左右につながる文字をなぞって百種類の仲間を集める遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "kemono-karate",
+    "title": "けもの空手 一手入魂！",
+    "published": true,
+    "publishedAt": "2026-08-25",
+    "href": "games/kemono-karate/",
+    "guideHref": "guide/kemono-karate/",
+    "titleImage": "assets/home/title-kemono-karate.webp",
+    "playImage": "assets/home/play-kemono-karate.webp",
+    "ogImage": "assets/og/kemono-karate.jpg",
+    "description": "ためる・まもる・はなつから いってを えらび、あいての かんがえを よんで さきに3ぼん とろう。",
+    "skills": [
+      "えらぶ",
+      "かんがえる"
+    ],
+    "group": "communication",
+    "activities": [
+      "三つの技から一手を選ぶ",
+      "相手の気合いや選び方を見て次の手を考える"
+    ],
+    "guideSummary": "ためる・まもる・はなつの三手で、相手の考えを読み合う対戦ゲームです。",
+    "overview": "ためる・まもる・はなつの関係と気合いの量を使い、相手が次に選ぶ手を予想します。二人対戦では、同じ画面を囲んで互いの考えを読み合います。一人でCPUへ挑戦することもできます。",
+    "howToPlay": "二人対戦または一人対戦を選び、毎手ごとに三つの技から一つを決めます。ためると気合いが増え、はなつには気合いが必要です。技の関係を考えながら、先に三本を取ると勝ちです。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "chameleon-catch",
+      "total-ten",
+      "post-office"
+    ],
+    "sitemap": true,
+    "featureNote": "2人で心理戦",
+    "seo": {
+      "playTitle": "けもの空手 一手入魂！｜めとあたまのゲームパーク",
+      "playDescription": "ためる・まもる・はなつの三手から相手の考えを読み、先に三本を取る二人対戦・一人対戦対応の無料Webゲームです。",
+      "guideTitle": "けもの空手 一手入魂！｜相手の考えを読む心理戦ゲーム",
+      "guideDescription": "ためる・まもる・はなつの関係と気合いを使い、相手の次の一手を考えて対戦するゲームの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "warikiri-code",
+    "title": "わりきりコード",
+    "published": true,
+    "publishedAt": "2026-08-25",
+    "href": "games/warikiri-code/",
+    "guideHref": "guide/warikiri-code/",
+    "titleImage": "assets/home/title-warikiri-code.webp",
+    "playImage": "assets/home/play-warikiri-code.webp",
+    "ogImage": "assets/og/warikiri-code.jpg",
+    "description": "バグった すうじを わりきれる キーで 1まで なおし、コンボを つないで スコアを のばそう。",
+    "skills": [
+      "くらべる",
+      "かんがえる",
+      "すばやく"
+    ],
+    "group": "math",
+    "activities": [
+      "数字を割り切れる数を判断する",
+      "大きな数を一まで割る順番を考える"
+    ],
+    "guideSummary": "数字を割り切れるキーで一まで直し、スコアを伸ばす数のゲームです。",
+    "overview": "画面に現れる数字のバグを見て、二・三・五などのキーから割り切れる数を選びます。数字を一まで小さくして修理し、ボスや二つの数を一緒に割る問題にも挑戦します。",
+    "howToPlay": "修理する数字を確認し、割り切れる数のキーを選びます。答えが整数になるキーを続けて使い、数字を一にすると修理完了です。練習、エンドレス、約分の三つの遊び方があります。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "total-ten",
+      "number-bubbles",
+      "light-window"
+    ],
+    "sitemap": true,
+    "popularRank": 3,
+    "featureNote": "中・高学年向け",
+    "seo": {
+      "playTitle": "わりきりコード｜めとあたまのゲームパーク",
+      "playDescription": "数字を割り切れるキーを選び、一になるまで割ってバグを修理する無料の算数Webゲームです。",
+      "guideTitle": "わりきりコード｜割り切れる数を考える無料算数ゲーム",
+      "guideDescription": "数字を割り切れるキーを判断し、一になるまで割る順番を考えるゲームの内容と遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "mentaru-shindan",
+    "title": "めんタルしんだん",
+    "published": true,
+    "publishedAt": "2026-08-25",
+    "href": "games/mentaru-shindan/",
+    "guideHref": "guide/mentaru-shindan/",
+    "titleImage": "assets/home/title-mentaru-shindan.webp?v=20260922",
+    "playImage": "assets/home/play-mentaru-shindan.webp?v=20260922",
+    "ogImage": "assets/og/mentaru-shindan.jpg?v=20260922",
+    "description": "12の ばめんで じぶんに ちかい こうどうを えらび、36しゅるいの めんキャラから けっかを みて はなそう。",
+    "skills": [
+      "えらぶ",
+      "かんがえる"
+    ],
+    "group": "communication",
+    "activities": [
+      "十二の場面で自分に近い行動を選ぶ",
+      "結果を家族や友達と見せ合って話す"
+    ],
+    "guideSummary": "十二の場面で行動を選び、三十六種類のめんキャラの結果を見て話せる診断ゲームです。",
+    "overview": "学校や家で起こる十二の場面を読み、自分の行動に一番近い答えを選びます。結果は六つのめん族と六つの味わいを組み合わせた三十六種類です。家族や友達と結果を見せ合い、違いやよさを話すきっかけにできます。",
+    "howToPlay": "ひらがなまたは三年生までの漢字を選び、十二の質問へ順番に答えます。最後にめんキャラと今回よく選んだ行動が表示されます。正解・不正解はなく、医学や心理学の検査、能力の点数ではありません。",
+    "seeingGuide": false,
+    "isVisionTraining": false,
+    "related": [
+      "kemono-karate",
+      "most-candy",
+      "color-ghosts"
+    ],
+    "sitemap": true,
+    "featureNote": "正解なし・36タイプ",
+    "seo": {
+      "playTitle": "めんタルしんだん｜めとあたまのゲームパーク",
+      "playDescription": "十二の場面で自分に近い行動を選び、三十六種類のめんキャラから結果を見る無料の診断ゲームです。",
+      "guideTitle": "めんタルしんだん｜答えを選んで結果を話せる無料ゲーム",
+      "guideDescription": "十二の場面で自分に近い行動を選び、三十六種類のめんキャラの結果を家族や友達と話せるゲームを紹介します。"
+    }
+  },
+  {
+    "slug": "seirei-okuri",
+    "title": "せいれいおくり",
+    "published": true,
+    "publishedAt": "2026-10-21",
+    "href": "games/seirei-okuri/",
+    "guideHref": "guide/seirei-okuri/",
+    "titleImage": "assets/home/title-seirei-okuri.webp",
+    "playImage": "assets/home/play-seirei-okuri.webp",
+    "ogImage": "assets/og/seirei-okuri.jpg",
+    "description": "ランタンの せいれいを うつして おなじ なかまを そろえ、うごかす じゅんばんを かんがえて そらへ おくろう。",
+    "skills": [
+      "つなぐ",
+      "かんがえる"
+    ],
+    "group": "logic",
+    "activities": [
+      "ランタンのせいれいを同じ仲間にそろえる",
+      "空き場所と移す順番を考える"
+    ],
+    "guideSummary": "ランタンのせいれいを移し、同じ仲間をそろえて空へ送るパズルゲームです。",
+    "overview": "ランタンに入ったせいれいを別のランタンへ移し、同じ仲間だけの組み合わせを作ります。空き場所をどのように使うか、どの順番で移すかを考えながら、五十のステージに挑戦します。",
+    "howToPlay": "ランタンを押して上にいるせいれいを選び、移したいランタンを押します。同じ仲間を三つそろえるとランタンと一緒に空へ送れます。練習で基本を確かめてから、少しずつ増えるルールに挑戦できます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "peko-bento",
+      "waterworks",
+      "total-ten"
+    ],
+    "sitemap": true,
+    "featureNote": "全50ステージ",
+    "seo": {
+      "playTitle": "せいれいおくり｜めとあたまのゲームパーク",
+      "playDescription": "ランタンのせいれいを移して同じ仲間をそろえ、空へ送る順番を考える無料のWebパズルゲームです。",
+      "guideTitle": "せいれいおくり｜移す順番を考える無料パズルゲーム",
+      "guideDescription": "ランタンのせいれいを同じ仲間にそろえ、空き場所と移す順番を考えて五十のステージに挑戦する遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "peko-bento",
+    "title": "ペコのひみつのおべんとう",
+    "dialogTitleLines": [
+      "ペコのひみつの",
+      "おべんとう"
+    ],
+    "published": true,
+    "publishedAt": "2026-10-21",
+    "href": "games/peko-bento/",
+    "guideHref": "guide/peko-bento/",
+    "titleImage": "assets/home/title-peko-bento.webp",
+    "playImage": "assets/home/play-peko-bento.webp",
+    "ogImage": "assets/og/peko-bento.jpg",
+    "description": "○と△の ヒントと これまでの きろくを くらべ、3つの おかずと ばしょを すいりして ひみつの ふたを あけよう。",
+    "skills": [
+      "くらべる",
+      "かんがえる",
+      "えらぶ"
+    ],
+    "group": "logic",
+    "activities": [
+      "○と△のヒントを読み取る",
+      "これまでの記録を比べておかずと場所を推理する"
+    ],
+    "guideSummary": "○と△のヒントから、三つのおかずと入っている場所を推理するゲームです。",
+    "overview": "候補のおかずから三つを選んでおべんとうに入れ、○と△で示される結果を確かめます。これまでに試した並びを見比べながら、ひみつのおべんとうのおかずと場所を筋道立てて考えます。",
+    "howToPlay": "三つのおかずを選んで、左・真ん中・右のおべんとうへ入れます。○はおかずも場所も正解、△はおかずだけが正解です。練習でヒントの読み方を覚えたら、やさしい・ふつう・むずかしいから選んで何度でも挑戦できます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "seirei-okuri",
+      "most-candy",
+      "post-office"
+    ],
+    "sitemap": true,
+    "featureNote": "○△で推理",
+    "seo": {
+      "playTitle": "ペコのひみつのおべんとう｜めとあたまのゲームパーク",
+      "playDescription": "○と△のヒントとこれまでの記録を比べ、三つのおかずと場所を推理する無料のWebゲームです。",
+      "guideTitle": "ペコのひみつのおべんとう｜○△で推理する無料ゲーム",
+      "guideDescription": "○と△のヒントを読み取り、これまでに試したおべんとうを比べて三つのおかずと場所を推理する遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "kamesennin-cards",
+    "title": "かめせんにんの けいさんカードあそび",
+    "dialogTitleLines": [
+      "かめせんにんの",
+      "けいさんカードあそび"
+    ],
+    "published": true,
+    "publishedAt": "2026-11-01",
+    "href": "games/kamesennin-cards/",
+    "guideHref": "guide/kamesennin-cards/",
+    "titleImage": "assets/home/title-kamesennin-cards.webp",
+    "playImage": "assets/home/play-kamesennin-cards.webp",
+    "ogImage": "assets/og/kamesennin-cards.jpg",
+    "description": "たしざん・ひきざん・かけざんの カードで、こたえを えらんだり ならべたり。じぶんに あう あそびかたで れんしゅうしよう。",
+    "skills": [
+      "くらべる",
+      "かんがえる",
+      "えらぶ"
+    ],
+    "group": "math",
+    "activities": [
+      "たし算・ひき算・かけ算の答えを考える",
+      "カードの答えを選んだり小さい順に並べたりする"
+    ],
+    "guideSummary": "計算カードの答えを選んだり並べたりしながら、自分に合う方法で練習できるゲームです。",
+    "overview": "たし算・ひき算・かけ算からコースを選び、計算カードに取り組みます。答えを選ぶ、声に出して確かめる、同じ答えのカードを探す、答えの小さい順に並べるという四つの遊び方があります。",
+    "howToPlay": "計算コースと遊び方を選んで始めます。カードの式を見て答えを選ぶほか、カードを探したり順番に並べたりできます。必要に応じて数のブロックを表示し、考え方を確かめながら進められます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "total-ten",
+      "warikiri-code",
+      "number-bubbles"
+    ],
+    "sitemap": true,
+    "featureNote": "3コース・4つの遊び方",
+    "seo": {
+      "playTitle": "かめせんにんの けいさんカードあそび｜めとあたまのゲームパーク",
+      "playDescription": "たし算・ひき算・かけ算のカードを使い、答えを選んだり並べたりして遊べる無料の算数Webゲームです。",
+      "guideTitle": "けいさんカードあそび｜計算の答えを選んで並べる無料ゲーム",
+      "guideDescription": "たし算・ひき算・かけ算のカードで、答えを選ぶ、探す、順番に並べる四つの遊び方を紹介します。"
+    }
+  },
+  {
+    "slug": "tsurusennin-shodo",
+    "title": "つるせんにんの しょどうきょうしつ",
+    "dialogTitleLines": [
+      "つるせんにんの",
+      "しょどうきょうしつ"
+    ],
+    "published": true,
+    "publishedAt": "2026-11-01",
+    "href": "games/tsurusennin-shodo/",
+    "guideHref": "guide/tsurusennin-shodo/",
+    "titleImage": "assets/home/title-tsurusennin-shodo.webp",
+    "playImage": "assets/home/play-tsurusennin-shodo.webp",
+    "ogImage": "assets/og/tsurusennin-shodo.jpg",
+    "description": "つるせんにんと ひらがな・カタカナを かいて、おてほんと くらべよう。ひともじ・ことばの 2つの れんしゅうで きわめよう。",
+    "skills": [
+      "くらべる",
+      "かんがえる",
+      "えらぶ"
+    ],
+    "group": "language",
+    "activities": [
+      "ひらがな・カタカナをお手本と見比べて書く",
+      "絵を見て言葉を一文字ずつ書く"
+    ],
+    "guideSummary": "ひらがなとカタカナを、お手本と見比べながら一文字や言葉で練習できるゲームです。",
+    "overview": "ひらがなとカタカナの教室を選び、お手本を見ながら文字を書きます。一文字を繰り返して花丸を目指す練習と、絵を見て言葉を一文字ずつ書く練習があり、書けた言葉はコレクションに記録されます。",
+    "howToPlay": "ひらがなまたはカタカナの教室を選びます。一文字の練習では書きたい文字を選び、画面のマスに書いて確かめます。言葉の練習では絵を見ながら一文字ずつ書き、文字の順番も確かめます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "world-zoo",
+      "kamesennin-cards",
+      "alien-search"
+    ],
+    "sitemap": true,
+    "featureNote": "ひらがな・カタカナ",
+    "seo": {
+      "playTitle": "つるせんにんの しょどうきょうしつ｜めとあたまのゲームパーク",
+      "playDescription": "ひらがな・カタカナをお手本と見比べ、一文字や言葉を書いて練習できる無料の国語Webゲームです。",
+      "guideTitle": "つるせんにんの しょどうきょうしつ｜文字を書く無料ゲーム",
+      "guideDescription": "ひらがなとカタカナを、お手本と見比べながら一文字や言葉で練習するゲームの内容と遊び方を紹介します。"
+    }
+  }
 ];
