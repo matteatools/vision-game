@@ -23,7 +23,7 @@ function score(strokes, entry) {
   // Reject a collapsed shape (e.g. a horizontal line mistaken for ヘ), even
   // when the average distance is small. Preserve natural size variation.
   const extent=(lines,axis)=>{const values=lines.flat().map(p=>p[axis]);return Math.max(...values)-Math.min(...values);};
-  const hasShape=[0,1].every(axis=>extent(entry.strokes,axis)<12 || extent(strokes,axis)>=extent(entry.strokes,axis)*.5);
+  const hasShape=[0,1].every(axis=>extent(entry.strokes,axis)<12 || extent(strokes,axis)>=extent(entry.strokes,axis)*.42);
   const errors = strokes.map((s,i) => strokeDistance(s,entry.strokes[i]));
   const endpoints = strokes.map((s,i) => Math.max(distance(s[0],entry.strokes[i][0]),distance(s.at(-1),entry.strokes[i].at(-1))));
   return { character: entry.character, score: errors.reduce((a,b)=>a+b,0)/errors.length,
@@ -63,5 +63,6 @@ export function gradeHandwriting(strokes, character, bank=master) {
  const matched=Math.min(strokes.length,entry.strokeCount);
  const error=strokes.slice(0,matched).reduce((sum,s,i)=>sum+strokeDistance(s,entry.strokes[i]),0)/matched;
  const raw=Math.max(0,Math.floor(100-error*1.5-Math.abs(strokes.length-entry.strokeCount)*25+1e-8));
- return score(strokes,entry)?.valid ? raw : Math.min(94,raw);
+ // A shape that does not pass recognition can never receive a flower score.
+ return score(strokes,entry)?.valid ? raw : Math.min(89,raw);
 }

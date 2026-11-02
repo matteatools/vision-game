@@ -127,3 +127,6 @@ body:has(.pause-layer) .ten-blocks *{animation-play-state:paused!important}
 .sticker-btn small{overflow-wrap:anywhere}
 .gacha select{width:100%;min-width:0}
 @media(max-width:420px){.inventory{grid-template-columns:repeat(4,minmax(0,1fr))}.gacha{padding:18px 14px}.collection-panel{padding:16px 12px}}
+/* Dragging inserts a card at the drop position; tapping two cards still swaps them. */
+.sort-card.sort-drop-target{outline:3px dashed #d9b261;outline-offset:3px;background:#fff8df}
+.sort-drag-ghost{position:fixed!important;z-index:100;max-width:none!important;margin:0!important;pointer-events:none!important;opacity:.92!important;transform:rotate(2deg) scale(1.03)!important;box-shadow:0 12px 30px #38534833!important}
