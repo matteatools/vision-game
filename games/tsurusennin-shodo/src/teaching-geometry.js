@@ -24,9 +24,10 @@ export function buildTeachingMaster(source,script){
  pairs.forEach(([bases,marks],group)=>{[...marks].forEach((c,i)=>{voicedBases[c]=bases[i];const body=transform(raw[bases[i]],.85,.92,1,5);const marksData=group===1?['M88 12 C96 12 96 24 88 24 C80 24 80 12 88 12']:['M79 12 Q83 15 86 20','M89 10 Q93 13 96 18'];raw[c]=[...body,...marksData.map(path=>({path:parsePath(path),role:'mark',taper:group===0}))];});});
  if(!hira)raw['ー']=[{path:parsePath('M50 16 L50 84')}];
  const smallChars=smallPairs.map(x=>x[0]);return Object.fromEntries(Object.entries(raw).map(([character,definitions])=>{const strokes=definitions.map(s=>sample(s.path)),small=smallChars.includes(character);return [character,{
- id:`${script}-${character.codePointAt(0).toString(16)}`,character,version:'0.5.0',type:small?'small':character==='ー'?'long':voicedBases[character]?'voiced':'normal',strokes,strokeCount:strokes.length,
+ id:`${script}-${character.codePointAt(0).toString(16)}`,character,version:'0.7.0',type:small?'small':character==='ー'?'long':voicedBases[character]?'voiced':'normal',strokes,strokeCount:strokes.length,
+ reference:'font',referenceStrokeWidths:definitions.map(s=>s.role==='mark'?5.5:voicedBases[character]?8.5:10),
  displayPaths:definitions.map(s=>s.path.map(([op,...p])=>op+p.join(' ')).join(' ')),outlinePaths:definitions.map((s,i)=>outline(strokes[i],s.taper,s.scale)),directions:strokes.map(s=>({start:s[0],end:s.at(-1)})),region:small?[52,4,95,47]:[10,10,90,90],
  tolerance:{meanDistance:small?9:14,endpointDistance:small?16:25,ambiguityMargin:1.4,perStroke:definitions.map(s=>s.role==='mark'?{meanDistance:6,endpointDistance:10}:null)},
- verification:{status:'prototype-unreviewed',source:'独自作成の教科書体に近い運筆曲線（src/teaching-paths.js）',license:null,history:['2026-10-31 全基本文字を再作図。とめ・はらい、字形の比率、分離する画を統一。教育専門家の監修は未実施。','2026-11-02 学習用教科書体の見本を参照し、線幅、丸い始筆、はらいの見え方を調整。児童の自然なずれを許容するよう判定幅を緩和。']}
+ verification:{status:'prototype-unreviewed',source:'Klee One SemiBold の表示字形に沿って独自作成した運筆曲線（src/teaching-paths.js）',license:null,history:['2026-10-31 全基本文字を再作図。とめ・はらい、字形の比率、分離する画を統一。教育専門家の監修は未実施。','2026-11-02 学習用教科書体の見本を参照し、線幅、丸い始筆、はらいの見え方を調整。児童の自然なずれを許容するよう判定幅を緩和。','2026-11-02 添付見本の書体が UD デジタル教科書体であることを確認し、全字を比較。','2026-11-02 Chromebookでも3・4画目が分離した「き」を表示するため、Klee One SemiBoldを全端末共通のお手本へ変更。輪郭を文字サイズの1.8%太くし、全基本文字で表示位置を再確認。']}
  }];}));
 }
