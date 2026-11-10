@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>けもの空手 対戦ルーム｜めとあたまのゲームパーク</title><link rel="stylesheet" href="./style.css"></head>
+<body><main><header><img src="../assets/logo-kemono-karate-isshu-nyukon-v1.webp" alt="けもの空手 一手入魂！"><h1>オンライン対戦ルーム</h1></header>
+<section id="lobby"><p>ふたりで技を選んで、先に三本取ろう。</p><label>選手を選ぶ <select id="fighter"></select></label><button id="enter">部屋を作る</button>
+<form id="joinForm"><label>部屋番号 <input id="code" type="text" inputmode="numeric" pattern="[0-9０-９]{4}" maxlength="4" size="5" placeholder="例 0123" required></label><button id="join">番号で入る</button></form></section>
+<section id="arena" hidden><h2>相手の入室を待っています</h2><div id="invite"><p id="numberLabel">相手に伝える部屋番号 <strong id="number"></strong></p><button id="copy">招待リンクをコピー</button></div>
+</section>
+<p id="error" role="alert"></p><details><summary>あそびかた</summary><p>ためると気合いが1増えます。はなつと全部の気合いを使い、ためている相手から一本取れます。お互いにはなつと、気合いが多い方が一本。同じなら相殺です。</p><p>まもると攻撃を防げます。気合い5では「はなつ」だけが使え、まもりを破れます。一本の後は、それぞれ取られた本数ぶんの気合いで再開します。</p></details>
+<a id="home" href="./" hidden>新しい部屋へ</a><p><small>おとの そざい：<a href="https://otologic.jp/">OtoLogic</a>（<a href="https://creativecommons.org/licenses/by/4.0/deed.ja">CC BY 4.0</a>）</small></p></main><script type="module" src="./room.js"></script></body></html>
+

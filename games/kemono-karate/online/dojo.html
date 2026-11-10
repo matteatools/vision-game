@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>けもの空手 一手入魂！｜オンライン対戦</title><link rel="stylesheet" href="../style.css"></head><body><main>    <section id="game" class="screen active cpu-mode" aria-label="たいせんがめん">
+      <header class="hud">
+        <button class="back" data-back>× やめる</button>
+        <div class="match-name"><span id="modeLabel">ふたりで たいせん</span><b id="roundLabel">1 てめ</b></div>
+        <button id="soundBtn" class="sound" aria-label="おとのオンオフ">♪</button>
+      </header>
+      <div class="scoreboard">
+        <div class="red-side"><span id="p1Name">コタロウ</span><b id="p1Score">○ ○ ○</b></div>
+        <p>さきに<br><strong>3</strong> ほん</p>
+        <div class="blue-side"><span id="p2Name">レオン</span><b id="p2Score">○ ○ ○</b></div>
+      </div>
+      <div class="dojo">
+        <div id="p1Fighter" class="fighter p1-side" data-ki="0" data-fighter="kotaro">
+          <div class="fighter-visual">
+            <div class="ki-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <img id="p1Art" class="fighter-art" src="../assets/fighters/kotaro-charge-v1.webp" alt="コタロウ">
+            <div class="guard-field" aria-hidden="true"></div>
+            <div class="guard-shards" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <h3 id="fighterP1Name">コタロウ</h3><div id="p1Ki" class="ki" aria-label="コタロウの きあい 0 / 5"></div>
+        </div>
+        <div class="center"><div id="countdown">かまえ！</div><div id="message" role="status">わざを えらぼう</div></div>
+        <div id="p2Fighter" class="fighter p2-side" data-ki="0" data-fighter="leon">
+          <div class="fighter-visual">
+            <div class="ki-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <img id="p2Art" class="fighter-art" src="../assets/fighters/leon-charge-v1.webp" alt="レオン">
+            <div class="guard-field" aria-hidden="true"></div>
+            <div class="guard-shards" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <h3 id="fighterP2Name">レオン</h3><div id="p2Ki" class="ki" aria-label="レオンの きあい 0 / 5"></div>
+        </div>
+        <div id="battleFx" class="battle-fx" aria-hidden="true">
+          <div id="p1Shot" class="energy-shot p1-shot"></div>
+          <div id="p2Shot" class="energy-shot p2-shot"></div>
+          <div id="clashFx" class="clash-fx"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div id="breakthroughFx" class="breakthrough-fx"></div>
+          <div id="finishFx" class="finish-fx">
+            <div class="finish-core"></div>
+            <div class="finish-rings"><i></i><i></i><i></i></div>
+            <div class="finish-slashes"><i></i><i></i><i></i><i></i></div>
+            <div class="finish-fragments"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <strong id="finishFxText"></strong>
+          </div>
+        </div>
+        <div id="eventBanner" class="event-banner" role="status" aria-live="assertive" aria-atomic="true">
+          <span id="eventBannerName"></span><strong id="eventBannerText"></strong>
+        </div>
+      </div>
+      <div id="turnPanels" class="turn-panels">
+        <div class="turn-panel p1"><p><i>あか</i> <span id="panelP1Label">コタロウの ばん</span></p><div class="actions" data-player="1"></div></div>
+        <div class="turn-panel p2" style="display:none"><p><i>あお</i> <span id="panelP2Name">レオン</span>の ばん</p><div class="actions" data-player="2"></div></div>
+      </div>
+      <p id="keyHelp" class="key-help">キー：コタロウ A・S・D ／ レオン J・K・L</p>
+    </section>
+
+    <section id="result" class="screen" aria-labelledby="resultTitle">
+      <div class="result-card">
+        <div id="resultPoses" class="result-poses" aria-hidden="true">
+          <img id="resultWinnerArt" alt=""><img id="resultLoserArt" alt="">
+        </div>
+        <p class="kicker">しょうぶあり！</p><h2 id="resultTitle">コタロウの かち！</h2><p id="resultLine">みごとな いっぽん！</p>
+        <button class="primary" data-back>対戦ルームへ</button>
+      </div>
+    </section>
+</main><script type="module" src="./dojo.js"></script></body></html>
