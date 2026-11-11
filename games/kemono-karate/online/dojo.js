@@ -622,9 +622,11 @@ async function applySnapshot(next) {
     playSfx('victory');
     return;
   }
-  resetFighterEffects();
-  drawMeters(next.round, localOrder(next.score), localOrder(next.ki));
-  setCountdown('かまえ！');
+  if (!previous || next.round !== previous.round) {
+    resetFighterEffects();
+    drawMeters(next.round, localOrder(next.score), localOrder(next.ki));
+    setCountdown('かまえ！');
+  }
   const waiting = next.ready[next.seat];
   announce(waiting ? 'けってい！ あいての わざを まっています' : 'あなたの わざを えらぼう');
   lockInput(waiting);
