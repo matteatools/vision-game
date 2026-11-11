@@ -2643,6 +2643,10 @@
                 margin-top: 8px;
             }
         }
+        #slime-room { margin: auto; max-width: 92vw; padding: 1.4rem; border-radius: 1rem; color: #20314b; }
+        #slime-room::backdrop { background: #101827b3; }
+        #slime-room fieldset { display: grid; gap: .7rem; border: 0; padding: .6rem 0; }
+        #slime-room button, #slime-room input { padding: .55rem; font: inherit; }
     </style>
 </head>
 <body>
@@ -2673,6 +2677,7 @@
                 <div class="title-menu">
                     <button class="secondary-button practice-button" type="button" onclick="showPracticeIntro()">れんしゅう</button>
                     <button class="primary-button" type="button" onclick="startGame()">スタート</button>
+                    <button class="secondary-button" type="button" onclick="slimeMatch.openRoom()">オンラインでたいせん</button>
                     <a class="secondary-button classic" href="./classic.html">クラシック</a>
                     <a class="secondary-button park-link" href="../../index.html">ゲームパークへ もどる</a>
                 </div>
@@ -2750,6 +2755,17 @@
             </div>
         </section>
 
+        <dialog id="slime-room" aria-labelledby="slime-room-title">
+            <h2 id="slime-room-title">オンラインでたいせん</h2>
+            <p>消したスライムが相手の盤面に降るよ。</p>
+            <fieldset>
+                <button type="button" data-create>部屋をつくる</button>
+                <label>部屋番号 <input inputmode="numeric" maxlength="4" size="4" placeholder="0000"></label>
+                <button type="button" data-join>部屋に入る</button>
+            </fieldset>
+            <p role="status" aria-live="polite"></p>
+            <button type="button" data-close>もどる</button>
+        </dialog>
         <div id="flash-overlay"></div>
 
         <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
@@ -3007,6 +3023,8 @@
         }
 
         function showTitle() {
+            if (window.slimeMatch?.lose()) return;
+            document.querySelector("#result-screen .primary-button").onclick = startGame;
             clearInterval(timerInterval);
             timerInterval = null;
             resetPauseState({ clearTasks: true });
@@ -3297,6 +3315,7 @@
         }
 
         function finishBattle() {
+            if (slimeMatch.lose()) return;
             clearInterval(timerInterval);
             timerInterval = null;
             isResolving = true;
@@ -3666,6 +3685,7 @@
             drawPath();
             updateSumDisplay();
 
+            slimeMatch.send(blocksToRemove);
             blocksToRemove.forEach((block, index) => {
                 if (board[block.c]?.[block.r] === block) board[block.c][block.r] = null;
                 scheduleGameTimeout(() => block.el?.classList.add("clearing"), Math.min(index * 7, 90));
@@ -3862,5 +3882,6 @@
         updateMusicButtons();
         showTitle();
     </script>
+    <script src="./online.js"></script>
 </body>
 </html>
