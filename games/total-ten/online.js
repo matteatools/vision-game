@@ -140,9 +140,17 @@ window.slimeMatch = (() => {
   dialog.addEventListener('close', () => { if (session && !session.started) session = null; });
   return {
     openRoom, lose,
+    get active() { return Boolean(session?.started); },
     send(blocks) {
-      if (session?.started && !session.lost)
-        session.outbox.push({ id: session.next++, values: blocks.map(block => block.val) });
+      const count = Math.floor(blocks.length / 2);
+      if (!session?.started || session.lost || count === 0) return;
+      const pool = blocks.map(block => block.val);
+      const values = [];
+      while (values.length < count) {
+        const index = Math.floor(Math.random() * pool.length);
+        values.push(pool.splice(index, 1)[0]);
+      }
+      session.outbox.push({ id: session.next++, values });
     }
   };
 })();

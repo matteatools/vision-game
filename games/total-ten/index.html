@@ -2757,7 +2757,7 @@
 
         <dialog id="slime-room" aria-labelledby="slime-room-title">
             <h2 id="slime-room-title">オンラインでたいせん</h2>
-            <p>消したスライムが相手の盤面に降るよ。</p>
+            <p>消したスライムの半分が相手の盤面に降るよ。4匹でも5匹でも、降るのは2匹！</p>
             <fieldset>
                 <button type="button" data-create>部屋をつくる</button>
                 <label>部屋番号 <input inputmode="numeric" maxlength="4" size="4" placeholder="0000"></label>
@@ -3242,7 +3242,7 @@
             boardEl.querySelectorAll(".block, .particle, .shockwave, .effect-text, .warning-effect, .score-pop").forEach((el) => el.remove());
             board = Array.from({ length: COLS }, () => Array(ROWS).fill(null));
 
-            const startRow = ROWS - INITIAL_FILLED_ROWS;
+            const startRow = ROWS - (window.slimeMatch?.active ? 2 : INITIAL_FILLED_ROWS);
             for (let c = 0; c < COLS; c++) {
                 for (let r = startRow; r < ROWS; r++) {
                     board[c][r] = createBlock(c, r);
