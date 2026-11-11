@@ -2757,7 +2757,7 @@
 
         <dialog id="slime-room" aria-labelledby="slime-room-title">
             <h2 id="slime-room-title">オンラインでたいせん</h2>
-            <p>消したスライムの半分が相手の盤面に降るよ。4匹でも5匹でも、降るのは2匹！</p>
+            <p>10ぎりは消したスライムの半分（はすうは切りすて）、20ぎりは消したスライムがぜんぶ相手の盤面に降るよ！</p>
             <fieldset>
                 <button type="button" data-create>部屋をつくる</button>
                 <label>部屋番号 <input inputmode="numeric" maxlength="4" size="4" placeholder="0000"></label>
@@ -3685,7 +3685,7 @@
             drawPath();
             updateSumDisplay();
 
-            slimeMatch.send(blocksToRemove);
+            slimeMatch.send(blocksToRemove, exactSum);
             blocksToRemove.forEach((block, index) => {
                 if (board[block.c]?.[block.r] === block) board[block.c][block.r] = null;
                 scheduleGameTimeout(() => block.el?.classList.add("clearing"), Math.min(index * 7, 90));

@@ -141,8 +141,8 @@ window.slimeMatch = (() => {
   return {
     openRoom, lose,
     get active() { return Boolean(session?.started); },
-    send(blocks) {
-      const count = Math.floor(blocks.length / 2);
+    send(blocks, sum) {
+      const count = sum === 20 ? blocks.length : Math.floor(blocks.length / 2);
       if (!session?.started || session.lost || count === 0) return;
       const pool = blocks.map(block => block.val);
       const values = [];
