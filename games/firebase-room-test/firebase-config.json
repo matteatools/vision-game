@@ -1,0 +1,11 @@
+{
+  "projectId": "metoatama-room-test",
+  "appId": "1:74611779867:web:5da714abfaa952828a0bbe",
+  "databaseURL": "https://metoatama-room-test-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "storageBucket": "metoatama-room-test.firebasestorage.app",
+  "apiKey": "AIzaSyBukpP9Kkgvnxz8MToVhmTHyU8HrOuRDeY",
+  "authDomain": "metoatama-room-test.firebaseapp.com",
+  "messagingSenderId": "74611779867",
+  "projectNumber": "74611779867",
+  "version": "2"
+}
