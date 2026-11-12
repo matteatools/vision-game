@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4けたの通信テスト｜めとあたまのゲームパーク</title>
+<style>
+* { box-sizing:border-box }
+body { margin:0; padding:24px 14px; background:#edf6f3; color:#183d38; font:1.05rem/1.65 system-ui,sans-serif }
+main { margin:auto; max-width:32rem; background:white; padding:clamp(18px,5vw,36px); border-radius:16px }
+h1 { font-size:1.65rem } button,input { font:inherit; padding:.6rem .9rem; border-radius:8px }
+button { background:#146459; color:white; border:0; cursor:pointer } button:disabled { opacity:.55 }
+input { width:6.5rem; border:1px solid #607b78 } fieldset { margin:1.2rem 0; border:1px solid #bed0cb; border-radius:8px }
+output { font-weight:bold } #code { font: bold 2rem monospace; letter-spacing:.15em } a { color:#146459 }
+</style>
+<main>
+<a href="../../">ゲームパークへ</a>
+<h1>4けたの通信テスト</h1>
+<section id="lobby">
+<p>1台目で部屋をつくり、2台目でその番号を入れてね。</p>
+<button id="create">部屋をつくる</button>
+<form id="join"><fieldset><legend>部屋に入る</legend>
+<label>部屋番号 <input id="number" placeholder="0000" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></label>
+<button>入る</button></fieldset></form>
+</section>
+<section id="room" hidden>
+<h2>部屋番号 <span id="code"></span></h2>
+<p id="ready"></p><button id="send" disabled>あいてに合図をおくる</button>
+<p>自分が送った合図　<output id="mine">0</output> 回<br>
+相手から届いた合図　<output id="theirs">0</output> 回</p>
+<button id="back">入口にもどる</button>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+</main>
+<script type="module" src="./room.js"></script>
+</html>

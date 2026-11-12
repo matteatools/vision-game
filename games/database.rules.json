@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "testRooms": {
+      "$code": {
+        ".read": "auth != null && (data.child('host').val() === auth.uid || data.child('guest').val() === auth.uid)",
+        ".write": "auth != null && $code.matches(/^[0-9]{4}$/) && (!data.exists() || data.child('created').val() + 7200000 <= now) && newData.child('host').val() === auth.uid && newData.child('created').val() === now && !newData.child('guest').exists() && newData.child('hostCount').val() === 0 && newData.child('guestCount').val() === 0",
+        "guest": { ".write": "auth != null && data.parent().child('host').exists() && data.parent().child('host').val() !== auth.uid && data.parent().child('created').val() + 7200000 > now && (!data.exists() || data.val() === auth.uid) && newData.val() === auth.uid" },
+        "hostCount": { ".write": "auth != null && data.parent().child('host').val() === auth.uid && data.parent().child('guest').exists() && data.parent().child('created').val() + 7200000 > now && newData.val() === data.val() + 1" },
+        "guestCount": { ".write": "auth != null && data.parent().child('guest').val() === auth.uid && data.parent().child('created').val() + 7200000 > now && newData.val() === data.val() + 1" },
+        "host": { ".validate": "newData.isString()" },
+        "created": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
