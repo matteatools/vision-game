@@ -3,20 +3,13 @@ window.slimeMatch = (() => {
   const roomInput = dialog.querySelector('input');
   const status = dialog.querySelector('[role=status]');
   const controls = dialog.querySelector('fieldset');
-  const api = 'https://kemono-karate-room.metoatama-gamepark.workers.dev/slime-rooms/';
   let session;
 
   async function request(s, op, data) {
-    const options = { headers: { Authorization: 'Bearer ' + s.token }, signal: AbortSignal.timeout(10000) };
-    if (data) {
-      options.method = 'POST';
-      options.headers['Content-Type'] = 'application/json';
-      options.body = JSON.stringify(data);
-    }
-    const response = await fetch(api + s.code + '/' + op, options);
-    const body = await response.json();
-    if (!response.ok) throw Object.assign(new Error(body.error || '通信できませんでした。'), { status: response.status });
-    return body;
+    if (op === 'play') return s.match.poll(data);
+    const { connectSlimes } = await import('./slime-api.js');
+    s.match = await connectSlimes(s, op);
+    if (s !== session) s.match.close();
   }
 
   function showResult(s, message) {
@@ -61,6 +54,7 @@ window.slimeMatch = (() => {
         showResult(s, state.winner === state.seat ? 'あなたの かち！' : 'あなたの まけ');
         return;
       }
+      if (!state.ready) status.textContent = '部屋番号 ' + s.code + '　相手を待っています';
       if (state.ready && !s.started) {
         s.started = true;
         dialog.close();
@@ -86,7 +80,8 @@ window.slimeMatch = (() => {
         else { session = null; controls.disabled = false; status.textContent = error.message; }
         return;
       }
-      (s.started ? timerLabelEl : status).textContent = '通信を確認しています…';
+      (s.started ? timerLabelEl : status).textContent =
+        (s.started ? '' : '部屋番号 ' + s.code + '　') + '通信を確認しています…';
     }
     if (s === session) setTimeout(() => poll(s), 650);
   }
@@ -137,7 +132,9 @@ window.slimeMatch = (() => {
   dialog.querySelector('[data-create]').onclick = () => enterRoom(true);
   dialog.querySelector('[data-join]').onclick = () => enterRoom(false);
   dialog.querySelector('[data-close]').onclick = () => dialog.close();
-  dialog.addEventListener('close', () => { if (session && !session.started) session = null; });
+  dialog.addEventListener('close', () => {
+    if (session && !session.started) { session.match?.close(); session = null; }
+  });
   return {
     openRoom, lose,
     get active() { return Boolean(session?.started); },
