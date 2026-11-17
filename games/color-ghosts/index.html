@@ -1673,6 +1673,12 @@
                 transition-duration: 1ms !important;
             }
         }
+    #coop-room {margin:auto;max-width:94vw;padding:1.3rem;border:2px solid #684936;border-radius:16px;color:#452c24;background:#fff8e9}
+        #coop-room::backdrop {background:#26172cb8}
+        #coop-room button,#coop-room input {font:inherit;padding:.55em;border-radius:.5em}
+        #coop-room fieldset {border:0;display:grid;gap:.65rem;padding:.5rem 0}
+        #coop-room [hidden] {display:none}
+        #coop-number {font-size:1.5rem}
     </style>
 </head>
 <body>
@@ -1698,6 +1704,7 @@
         <div class="title-menu">
             <a class="audio-credit" href="https://shinrockmusic.com/nightadventure/" target="_blank" rel="noopener noreferrer">BGM：真夜中の大冒険 / shinrock</a>
             <button class="title-button practice-button" id="practice-button" type="button">れんしゅう</button>
+            <button class="title-button practice-button" id="coop-button" type="button">みんなで協力</button>
             <button class="title-button start-button" id="start-button" type="button">
                 スタート
                 <small>15かい・100たいに ちょうせん</small>
@@ -1706,6 +1713,17 @@
         </div>
     </section>
 
+    <dialog id="coop-room" aria-labelledby="coop-heading">
+        <h2 id="coop-heading">みんなで協力</h2>
+        <fieldset id="coop-entry">
+            <button id="coop-create">部屋をつくる</button>
+            <label>部屋番号 <input id="coop-code" inputmode="numeric" maxlength="4" placeholder="0000" size="4"></label>
+            <button id="coop-join">部屋に入る</button>
+        </fieldset>
+        <strong id="coop-number"></strong><p id="coop-note" role="status"></p>
+        <button id="coop-start" hidden>みんなでスタート</button>
+        <button id="coop-back">もどる</button>
+    </dialog>
     <section class="screen game-screen" id="screen-game" aria-label="ゲーム画面" hidden>
         <header class="game-header">
             <div class="hud-card">
@@ -2272,6 +2290,7 @@
             }
 
             function dropOfuda(index, color, sourceIndex) {
+                if (state.mode === "coop") { if (state.phase === "answer") coop.edit(index,color,sourceIndex); return; }
                 if (state.phase !== "answer") return;
 
                 if (sourceIndex !== null) {
@@ -2408,6 +2427,7 @@
             }
 
             function removeOfuda(index) {
+                if (state.mode === "coop") { if (state.phase === "answer") coop.edit(index,0,null); return; }
                 if (state.phase !== "answer" || state.answer[index] === 0) return;
                 state.answer[index] = 0;
                 elements.check.disabled = true;
@@ -2417,6 +2437,7 @@
             }
 
             function checkAnswer() {
+                if (state.mode === "coop") { if (state.phase === "answer" && !elements.check.disabled) coop.vote(); return; }
                 if (state.phase !== "answer" || elements.check.disabled) return;
                 cancelOfudaDrag();
                 const rememberedGhosts = state.target.reduce((total, color, index) => {
@@ -2603,7 +2624,7 @@
 
             elements.practice.addEventListener("click", startPractice);
             elements.start.addEventListener("click", startChallenge);
-            elements.exit.addEventListener("click", returnToTitle);
+            elements.exit.addEventListener("click", () => state.mode === "coop" ? coop.leave() : returnToTitle());
             elements.check.addEventListener("click", checkAnswer);
             elements.paletteButtons.forEach((button) => {
                 const color = Number(button.dataset.color);
@@ -2624,7 +2645,7 @@
                 }
             });
             elements.retry.addEventListener("click", startChallenge);
-            elements.resultTitle.addEventListener("click", returnToTitle);
+            elements.resultTitle.addEventListener("click", () => state.mode === "coop" ? coop.leave() : returnToTitle());
             elements.soundButtons.forEach((button) => {
                 button.addEventListener("click", () => {
                     state.soundOn = !state.soundOn;
@@ -2652,6 +2673,7 @@
                     Music.play();
                 }
 
+                if (state.mode === "coop") return;
                 if (document.hidden && state.phase === "night") {
                     clearRoundTiming();
                     state.phase = "waiting";
@@ -2667,6 +2689,59 @@
                     schedule(startNight, 300);
                 }
             });
+
+            let coop;
+            document.getElementById('coop-button').onclick = async () => {
+                const dialog = document.getElementById('coop-room');
+                dialog.showModal();
+                document.getElementById('coop-note').textContent = '通信の準備中…';
+                try { coop = await import('./coop.js'); if (dialog.open) coop.open(); }
+                catch { document.getElementById('coop-note').textContent = '通信を準備できません。接続を確認してね。'; }
+            };
+            document.getElementById('coop-back').onclick = () => document.getElementById('coop-room').close();
+            window.ghostBoard = {
+                pattern:createPattern,
+                home() {
+                    cancelOfudaDrag(); state.mode='practice'; elements.retry.hidden=false;
+                    elements.check.textContent='おはらいする！'; returnToTitle();
+                },
+                draw(g,level,phase,remaining,seat) {
+                    if(state.mode!=='coop') resetSession('coop');
+                    const changed = state.phase!==phase || state.target.join('')!==g.target || state.answer.join('')!==g.answer;
+                    const newPhase = state.phase!==phase;
+                    state.currentLevel=level; state.target=Array.from(g.target,Number);
+                    state.answer=Array.from(g.answer,Number); state.phase=phase;
+                    if(newPhase) {
+                        clearRoundTiming(); cancelOfudaDrag();
+                        if(phase==='night') { Sound.night(); state.selectedColor=1; }
+                        else if(phase==='answer') Sound.dawn();
+                        else if(phase==='success') Sound.correct();
+                    }
+                    setDaytime(phase==='night'?'night':'day');
+                    elements.nightTimer.hidden=phase!=='night';
+                    if(phase==='night') {
+                        if(state.animationFrame)cancelAnimationFrame(state.animationFrame);
+                        state.nightEndsAt=performance.now()+remaining; updateNightTimer(performance.now());
+                    }
+                    elements.progressLabel.textContent='協力 '+g.stage+'日目';
+                    elements.progress.textContent=g.score+'たい';
+                    elements.mistakes.textContent=g.misses+' / 3';
+                    elements.answerTools.hidden=phase!=='answer';
+                    const votes=Object.keys(g.votes||{}).length;
+                    elements.check.disabled=Boolean(g.votes?.[seat]) || placedCount()!==level.ghosts;
+                    elements.check.textContent=(g.votes?.[seat]?'準備できたよ':'おはらいする！')+'（'+votes+'/'+g.count+'）';
+                    elements.phaseMessage.textContent={night:'ゆうれいの いろと まどを おぼえてね！',answer:'みんなで おふだを はろう。',success:'せいかい！ つぎのよるへ',review:'おしい！ 正しいまどを見てみよう。'}[phase];
+                    elements.hudMessage.textContent=phase==='answer'?'おふだを変えると、全員の準備がもどるよ。':level.ghosts+'たい・おぼえる時間 '+level.seconds+'秒';
+                    if(changed){renderPalette();renderBoard();}
+                },
+                result(g) {
+                    clearAllTiming(); cancelOfudaDrag(); state.phase='over';
+                    elements.resultHeading.textContent='みんなで '+(g.stage-1)+'日クリア！';
+                    elements.resultCopy.textContent='4回目のミスで おはらい終了。';
+                    elements.resultScore.textContent=g.score; elements.resultBest.textContent=g.count+'人の協力きろく';
+                    elements.retry.hidden=true; showScreen('result');
+                }
+            };
 
             state.best = readBest();
             updateBest();
