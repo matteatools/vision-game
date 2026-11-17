@@ -6,7 +6,7 @@ import * as hiraganaData from './hiragana-data.js';
 const {illustration}=katakanaData;
 import { master as katakanaMaster } from './master.js';
 import { master as hiraganaMaster } from './hiragana-master.js';
-import { recognize as recognizeBase, suggestCharacters as suggestBase, evaluateWord, gradeHandwriting as gradeBase } from './recognizer.js';
+import { recognize as recognizeBase, suggestCharacters as suggestBase, evaluateWord, gradeHandwriting as gradeBase, handwritingIssue as issueBase } from './recognizer.js';
 import { loadProgress as loadProgressBase, storageKey as katakanaStorageKey, allWordsCompleted as allWordsCompletedBase } from './progress.js';
 
 const app=document.querySelector('#app');
@@ -40,7 +40,7 @@ function failedAttempt(message){
  const signature=JSON.stringify(strokes);
  if(signature===lastFailedAttempt)return message;
  lastFailedAttempt=signature;modelFailures++;
- if(modelFailures===2 && !showGuide){showGuide=true;return '「かきなおす」を おして、うすい もじを なぞってみよう。';}
+ if(modelFailures===2 && !showGuide){showGuide=true;return '「けす」を おして、うすい もじを なぞってみよう。';}
  return message;
 }
 let feedback='', feedbackKind='', showGuide=false, selectedSlot=null, animationId=0, celebration=false;
@@ -65,8 +65,8 @@ function switchClassroom(next){
  voicePlayer=createVoicePlayer(window,recordedWordIds,next==='hiragana'?'./assets/hiragana-audio':'./assets/audio');
  progress=loadProgress(storage);stageId=1;word=words[0];target=dictionaryCharacters[0];strokes=[];slots=[];model=null;go('home');
 }
-const usesVectorReference=entry=>entry.type==='long'||entry.reference==='paths';
-function vectorReference(entry){if(entry.type==='long')return entry.outlinePaths.map(d=>`<path d="${d}" fill="currentColor"/>`).join('');return entry.displayPaths.map((d,i)=>`<path d="${d}" fill="none" stroke="currentColor" stroke-width="${entry.referenceStrokeWidths[i]}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');}
+const usesVectorReference=entry=>entry.type==='long'||entry.reference==='paths'||entry.reference==='font-outline';
+function vectorReference(entry){if(entry.reference==='font-outline')return `<path d="${entry.fontOutline}" transform="matrix(${entry.fontTransform.join(' ')})" fill="currentColor" stroke="currentColor" stroke-width="${entry.fontOutlineStrokeWidth}" stroke-linejoin="round"/>`;if(entry.type==='long')return entry.outlinePaths.map(d=>`<path d="${d}" fill="currentColor"/>`).join('');return entry.displayPaths.map((d,i)=>`<path d="${d}" fill="none" stroke="currentColor" stroke-width="${entry.referenceStrokeWidths[i]}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');}
 function glyph(c){const entry=master[c];if(!entry)return c;return usesVectorReference(entry)?`<svg class="kana-glyph kana-vector" viewBox="0 0 100 100" aria-hidden="true">${vectorReference(entry)}</svg>`:`<span class="kana-glyph" aria-hidden="true">${c}</span>`;}
 function header(){return `<header class="school-header"><button class="text-button" data-action="title">← タイトル</button><button class="school-name" data-action="home">${classroomName}</button><button class="icon-button" data-action="settings" aria-label="せってい">⚙</button></header>`;}
 function footer(){return '';}
@@ -123,7 +123,7 @@ function collection() {
  return `<main class="word-selection"><button class="text-button back" data-action="words">← ステージをえらぶ</button><div class="page-title"><span class="title-emoji">${illustration('books')}</span><div><div class="eyebrow">かけた！を あつめよう</div><h1>${scriptName}コレクション</h1><p>${progress.completed.length} / 48 ことば</p></div></div>${stages.map(s=>`<section class="collection-section"><h2>${s.icon} ${s.name} <small>${s.words.filter(w=>completed(w.id)).length} / 6</small></h2><div class="collection-grid">${s.words.map(w=>`<button data-word="${w.id}" class="collection-item ${completed(w.id)?'collected':''}"><span>${completed(w.id)?w.icon:'?'}</span><strong>${completed(w.id)?w.text:"？？？"}</strong><small>${completed(w.id)?'✓ かけた！':'まだ みつけていないよ'}</small></button>`).join('')}</div></section>`).join('')}${allWordsCompleted(progress)?`<section class="word-complete-banner"><span aria-hidden="true">${illustration('trophy')}</span><div><h2>コンプリート！</h2><p>48この ことばを ぜんぶ きわめたよ！</p></div></section>`:''}<div id="stage-message" role="status"></div></main>`;
 }
 function settings() {
- return `<main class="settings"><div class="eyebrow">おうちの ひとと いっしょに</div><h1>せってい</h1><section class="settings-card"><label><span><strong>よみあげ</strong><small>ことばの よみを きく</small></span><input id="voice-setting" type="checkbox" ${progress.voice?'checked':''}></label><label><span><strong>こうかおん</strong><small>かけた ときの おと</small></span><input id="sound-setting" type="checkbox" ${progress.sound?'checked':''}></label><p>${recordedWordIds.length?'ことばの音声：VOICEVOX Nemo。あらかじめ作成した音声を再生します。ひともじ練習は端末の日本語音声を使います。':'読み上げにはブラウザーの音声機能を使います。日本語音声の有無や発音は端末により異なります。'}</p></section><section class="settings-card"><h2>保護者・先生の方へ</h2><p>ひらがな・カタカナそれぞれ全48語に対応しています。表示するお手本には、Chromebook・スマートフォン・PCで同じ字形になる Klee One SemiBold を使用し、見本として読みやすいよう輪郭を少し太くしています。書き順の案内と判定用中心線は、お手本の各画に沿うよう独自に調整しています。教科書体・筆順の監修や児童の入力による認識精度検証はまだ行っていません。</p><p>練習履歴はこのブラウザーに保存します。手書きの軌跡をサーバーへ送信する機能はありません。</p><p>文字・旧版参考データのライセンス：<a href="./THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">出典・変更点</a></p><button class="danger-button" data-action="reset">この きょうしつの きろくを けす</button></section></main>`;
+ return `<main class="settings"><div class="eyebrow">おうちの ひとと いっしょに</div><h1>せってい</h1><section class="settings-card"><label><span><strong>よみあげ</strong><small>ことばの よみを きく</small></span><input id="voice-setting" type="checkbox" ${progress.voice?'checked':''}></label><label><span><strong>こうかおん</strong><small>かけた ときの おと</small></span><input id="sound-setting" type="checkbox" ${progress.sound?'checked':''}></label><p>${recordedWordIds.length?'ことばの音声：VOICEVOX Nemo。あらかじめ作成した音声を再生します。ひともじ練習は端末の日本語音声を使います。':'読み上げにはブラウザーの音声機能を使います。日本語音声の有無や発音は端末により異なります。'}</p></section><section class="settings-card"><h2>保護者・先生の方へ</h2><p>ひらがな・カタカナそれぞれ全48語に対応しています。この検証用候補ではKlee One SemiBold の輪郭をそのまま表示し、文字別の筆順付き判定線を校正しています。全字の統合試験・字形確認を進めている途中で、まだ公開版ではありません。教科書体・筆順の監修や児童の入力による認識精度検証はまだ行っていません。</p><p>練習履歴はこのブラウザーに保存します。手書きの軌跡をサーバーへ送信する機能はありません。</p><p>文字・旧版参考データのライセンス：<a href="./THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">出典・変更点</a></p><button class="danger-button" data-action="reset">この きょうしつの きろくを けす</button></section></main>`;
 }
 function render() {
  modelPreview=false;previewPointer=null;previewKey=null;
@@ -140,7 +140,7 @@ function draw() {
  if((showGuide||modelPreview) && entry?.type==='small'){ctx.fillStyle='#f4eddc';ctx.fillRect(50,0,50,50);}
  ctx.strokeStyle='#cdd8d2';ctx.lineWidth=.5;ctx.setLineDash([2,2]);ctx.beginPath();ctx.moveTo(50,0);ctx.lineTo(50,100);ctx.moveTo(0,50);ctx.lineTo(100,50);ctx.stroke();ctx.setLineDash([]);
  const line=(s,color,width)=>{ctx.beginPath();s.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();};
- const reference=(referenceEntry,color)=>{ctx.fillStyle=color;if(referenceEntry.type==='long'){referenceEntry.outlinePaths.forEach(d=>ctx.fill(new Path2D(d)));return;}if(referenceEntry.reference==='paths'){ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';referenceEntry.displayPaths.forEach((d,i)=>{ctx.lineWidth=referenceEntry.referenceStrokeWidths[i];ctx.stroke(new Path2D(d));});return;}ctx.font=kanaFont;ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle=color;ctx.lineWidth=1.9;ctx.lineJoin='round';ctx.strokeText(referenceEntry.character,50,48);ctx.fillText(referenceEntry.character,50,48);};
+ const reference=(referenceEntry,color)=>{ctx.fillStyle=color;if(referenceEntry.reference==='font-outline'){ctx.save();ctx.transform(...referenceEntry.fontTransform);ctx.fill(new Path2D(referenceEntry.fontOutline));ctx.strokeStyle=color;ctx.lineWidth=referenceEntry.fontOutlineStrokeWidth;ctx.lineJoin='round';ctx.stroke(new Path2D(referenceEntry.fontOutline));ctx.restore();return;}if(referenceEntry.type==='long'){referenceEntry.outlinePaths.forEach(d=>ctx.fill(new Path2D(d)));return;}if(referenceEntry.reference==='paths'){ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';referenceEntry.displayPaths.forEach((d,i)=>{ctx.lineWidth=referenceEntry.referenceStrokeWidths[i];ctx.stroke(new Path2D(d));});return;}ctx.font=kanaFont;ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle=color;ctx.lineWidth=1.9;ctx.lineJoin='round';ctx.strokeText(referenceEntry.character,50,48);ctx.fillText(referenceEntry.character,50,48);};
  if(practiceScore!==null)reference(master[target],'#a4d7e9');
  const previewEntry=modelPreview?master[mode==='practice'?target:model]:entry;
  if((showGuide||modelPreview) && previewEntry && practiceScore===null)reference(previewEntry,'#dbe5dd');
@@ -182,13 +182,14 @@ function completeWord() {
 }
 function confirmationPanel() {
  if(!pending)return '';
- return `<section class="character-confirmation" aria-label="かいた もじの かくにん"><h2>「${pending.character}」？</h2><p>これで あってる？</p><button class="primary" data-action="confirm-character">うん、これ！</button><button class="secondary" data-action="clear">ちがう、かきなおす</button></section>`;
+ const many=pending.candidates.length>1;
+ return `<section class="character-confirmation" aria-label="かいた もじの かくにん"><h2>${many?'どの もじを かいた？':'「'+pending.candidates[0].character+'」？'}</h2><p>${many?'かいた もじを えらんでね':'これで あってる？'}</p><div class="candidate-choices">${pending.candidates.map(c=>`<button class="primary" data-action="confirm-character" data-candidate="${c.character}" aria-label="${c.character} をえらぶ">${many?c.character:'うん、これ！'}</button>`).join('')}</div><button class="secondary" data-action="clear">${many?'どれでもない、かきなおす':'ちがう、かきなおす'}</button></section>`;
 }
-function confirmCharacter() {
- if(!pending?.character || mode!=='word' || slots[active])return;
- const character=pending.character;
- const assessment=recognize(strokes);
- slots[active]={character,strokes:structuredClone(strokes),confirmed:true,handwritingPassed:assessment.ok&&assessment.character===character};
+function confirmCharacter(chosen) {
+ if(!pending?.candidates || mode!=='word' || slots[active])return;
+ const character=chosen||pending.candidates[0]?.character;
+ if(!pending.candidates.some(c=>c.character===character)||!suggestCharacters(strokes).some(c=>c.character===character))return;
+ slots[active]={character,strokes:structuredClone(strokes),confirmed:true,handwritingPassed:true};
  pending=null;selectedSlot=null;resetModelHelp();
  const result=completeWord();
  if(result==='incomplete'){
@@ -202,9 +203,9 @@ function judge() {
  if(mode==='word'){
   if(!strokes.length){feedback='マスに もじを かいてみよう';feedbackKind='';render();return;}
   const candidates=suggestCharacters(strokes);
-  if(!candidates.length){feedback=failedAttempt('わからなかったよ。もういちど かいてみよう。');feedbackKind='';render();return;}
-  pending={character:candidates[0].character};
-  feedback='';feedbackKind='';render();document.querySelector('.character-confirmation')?.scrollIntoView?.({block:'center',behavior:'smooth'});announce(pending.character?'「'+pending.character+'」？':'なんの もじを かいた？');return;
+  if(!candidates.length){feedback=failedAttempt(recognize(strokes).message||'わからなかったよ。もういちど かいてみよう。');feedbackKind='';render();return;}
+  pending={candidates};
+  feedback='';feedbackKind='';render();document.querySelector('.character-confirmation')?.scrollIntoView?.({block:'center',behavior:'smooth'});announce(candidates.length===1?'「'+candidates[0].character+'」？':'どの もじを かいた？');return;
  }
  if(!strokes.length){feedback='マスに もじを かいてみよう';render();return;}
  practiceScore=gradeHandwriting(strokes,target);
@@ -215,6 +216,8 @@ function judge() {
  }else{feedback=failedAttempt(`かさねて みくらべよう。${HANAMARU_SCORE}てんで はなまる！`);feedbackKind='hint';}
  if(lesson!==null&&practiceScore>=70){lessonFailures=0;lastLessonFailure=null;}
  if(lesson!==null&&practiceScore<HANAMARU_SCORE){feedback=practiceScore>=70?`よく できたのう！ つぎへ すすめるぞ。${HANAMARU_SCORE}点 いじょうで はなまるじゃ。`:'おてほんと かさねて みよう。「けす」で もういちど！ 70点 いじょうで つぎへ すすめるぞ。';feedbackKind=practiceScore>=70?'success':'hint';}
+ const writingIssue=issueBase(strokes,target,master);
+ if(writingIssue){feedback=writingIssue==='order'?'かく じゅんばんを たしかめよう':'かきはじめと むきを たしかめよう';feedbackKind='hint';}
  save();render();announce(practiceScore+'点！ '+feedback);
 }
 
@@ -276,7 +279,7 @@ app.addEventListener('click',e=>{
   case 'stage-back':go('stage');break;case 'rocket':stageId=4;startWord(words.find(w=>w.text==='ロケット'));break;
   case 'mastery-list':masteryList();break;case 'practice':startPractice();break;case 'next-character':startPractice(practiceCharacters()[(practiceCharacters().indexOf(target)+1)%practiceCharacters().length]);break;
   case 'hide-model':model=null;resetModelHelp();render();break;
-  case 'confirm-character':confirmCharacter();break;
+  case 'confirm-character':confirmCharacter(b.dataset.candidate);break;
   case 'judge':judge();break;case 'speak':speak();break;case 'dictionary':dictionary();break;case 'animate':animate();break;
   case 'replace':case 'clear':{
    practiceScore=null;

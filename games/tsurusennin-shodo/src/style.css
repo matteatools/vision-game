@@ -212,3 +212,6 @@
 
 .hanamaru.double-flower{width:44px;height:22px}
 .canvas-wrap>.hanamaru.double-flower{width:84px;height:42px;border-radius:22px}
+/* Word identity choices: every independently valid candidate stays reachable. */
+.candidate-choices{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-height:210px;overflow:auto;padding:4px;margin:6px 0}
+.candidate-choices .primary{min-width:56px;min-height:48px;font-size:24px;padding:8px 16px}
