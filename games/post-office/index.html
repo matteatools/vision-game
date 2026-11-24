@@ -1886,6 +1886,7 @@
             <nav class="title-menu" aria-label="タイトルメニュー">
                 <button id="practice-button" class="menu-button" type="button">れんしゅう</button>
                 <button id="start-button" class="menu-button primary" type="button">スタート</button>
+                <button id="post-online" class="menu-button" type="button" style="background:#a9304e;color:white">オンラインでたいせん</button>
                 <button class="menu-button music-toggle-button" type="button" data-music-toggle aria-label="BGMを切る" aria-pressed="true">♫ BGM</button>
                 <a class="menu-button park" href="../../index.html">ゲームパークへ もどる</a>
                 <a class="audio-credit" href="https://otologic.jp/free/bgm/wood_mallet01.html" target="_blank" rel="noopener noreferrer">BGM：お後がよろしいようで-2（シンプル） / OtoLogic（CC BY 4.0）</a>
@@ -3251,10 +3252,59 @@
                 elements.debugPanel.hidden = false;
             }
 
+
+            // Online play reuses the original envelopes, whistle and birds.
+            let onlineAnswer, onlineLeave, onlineLocked = true;
+            window.postOfficeOnline = {
+                bind(answer, leave) { onlineAnswer = answer; onlineLeave = leave; },
+                begin() {
+                    mode = "online"; resetState(); inputLocked = true;
+                    elements.practiceBanner.classList.add("hidden");
+                    elements.modeLabel.textContent = "つぎの てがみまで";
+                    document.body.classList.add("duel-post");
+                    showScreen("game-screen"); initAudio(); Music.play();
+                },
+                question(rows) {
+                    clearBoard();
+                    rows.forEach((row, r) => row.forEach((color, c) => {
+                        if (color) createMail(color, r, c, r === 0);
+                    }));
+                },
+                lock(value) { onlineLocked = value; elements.whistles.forEach(b => b.disabled = value); },
+                score(value) { elements.delivered.textContent = value; },
+                clock(left, next) { elements.workTime.textContent = left; elements.timerNumber.textContent = next; },
+                feedback(mine) {
+                    initAudio(); playWhistle(); launchBirds(exactFiveColors(), mine ? "delivery" : "rival");
+                    elements.birdLayer.querySelectorAll(".bird-label").forEach(label => { label.textContent = mine ? "あなたの とり" : "あいての とり"; });
+                    showEffect(mine ? "おとどけ！ ＋1" : "あいてが おとどけ！", 650);
+                },
+                wrong() { playWrong(); showEffect("ちがった！ −1", 650, "penalty"); },
+                end() { Music.stop(); },
+                home() {
+                    document.body.classList.remove("duel-post");
+                    elements.whistles.forEach(b => b.disabled = false); goTitle();
+                }
+            };
+            elements.whistles.forEach(button => button.addEventListener("click", event => {
+                if (mode !== "online") return;
+                event.stopImmediatePropagation();
+                if (!onlineLocked) onlineAnswer("yes");
+            }, true));
+            document.addEventListener("keydown", event => {
+                if (mode !== "online" || event.code !== "Space") return;
+                event.preventDefault(); event.stopImmediatePropagation();
+                if (!onlineLocked && !event.repeat) onlineAnswer("yes");
+            }, true);
+            document.querySelectorAll('[data-action="title"]').forEach(button => button.addEventListener("click", event => {
+                if (mode !== "online") return;
+                event.stopImmediatePropagation(); onlineLeave();
+            }, true));
+
             updateTitleBest();
             updateHud();
             updateMusicButtons();
         })();
     </script>
+<script type="module" src="./online.js"></script>
 </body>
 </html>
