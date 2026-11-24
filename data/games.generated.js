@@ -341,7 +341,7 @@ window.GAME_DATA = [
     ],
     "sitemap": true,
     "onlineOrder": 1,
-    "onlineLabel": "オンライン",
+    "onlineLabel": "たいせん",
     "seo": {
       "playTitle": "ぽんすけの あわせて10｜めとあたまのゲームパーク",
       "playDescription": "隣り合う数字をつないで合計をぴったり10や20にし、スライムを切る無料・登録不要のWebゲームです。",
@@ -984,7 +984,6 @@ window.GAME_DATA = [
       "chameleon-catch"
     ],
     "sitemap": true,
-    "featureNote": "30にちの ものがたり",
     "newDescription": "おなじいろのくつしたをそろえよう。いつでも。",
     "seo": {
       "playTitle": "それでもぼくはくつしたをそろえる。｜めとあたまのゲームパーク",
