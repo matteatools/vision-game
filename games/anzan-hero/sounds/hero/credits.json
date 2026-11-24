@@ -1,0 +1,504 @@
+[
+  {
+    "file": "robot.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "オノマトペ 光る15-1（低）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3",
+        "page": "https://otologic.jp/free/se/flash01.html",
+        "bytes": 39378
+      },
+      {
+        "title": "SNES RPG04-05（魔法 雷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-05%28Magic-Lightning1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19016
+      }
+    ]
+  },
+  {
+    "file": "robot-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "オノマトペ 光る15-1（低）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3",
+        "page": "https://otologic.jp/free/se/flash01.html",
+        "bytes": 39378
+      },
+      {
+        "title": "SNES RPG04-05（魔法 雷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-05%28Magic-Lightning1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19016
+      }
+    ]
+  },
+  {
+    "file": "kaiju.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG04-02（魔法 炎1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-02%28Magic-Fire1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 20032
+      }
+    ]
+  },
+  {
+    "file": "kaiju-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG04-02（魔法 炎1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-02%28Magic-Fire1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 20032
+      }
+    ]
+  },
+  {
+    "file": "orochi.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG04-14（魔法 状態）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-14%28Magic-Status%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19220
+      },
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      }
+    ]
+  },
+  {
+    "file": "orochi-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG04-14（魔法 状態）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-14%28Magic-Status%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19220
+      },
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      }
+    ]
+  },
+  {
+    "file": "franken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-01（攻撃 剣）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-01%28Attack-Sword%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12407
+      },
+      {
+        "title": "SNES RPG04-05（魔法 雷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-05%28Magic-Lightning1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19016
+      }
+    ]
+  },
+  {
+    "file": "franken-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-01（攻撃 剣）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-01%28Attack-Sword%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12407
+      },
+      {
+        "title": "SNES RPG04-05（魔法 雷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-05%28Magic-Lightning1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19016
+      }
+    ]
+  },
+  {
+    "file": "slime.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-12（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-12%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 16061
+      },
+      {
+        "title": "オノマトペ 衝撃19-2（短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Impact19-2%28Short%29.mp3",
+        "page": "https://otologic.jp/free/se/impact01.html",
+        "bytes": 31895
+      }
+    ]
+  },
+  {
+    "file": "slime-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-12（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-12%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 16061
+      },
+      {
+        "title": "オノマトペ 衝撃19-2（短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Impact19-2%28Short%29.mp3",
+        "page": "https://otologic.jp/free/se/impact01.html",
+        "bytes": 31895
+      }
+    ]
+  },
+  {
+    "file": "mummy.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "オノマトペ 衝撃19-2（短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Impact19-2%28Short%29.mp3",
+        "page": "https://otologic.jp/free/se/impact01.html",
+        "bytes": 31895
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "mummy-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "オノマトペ 衝撃19-2（短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Impact19-2%28Short%29.mp3",
+        "page": "https://otologic.jp/free/se/impact01.html",
+        "bytes": 31895
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "lion.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG05-01（攻撃 剣）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-01%28Attack-Sword%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12407
+      }
+    ]
+  },
+  {
+    "file": "lion-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG05-01（攻撃 剣）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-01%28Attack-Sword%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12407
+      }
+    ]
+  },
+  {
+    "file": "ice.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "オノマトペ 光る15-1（低）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3",
+        "page": "https://otologic.jp/free/se/flash01.html",
+        "bytes": 39378
+      },
+      {
+        "title": "SNES RPG04-08（魔法 氷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-08%28Magic-Ice1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19617
+      }
+    ]
+  },
+  {
+    "file": "ice-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "オノマトペ 光る15-1（低）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3",
+        "page": "https://otologic.jp/free/se/flash01.html",
+        "bytes": 39378
+      },
+      {
+        "title": "SNES RPG04-08（魔法 氷1）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG04-08%28Magic-Ice1%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 19617
+      }
+    ]
+  },
+  {
+    "file": "octopus.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-13（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-13%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12537
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "octopus-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG05-13（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-13%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12537
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "thunder.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG05-12（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-12%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 16061
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "thunder-awaken.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "モーション スピード線09-2（低 短）",
+        "url": "https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3",
+        "page": "https://otologic.jp/free/se/motion-speed-lines01.html",
+        "bytes": 65803
+      },
+      {
+        "title": "SNES RPG05-12（ジャンプ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-12%28Jump%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 16061
+      },
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  },
+  {
+    "file": "gacha.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, layered, adjusted gain, faded out; awakened variants pitched down.",
+    "sources": [
+      {
+        "title": "SNES RPG03-4（宝箱）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG03-4%28Chest%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 11703
+      },
+      {
+        "title": "オノマトペ 光る15-1（低）",
+        "url": "https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3",
+        "page": "https://otologic.jp/free/se/flash01.html",
+        "bytes": 39378
+      }
+    ]
+  },
+  {
+    "file": "hero-punch.wav",
+    "durationSeconds": 0.72,
+    "author": "OtoLogic",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Trimmed silence, adjusted gain, faded out. No layering.",
+    "sources": [
+      {
+        "title": "SNES RPG05-07（攻撃 パンチ）",
+        "url": "https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3",
+        "page": "https://otologic.jp/free/se/game-rpg01.html",
+        "bytes": 12826
+      }
+    ]
+  }
+]

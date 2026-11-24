@@ -1,0 +1,54 @@
+/* Reuse the original readable flash display; match setup to the hero command room. */
+:root{--bg:#14273e;--panel:#203b57;--panel-deep:#12243a;--border:#496783;--muted:#b5c7d7;--accent:#ffdc7e;--ink:#23364e;font-family:"Arial Rounded MT Bold","Yu Gothic",Meiryo,sans-serif}
+body{background:radial-gradient(ellipse at 70% 5%,#35516d 0,transparent 65%),var(--bg)}
+button,a,input,select,summary{touch-action:manipulation}
+.app-shell{max-width:1120px;padding:0 28px 10px}
+.topbar{min-height:64px;border-color:#4d6580}
+.back-home{font-weight:700;text-decoration:none;color:#ffdc7e;border:0;padding-left:0}
+.quiet-button{min-height:44px}
+.intro{padding:14px 0 16px}
+.intro h1{font-size:clamp(26px,3vw,34px);line-height:1.25;font-weight:900;letter-spacing:.02em;color:#fff9e6;text-shadow:2px 3px #112033}
+.intro h1 span{display:inline-block}
+.intro-copy{margin-top:6px;line-height:1.5;color:#ccdeeb}
+.practice-layout{grid-template-columns:370px 1fr;gap:22px}
+.settings-card,.preview-panel{border:2px solid #52728b;border-radius:19px 10px 19px 10px;box-shadow:0 5px 0 #0a1728}
+.settings-card{padding:20px 23px 16px}
+.card-heading{margin-bottom:12px}.small-tag{background:#182f48;color:#ffdc7e}
+fieldset{margin-bottom:14px}legend{margin-bottom:9px;font-size:15px}
+.segments button{background:#14283e;border-width:2px;font-size:22px;min-height:48px}.segments button span{font-size:11px}
+.segments button[aria-pressed=true]{box-shadow:0 2px 0 #ac803d}
+.speed-field{margin-bottom:14px}.speed-presets button{min-height:44px;font-size:14px}input[type=range]{margin:12px 0}
+.speed-presets button[aria-pressed=true]{background:#594c30;border-color:#ffdc7e}.speed-presets button:hover{background:#3b4f62}
+.seconds-control select{border-color:#8192a0;background-color:#152c45;color:#ffdc7e;min-height:44px}
+.fullscreen-choice{min-height:44px;margin:0 0 12px}.fullscreen-label{font-size:12px;color:#dbe7ed}
+.fullscreen-choice input{height:44px;width:46px}.fullscreen-choice input:checked+.switch{background:#ffdc7e}
+.primary-button{border:2px solid #15283e;box-shadow:0 4px 0 #0a1728;border-radius:13px 8px 13px 8px;min-height:54px;font-weight:900}
+.primary-button:hover{background:#ffe8a8;box-shadow:0 4px 0 #0a1728}
+.start-button{background:#ef6150;color:#fff7df;text-shadow:0 2px #a13931}.start-button:hover{background:#fa7966}
+.start-hint{margin:10px 0 0}.setup-notice{margin:12px 0 0;font-size:13px}
+.preview-panel{background:linear-gradient(145deg,#304e6b88,#12243ad9),url('../assets/command/base-command.webp') center / cover;isolation:isolate}
+.preview-top{padding:20px 24px}.preview-top h2{color:#d5e7f4}.preview-label{color:#ffdc7e;border-color:#66809b}
+.preview-stage{min-height:260px;justify-content:flex-start;padding-top:30px;padding-right:16%;z-index:1;pointer-events:none}
+.preview-number{font-size:180px;color:#fff8dc;text-shadow:0 5px 0 #14273e,0 0 30px #14273e;letter-spacing:-.04em;margin:0}
+.preview-number[data-digits="3"]{font-size:130px}.preview-number[data-digits="4"]{font-size:105px}
+.preview-stage>p{font-size:13px;margin-top:16px;color:#e1ecf4;align-self:flex-start;padding-left:20px;text-shadow:1px 1px 3px #071420}
+.preview-stage:before,.preview-stage:after{display:none}
+.training-hero{position:absolute;right:-10px;bottom:65px;width:52%;height:52%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 8px 5px #08172e88);z-index:0}
+.preview-bottom{position:relative;z-index:2;background:#10233bee;border-top:1px solid #5c7a95;margin:0;padding:20px 24px}.preview-bottom p{white-space:normal;color:#ffdc7e}
+.summary-label{color:#b8ccde}.answer-screen{background:radial-gradient(ellipse at 50% 0%,#304e6b 0,transparent 70%)}
+.answer-card{background:#203b57;border:2px solid #52728b;border-radius:22px 12px 22px 12px;box-shadow:0 6px #0a1728}
+.answer-symbol{background:#173047;color:#ffdc7e}.correct-answer strong{color:#ffdc7e}.answer-card h1{font-size:clamp(21px,5.5vw,28px)}
+#answer-input{border:2px solid #708ca5;background:#12243a}dialog{background:#203b57;border-color:#52728b}
+.game-screen{background:#101b2a}.game-screen.countdown .game-number{color:#ffdc7e}
+@media(max-width:950px){.practice-layout{grid-template-columns:340px 1fr;gap:18px}.settings-card{padding:20px}.preview-number{font-size:150px}.preview-number[data-digits="3"]{font-size:100px}.preview-number[data-digits="4"]{font-size:80px}.training-hero{width:56%;height:46%}.preview-stage>p{display:none}}
+@media(max-width:720px){
+ .app-shell{max-width:520px;padding:0 16px 12px}.topbar{min-height:62px;gap:6px}.back-home{font-size:12px}.guide-button{min-height:44px}
+ .intro{padding:14px 0 12px}.intro h1{font-size:26px;line-height:1.25;letter-spacing:0}.intro-copy{font-size:12px}
+ .practice-layout{grid-template-columns:1fr;gap:16px}.settings-card{padding:20px}
+ .preview-panel{min-height:134px;grid-template-columns:38% 62%}.preview-top{padding:12px 16px;grid-column:1/-1}.preview-top h2{font-size:11px}
+ .preview-stage{grid-row:2;grid-column:1;min-height:78px;padding:0 0 12px;justify-content:center}.preview-number{font-size:72px}
+ .preview-number[data-digits="3"]{font-size:47px}.preview-number[data-digits="4"]{font-size:38px}
+ .training-hero{width:25%;height:90%;right:-5px;bottom:0;opacity:.95}
+ .preview-bottom{grid-row:2;grid-column:2;background:none;border:0;padding:0 22% 15px 0;justify-content:center}.preview-bottom p{font-size:12px;line-height:1.8;margin-top:4px}.summary-label{font-size:10px}
+}
+@media(max-width:370px){.app-shell{padding:0 12px 12px}.intro h1{font-size:24px}.settings-card{padding:18px 16px}.back-home{font-size:11px}.guide-button{padding:6px 8px}.speed-caption{font-size:12px}}

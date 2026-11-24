@@ -1,0 +1,196 @@
+body[data-screen="title"]{overflow:hidden}body[data-screen="title"]>header{display:none}
+.title-screen{position:fixed;inset:0;z-index:20;background:#76cafa;overflow:hidden;min-height:280px}
+.title-backdrop{position:absolute;inset:0}.title-backdrop img{width:100%;height:100%;object-fit:cover;object-position:center center}
+.title-logo{position:absolute;top:4%;left:50%;transform:translateX(-50%);width:min(78vw,800px);margin:0;text-align:center;line-height:1}
+.title-logo img{display:block;width:100%;height:auto;max-height:25dvh;object-fit:contain;filter:drop-shadow(0 3px 0 #ffffffc9)}
+.title-logo span{display:inline-block;background:#ffffffde;border-radius:18px;color:#20365e;font-size:clamp(12px,1.3vw,17px);font-weight:800;padding:6px 18px;letter-spacing:.14em}
+.title-menu{position:absolute;top:75%;left:50%;transform:translateX(-50%);width:min(520px,92%);text-align:center}
+.title-main-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}.title-main-actions button{height:60px;border-radius:16px;font-size:24px;letter-spacing:.07em;border:3px solid #fff7e5;box-shadow:0 5px 0 #2437543d}
+.title-start{background:#e94b48;color:#fff}.title-practice{background:#fff6dd;color:#25466f}
+.title-sub-actions{display:flex;justify-content:center;gap:9px;margin-top:14px}.title-sub-actions button{background:#ffffffec;color:#264666;border:1px solid #bacacb;border-radius:11px;padding:9px 21px;font-size:14px;min-height:40px}
+.park-link{display:inline-block;color:#294765;font-size:13px;font-weight:800;text-underline-offset:4px;margin-top:12px;padding:5px 8px;background:#fff9;border-radius:8px}
+.setup-nav{display:flex;justify-content:space-between}.home-intro h1{font-size:25px;margin:2px 0 16px}.home-layout{gap:16px}.home-layout .setup{padding:20px}
+#setupFlash{margin-top:12px;width:100%}.home-layout .opponent-card{padding-bottom:18px}
+.options-dialog{width:min(640px,calc(100% - 24px))}.options-dialog .home-settings{flex-direction:column;gap:20px}.options-dialog .test-controls{max-width:none;text-align:left}.options-dialog .sound-settings{width:100%}.options-dialog .sound-settings summary{font-size:17px}
+.ranger-guide{width:100%;height:100%;object-fit:contain}.practice-coach{display:flex;align-items:center;gap:12px;text-align:left;background:#fff1dc;border:1px solid #eac78e;border-radius:14px;margin-bottom:12px;padding:8px 12px;color:#304760;flex-shrink:0}
+.practice-coach>.ranger-guide{width:58px;height:70px;flex-shrink:0}.practice-coach b{font-size:14px;color:#b2403e}.practice-coach p{font-size:14px;line-height:1.6;margin:4px 0}.practice-coach span{white-space:nowrap}
+.hud-ranger{float:left;object-fit:contain;margin:0 7px 0 0}.result-ranger{width:85px;height:100px;float:left;margin:6px 14px 0 0}
+.practice-done{text-align:center;max-width:650px;background:#fffdf5;border-radius:25px;margin:35px auto;padding:24px}.practice-done>div{height:220px}.practice-done h2{color:#dd4c44;font-size:30px}.practice-done p{font-size:16px;line-height:1.8}.practice-done button{margin:8px}
+.pause-dialog{width:min(400px,calc(100% - 30px));padding:25px;text-align:center}.pause-dialog button{margin:8px}.manual-paused *{animation-play-state:paused!important;transition:none!important}
+#play:not(.vision-mode) .answer-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+#play .answer-choice:focus-visible{outline-offset:1px}#play .answer-choice:hover:not(:disabled){background:#e3f4e9}
+@media(orientation:portrait){.title-logo{top:8%;width:94%}.title-logo img{max-height:20dvh}.title-logo span{font-size:13px}.title-menu{top:71%;width:min(420px,90%)}.title-main-actions{gap:10px}.title-main-actions button{height:57px;font-size:21px}.title-sub-actions{gap:7px}.title-sub-actions button{padding:9px 17px}.park-link{font-size:12px;margin-top:10px}}
+@media(max-height:670px) and (orientation:portrait){.title-logo{top:5%}.title-menu{top:70%}.title-main-actions button{height:48px;font-size:19px}.title-sub-actions{margin-top:10px}.title-sub-actions button{min-height:35px;padding:6px 14px}.park-link{margin-top:5px}}
+@media(max-width:799px){.result-ranger{width:58px;height:70px;margin-right:8px}.practice-done{padding:18px;margin:14px auto}.practice-done>div{height:170px}.practice-done h2{font-size:25px}.practice-coach{gap:7px;padding:6px 8px;margin-bottom:6px}.practice-coach>.ranger-guide{width:40px;height:53px}.practice-coach b,.practice-coach p{font-size:12px}.hud-ranger{width:34px;height:43px;margin-right:4px}#play>.toolbar{gap:3px;padding:0 5px}#play>.toolbar button{font-size:11px;padding:6px 5px}#play>.toolbar .small{display:none}}
+@media(max-height:600px) and (orientation:landscape){
+ .title-logo{top:2%;width:52%}.title-logo img{max-height:24dvh}.title-logo span{font-size:11px;padding:3px 10px}.title-menu{top:72%;width:min(480px,84%)}.title-main-actions button{height:39px;font-size:18px;border-width:2px}.title-sub-actions{position:absolute;left:calc(100% + 12px);bottom:0;flex-direction:column;margin:0;gap:5px;display:none}.park-link{margin-top:4px;font-size:10px;padding:2px 5px}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #play .battle{height:calc(100dvh - 35px);min-height:0;display:block}#play .arena{left:52%;width:48%;padding:8px 10px 0}#play .panel{left:0;top:0;bottom:0;transform:none;width:52%;max-width:none;background:#f8fcf3;padding:8px;display:flex;flex-direction:column;justify-content:center;min-height:0}
+ #play .panel>.question{font-size:32px;margin:2px 0;padding:0;line-height:1.15;max-width:100%}#play .panel-top{font-size:11px;width:100%;margin:3px 0}#play .feedback{font-size:11px;min-height:0;padding:2px;margin:2px 0}#play .keypad{gap:5px;margin:3px 0}#play:not(.vision-mode) .key{height:31px;font-size:20px}#play .key.del,#play .key.submit{font-size:12px}#play .panel .toolbar{margin-top:2px}#play .panel .textbtn,#play .panel .small{font-size:10px;padding:3px}#play>.toolbar{height:35px}
+ #play .enemy-name{font-size:13px}#play .hpbar{height:8px;margin:3px 0}#play .hptext{font-size:10px}#play #sprite{top:70px;bottom:26px;left:0;right:0}#play .status{display:none}#play .player-hud{top:49px;left:6px;padding:4px;font-size:9px}.player-hud small{display:none}#play .approach-hud{top:auto;bottom:6px;right:8px;width:110px;font-size:10px}#playerNotice{top:90px;font-size:11px}
+ .practice-coach>.ranger-guide{width:26px;height:32px}.practice-coach b{font-size:10px}.practice-coach p{font-size:11px;line-height:1.35;margin:1px 0}.practice-coach{padding:3px 5px;margin:0 0 3px}
+ .hud-ranger{width:27px;height:32px}#playerShields{gap:2px}#playerShields .shield{font-size:15px}
+ .practice-done{max-width:520px;margin:8px auto;padding:14px}.practice-done>div{height:120px;float:left;width:140px}.practice-done h2{font-size:23px;margin:6px}.practice-done p{font-size:13px}.practice-done .primary{font-size:15px;padding:12px 18px}
+}
+/* Keep the enemy and the answer panel in separate areas on a phone. */
+@media(max-width:799px) and (orientation:portrait){
+ #play:not(.vision-mode) .battle{display:flex;flex-direction:column;height:calc(100dvh - 38px);min-height:0}
+ #play:not(.vision-mode) .arena{position:relative;inset:auto;flex:1;min-height:145px;padding:8px 14px 0;width:100%}
+ #play:not(.vision-mode) .panel{position:relative;inset:auto;transform:none;width:100%;max-width:none;padding:5px 12px 0;background:#e5eedc;flex:none}
+ #play:not(.vision-mode) #sprite{top:112px;bottom:0}
+ #play:not(.vision-mode) .player-hud{left:8px;top:65px;transform:none;min-width:0;width:auto;padding:4px 7px;font-size:10px}
+ #play:not(.vision-mode) .player-hud small{display:none}
+ #play:not(.vision-mode) .approach-hud{top:65px;right:8px;width:139px;font-size:10px}
+ #play:not(.vision-mode) .status{display:none}
+ #play:not(.vision-mode) #playerNotice{top:115px;font-size:12px}
+ #play:not(.vision-mode) .question{margin:4px auto;font-size:clamp(30px,8.5vw,38px);padding:2px 10px}
+ #play:not(.vision-mode) .practice-coach{margin-bottom:2px;min-height:51px;padding:4px 7px}
+ #play:not(.vision-mode) .practice-coach>.ranger-guide{height:40px;width:30px}
+ #play:not(.vision-mode) .practice-coach b,#play:not(.vision-mode) .practice-coach p{font-size:11px;line-height:1.4;margin:2px 0}
+ #play:not(.vision-mode) .feedback{padding:2px;margin-bottom:2px;font-size:11px;min-height:20px}
+ #play:not(.vision-mode) .keypad{gap:6px;margin-top:3px}
+ #play:not(.vision-mode) .key{height:42px}
+ #play:not(.vision-mode) .panel .toolbar{height:27px;margin-top:3px}
+ #play:not(.vision-mode) .panel-top{font-size:11px;margin-bottom:2px}
+ #play:not(.vision-mode) .hud-ranger{height:35px;width:25px}
+}
+/* Ten frames also work on a small phone turned sideways. */
+@media(max-width:799px) and (orientation:landscape){
+ #play .number-blocks:not(:empty){display:block;padding:3px;margin:1px 0;background:#e7f0e4;border-radius:8px}
+ .blocks-operands,.block-operand{display:flex;align-items:center;justify-content:center;gap:5px}.blocks-operands{gap:8px}
+ .block-group{display:flex;flex-direction:column;align-items:center;gap:1px}.ten-frame{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;border:1px solid #9bb5a5;border-radius:3px;padding:2px;background:#f8fbf4}
+ .ten-frame.complete-ten{border-color:#287d6f;background:#d4ece3}.block-cell{width:7px;height:7px;border:1px solid #cad7ca;background:#eff3e9;border-radius:1px}
+ .first-number .block-cell.filled{background:#238577;border-color:#17695e}.second-number .block-cell.filled{background:#d08830;border-color:#a46622}
+ .block-group>span{font-size:9px;white-space:nowrap}.block-join{font-size:10px}.block-operator{font-size:18px}.blocks-caption{display:none}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #play:not(.vision-mode) .panel{padding:5px}
+ #play:not(.vision-mode) .answer-choices{grid-template-columns:repeat(5,minmax(0,1fr))}
+ #play:not(.vision-mode) .keypad:not(.answer-choices){grid-template-columns:repeat(4,minmax(0,1fr))}
+ #play:not(.vision-mode) .key{height:40px}
+ #play:not(.vision-mode) .answer-choice{height:44px}
+ #play:not(.vision-mode) .feedback{font-size:10px;line-height:1.2}
+ #play:not(.vision-mode) .panel>.question{font-size:29px}
+ #play .player-hud{transform:none;min-width:0;left:6px;top:55px;font-size:9px;padding:3px;width:auto}
+ #play .player-hud small{display:none}#play #sprite{top:103px;bottom:42px}
+ #play .approach-hud{font-size:10px;left:auto;right:6px;bottom:4px;top:auto;width:calc(100% - 12px)}
+ #play .practice-coach>.ranger-guide{width:20px;height:25px}#play .practice-coach b,#play .practice-coach p{font-size:10px;line-height:1.2}
+ #play .practice-coach{gap:4px;padding:3px 5px;margin-bottom:1px}
+}
+
+/* Ranger palette and a compact, picture-led setup. */
+:root{color:#203451;background:#eef6fc;font-family:'Yu Gothic','Hiragino Maru Gothic ProN','Meiryo',sans-serif}
+body{background:radial-gradient(ellipse at 20% 0%,#fff3d9 0,transparent 48%),#eef6fc}
+button{transition:background-color .15s,box-shadow .15s,transform .15s}button:active:not(:disabled){transform:translateY(2px)}
+button:focus-visible{outline:3px solid #e7a51d;outline-offset:3px}
+body[data-screen="home"]>header{display:none}body[data-screen="home"] main{max-width:1080px;padding-top:14px}
+.primary{background:#e94b48;box-shadow:0 4px 0 #ac343a;color:white}.primary:hover{background:#db3f43}
+.outline-button{color:#315480;border-color:#b9cee1;background:#fffdf6;border-width:2px}
+.textbtn,.small{color:#526880}.setup-label{color:#314d70}
+.setup-greeting{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 14px}.setup-greeting>.ranger-guide{width:44px;height:52px}.setup-greeting h1{margin:0;color:#223d65;font-size:27px}
+.home-layout .setup{border:2px solid white;box-shadow:0 6px 0 #d8e5f0;background:#fffefa;border-radius:25px;padding:18px}
+.home-layout .opponent-card{background:#dcecf8;border:2px solid white;box-shadow:0 6px 0 #c3d6e8;border-radius:25px;padding:18px}
+.setup h2{color:#273e61;font-size:18px;margin-bottom:12px}.setup-label{font-size:15px;margin-bottom:8px}
+.setup .levels{margin-bottom:16px}#courses{gap:7px}
+#courses .course-button{display:flex;align-items:center;gap:9px;padding:10px 12px;text-align:left;border:2px solid #e1e8ed;background:#f1f6fa;color:#314b6b;border-radius:13px;min-height:65px}
+#courses .course-button>span{display:flex;flex-direction:column}.course-button strong{font-size:15px}.course-button small{font-size:11px;font-weight:600;line-height:1.6}.course-symbol{font-size:27px;width:30px;color:#e56e48;text-align:center}
+#courses .course-button[aria-pressed=true]{background:#244f87;color:#fff;border-color:#244f87;box-shadow:0 3px 0 #173558}#courses .course-button[aria-pressed=true] .course-symbol{color:#ffdb89}
+#courses .course-button:last-child{min-height:58px}#courses .course-button:last-child>span{flex-direction:row;align-items:center;gap:10px}
+.level{background:#e9f1f8;color:#365675}.level[aria-pressed=true],.mode-picker .level[aria-pressed=true]{background:#244f87;color:white}
+.setup .mode-picker .level{padding:10px;font-size:14px}.setup .setup-help{font-size:11px;margin:6px 0 14px;color:#657c93}
+.reward-rule{margin:10px 0 0;color:#536b84;font-size:12px;text-align:center}
+.opponent-preview{grid-template-columns:148px 1fr;min-height:146px;gap:10px}#selectedEnemyArt .monster-figure{height:145px}.opponent-preview h2{font-size:21px;color:#213c60}.opponent-preview p{display:none}
+.course-collection-label{font-size:11px;color:#3d5979;margin:5px 0}.hero-wallet{background:#203e65;border-radius:13px;padding:8px 12px}.hero-wallet strong{color:#ffda83}.hero-wallet button{background:#ffda83;font-size:12px;padding:8px 10px;min-height:38px}
+.loadout-heading{font-size:14px}.loadout-heading .textbtn{color:#285581;font-size:12px;min-height:36px}
+.equipped-slot{border-radius:13px;min-height:90px}.equipped-slot.empty{background:#eff6fc;border-color:#9db7cf;color:#496887}.equipped-slot.filled{background:#203e65;border-color:#5f87b0}
+.equipped-slot .skill-art{height:47px;width:65px}.equipped-slot span{font-size:11px}.equipped-slot.empty span{font-size:11px}
+#equippedSummary{font-size:11px;min-height:16px;margin:6px 0 10px;text-align:center;color:#4c6683}#start{font-size:22px;padding:13px;border-radius:14px}#startSummary{display:none}#setupFlash{min-height:36px;padding:7px;margin-top:10px;font-size:12px}
+.collection-dialog{background:#f6f9fd;color:#203451;border:2px solid #fff;box-shadow:0 24px 80px #102c5c66}.collection-dialog::backdrop{background:#132d4eb0}.dialog-header{background:#f6f9fd;border-color:#d2deeb}.dialog-header h2{color:#203f69;font-size:23px}.dialog-header p,.dialog-header .course-label{color:#59728d;font-size:12px;margin-top:5px}.dialog-help{font-size:13px;color:#56708a;margin:10px 0}
+.effect-equipped-editor{background:#e3edf8;border-color:#bfd1e3}.effect-equipped-editor.replacing{background:#fff0d0;border-color:#eab957}.effect-editor-heading{font-size:14px}.current-effect{background:#203e65}.current-effect>b{background:#dceaf7;color:#31567c}.current-effect.empty{color:#607690;border-color:#a3bdd4}.effect-item.equipped{background:#203c62;border-color:#73b6ed}.effect-item.owned>small{display:none}
+.effect-preview-disclosure{margin:10px 0;font-size:12px;color:#426387}.effect-preview-disclosure>summary{cursor:pointer;padding:8px 0}.effect-preview{margin-top:8px}.selection-status:empty{display:none}.selection-status{font-size:12px;min-height:0}
+.effect-item .effect-actions button[aria-pressed=true]{background:#345f92}.collection-dialog .card[aria-pressed=true]{background:#e3effc;border-color:#4384c8}.collection-dialog .card .enemy-reward{color:#3f6890}
+.gacha-dialog,.gacha-dialog .dialog-header{background:#14233d;color:#f3f7fc}.gacha-dialog .dialog-header h2{color:#fff}.gacha-dialog .dialog-header .course-label{color:#ffda83}.gacha-help summary{cursor:pointer;padding:4px}.gacha-help p{font-size:12px;text-align:left}
+.result{border:2px solid #fff;box-shadow:0 7px 0 #cfdeec;background:#fffefa}.result h2{color:#244b78}.result .stats>div{background:#e8f1fa;border-radius:15px}.result .stats b{color:#28588e}.result .stats>div>span{color:#536d8a}.result .effect-reward{background:#fff0cf;color:#906321}.result .eyebrow{color:#d56449}.result .unlock-message{font-size:13px;color:#56718c}
+.result-context,.stats-note,.battle-total,.stats-definition{color:#56718c}.stats-definition p{background:#eff5fc}.practice-done{box-shadow:0 6px 0 #d2e0ed}.pause-dialog{background:#fffdf4}
+#play .arena{background:radial-gradient(ellipse at 50% 45%,#fffbe9 0%,#e4f1f9 65%,#bfd9f0 100%)}#play .arena:after{background:#bdd8c5}
+#play .hp{background:#377fc1}#play .enemy-name{color:#244568}#play .player-hud{background:#fffdf1ed;color:#315772}#play .approach-hud{background:#fffdf1ed;color:#785d39}
+#play .feedback{background:#f9fcff;color:#355a80}#play .question{color:#223e63}#play .answer{color:#df5346}#play .key{color:#284c77;box-shadow:0 4px 0 #c1d4e4;background:#fffdf6}#play .key.submit{background:#e94b48;box-shadow:0 4px 0 #b53b40;color:#fff}
+#play>.toolbar{background:#dbe9f5;color:#466380}#inputHelp{display:none}#play .panel .toolbar{justify-content:center}#play .textbtn{color:#466380}.practice-coach{background:#fff2d9;border-color:#e6cfa1;color:#355572}
+@media(max-width:799px){
+ body[data-screen="home"] main{padding-top:8px}.setup-greeting{margin-bottom:10px;gap:7px}.setup-greeting>.ranger-guide{height:42px;width:35px}.setup-greeting h1{font-size:22px}.setup-nav .textbtn{font-size:12px;padding:7px}
+ .home-layout{gap:14px}.home-layout .setup,.home-layout .opponent-card{padding:14px;border-radius:20px}.setup h2{font-size:17px;margin-bottom:9px}.setup-label{font-size:13px;margin-bottom:6px}
+ #courses .course-button{padding:8px 9px;min-height:59px;gap:6px}.course-button strong{font-size:13px}.course-button small{font-size:10px}.course-symbol{font-size:24px;width:23px}#courses .course-button:last-child{min-height:46px}.setup .levels{margin-bottom:12px}
+ .setup .mode-picker .level{min-height:40px;padding:8px}.setup .setup-help{margin-bottom:10px}
+ .opponent-preview{grid-template-columns:105px 1fr;min-height:110px}#selectedEnemyArt .monster-figure{height:107px}.opponent-preview h2{font-size:20px}
+ .collection-dialog .dialog-header h2{font-size:19px}.dialog-header p{font-size:11px}.effect-editor-heading{font-size:12px}.current-effect .skill-art{height:43px}.current-effect>span{font-size:10px}.current-effect>b{font-size:10px;padding:5px}.current-effect.empty{min-height:115px}
+ .effect-portrait{min-height:135px}.effect-portrait span{font-size:12px}.effect-portrait .skill-art{height:95px}.effect-item .rarity-label{font-size:10px}.effect-actions button{font-size:12px;padding:8px 5px}.effect-current-slots{gap:5px}
+ .result .stats b{font-size:25px}.result .stats>div>span{font-size:11px}.result .result-actions .primary{min-width:0;font-size:14px}.result .result-heading p{font-size:13px}
+}
+@media(max-width:799px) and (orientation:portrait){
+ #play:not(.vision-mode) .panel{background:#e9f2f9}
+ #play.vision-mode .panel{padding:4px 0 0;min-height:0}
+ #play.vision-mode .panel>.question{font-size:32px;padding:2px 10px;margin:3px auto;line-height:1.2}
+ #play.vision-mode .practice-coach{padding:4px 7px;margin-bottom:2px;min-height:45px}
+ #play.vision-mode .practice-coach>.ranger-guide{width:27px;height:34px}
+ #play.vision-mode .practice-coach b,#play.vision-mode .practice-coach p{font-size:10px;line-height:1.3;margin:2px 0}
+ #play.vision-mode .panel-top{font-size:10px;margin:2px 0}
+ #play.vision-mode .feedback{font-size:11px;padding:2px;margin:2px 0;min-height:19px}
+ #play.vision-mode .panel .toolbar{height:27px;margin-top:2px}
+ #play.vision-mode .player-hud{top:66px;padding:4px 8px;font-size:10px;min-width:0;width:205px}
+ #play.vision-mode .player-hud small{display:none}#play.vision-mode .hud-ranger{width:23px;height:32px}
+ #play.vision-mode #sprite{opacity:.25;pointer-events:none}#play.vision-mode .vision-choice{background:#fffdf8f5;color:#244f78;border-color:#fff;box-shadow:0 0 0 2px #8db2c8,0 3px 5px #28486622}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #play:not(.vision-mode) .panel{background:#edf5fb}
+ #play.vision-mode .panel{position:fixed;left:0;top:0;bottom:35px;width:52%;z-index:4;background:#edf5fb}
+ #play.vision-mode .panel>.question{font-size:30px}
+ #play.vision-mode #sprite{opacity:.18;pointer-events:none}
+ #play.vision-mode .player-hud{top:61px;font-size:9px}
+ #play.vision-mode .approach-hud{display:none}
+ #play.vision-mode .enemy-name{max-width:none;align-self:center}
+ #play.vision-mode .vision-choice{background:#fffdf8f5;color:#244f78}
+ #play.vision-mode>.toolbar{position:fixed;bottom:0;left:0;right:0}
+}
+.result .eyebrow{display:none}.result-heading h2{font-size:32px;margin:6px 0}.result .result-heading .sprite{width:98px}.result .result-ranger{height:82px;width:65px}
+body:is([data-screen="result"],[data-screen="defeat"],[data-screen="practiceDone"])>header{display:none}
+body:is([data-screen="result"],[data-screen="defeat"],[data-screen="practiceDone"]) main{padding-top:8px}
+.result .stats>div{padding:11px 5px}.result .stats b{margin-top:4px;line-height:1.3}.result .stats-note{font-size:12px;margin:8px 0}
+.result .effect-reward{font-size:16px;margin:10px 0;padding:8px}.effect-reward>b{font-size:24px}.effect-reward>small{display:block;font-size:11px;font-weight:600;margin-top:3px}
+.first-clear-reward{padding:8px;margin:10px 0;gap:10px}.first-clear-art{width:62px;height:62px}.first-clear-reward strong{font-size:18px;margin:3px 0}.first-clear-reward small,.first-clear-reward span{font-size:11px}
+.result .unlock-message:empty{display:none}.result-actions{margin-top:14px}.result .result-context{font-size:12px}.result .gacha-result-button,.result #resultEffectsButton{font-size:13px;padding:9px 16px;min-height:40px;margin-bottom:0}.stats-definition summary{font-size:11px;min-height:25px}
+@media(max-width:799px){
+ #play:not(.vision-mode) #sprite .monster-figure{transform:scale(var(--approach-scale,.65));transform-origin:center bottom}
+ #play.enemy-attacking:not(.vision-mode) #sprite .monster-figure{transform:scale(1.05)}
+ #play:not(.vision-mode) .approach-hud{white-space:nowrap;font-size:9px;width:144px}
+ .result{margin:8px auto;padding:14px 12px}.result .result-ranger{width:40px;height:52px;margin:0 7px 0 0}.result .result-heading .sprite{width:70px}.result-heading h2{font-size:26px;margin:4px 0}.result .result-heading p{font-size:12px;margin:4px 0}
+ .result .stats{margin:9px 0}.result .stats>div{padding:10px 3px}.result .stats b{font-size:24px}.result .stats b small{font-size:10px}.result .stats>div>span{font-size:10px;white-space:nowrap}.result .result-context{font-size:10px;margin:8px 0}
+ .result .first-clear-art{width:48px;height:48px}.result .first-clear-reward strong{font-size:15px}.result .first-clear-reward small,.result .first-clear-reward span{font-size:10px}.result .effect-reward{font-size:13px;margin:8px 0}.result .effect-reward>b{font-size:22px}
+ .result .result-actions{margin:12px 0 6px;gap:8px}.result .result-actions .primary{font-size:16px;padding:12px 16px}.result .gacha-result-button,.result #resultEffectsButton{font-size:12px;padding:8px 13px}.result>#choose,.result>#chooseDefeat,.result>.result-to-title{font-size:11px;min-height:32px;padding:7px}
+}
+@media(max-width:799px) and (orientation:portrait){
+ #play.vision-mode.practice-mode .feedback{display:none}
+ #play.vision-mode.practice-mode .panel .toolbar{height:23px;margin:0}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #play.vision-mode .battle{margin-bottom:35px}
+ #play.vision-mode .panel::before{content:'したにも こたえが あるよ ↓';color:#527390;font-size:11px;margin-bottom:10px}
+}
+.collection-dialog.multiply-guide{width:min(510px,calc(100% - 24px));max-height:calc(100dvh - 28px);padding:20px;text-align:left;box-sizing:border-box}
+.multiply-guide-heading{display:flex;align-items:center;gap:14px}
+.multiply-guide-heading .ranger-guide{width:60px;height:70px;flex:none}
+.multiply-guide-heading h2{margin:0;font-size:clamp(22px,5.5vw,29px);color:#213e60}
+.multiply-guide #multiplyGuideText{margin:12px 0 18px;font-size:16px;font-weight:800;line-height:1.6}
+.multiply-guide-examples{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.multiply-guide-example{background:#fff;border:2px solid #c5d3dc;border-radius:13px;padding:12px 8px;text-align:center}
+.multiply-guide-example>span{display:block;font-size:15px;margin-bottom:9px}
+.multiply-guide-example b{font-size:28px;color:#213e60;margin-left:5px}
+.multiply-guide-example>div{display:flex;align-items:center;justify-content:center;gap:7px}
+.multiply-guide-example kbd{box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:52px;height:62px;background:#edf4fa;border:2px solid #7e9bb3;border-radius:10px;box-shadow:0 3px 0 #a0b3c3;font-family:inherit;font-size:29px;font-weight:800;line-height:1.1}
+.multiply-guide-example kbd.guide-zero{background:#fff0bd;border-color:#c98c26;box-shadow:0 3px 0 #ddbc76}
+.multiply-guide-example kbd small{font-size:10px;line-height:1.5}
+.multiply-guide-example i{font-style:normal;font-weight:900}
+.multiply-guide-clock{font-size:12px;color:#53677d;margin:15px 0 10px;text-align:center}
+.multiply-guide #multiplyGuideStart{display:block;width:100%;min-height:48px;padding:10px 14px;line-height:1.3;font-size:19px;margin:0;border:2px solid #213e60;border-radius:12px}
+@media(max-width:380px){.collection-dialog.multiply-guide{padding:15px}.multiply-guide-examples{grid-template-columns:1fr;gap:10px}.multiply-guide-example{padding:8px;display:flex;align-items:center;justify-content:space-around;gap:8px}.multiply-guide-example>span{margin:0}.multiply-guide-example kbd{min-width:45px;height:52px}.multiply-guide-example>div{gap:5px}.multiply-guide #multiplyGuideText{font-size:14px}}
+@media(orientation:landscape) and (max-height:450px){.collection-dialog.multiply-guide{padding:10px 16px}.multiply-guide-heading{justify-content:center;gap:10px}.multiply-guide-heading .ranger-guide{width:30px;height:36px}.multiply-guide-heading h2{font-size:23px}.multiply-guide #multiplyGuideText{margin:5px 0 8px;font-size:14px;text-align:center}.multiply-guide-example{padding:7px;display:flex;align-items:center;justify-content:space-around;gap:5px}.multiply-guide-example>span{margin:0;font-size:12px}.multiply-guide-example b{display:block;font-size:24px}.multiply-guide-example kbd{min-width:44px;height:48px;font-size:26px}.multiply-guide-clock{margin:9px 0 5px}.multiply-guide #multiplyGuideStart{min-height:44px;padding:8px;font-size:17px}}

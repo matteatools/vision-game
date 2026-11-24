@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#25483e">
+<meta name="description" content="色と模様が同じ靴下を見つけ、二枚ずつそろえて三十日間の物語を進める無料Webゲームです。">
+<title>それでもぼくはくつしたをそろえる｜めとあたまのゲームパーク</title><link rel="icon" href="pan.svg" type="image/svg+xml"><link rel="stylesheet" href="remake.css">
+<script defer src="game-core.js"></script><script defer src="storage.js"></script><script defer src="audio.js"></script><script defer src="render.js"></script><script defer src="app.js"></script>
+    <link rel="canonical" href="https://matteatools.github.io/vision-game/games/pan-socks/">
+    <meta property="og:site_name" content="めとあたまのゲームパーク">
+    <meta property="og:title" content="それでもぼくはくつしたをそろえる｜めとあたまのゲームパーク">
+    <meta property="og:description" content="色と模様が同じ靴下を見つけ、二枚ずつそろえて三十日間の物語を進める無料Webゲームです。">
+    <meta property="og:url" content="https://matteatools.github.io/vision-game/games/pan-socks/">
+    <meta property="og:image" content="https://matteatools.github.io/vision-game/assets/og/pan-socks.jpg">
+    <meta property="og:image:alt" content="それでもぼくはくつしたをそろえるのゲーム画面">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="それでもぼくはくつしたをそろえる｜めとあたまのゲームパーク">
+    <meta name="twitter:description" content="色と模様が同じ靴下を見つけ、二枚ずつそろえて三十日間の物語を進める無料Webゲームです。">
+    <meta name="twitter:image" content="https://matteatools.github.io/vision-game/assets/og/pan-socks.jpg">
+</head>
+<body><main>
+<section id="title-screen" class="screen title-screen" aria-label="タイトル">
+<h1><img class="title-logo" src="assets/logo.svg" alt="それでもぼくはくつしたをそろえる" width="760" height="280"></h1>
+<nav class="title-menu" aria-label="あそぶ"><div class="main-buttons"><button id="practice-button" class="button light">れんしゅう</button><button id="start-button" class="button primary">スタート<span aria-hidden="true"> →</span></button></div><button id="mode-button" class="mode-link">あそぶひ：<span id="chosen-mode"></span><span aria-hidden="true">⌄</span></button><p id="journey-progress" class="journey-progress">0 / 30にち クリア</p><a class="park-link" href="https://matteatools.github.io/vision-game/">ゲームパークへ もどる</a></nav>
+<button class="sound-button quiet-button" data-sound aria-label="おとを きりかえる"></button>
+</section>
+<section id="intro-screen" class="screen intro-screen" hidden aria-label="きょうの おはなし"><div class="intro-content"><span id="intro-day" class="eyebrow"></span><p id="intro-story" class="intro-story"></p><div id="intro-art" aria-hidden="true"></div><h2>それでもぼくは<br>くつしたをそろえる。</h2><p id="intro-rules"></p><p id="intro-tip"></p><div class="intro-buttons"><button id="intro-start" class="button primary">はじめる</button><button id="intro-back" class="button light">もどる</button></div></div></section><section id="play-screen" class="screen play-screen" hidden aria-label="くつしたを そろえる"><div class="play-layout">
+<header class="hud"><div class="hud-mode"><span id="mode-name"></span><small id="best-label"></small></div><div class="score"><small>そろえた</small><strong><span id="matched-label">0</span><span class="score-slash"> / </span><span id="total-label">15</span><small>くみ</small></strong></div><div class="clock"><small>のこり</small><span id="time-label">00:00</span></div><button id="pause-button" class="quiet-button pause-button" aria-label="ゲームを とめる"><span class="pause-icon" aria-hidden="true"></span><span>とめる</span></button></header>
+<div class="board-wrap" id="board-wrap"><div class="board-corner" aria-hidden="true"></div><div id="board" class="board" aria-label="くつしたの マット"></div><img id="incident-visitor" class="incident-visitor" src="assets/ghost.svg" alt="" aria-hidden="true" hidden><img id="visitor-cat" class="visitor cat" src="cat.svg" alt="" aria-hidden="true"><img id="visitor-baby" class="visitor baby" src="baby.svg" alt="" aria-hidden="true"></div>
+<aside class="pan-guide" aria-label="パンの おはなし"><div class="pan-face"><img id="pan-image" src="pan.svg" alt="パン"></div><div class="speech"><span id="lesson-label" class="lesson-label">パン</span><p id="message" role="status" aria-live="polite"></p></div><button id="lesson-action" class="button small" hidden>つぎへ</button></aside>
+<footer class="play-footer"><div class="obstacles" id="obstacles"><div class="obstacle-meter"><span id="incident-label"></span><div class="meter-track"><i id="incident-progress"></i></div></div><span id="incident-status"></span></div><span id="board-help" class="board-help">おなじ いろ と もようを タップ</span><button class="quiet-button" data-sound aria-label="おとを きりかえる"></button></footer>
+</div></section>
+<section id="result-screen" class="screen result-screen" hidden aria-label="おかたづけの けっか"><div class="result-content"><span class="result-eyebrow" id="result-eyebrow">おかたづけ おしまい</span><h2 id="result-title">それでも、そろった。</h2><img class="result-pan" src="assets/pan-happy.svg" alt="にっこりした パン" width="200" height="180"><p id="result-message">ひとくみずつ。ぜんぶ そろったね。</p><div id="result-stats" class="result-stats"><div><small>そろえた</small><strong id="result-pairs"></strong></div><div><small>じかん</small><strong id="result-time"></strong></div></div><p id="record-message" class="record-message"></p><div class="result-buttons"><button id="next-button" class="button primary" hidden>つぎのひへ</button><button id="again-button" class="button primary">もういちど</button><button id="result-home" class="button light">タイトルへ</button></div><a class="park-link" href="https://matteatools.github.io/vision-game/">ゲームパークへ もどる</a></div></section>
+</main>
+<dialog id="mode-dialog" aria-labelledby="mode-heading"><div class="dialog-content"><span class="eyebrow">パンの おせんたく</span><h2 id="mode-heading">どんなひに する？</h2><nav id="mode-pages" class="mode-pages" aria-label="ひづけの ページ"></nav><p id="mode-page-range" class="mode-page-range" aria-live="polite"></p><div id="mode-list" class="mode-list"></div><button id="mode-close" class="button light full">もどる</button></div></dialog>
+<dialog id="pause-dialog" aria-labelledby="pause-heading"><div class="dialog-content pause-content"><img src="pan.svg" width="100" height="90" alt="ひとやすみする パン"><h2 id="pause-heading">ちょっと ひとやすみ。</h2><p>じかんも おじゃまも とまっているよ。</p><button id="resume-button" class="button primary full">つづける</button><button id="pause-home" class="button light full">タイトルへ</button><small>タイトルに もどると、いまの おかたづけは おしまい。</small></div></dialog>
+<noscript>このゲームでは JavaScript を つかいます。ブラウザーの せっていを かくにんしてね。</noscript>
+</body></html>

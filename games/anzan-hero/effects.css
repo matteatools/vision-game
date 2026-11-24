@@ -1,0 +1,39 @@
+.attack-effects{position:fixed;z-index:14;overflow:hidden;pointer-events:none;contain:layout paint;isolation:isolate}
+.attack-effects *{pointer-events:none!important}
+.attack-effect-art{display:block;width:100%;height:100%;overflow:hidden}
+.hero-skill-icon{display:block;width:100%;height:100%}
+.attack-effects .fx-main,.attack-effects .fx-secondary,.attack-effects .fx-third{transform-origin:200px 210px;animation:hero-strike .72s cubic-bezier(.15,.75,.2,1) both}
+.attack-effects .fx-secondary{animation-delay:45ms;animation-duration:.66s}.attack-effects .fx-third{animation-delay:90ms;animation-duration:.61s}
+.attack-effects .fx-aura{transform-origin:200px 210px;animation:hero-aura .72s ease-out both}
+.attack-effects .fx-charge,.attack-effects .fx-rings,.attack-effects .fx-orbit{transform-origin:200px 210px;animation:hero-circle .72s ease-out both}
+.attack-effects .fx-impact{transform-origin:200px 235px;animation:hero-impact .72s ease-out both}
+.attack-effects .fx-sparks{transform-origin:200px 210px;animation:hero-sparks .72s ease-out both}
+.attack-effects .fx-trails,.attack-effects .fx-flames,.attack-effects .fx-wings{transform-origin:200px 210px;animation:hero-trails .72s ease-out both}
+.attack-effects .fx-beam{animation-name:hero-beam}.attack-effects .fx-slash{animation-name:hero-slash}
+.attack-effects .fx-bolt{animation-name:hero-bolt}.attack-effects .fx-vortex{animation-name:hero-vortex}
+.attack-effects .fx-drop{animation-name:hero-drop}.attack-effects .fx-fan{animation-name:hero-fan}
+.attack-effects .fx-cat,.attack-effects .fx-rice{animation-name:hero-meteor}.attack-effects .fx-paw{animation-name:hero-paw}
+.attack-effects .fx-rush-left,.attack-effects .fx-rush-right,.attack-effects .fx-rush-center{animation-name:hero-rush;animation-duration:.58s}.attack-effects .fx-rush-left{animation-delay:0s}.attack-effects .fx-rush-right{animation-delay:.07s}.attack-effects .fx-rush-center{animation-delay:.14s}
+@keyframes hero-rush{0%{translate:0 60px;scale:.35;opacity:0}28%{translate:0 0;scale:1.12;opacity:1}46%{translate:0 4px;scale:1;opacity:1}100%{translate:0 -18px;scale:1.2;opacity:0}}
+.fx-title{position:absolute;left:5%;right:5%;top:5%;width:max-content;max-width:90%;margin:auto;padding:6px 15px;border:1px solid var(--effect-color);border-radius:7px;background:#10213cea;color:white;text-shadow:0 0 12px var(--effect-color);font-family:'Yu Gothic',sans-serif;font-weight:900;font-size:clamp(13px,1.6vw,26px);text-align:center;letter-spacing:.05em;animation:hero-title .72s ease-out both}
+@keyframes hero-strike{0%{opacity:0;scale:.35}18%{opacity:.6;scale:.65}36%{opacity:1;scale:1.08}65%{opacity:1;scale:1}100%{opacity:0;scale:1.18}}
+@keyframes hero-aura{0%{opacity:0;scale:.25}22%{opacity:.7;scale:.7}42%{opacity:1;scale:1.1}100%{opacity:0;scale:1.25}}
+@keyframes hero-circle{0%{opacity:0;scale:.3;rotate:-35deg}22%{opacity:.8;scale:.85}45%{opacity:.9;scale:1;rotate:0deg}100%{opacity:0;scale:1.18;rotate:30deg}}
+@keyframes hero-impact{0%,24%{opacity:0;scale:.25}37%{opacity:1;scale:.75}100%{opacity:0;scale:1.7}}
+@keyframes hero-sparks{0%,20%{opacity:0;scale:.3;rotate:-15deg}39%{opacity:1;scale:.8}85%{opacity:.6}100%{opacity:0;scale:1.3;rotate:20deg}}
+@keyframes hero-trails{0%{opacity:0;scale:.3}22%{opacity:.7;scale:.7}50%{opacity:.8;scale:1.05}100%{opacity:0;scale:1.2}}
+@keyframes hero-beam{0%,12%{opacity:0;scale:.05 .2}24%{opacity:1;scale:.3 1}36%{opacity:1;scale:1 1}67%{opacity:.9;scale:.85 1}100%{opacity:0;scale:.05 1.2}}
+@keyframes hero-slash{0%,10%{opacity:0;translate:55px -60px;scale:.5}32%{opacity:1;translate:0 0;scale:1.05}62%{opacity:1}100%{opacity:0;translate:-25px 25px;scale:1.2}}
+@keyframes hero-bolt{0%,14%{opacity:0;translate:0 -110px;scale:.5 1}30%{opacity:1;translate:0 0;scale:1.05 1}65%{opacity:.95}100%{opacity:0;scale:1.08}}
+@keyframes hero-vortex{0%{opacity:0;scale:.1;rotate:-60deg}34%{opacity:1;scale:1;rotate:0deg}65%{opacity:1;scale:1.08;rotate:18deg}100%{opacity:0;scale:.1;rotate:65deg}}
+@keyframes hero-drop{0%{opacity:0;translate:0 -160px;scale:.75 1.15}28%{opacity:1;translate:0 12px;scale:1.15 .8}43%{translate:0 -10px;scale:.92 1.06}65%{opacity:1;translate:0 0;scale:1}100%{opacity:0;scale:.95}}
+@keyframes hero-fan{0%{opacity:0;rotate:-80deg;scale:.5}30%{opacity:1;rotate:10deg;scale:1.05}48%{rotate:-8deg}64%{opacity:1;rotate:0deg}100%{opacity:0;rotate:20deg;scale:1.1}}
+@keyframes hero-meteor{0%{opacity:0;translate:90px -130px;scale:.6}34%{opacity:1;translate:0 0;scale:1.05}62%{opacity:1;translate:-8px 12px}100%{opacity:0;translate:-35px 35px;scale:.9}}
+@keyframes hero-paw{0%{opacity:0;scale:2}28%{opacity:1;scale:.85}43%{scale:1.1}68%{opacity:1;scale:1}100%{opacity:0;scale:1.18}}
+@keyframes hero-title{0%,12%{opacity:0;translate:0 6px}28%,75%{opacity:1;translate:0 0}100%{opacity:0}}
+.attack-effects-reduced *{animation:none!important}.attack-effects-reduced .fx-main{opacity:.9}.attack-effects-reduced .fx-secondary,.attack-effects-reduced .fx-third,.attack-effects-reduced .fx-sparks{opacity:.55}.attack-effects-reduced .fx-aura{opacity:.4}
+@media(prefers-reduced-motion:reduce){.attack-effects *{animation:none!important}.attack-effects .fx-main{opacity:.9}.attack-effects .fx-aura{opacity:.4}}
+
+.attack-effects .fx-spin{animation-name:hero-spin}.attack-effects .fx-phoenix{animation-name:hero-phoenix}
+@keyframes hero-spin{0%{opacity:0;scale:.2;rotate:-120deg}35%{opacity:1;scale:1;rotate:0deg}70%{opacity:1;rotate:35deg}100%{opacity:0;scale:1.15;rotate:85deg}}
+@keyframes hero-phoenix{0%{opacity:0;scale:.15 .7;translate:0 55px}35%{opacity:1;scale:1;translate:0 0}70%{opacity:1;scale:1.04;translate:0 -10px}100%{opacity:0;scale:1.15;translate:0 -60px}}

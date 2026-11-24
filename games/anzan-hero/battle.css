@@ -1,0 +1,119 @@
+/* Landscape battlefield: one scene, side HUDs, a compact equation, then answers. */
+.battle-side,.battle-question-dock{display:none}
+#play .key.zero-key{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1px;line-height:1}
+#play .zero-key small{display:block;font-size:11px;line-height:1.1;white-space:nowrap}
+#play.landscape-battle{--battle-toolbar:44px;overflow:auto;background:#7ccbf3}
+#play.landscape-battle .battle{display:flex;flex-direction:column;height:calc(100dvh - var(--battle-toolbar) + var(--vision-extra-height,0px));min-height:0;background:#7ccbf3 url('assets/command/city-arena.webp') center/cover no-repeat;gap:0}
+#play.landscape-battle .arena{position:relative;inset:auto;flex:1;min-height:100px;width:100%;padding:0;border:0;border-radius:0;background:none;overflow:visible;display:block}
+#play.landscape-battle .arena::after{display:none}
+#play.landscape-battle .battle-side{display:flex;flex-direction:column;position:absolute;top:50%;transform:translateY(-50%);width:20%;padding:clamp(9px,1.5vw,22px);background:#fff9e9;color:#203652;border:2px solid #294760;border-radius:18px;box-shadow:0 4px 0 #20365230;z-index:5;text-align:center;font-size:clamp(14px,1.6vw,22px);line-height:1.35}
+#play.landscape-battle .battle-player-side{left:2.5%}
+#play.landscape-battle .battle-enemy-side{right:2.5%}
+#play.landscape-battle .battle-stage{display:flex;flex-direction:column;gap:4px;border-bottom:1px solid #a6b9c5;padding-bottom:12px;margin-bottom:12px;font-weight:900}
+#play.landscape-battle .battle-stage strong{font-size:clamp(28px,3.5vw,48px);line-height:1.15}
+#play.landscape-battle .battle-stage small{font-size:.5em}
+#play.landscape-battle.practice-mode .battle-stage strong{display:none}
+#play.landscape-battle .player-hud{position:static;transform:none;min-width:0;max-height:none;width:100%;padding:0;border:0;background:none;box-shadow:none;font-size:clamp(13px,1.5vw,20px);color:#203652}
+#play.landscape-battle .player-hud .hud-ranger,#play.landscape-battle #playerHits{display:none}
+#play.landscape-battle #playerHp{display:block;line-height:1.6}
+#play.landscape-battle #playerShields{height:auto;min-height:24px;gap:clamp(4px,.6vw,10px);margin:9px 0 0;flex-wrap:nowrap}
+#play.landscape-battle #playerShields .shield{flex:none;width:clamp(18px,2.2vw,32px);height:clamp(22px,2.6vw,37px);font-size:0}
+#play.landscape-battle .enemy-name{font-size:clamp(16px,2vw,28px);max-width:none;line-height:1.3;overflow-wrap:anywhere}
+#play.landscape-battle .hpbar{width:100%;max-width:none;height:14px;min-height:14px;border:0;background:#d4dedb;margin:10px 0 4px}
+#play.landscape-battle .hp{background:#e9aa2c}
+#play.landscape-battle .hptext{font-size:clamp(14px,1.7vw,24px);color:#203652;white-space:nowrap}
+#play.landscape-battle #round{display:block;border-top:1px solid #a6b9c5;padding-top:10px;margin-top:12px;white-space:nowrap;font-weight:900;font-size:clamp(14px,1.8vw,25px)}
+#play.landscape-battle #comboCount{display:block;min-height:1.5em;line-height:1.5;font-size:clamp(15px,2vw,27px);margin-top:4px;color:#a65b13;text-shadow:none}
+#play.landscape-battle .status{position:static;inset:auto;width:100%;max-width:none;display:none}
+#play.landscape-battle .feedback{font-size:clamp(12px,1.25vw,18px);min-height:2.8em;height:2.8em;line-height:1.4;padding:0;margin:4px 0 0;background:none;display:flex;align-items:center;justify-content:center;color:#365777}
+#play.landscape-battle #playerNotice{position:static;inset:auto;min-height:2.8em;line-height:1.4;font-size:clamp(12px,1.15vw,16px);margin-top:7px;color:#a43725;text-shadow:none}
+#play.landscape-battle #sprite{position:absolute;left:24%;right:auto;top:1%;bottom:1%;width:52%;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;overflow:visible;opacity:1;pointer-events:none}
+#play.landscape-battle #sprite .monster-figure{width:100%;height:100%;max-height:100%;max-width:none;flex:none;transform:translateY(calc(var(--approach-y,-56px)*.12)) scale(calc(.8 + var(--approach-scale,.65)*.16));transform-origin:center bottom}
+#play.landscape-battle.enemy-attacking #sprite .monster-figure{transform:translateY(5px) scale(1.06)}
+#play.landscape-battle .panel{position:relative;inset:auto;transform:none;flex:none;width:100%;max-width:none;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 3% 16px;margin:0;border:0;background:none;box-shadow:none;perspective:none;z-index:6}
+#play.landscape-battle .panel-top,#play.landscape-battle .panel>.toolbar{display:none}
+#play.landscape-battle .battle-question-dock{display:flex;flex-direction:column;align-items:stretch;width:max-content;max-width:100%;padding:4px clamp(12px,1.7vw,24px) 6px;border:3px solid #294760;border-radius:16px;background:#fff9e9;box-shadow:0 4px 0 #20365230}
+#play.landscape-battle .question,#play.landscape-battle .question.wrong-answer{position:static;display:block;width:max-content;max-width:100%;padding:0;margin:0;background:none;border:0;box-shadow:none;border-radius:0;color:#203652;font-size:clamp(38px,7.7vw,116px);line-height:1.08;font-weight:900;letter-spacing:-.035em;text-shadow:none;-webkit-text-stroke:0;white-space:nowrap;transform:none;animation:none!important;pointer-events:none}
+#play.landscape-battle .question .answer{display:inline-block;min-width:1.25em;border:0;text-align:center;color:#087e70;-webkit-text-stroke:0}
+#play.landscape-battle .question.wrong-answer .answer{color:#b43d26}
+#play.landscape-battle .approach-hud{position:static;inset:auto;width:100%;padding:0;margin:2px 0 0;border:0;border-radius:0;background:none;box-shadow:none;color:#456273;display:flex;flex-direction:row-reverse;align-items:center;gap:10px;font-size:clamp(12px,1.1vw,17px);font-weight:700;text-align:right}
+#play.landscape-battle #approachText{white-space:nowrap;font-size:inherit}
+#play.landscape-battle #approachText.urgent{color:#a62d22}
+#play.landscape-battle .approach-track{height:5px;flex:1;min-width:30px;margin:0;background:#d1dcdd}
+#play.landscape-battle #approachBar{background:#d99838}
+#play.landscape-battle .keypad,#play.landscape-battle:not(.vision-mode) .answer-choices{display:grid;grid-template-columns:repeat(var(--answer-count,9),minmax(0,1fr));width:100%;max-width:none;gap:clamp(6px,.8vw,14px);margin:0}
+#play.landscape-battle .keypad:not(.answer-choices){grid-template-columns:repeat(12,minmax(0,1fr))}
+#play.landscape-battle .key{height:clamp(44px,8.8dvh,88px);min-height:44px;padding:0;border:2px solid #294760;border-radius:12px;background:#fff9e9;box-shadow:0 4px 0 #29476080;font-size:clamp(25px,3.6vw,48px);color:#203652}
+#play.landscape-battle .key.del,#play.landscape-battle .key.submit{font-size:clamp(14px,1.7vw,24px)}
+#play.landscape-battle .key.submit{color:#fff;background:#e84c40}
+#play.landscape-battle.multiply-input:not(.vision-mode) .keypad{max-width:900px;grid-template-columns:repeat(11,minmax(0,1fr));gap:8px}
+#play.landscape-battle.multiply-input:not(.vision-mode) .key{height:clamp(44px,7dvh,64px);font-size:clamp(23px,2.3vw,32px)}
+#play.landscape-battle.multiply-input:not(.vision-mode) .key.del{font-size:16px}
+#play.landscape-battle>.toolbar{position:relative;bottom:auto;height:var(--battle-toolbar);padding:0 max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));gap:8px;border-top:1px solid #819cae;flex-wrap:nowrap}
+#play.landscape-battle>.toolbar button{min-height:40px;font-size:14px;padding:6px 10px;white-space:nowrap}
+#play.landscape-battle>.toolbar .small{display:none}
+#play.landscape-battle .practice-coach{display:none}
+#play.landscape-battle.practice-mode .practice-coach{display:block;margin:8px 0 0;padding:6px;border:0;box-shadow:none;background:#fff0c9;font-size:13px}
+#play.landscape-battle .practice-coach>.ranger-guide{display:none}
+#play.landscape-battle .practice-coach b,#play.landscape-battle .practice-coach p{font-size:13px;line-height:1.4;margin:2px 0}
+#play.landscape-battle.practice-mode #playerNotice{display:none}
+/* Vision uses the entire scene, including the enemy and the space beside the equation. */
+#play.landscape-battle.vision-mode .battle{display:block;min-height:0;margin:0}
+#play.landscape-battle.vision-mode .arena{position:absolute;inset:18% 0 19%;width:100%;min-height:0}
+#play.landscape-battle.vision-mode .panel{position:absolute;left:50%;right:auto;top:auto;bottom:9%;transform:translateX(-50%);width:max-content;max-width:94%;padding:0;gap:0;pointer-events:none}
+#play.landscape-battle.vision-mode .panel::before{display:none}
+#play.landscape-battle.vision-mode #keypad{display:none}
+#play.landscape-battle.vision-mode .vision-field{position:absolute;inset:0;display:block;pointer-events:none;z-index:7}
+#play.landscape-battle.vision-mode .vision-choice{background:#fffaf1e8;color:#203652;border:2px solid #fff;box-shadow:0 0 0 2px #375c78,0 3px 0 #24445b66;font-weight:900;text-shadow:none;-webkit-text-stroke:0;pointer-events:auto}
+#play.landscape-battle.vision-mode .vision-choice:active{background:#ffe5a1}
+#play.landscape-battle.vision-mode .battle-side{z-index:6}
+@media(max-width:1000px){
+ #play.landscape-battle .keypad:not(.answer-choices){grid-template-columns:repeat(6,minmax(0,1fr))}
+ #play.landscape-battle.multiply-input:not(.vision-mode) .keypad{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media(max-height:600px) and (orientation:landscape){
+ #play.landscape-battle .battle-side{padding:8px;border-radius:12px;font-size:13px}
+ #play.landscape-battle .battle-stage{padding-bottom:5px;margin-bottom:5px;gap:1px}
+ #play.landscape-battle .battle-stage strong{font-size:26px}
+ #play.landscape-battle #playerHp{font-size:12px;line-height:1.4}
+ #play.landscape-battle #playerShields{gap:4px;margin-top:5px;min-height:20px}
+ #play.landscape-battle #playerShields .shield{width:18px;height:20px}
+ #play.landscape-battle #playerNotice{font-size:11px;min-height:2.6em;line-height:1.3;margin-top:4px}
+ #play.landscape-battle .enemy-name{font-size:16px}
+ #play.landscape-battle .hpbar{height:8px;min-height:8px;margin:5px 0 3px}
+ #play.landscape-battle .hptext{font-size:12px}
+ #play.landscape-battle #round{font-size:13px;margin-top:5px;padding-top:5px}
+ #play.landscape-battle #comboCount{font-size:15px;margin-top:0}
+ #play.landscape-battle .feedback{font-size:11px;margin-top:2px;line-height:1.3;height:2.6em;min-height:2.6em}
+ #play.landscape-battle .panel{gap:8px;padding-bottom:9px}
+ #play.landscape-battle .question{font-size:clamp(38px,7.7vw,68px)}
+ #play.landscape-battle .battle-question-dock{padding:2px 12px 4px;border-width:2px;border-radius:12px}
+ #play.landscape-battle .approach-hud{font-size:11px;gap:7px;margin-top:0}
+ #play.landscape-battle.practice-mode .player-hud{display:none}
+ #play.landscape-battle .practice-coach b{display:none}
+ #play.landscape-battle .practice-coach p{font-size:12px}
+}
+@media(max-height:420px) and (orientation:landscape){
+ #play.landscape-battle .arena{min-height:80px}
+ #play.landscape-battle .battle-side{padding:5px;width:21%;top:4px;transform:none}
+ #play.landscape-battle .battle-player-side{left:1%}
+ #play.landscape-battle .battle-enemy-side{right:1%}
+ #play.landscape-battle .battle-stage{flex-direction:row;align-items:center;justify-content:center;font-size:11px;gap:4px}
+ #play.landscape-battle .battle-stage strong{font-size:21px}
+ #play.landscape-battle .enemy-name{font-size:13px}
+ #play.landscape-battle .hptext{display:none}
+ #play.landscape-battle #round{font-size:11px;margin-top:3px;padding-top:3px}
+ #play.landscape-battle #comboCount{font-size:13px}
+ #play.landscape-battle #playerNotice,#play.landscape-battle .feedback{font-size:10px}
+ #play.landscape-battle #playerNotice{position:absolute;top:100%;left:0;right:0;margin:4px 0 0;min-height:0;background:#fff5dd;border-radius:6px}
+ #play.landscape-battle .feedback{position:absolute;width:1px;height:1px;min-height:0;overflow:hidden;clip-path:inset(50%);margin:0;padding:0}
+ #play.landscape-battle .panel{padding-top:2px;gap:6px}
+ #play.landscape-battle .question{font-size:clamp(38px,7.7vw,48px)}
+ #play.landscape-battle .key{height:44px;font-size:25px}
+ #play.landscape-battle .key.del,#play.landscape-battle .key.submit{font-size:14px}
+ #play.landscape-battle>.toolbar button{padding:5px 6px;font-size:11px}
+ #play.landscape-battle.vision-mode .arena{inset:20% 0 23%}
+ #play.landscape-battle.vision-mode #playerHp{font-size:11px;line-height:1.2}
+ #play.landscape-battle.vision-mode .panel{bottom:9%}
+ #play.landscape-battle.vision-mode .vision-choice{box-shadow:0 0 0 1px #375c78,0 2px 0 #24445b66}
+}

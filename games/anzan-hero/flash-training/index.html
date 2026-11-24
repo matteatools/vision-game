@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14273e">
+  <title>フラッシュトレーニング | あんざんヒーロー</title>
+  <link rel="icon" href="../assets/rangers/red-guide.webp">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="hero.css">
+  <link rel="stylesheet" href="sequence.css">
+</head>
+<body>
+  <div class="app-shell" id="setup">
+    <header class="topbar">
+      <a class="quiet-button back-home" id="back-home" href="../index.html">← きちに もどる</a>
+      <button class="quiet-button guide-button" id="guide-open" type="button"><span class="help-icon" aria-hidden="true">?</span>あそびかた</button>
+    </header>
+    <main>
+      <div class="intro"><h1><span>フラッシュ</span><span>トレーニング</span></h1><p class="intro-copy" id="intro-copy">でてくる すうじを、ぜんぶ たそう！</p><div class="mode-options" id="mode-options" role="group" aria-label="あそびを えらぶ"><button type="button" data-mode="numbers" aria-pressed="true"><span aria-hidden="true">＋</span>あんざん</button><button type="button" data-mode="heroes" aria-pressed="false"><img src="../assets/command/ranger-red-action.webp" alt="" width="36" height="36">ヒーローの じゅんばん</button></div></div>
+      <div class="practice-layout">
+        <section class="settings-card" aria-labelledby="settings-title">
+          <div class="card-heading"><h2 id="settings-title">じゅんび</h2><span class="small-tag" id="mode-tag">たしざん</span></div>
+          <fieldset id="digits-field"><legend>なんけた？</legend><div class="segments" id="digits-options" role="group" aria-label="けたすう">
+            <button type="button" data-value="1" aria-pressed="true">1<span>けた</span></button><button type="button" data-value="2" aria-pressed="false">2<span>けた</span></button><button type="button" data-value="3" aria-pressed="false">3<span>けた</span></button><button type="button" data-value="4" aria-pressed="false">4<span>けた</span></button>
+          </div></fieldset>
+          <fieldset class="speed-field"><legend id="speed-title">すうじの はやさ</legend>
+            <div class="speed-value-row"><span class="speed-caption" id="speed-caption">ゆっくり かんがえよう</span><div class="seconds-control"><select id="seconds" aria-label="ひとつの すうじを だす じかん"></select><span>びょう</span></div></div>
+            <input id="speed-range" type="range" min="0.1" max="10" step="0.1" value="3" aria-label="0.1〜10びょうで えらぶ">
+            <div class="range-labels"><span>はやい <b>0.1</b></span><span>ゆっくり <b>10</b></span></div>
+            <div class="speed-presets" role="group" aria-label="はやさの ボタン"><button type="button" data-seconds="0.5">0.5</button><button type="button" data-seconds="1">1</button><button type="button" data-seconds="3">3</button><button type="button" data-seconds="5">5</button><button type="button" data-seconds="8">8</button><button type="button" data-seconds="10">10</button></div>
+          </fieldset>
+          <fieldset id="number-count-field"><legend>なんこ たす？</legend><div class="segments count-segments" id="count-options" role="group" aria-label="すうじの かず"><button type="button" data-value="5" aria-pressed="true">5<span>こ</span></button><button type="button" data-value="10" aria-pressed="false">10<span>こ</span></button><button type="button" data-value="15" aria-pressed="false">15<span>こ</span></button><button type="button" data-value="20" aria-pressed="false">20<span>こ</span></button></div></fieldset>
+          <fieldset id="hero-count-field" hidden><legend>いくつ おぼえる？</legend><div class="segments count-segments" id="hero-count-options" role="group" aria-label="おぼえる かず"><button type="button" data-value="3" aria-pressed="true">3</button><button type="button" data-value="4" aria-pressed="false">4</button><button type="button" data-value="5" aria-pressed="false">5</button><button type="button" data-value="6" aria-pressed="false">6</button><button type="button" data-value="8" aria-pressed="false">8</button></div></fieldset>
+          <label class="fullscreen-choice"><span class="fullscreen-label">がめん いっぱいに ひろげる</span><input type="checkbox" id="fullscreen" checked><span class="switch" aria-hidden="true"></span></label>
+          <button class="primary-button start-button" id="start" type="button"><span aria-hidden="true">▶</span>はじめる</button>
+          <p class="start-hint">3・2・1で スタート！</p>
+        </section>
+        <section class="preview-panel" aria-label="でてくるものの みほん">
+          <div class="preview-top"><h2>こんなふうに でるよ</h2><span class="preview-label" aria-hidden="true">＋ ＋ ＋</span></div>
+          <div class="preview-stage"><div class="preview-number" id="preview-number" aria-hidden="true">7</div><img id="preview-hero" src="../assets/command/ranger-red-action.webp" width="512" height="512" alt="レッド" hidden><p id="preview-instruction">みて、たして、ひらめこう！</p></div>
+          <img class="training-hero" src="../assets/command/ranger-blue-scout.webp" width="512" height="512" alt="トレーニングする ブルー">
+          <div class="preview-bottom"><div><span class="summary-label">こんかいの トレーニング</span><p id="challenge-summary"></p></div></div>
+        </section>
+      </div>
+      <p class="setup-notice" id="setup-notice" role="status"></p>
+    </main>
+  </div>
+
+  <section id="game" class="game-screen" hidden aria-label="フラッシュあんざん">
+    <div class="game-top"><div class="game-status" id="game-status"></div><button class="quiet-button" id="quit" type="button"><span aria-hidden="true">×</span>やめる</button></div>
+    <div class="game-center"><p id="game-instruction">じゅんびは いい？</p><div id="game-number" class="game-number">3</div><figure id="game-hero" hidden><img id="game-hero-image" alt="" width="512" height="512"><figcaption id="game-hero-name"></figcaption></figure></div>
+    <div class="game-bottom"><p id="game-footnote">ぜんぶ たしてね</p><div class="progress-track"><div id="game-progress"></div></div></div>
+    <div id="game-announcement" class="sr-only" aria-live="polite"></div>
+  </section>
+
+  <main id="answer-screen" class="answer-screen" hidden>
+    <div class="answer-card"><div class="answer-symbol" aria-hidden="true">＋</div><h1>ぜんぶで、いくつ？</h1><p class="round-settings" id="round-settings"></p>
+      <form id="answer-form" novalidate><label class="sr-only" for="answer-input">たした こたえ</label><input id="answer-input" type="text" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="こたえ" aria-describedby="answer-error"><p class="input-error" id="answer-error" role="alert"></p><button type="submit" class="primary-button">こたえあわせ</button></form>
+      <button class="text-button" id="reveal" type="button">こたえを みる</button><button class="text-button back-button" id="answer-back" type="button">じゅんびへ もどる</button>
+    </div>
+  </main>
+
+  <main id="hero-answer-screen" class="answer-screen" hidden>
+    <div class="answer-card hero-answer-card"><h1>どんな じゅんばん？</h1><p class="answer-copy">でてきた じゅんに タップしよう！</p><p class="round-settings" id="hero-round-settings"></p>
+      <div class="hero-slots" id="hero-slots" role="group" aria-label="きみの じゅんばん"></div><p id="hero-answer-status" class="hero-answer-status" role="status"></p>
+      <div class="hero-bank" id="hero-bank" role="group" aria-label="ヒーローを えらぶ"></div>
+      <div class="hero-edit-actions"><button type="button" class="quiet-button" id="hero-undo">ひとつ もどす</button><button type="button" class="quiet-button" id="hero-clear">ぜんぶ けす</button></div>
+      <button type="button" class="primary-button" id="hero-check" disabled>こたえあわせ</button><button type="button" class="text-button" id="hero-reveal">こたえを みる</button><button type="button" class="text-button back-button" id="hero-back">じゅんびへ もどる</button>
+    </div>
+  </main>
+
+  <main id="result-screen" class="answer-screen" hidden>
+    <div class="answer-card result-card"><div class="answer-symbol" id="result-symbol" aria-hidden="true">✓</div><h1 id="result-title">せいかい！</h1><p id="your-answer" class="your-answer"></p><div class="correct-answer"><span>こたえ</span><strong id="correct-answer">0</strong></div>
+      <details class="calculation"><summary>でてきた すうじ</summary><p id="calculation"></p></details><div id="hero-comparison" hidden><section id="hero-yours-section"><h2>きみの じゅんばん</h2><ol class="hero-result-row" id="hero-yours"></ol></section><section><h2>でてきた じゅんばん</h2><ol class="hero-result-row" id="hero-correct"></ol></section></div><p id="result-settings" class="round-settings"></p><button id="retry" class="primary-button" type="button">もういちど</button><button id="result-back" class="text-button" type="button">じゅんびへ もどる</button>
+    </div>
+  </main>
+
+  <dialog id="guide" aria-labelledby="guide-title"><div class="guide-heading"><h2 id="guide-title">あそびかた</h2><button class="quiet-button" id="guide-close" type="button" aria-label="とじる">×</button></div><ol><li><strong id="guide-step1">けた・はやさ・かずを えらぼう。</strong><p id="guide-copy1">はじめは「1けた・3びょう・5こ」から。</p></li><li><strong>3・2・1で スタート！</strong><p id="guide-copy2">でてくる すうじを、あたまの なかで たそう。</p></li><li><strong id="guide-step3">ぜんぶで、いくつ？</strong><p id="guide-copy3">さいごに こたえを いれてね。</p></li></ol><button class="primary-button" id="guide-done" type="button">わかった！</button></dialog>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

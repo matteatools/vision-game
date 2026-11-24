@@ -1,0 +1,324 @@
+[
+  {
+    "id": "hero-punch",
+    "name": "ヒーローパンチ",
+    "file": "hero-punch.wav",
+    "colors": 1,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "slime",
+    "name": "ぷるぷるスライム",
+    "file": "slime.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "bandage",
+    "name": "ぐるぐるほうたい",
+    "file": "mummy.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "ink",
+    "name": "スミスプラッシュ",
+    "file": "octopus.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "volt",
+    "name": "ビリビリパンチ",
+    "file": "franken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "beam",
+    "name": "てんせんレーザー",
+    "file": "robot.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "dragon",
+    "name": "ぐれんドラゴン",
+    "file": "kaiju.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "ice",
+    "name": "クリスタルランス",
+    "file": "ice.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "hydra",
+    "name": "ヤツマタファング",
+    "file": "orochi.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "thunder",
+    "name": "ライデンウイング",
+    "file": "franken-awaken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "flame",
+    "name": "メラメラファング",
+    "file": "kaiju-awaken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "void",
+    "name": "こくうブラックホール",
+    "file": "orochi.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "pudding",
+    "name": "ぷるぷるプリンおとし",
+    "file": "slime.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "fan",
+    "name": "ハリセンひゃくれつ",
+    "file": "mummy.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "slash",
+    "name": "クロススラッシュ",
+    "file": "lion.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "cat",
+    "name": "ねこねこりゅうせいぐん",
+    "file": "octopus.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "rice",
+    "name": "おにぎりメテオ",
+    "file": "thunder.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "meteor",
+    "name": "ほしふるメテオ",
+    "file": "kaiju.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "sword",
+    "name": "せいけんエクスカリバー",
+    "file": "lion.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "shuriken",
+    "name": "かげぬいシュリケン",
+    "file": "lion.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "spear",
+    "name": "しおかぜトライデント",
+    "file": "ice.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "chain",
+    "name": "ふういんチェーン",
+    "file": "franken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "tornado",
+    "name": "しっぷうサイクロン",
+    "file": "orochi.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "phoenix",
+    "name": "あかつきフェニックス",
+    "file": "kaiju.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "rose",
+    "name": "ローズガーデン",
+    "file": "lion.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "hammer",
+    "name": "ピコピコハンマー",
+    "file": "mummy.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "rocket",
+    "name": "えんぴつロケット",
+    "file": "robot.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "banana",
+    "name": "バナナスリップ",
+    "file": "slime.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "donut",
+    "name": "ドーナツワープ",
+    "file": "orochi-awaken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "fish",
+    "name": "おさかなスプラッシュ",
+    "file": "octopus.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "dice",
+    "name": "ころころラッキーダイス",
+    "file": "mummy.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "clock",
+    "name": "ときのクロノバースト",
+    "file": "ice-awaken.wav",
+    "colors": 10,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "hero-rush",
+    "name": "ヒーローラッシュ",
+    "file": "hero-punch.wav",
+    "colors": 1,
+    "role": "normal-or-5-combo"
+  },
+  {
+    "id": "hero-finale",
+    "name": "ヒーロー・ビッグバン",
+    "file": "robot-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "omega-cannon",
+    "name": "オメガ・ゼロバスター",
+    "file": "robot-awaken.wav",
+    "colors": 10,
+    "role": "10-combo"
+  },
+  {
+    "id": "galaxy-requiem",
+    "name": "ギャラクシー・レクイエム",
+    "file": "orochi-awaken.wav",
+    "colors": 10,
+    "role": "10-combo"
+  },
+  {
+    "id": "solar-phoenix",
+    "name": "ソーラー・フェニックス",
+    "file": "kaiju-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "eclipse-nova",
+    "name": "エクリプス・ノヴァ",
+    "file": "orochi-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "sacred-sword",
+    "name": "セイクリッド・エクスカリバー",
+    "file": "lion-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "infinite-blades",
+    "name": "インフィニティ・ブレイド",
+    "file": "lion-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "absolute-freeze",
+    "name": "アブソリュート・フリーズ",
+    "file": "ice-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "tempest-leviathan",
+    "name": "テンペスト・リヴァイアサン",
+    "file": "ice-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "rising-dragoon",
+    "name": "ライジング・ドラグーン",
+    "file": "kaiju-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "chaos-judgment",
+    "name": "カオス・ジャッジメント",
+    "file": "franken-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "starlight-arrow",
+    "name": "スターライト・アロー",
+    "file": "thunder-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  },
+  {
+    "id": "metal-breaker",
+    "name": "メタル・ブレイカー",
+    "file": "robot-awaken.wav",
+    "colors": 1,
+    "role": "10-combo"
+  }
+]

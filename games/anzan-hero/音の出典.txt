@@ -1,0 +1,92 @@
+音のクレジット（2026年11月24日 更新）
+
+【技・ガチャ】
+効果音素材：OtoLogic (https://otologic.jp/)
+ライセンス：Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+配布元の利用規約：https://otologic.jp/free/license.html
+
+OtoLogicの無料公開MP3素材を使用しています。無音部分の除去、0.72秒への短縮、音量調整、フェード、複数音源の重ね合わせを行っています。一部の上位演出では音程を下げています。
+各出力WAVと元音源の対応は sounds/hero/credits.json に記載しています。
+
+使用した素材：
+オノマトペ 光る15-1（低）
+https://otologic.jp/free/se/flash01.html
+https://otologic.jp/sounds/se/pre2/Onoma-Flash15-1%28Low%29.mp3
+
+SNES RPG04-05（魔法 雷1）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG04-05%28Magic-Lightning1%29.mp3
+
+モーション スピード線09-2（低 短）
+https://otologic.jp/free/se/motion-speed-lines01.html
+https://otologic.jp/sounds/se/pre2/Motion-Speed_Lines09-2%28Low-Short%29.mp3
+
+SNES RPG04-02（魔法 炎1）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG04-02%28Magic-Fire1%29.mp3
+
+SNES RPG04-14（魔法 状態）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG04-14%28Magic-Status%29.mp3
+
+SNES RPG05-01（攻撃 剣）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG05-01%28Attack-Sword%29.mp3
+
+SNES RPG05-12（ジャンプ）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG05-12%28Jump%29.mp3
+
+オノマトペ 衝撃19-2（短）
+https://otologic.jp/free/se/impact01.html
+https://otologic.jp/sounds/se/pre2/Onoma-Impact19-2%28Short%29.mp3
+
+SNES RPG05-07（攻撃 パンチ）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG05-07%28Attack-Punch%29.mp3
+
+SNES RPG04-08（魔法 氷1）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG04-08%28Magic-Ice1%29.mp3
+
+SNES RPG05-13（ジャンプ）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG05-13%28Jump%29.mp3
+
+SNES RPG03-4（宝箱）
+https://otologic.jp/free/se/game-rpg01.html
+https://otologic.jp/sounds/se/pre/SNES-RPG03-4%28Chest%29.mp3
+
+通常33種類と10コンボ必殺技13種類は、一部の効果音を共用します。同じ種類の色違いは共通の音を使います。新しい必殺技13種類にも、上記のクレジットに含まれる同梱済みの音源を使用しています。専用初期技「ヒーローラッシュ」はヒーローパンチの効果音を共用します。各技が使用する音源は sounds/hero/skill-sounds.json に記載しています。
+ヒーローパンチは SNES RPG05-07（攻撃 パンチ）を単独で使用し、無音除去・音量調整・フェードを行っています。
+
+【従来のオリジナル音】
+sounds/attack.wav / sounds/shield.wav / sounds/victory.wav
+このゲームのために生成したオリジナル合成音です。attack.wavは互換用に残しており、現在の基本攻撃ではhero-punch.wavを使用します。
+
+音源はゲーム内へ同梱しており、プレイ時に外部サーバーへ音源を取りに行きません。
+OtoLogicの音源の権利はOtoLogicに帰属します。ゲームを配布するときは、この出典表記とゲーム内のクレジットも一緒に残してください。
+
+【BGM（2026-11-24 追加）】
+素材：OtoLogic (https://otologic.jp/)
+ライセンス：CC BY 4.0 https://creativecommons.org/licenses/by/4.0/
+利用規約：https://otologic.jp/free/license.html
+基地・技選択の音源は無加工。戦闘曲はすぐに盛り上がるよう導入32秒をカットし、先頭に120msのフェードを加えてMP3再圧縮しています。全曲、ゲーム内で音量調整・フェードイン・リピート再生を行います。
+
+基地：等身大の日常（タイトルはBGMなし）
+sounds/bgm/base.mp3
+https://otologic.jp/free/bgm/pop-music-synth01.html
+https://otologic.jp/sounds/bgm/pre/tousindaino%20nitizyou.mp3
+
+戦闘：力がみなぎる
+sounds/bgm/battle.mp3
+https://otologic.jp/free/bgm/rock01.html
+https://otologic.jp/sounds/bgm/pre/tikara%20ga%20minagiru.mp3
+
+技選択：Specification
+sounds/bgm/skills.mp3
+https://otologic.jp/free/bgm/electronica01.html
+https://otologic.jp/sounds/bgm/pre/Specification.mp3
+
+フラッシュトレーニングでは音楽を流しません。素材名・元URL・ファイル照合値は sounds/bgm/credits.json にも記録しています。

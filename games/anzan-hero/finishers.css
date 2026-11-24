@@ -1,0 +1,35 @@
+/* A final, two-second scene. Transform/opacity only; bounded particle counts. */
+.ultimate-stage{position:fixed;inset:0;width:100vw;height:100dvh;box-sizing:border-box;padding:0;margin:0;border:0;overflow:hidden;background:transparent;z-index:100;isolation:isolate;color:white;pointer-events:none;animation:uf-scene 2s ease-out both}
+.uf-rays{position:absolute;inset:0}.uf-rays i{position:absolute;left:var(--uf-x,50%);top:var(--uf-y,50%);width:5vmax;height:70vmax;background:linear-gradient(var(--uf-color),transparent 60%);clip-path:polygon(49% 0,100% 100%,0 100%);transform-origin:50% 0;transform:rotate(calc(var(--ray)*25.714deg));opacity:.12;animation:uf-ray 2s ease-out both}
+.uf-ring{position:absolute;left:var(--uf-x,50%);top:var(--uf-y,50%);width:calc(var(--uf-size)*.8);height:calc(var(--uf-size)*.8);border:2px solid var(--uf-accent);border-radius:50%;transform:translate(-50%,-50%);animation:uf-ring 2s ease-out both;box-shadow:0 0 12px var(--uf-color),inset 0 0 10px var(--uf-color)}
+.uf-ring-two{width:calc(var(--uf-size)*1.1);height:calc(var(--uf-size)*1.1);border:3px dashed var(--uf-color);animation-delay:.06s;opacity:.5}
+.uf-art{position:absolute;left:var(--uf-x,50%);top:var(--uf-y,50%);width:var(--uf-size);height:var(--uf-size);transform:translate(-50%,-50%);filter:drop-shadow(0 0 7px var(--uf-color));opacity:.9}
+.uf-emblem{display:block;width:100%;height:100%;overflow:visible}
+.ultimate-stage .uf-core{transform-origin:200px 200px;animation:uf-strike 2s cubic-bezier(.17,.8,.2,1) both}.ultimate-stage .uf-orbit{transform-origin:200px 200px;animation:uf-orbit 2s ease-out both}.ultimate-stage .uf-front{transform-origin:200px 230px;animation:uf-front 2s ease-out both}
+.uf-particles{position:absolute;inset:0;overflow:hidden}.uf-particles i{position:absolute;left:var(--px);top:var(--py);width:var(--size);height:var(--size);border-radius:50%;background:var(--uf-accent);box-shadow:0 0 10px var(--uf-color);animation:uf-particle 2s ease-out both;animation-delay:calc(var(--particle)*4ms)}
+.uf-impact{position:absolute;left:var(--uf-x,50%);top:var(--uf-y,50%);width:var(--uf-size);height:var(--uf-size);transform:translate(-50%,-50%);background:radial-gradient(ellipse,var(--uf-accent),transparent 65%);opacity:0;animation:uf-impact 2s ease-out both}
+.uf-banner{position:absolute;left:var(--uf-caption-x);top:var(--uf-caption-y);width:var(--uf-caption-width);transform:translateX(-50%);text-align:center;animation:uf-banner 2s ease-out both;text-shadow:0 2px 2px #12233c,0 0 5px #12233c,0 0 15px var(--uf-color)}
+.uf-banner small{display:block;font-weight:900;font-size:clamp(12px,1.4vw,20px);letter-spacing:.08em;color:var(--uf-accent);margin-bottom:4px}
+.uf-banner strong{display:block;font-weight:1000;font-size:clamp(18px,2.5vw,36px);line-height:1.4;letter-spacing:.02em;-webkit-text-stroke:3px #203652;paint-order:stroke fill}
+.finisher-anchor{position:relative}.ultimate-preview{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:3}.ultimate-preview .uf-rays,.ultimate-preview .uf-particles{display:none}
+.uf-paused,.uf-paused *{animation-play-state:paused!important}
+@keyframes uf-scene{0%{opacity:0}8%,85%{opacity:1}100%{opacity:0}}
+@keyframes uf-ray{0%{opacity:0}24%{opacity:.08}55%{opacity:.25}100%{opacity:0}}
+@keyframes uf-ring{0%{scale:.2;opacity:0}30%{scale:.85;opacity:.8}70%{scale:1.2;opacity:.65}100%{scale:1.9;opacity:0}}
+@keyframes uf-strike{0%{scale:.08;opacity:0;translate:0 50px}22%{scale:.5;opacity:.75;translate:0 0}44%{scale:1.04;opacity:1}65%{scale:1;opacity:1}88%{scale:1.13;opacity:1}100%{scale:1.25;opacity:0}}
+@keyframes uf-orbit{0%{scale:.2;rotate:-45deg;opacity:0}30%{scale:.85;opacity:.8}65%{scale:1.05;rotate:0deg;opacity:1}100%{scale:1.4;rotate:26deg;opacity:0}}
+@keyframes uf-front{0%,26%{scale:.1;opacity:0}45%{scale:.8;opacity:1}75%{scale:1.2;opacity:.9}100%{scale:1.6;opacity:0}}
+@keyframes uf-particle{0%{translate:0 40px;scale:0;opacity:0}35%{scale:1;opacity:.9}100%{translate:0 -130px;scale:.5;opacity:0}}
+@keyframes uf-impact{0%,35%{opacity:0}46%{opacity:.35}70%,100%{opacity:0}}
+@keyframes uf-banner{0%,15%{translate:0 25px;opacity:0}35%,85%{translate:0 0;opacity:1}100%{translate:0 -10px;opacity:0}}
+.uf-cannon .uf-core{animation-name:uf-cannon}.uf-galaxy .uf-core,.uf-eclipse .uf-core{animation-name:uf-vortex}.uf-phoenix .uf-core,.uf-dragon .uf-core{animation-name:uf-flight}.uf-blades .uf-core{animation-name:uf-blades}
+.uf-archer .uf-core{animation-name:uf-arrow}.uf-titan .uf-core{animation-name:uf-titan}
+@keyframes uf-arrow{0%{scale:.2;translate:-65px 65px;opacity:0}30%{scale:.8;translate:-20px 20px;opacity:.85}48%,68%{scale:1;translate:0 0;opacity:1}86%{scale:1.15;translate:15px -15px;opacity:1}100%{scale:1.45;translate:110px -110px;opacity:0}}
+@keyframes uf-titan{0%{scale:.25;translate:0 80px;opacity:0}30%{scale:.82;translate:0 15px;opacity:.85}46%{scale:1.08;translate:0 -3px;opacity:1}57%,80%{scale:1;translate:0 0;opacity:1}100%{scale:1.5;translate:0 -15px;opacity:0}}
+@keyframes uf-cannon{0%,20%{scale:.02 1;opacity:0}38%{scale:.25 1;opacity:1}53%,75%{scale:1 1;opacity:1}100%{scale:.05 1.5;opacity:0}}
+@keyframes uf-vortex{0%{scale:.05;rotate:-80deg;opacity:0}40%{scale:.9;rotate:0deg;opacity:1}80%{scale:1.1;rotate:30deg;opacity:1}100%{scale:.1;rotate:70deg;opacity:0}}
+@keyframes uf-flight{0%{scale:.1;translate:-70px 70px;opacity:0}38%{scale:.85;translate:0 0;opacity:1}72%{scale:1.13;translate:15px -12px;opacity:1}100%{scale:1.7;translate:45px -50px;opacity:0}}
+@keyframes uf-blades{0%{scale:1.7;rotate:-30deg;opacity:0}35%{scale:1.2;rotate:0deg;opacity:1}62%{scale:.8;rotate:22deg;opacity:1}85%{scale:.25;rotate:55deg;opacity:1}100%{scale:.1;opacity:0}}
+@media(max-width:600px){.uf-banner strong{font-size:20px}.uf-banner small{font-size:12px}}
+@media(max-height:450px) and (orientation:landscape){.uf-banner strong{font-size:18px}.uf-banner small{font-size:11px;margin-bottom:2px}}
+@media(prefers-reduced-motion:reduce){.ultimate-stage,.ultimate-stage *{animation:none!important}.uf-rays,.uf-impact,.uf-particles{display:none}.uf-core,.uf-orbit,.uf-front{opacity:1}.uf-ring{opacity:.3}}

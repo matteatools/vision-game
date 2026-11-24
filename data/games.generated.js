@@ -903,5 +903,89 @@ window.GAME_DATA = [
       "guideTitle": "つるせんにんの しょどうきょうしつ｜文字を書く無料ゲーム",
       "guideDescription": "ひらがなとカタカナを、お手本と見比べながら一文字や言葉で練習するゲームの内容と遊び方を紹介します。"
     }
+  },
+  {
+    "slug": "anzan-hero",
+    "title": "暗算ヒーロー",
+    "published": true,
+    "publishedAt": "2026-11-24",
+    "href": "games/anzan-hero/",
+    "guideHref": "guide/anzan-hero/",
+    "titleImage": "assets/home/title-anzan-hero.webp",
+    "playImage": "assets/home/play-anzan-hero.webp",
+    "ogImage": "assets/og/anzan-hero.jpg",
+    "description": "たしざん・ひきざん・九九を あんざんして、こたえを タッチ。わざを あつめて、モンスターに たちむかおう。",
+    "skills": [
+      "かんがえる",
+      "えらぶ",
+      "すばやく"
+    ],
+    "group": "math",
+    "activities": [
+      "たし算・ひき算・九九を暗算する",
+      "答えを選び、技を集めながらステージへ挑戦する"
+    ],
+    "guideSummary": "たし算・ひき算・九九を暗算し、答えを選んでモンスターと戦うゲームです。",
+    "overview": "五つの計算コースから選び、たし算・ひき算・九九を暗算してモンスターと戦います。答えを選ぶとヒーローが技を放ち、ステージを進めると新しい相手や技が増えていきます。",
+    "howToPlay": "計算コースと通常またはビジョンの遊び方を選び、表示された式の答えをタッチします。十問に取り組みながらモンスターの力を減らし、集めた技を三つの枠へ装備して次のステージへ挑戦します。練習とフラッシュトレーニングも選べます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "kamesennin-cards",
+      "total-ten",
+      "warikiri-code"
+    ],
+    "sitemap": true,
+    "featureNote": "5コース・ヒーローバトル",
+    "seo": {
+      "playTitle": "暗算ヒーロー｜めとあたまのゲームパーク",
+      "playDescription": "たし算・ひき算・九九を暗算し、答えを選んでモンスターと戦う無料の算数Webゲームです。",
+      "guideTitle": "暗算ヒーロー｜計算でモンスターと戦う無料算数ゲーム",
+      "guideDescription": "たし算・ひき算・九九を暗算し、答えを選んで技を放ちながらステージへ挑戦するゲームを紹介します。"
+    }
+  },
+  {
+    "slug": "pan-socks",
+    "title": "それでもぼくはくつしたをそろえる",
+    "dialogTitleLines": [
+      "それでもぼくは",
+      "くつしたをそろえる"
+    ],
+    "published": true,
+    "publishedAt": "2026-11-24",
+    "href": "games/pan-socks/",
+    "guideHref": "guide/pan-socks/",
+    "titleImage": "assets/home/title-pan-socks.webp",
+    "playImage": "assets/home/play-pan-socks.webp",
+    "ogImage": "assets/og/pan-socks.jpg",
+    "description": "いろと もようが おなじ くつしたを 2まいずつ。いろいろな できごとを のりこえて、30にちの おせんたくを すすめよう。",
+    "skills": [
+      "くらべる",
+      "みつける",
+      "すばやく"
+    ],
+    "group": "compare",
+    "activities": [
+      "色と模様を見比べて同じ靴下を二枚選ぶ",
+      "重なった靴下を動かしながら組み合わせを見つける"
+    ],
+    "guideSummary": "色と模様が同じ靴下を見つけ、二枚ずつそろえる三十日間のゲームです。",
+    "overview": "まじめなチンパンジーのパンと一緒に、色と模様が同じ靴下を二枚ずつそろえます。日が進むと猫や赤ちゃん、幽霊などが現れ、靴下を動かしたり見え方を変えたりします。",
+    "howToPlay": "同じ色と模様の靴下を二枚タッチします。重なって見えにくいときはドラッグして動かせます。制限時間内にすべての組をそろえると次の日が開き、三十日目まで物語が続きます。",
+    "seeingGuide": true,
+    "isVisionTraining": false,
+    "related": [
+      "most-candy",
+      "color-ghosts",
+      "chameleon-catch"
+    ],
+    "sitemap": true,
+    "featureNote": "30にちの ものがたり",
+    "seo": {
+      "playTitle": "それでもぼくはくつしたをそろえる｜めとあたまのゲームパーク",
+      "playDescription": "色と模様が同じ靴下を見つけ、二枚ずつそろえて三十日間の物語を進める無料Webゲームです。",
+      "guideTitle": "くつしたをそろえる｜色と模様を見比べる無料ゲーム",
+      "guideDescription": "色と模様が同じ靴下を二枚ずつ選び、さまざまな出来事を乗り越えて三十日間を進める遊び方を紹介します。"
+    }
   }
 ];

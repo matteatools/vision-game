@@ -1,0 +1,45 @@
+{
+  "author": "OtoLogic",
+  "homepage": "https://otologic.jp/",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "terms": "https://otologic.jp/free/license.html",
+  "retrieved": "2026-11-24",
+  "modifications": "基地・技選択の音源は無加工。戦闘曲は導入32秒をカットし、先頭に120msのフェードを加えてMP3再圧縮。全曲、再生時に音量調整・フェードイン・リピート。",
+  "tracks": [
+    {
+      "id": "base",
+      "title": "等身大の日常",
+      "scene": "基地（タイトルはBGMなし）",
+      "page": "https://otologic.jp/free/bgm/pop-music-synth01.html",
+      "source": "https://otologic.jp/sounds/bgm/pre/tousindaino%20nitizyou.mp3",
+      "gain": 0.32,
+      "file": "sounds/bgm/base.mp3",
+      "bytes": 4465648,
+      "sha256": "344abbc826fad026c525dc9d06babc4d56af546b7fa4295145ee8e263ce9fe4b"
+    },
+    {
+      "id": "battle",
+      "title": "力がみなぎる",
+      "scene": "戦闘",
+      "page": "https://otologic.jp/free/bgm/rock01.html",
+      "source": "https://otologic.jp/sounds/bgm/pre/tikara%20ga%20minagiru.mp3",
+      "gain": 0.3,
+      "file": "sounds/bgm/battle.mp3",
+      "bytes": 2074860,
+      "sha256": "8c23632fc596f55096cffb22486e121f11d4d8930af41549f6735a378ab69e96",
+      "trimStartSeconds": 32
+    },
+    {
+      "id": "skills",
+      "title": "Specification",
+      "scene": "技選択",
+      "page": "https://otologic.jp/free/bgm/electronica01.html",
+      "source": "https://otologic.jp/sounds/bgm/pre/Specification.mp3",
+      "gain": 0.34,
+      "file": "sounds/bgm/skills.mp3",
+      "bytes": 4048298,
+      "sha256": "00b92ce4cf6cf949869ce11b63385ab9524923572d92af75e952c135fdf70ebf"
+    }
+  ]
+}
