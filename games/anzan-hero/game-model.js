@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 const COUNT=20, GACHA_COST=10, DUPLICATE_REFUND=3;
-const SAVE_VERSION=8;
+const SAVE_VERSION=9;
 const COMBO_TRIGGER=5,ULTIMATE_GACHA_CHANCE=.02;
 const SLOT_LABELS=Object.freeze(['いつも','5コンボ','10コンボ']);
 const GACHA_SLOT_CHANCES=Object.freeze([.49,.49,ULTIMATE_GACHA_CHANCE]);
@@ -170,14 +170,15 @@ function cleanCourse(raw){
 function cleanProgress(raw){
  // Keep all shared collections. Version 5 wins have no input-mode
  // evidence, so they count as normal clears, never as vision-only achievements.
- raw=raw&&[5,6,7,SAVE_VERSION].includes(raw.version)?raw:{};
+ raw=raw&&[5,6,7,8,SAVE_VERSION].includes(raw.version)?raw:{};
  const courses=Object.fromEntries(COURSE_IDS.map(id=>[id,cleanCourse(raw.courses?.[id])]));
  const collection=raw.collection&&typeof raw.collection==='object'?raw.collection:{};
  // Keep the former starter in old collections; only its default slot changes.
  const upgradingStarter=raw.version===5||raw.version===6;
  const bonusEffectIds=validIds([...(Array.isArray(collection.bonusEffectIds)?collection.bonusEffectIds:[]),...(upgradingStarter?['slash@blue']:[])]);
  const owned=new Set([...STARTER_EFFECTS,...bonusEffectIds]);
- let heroPower=0;
+ const coopWins=uniqueEvents(collection.coopWins,()=>true).map(w=>({id:w.id}));
+ let heroPower=coopWins.length*10;
  for(const course of COURSE_IDS){
   for(const enemy of courses[course].defeated)owned.add(firstClearEffect(enemy,course).id);
   heroPower+=courses[course].wins.reduce((sum,w)=>sum+winPower(w.shields,w.difficulty),0);
@@ -203,7 +204,7 @@ function cleanProgress(raw){
   }
  }
  return {version:SAVE_VERSION,mode:raw.mode==='vision'?'vision':'normal',activeCourse:validCourse(raw.activeCourse),courses,
-  collection:{bonusEffectIds,draws,heroPower,effectIds:[...owned],equippedEffectIds:equippedEffects(effects.filter(e=>owned.has(e.id)),equipped).map(e=>e.id)}};
+  collection:{bonusEffectIds,draws,coopWins,heroPower,effectIds:[...owned],equippedEffectIds:equippedEffects(effects.filter(e=>owned.has(e.id)),equipped).map(e=>e.id)}};
 }
 function courseProgress(raw,course){return cleanProgress(raw).courses[validCourse(course)];}
 function collectionProgress(raw){return cleanProgress(raw).collection;}
@@ -216,6 +217,7 @@ function mergeProgress(current,stored){
  for(const id of COURSE_IDS){const x=a.courses[id],y=b.courses[id];a.courses[id]={unlocked:Math.max(x.unlocked,y.unlocked),defeated:[...x.defeated,...y.defeated],visionDefeated:[...x.visionDefeated,...y.visionDefeated],wins:[...x.wins,...y.wins]};}
  a.collection.bonusEffectIds=[...a.collection.bonusEffectIds,...b.collection.bonusEffectIds];
  a.collection.draws=[...a.collection.draws,...b.collection.draws];
+ a.collection.coopWins=[...a.collection.coopWins,...b.collection.coopWins];
  return cleanProgress(a);
 }
 function setEquipment(raw,ids){
@@ -264,7 +266,8 @@ function pullEffect(raw,course,id,rng=Math.random,enemy=0,{allowLocked=false}={}
  c.draws.push({id,effectId:effect.id,duplicate:false});
  return {progress:cleanProgress(p),reward:{effect,duplicate:false,refund:0,autoEquipped:false},reason:null};
 }
+function awardCoopVictory(raw,id){const p=cleanProgress(raw);if(!validEventId(id)||p.collection.coopWins.some(w=>w.id===id))return {progress:p,reward:false};p.collection.coopWins.push({id});return {progress:cleanProgress(p),reward:true};}
 function battleStats(battle){const correct=battle.done,attempts=battle.attempts;return {correct,attempts,accuracy:attempts?Math.round(correct/attempts*100):null,average:battle.times.length?battle.times.reduce((sum,n)=>sum+n,0)/battle.times.length:null};}
-const api={COUNT,SAVE_VERSION,COMBO_TRIGGER,ULTIMATE_GACHA_CHANCE,GACHA_SLOT_CHANCES,SLOT_LABELS,DEFAULT_EQUIPMENT,STARTER_EFFECTS,comboSlot,slotAccepts,familiesForSlot,effectForCombo,visionCount,regularFamilies,regularEffects,finisherFamilies,finisherEffects,gachaFinishers,enemies,COURSE_IDS,DEFAULT_COURSE,SHIELD_POWER,GACHA_COST,DUPLICATE_REFUND,HERO_CLEAR_COUNT,heroes,heroRoster,rarities,families,palettes,familyById,familyVariants,paletteForCourse,effectLabel,effects,gachaEffects,gachaFamilies,baseEffect,firstClearEffect,ownedEffects,remainingGachaEffects,equippedEffects,cleanProgress,courseProgress,collectionProgress,mergeProgress,setEquipment,winPower,awardVictory,pullEffect,battleStats};
+const api={COUNT,SAVE_VERSION,COMBO_TRIGGER,ULTIMATE_GACHA_CHANCE,GACHA_SLOT_CHANCES,SLOT_LABELS,DEFAULT_EQUIPMENT,STARTER_EFFECTS,comboSlot,slotAccepts,familiesForSlot,effectForCombo,visionCount,regularFamilies,regularEffects,finisherFamilies,finisherEffects,gachaFinishers,enemies,COURSE_IDS,DEFAULT_COURSE,SHIELD_POWER,GACHA_COST,DUPLICATE_REFUND,HERO_CLEAR_COUNT,heroes,heroRoster,rarities,families,palettes,familyById,familyVariants,paletteForCourse,effectLabel,effects,gachaEffects,gachaFamilies,baseEffect,firstClearEffect,ownedEffects,remainingGachaEffects,equippedEffects,cleanProgress,courseProgress,collectionProgress,mergeProgress,setEquipment,winPower,awardVictory,awardCoopVictory,pullEffect,battleStats};
 if(typeof module!=='undefined')module.exports=api;root.GameModel=api;
 })(typeof window==='undefined'?globalThis:window);
