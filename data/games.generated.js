@@ -29,6 +29,8 @@ window.GAME_DATA = [
       "robot-factory"
     ],
     "sitemap": true,
+    "onlineOrder": 5,
+    "onlineLabel": "たいせん",
     "seo": {
       "playTitle": "へびしょうにんの まほうせき｜めとあたまのゲームパーク",
       "playDescription": "動き回る宝石を見比べ、大きさや向きが違っても見本と同じ形を見つける、無料・登録不要のWebゲームです。",
@@ -66,6 +68,8 @@ window.GAME_DATA = [
       "chameleon-catch"
     ],
     "sitemap": true,
+    "onlineOrder": 3,
+    "onlineLabel": "たいせん",
     "popularRank": null,
     "seo": {
       "playTitle": "ピョコッとしゅうかく！｜めとあたまのゲームパーク",
@@ -219,7 +223,7 @@ window.GAME_DATA = [
       "alien-search"
     ],
     "sitemap": true,
-    "onlineOrder": 3,
+    "onlineOrder": 6,
     "onlineLabel": "きょうりょく",
     "seo": {
       "playTitle": "おぼえて！いろゆうれい｜めとあたまのゲームパーク",
@@ -492,6 +496,8 @@ window.GAME_DATA = [
       "chameleon-catch"
     ],
     "sitemap": true,
+    "onlineOrder": 4,
+    "onlineLabel": "たいせん",
     "seo": {
       "playTitle": "ぴったりゆうびんきょく｜めとあたまのゲームパーク",
       "playDescription": "流れる手紙の色を見分け、同じ色がちょうど五通そろう瞬間に笛を鳴らす無料Webゲームです。",
@@ -939,6 +945,8 @@ window.GAME_DATA = [
       "warikiri-code"
     ],
     "sitemap": true,
+    "onlineOrder": 7,
+    "onlineLabel": "きょうりょく",
     "featureNote": "5コース・ヒーローバトル",
     "newDescription": "あんざんパワーでモンスターをたおせ！",
     "seo": {
