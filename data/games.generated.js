@@ -219,6 +219,8 @@ window.GAME_DATA = [
       "alien-search"
     ],
     "sitemap": true,
+    "onlineOrder": 3,
+    "onlineLabel": "きょうりょく",
     "seo": {
       "playTitle": "おぼえて！いろゆうれい｜めとあたまのゲームパーク",
       "playDescription": "夜に現れた幽霊の色と窓の場所を覚え、朝に同じ場所を見つけてお札を貼る無料Webゲームです。",
@@ -338,7 +340,8 @@ window.GAME_DATA = [
       "light-window"
     ],
     "sitemap": true,
-    "popularRank": 1,
+    "onlineOrder": 1,
+    "onlineLabel": "オンライン",
     "seo": {
       "playTitle": "ぽんすけの あわせて10｜めとあたまのゲームパーク",
       "playDescription": "隣り合う数字をつないで合計をぴったり10や20にし、スライムを切る無料・登録不要のWebゲームです。",
@@ -414,7 +417,6 @@ window.GAME_DATA = [
       "most-candy"
     ],
     "sitemap": true,
-    "popularRank": 2,
     "seo": {
       "playTitle": "がっこうのジワふしぎ｜めとあたまのゲームパーク",
       "playDescription": "学校の風景を見ながら、時間をかけてゆっくり変わる三つの場所を見つける無料Webゲームです。",
@@ -645,6 +647,8 @@ window.GAME_DATA = [
       "post-office"
     ],
     "sitemap": true,
+    "onlineOrder": 2,
+    "onlineLabel": "たいせん",
     "featureNote": "2人で心理戦",
     "seo": {
       "playTitle": "けもの空手 一手入魂！｜めとあたまのゲームパーク",
@@ -685,7 +689,6 @@ window.GAME_DATA = [
       "light-window"
     ],
     "sitemap": true,
-    "popularRank": 3,
     "featureNote": "中・高学年向け",
     "seo": {
       "playTitle": "わりきりコード｜めとあたまのゲームパーク",
@@ -738,6 +741,7 @@ window.GAME_DATA = [
     "title": "せいれいおくり",
     "published": true,
     "publishedAt": "2026-10-21",
+    "showAsNew": false,
     "href": "games/seirei-okuri/",
     "guideHref": "guide/seirei-okuri/",
     "titleImage": "assets/home/title-seirei-okuri.webp",
@@ -781,6 +785,7 @@ window.GAME_DATA = [
     ],
     "published": true,
     "publishedAt": "2026-10-21",
+    "showAsNew": false,
     "href": "games/peko-bento/",
     "guideHref": "guide/peko-bento/",
     "titleImage": "assets/home/title-peko-bento.webp",
@@ -818,11 +823,7 @@ window.GAME_DATA = [
   },
   {
     "slug": "kamesennin-cards",
-    "title": "かめせんにんの けいさんカードあそび",
-    "dialogTitleLines": [
-      "かめせんにんの",
-      "けいさんカードあそび"
-    ],
+    "title": "かめせんにんのけいさんあそび",
     "published": true,
     "publishedAt": "2026-11-01",
     "href": "games/kamesennin-cards/",
@@ -853,10 +854,11 @@ window.GAME_DATA = [
     ],
     "sitemap": true,
     "featureNote": "3コース・4つの遊び方",
+    "newDescription": "けいさんカードあそびをデジタルで",
     "seo": {
-      "playTitle": "かめせんにんの けいさんカードあそび｜めとあたまのゲームパーク",
+      "playTitle": "かめせんにんのけいさんあそび｜めとあたまのゲームパーク",
       "playDescription": "たし算・ひき算・かけ算のカードを使い、答えを選んだり並べたりして遊べる無料の算数Webゲームです。",
-      "guideTitle": "けいさんカードあそび｜計算の答えを選んで並べる無料ゲーム",
+      "guideTitle": "かめせんにんのけいさんあそび｜計算の答えを選んで並べる無料ゲーム",
       "guideDescription": "たし算・ひき算・かけ算のカードで、答えを選ぶ、探す、順番に並べる四つの遊び方を紹介します。"
     }
   },
@@ -897,6 +899,7 @@ window.GAME_DATA = [
     ],
     "sitemap": true,
     "featureNote": "ひらがな・カタカナ",
+    "newDescription": "よくみて、おぼえてひらがなとカタカナを書こう。",
     "seo": {
       "playTitle": "つるせんにんの しょどうきょうしつ｜めとあたまのゲームパーク",
       "playDescription": "ひらがな・カタカナをお手本と見比べ、一文字や言葉を書いて練習できる無料の国語Webゲームです。",
@@ -906,7 +909,7 @@ window.GAME_DATA = [
   },
   {
     "slug": "anzan-hero",
-    "title": "暗算ヒーロー",
+    "title": "あんざんヒーロー",
     "published": true,
     "publishedAt": "2026-11-24",
     "href": "games/anzan-hero/",
@@ -937,19 +940,20 @@ window.GAME_DATA = [
     ],
     "sitemap": true,
     "featureNote": "5コース・ヒーローバトル",
+    "newDescription": "あんざんパワーでモンスターをたおせ！",
     "seo": {
-      "playTitle": "暗算ヒーロー｜めとあたまのゲームパーク",
+      "playTitle": "あんざんヒーロー｜めとあたまのゲームパーク",
       "playDescription": "たし算・ひき算・九九を暗算し、答えを選んでモンスターと戦う無料の算数Webゲームです。",
-      "guideTitle": "暗算ヒーロー｜計算でモンスターと戦う無料算数ゲーム",
+      "guideTitle": "あんざんヒーロー｜計算でモンスターと戦う無料算数ゲーム",
       "guideDescription": "たし算・ひき算・九九を暗算し、答えを選んで技を放ちながらステージへ挑戦するゲームを紹介します。"
     }
   },
   {
     "slug": "pan-socks",
-    "title": "それでもぼくはくつしたをそろえる",
-    "dialogTitleLines": [
+    "title": "それでもぼくはくつしたをそろえる。",
+    "dialogTitleParts": [
       "それでもぼくは",
-      "くつしたをそろえる"
+      "くつしたをそろえる。"
     ],
     "published": true,
     "publishedAt": "2026-11-24",
@@ -981,8 +985,9 @@ window.GAME_DATA = [
     ],
     "sitemap": true,
     "featureNote": "30にちの ものがたり",
+    "newDescription": "おなじいろのくつしたをそろえよう。いつでも。",
     "seo": {
-      "playTitle": "それでもぼくはくつしたをそろえる｜めとあたまのゲームパーク",
+      "playTitle": "それでもぼくはくつしたをそろえる。｜めとあたまのゲームパーク",
       "playDescription": "色と模様が同じ靴下を見つけ、二枚ずつそろえて三十日間の物語を進める無料Webゲームです。",
       "guideTitle": "くつしたをそろえる｜色と模様を見比べる無料ゲーム",
       "guideDescription": "色と模様が同じ靴下を二枚ずつ選び、さまざまな出来事を乗り越えて三十日間を進める遊び方を紹介します。"

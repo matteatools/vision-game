@@ -745,6 +745,10 @@
             line-height: 1.35;
         }
 
+        .title-part {
+            white-space: nowrap;
+        }
+
         .new-game-label small {
             color: var(--muted);
             font-size: 10px;
@@ -836,7 +840,7 @@
             border-radius: 6px;
         }
 
-        .quick-rank {
+        .quick-online {
             position: absolute;
             top: -6px;
             left: -4px;
@@ -858,13 +862,14 @@
             white-space: nowrap;
         }
 
-        .quick-rank.rank-2 {
-            background: #d9edf5;
-        }
-
-        .quick-rank.rank-3 {
+        .quick-online.mode-2 {
             color: #fff;
             background: var(--coral);
+        }
+
+        .quick-online.mode-3 {
+            color: #fff;
+            background: var(--teal);
         }
 
         .detail-picker-heading {
@@ -1055,7 +1060,8 @@
             transition: transform 240ms ease;
         }
 
-        .popular-badge {
+        .popular-badge,
+        .online-badge {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -1088,6 +1094,16 @@
         .popular-badge.rank-3 {
             color: #fff;
             background: var(--coral);
+        }
+
+        .online-badge.mode-2 {
+            color: #fff;
+            background: var(--coral);
+        }
+
+        .online-badge.mode-3 {
+            color: #fff;
+            background: var(--teal);
         }
 
         .device-badge {
@@ -1930,7 +1946,8 @@
                 font-size: 22px;
             }
 
-            .popular-badge {
+            .popular-badge,
+            .online-badge {
                 top: 9px;
                 left: 9px;
                 min-height: 25px;
@@ -2342,9 +2359,16 @@
             return skills.map((skill) => `<span class="skill-chip">${skill}</span>`).join("");
         }
 
-        function popularBadgeMarkup(rank) {
-            return rank
-                ? `<span class="popular-badge rank-${rank}">${rank}ばん にんき</span>`
+        function gameTitleMarkup(game) {
+            if (!game.dialogTitleParts) return game.title;
+            return game.dialogTitleParts
+                .map((part) => `<span class="title-part">${part}</span>`)
+                .join("<wbr>");
+        }
+
+        function onlineBadgeMarkup(game) {
+            return game.onlineLabel
+                ? `<span class="online-badge mode-${game.onlineOrder}">${game.onlineLabel}</span>`
                 : "";
         }
 
@@ -2361,6 +2385,7 @@
         }
 
         function isRecentlyPublished(game) {
+            if (game.showAsNew === false) return false;
             if (!game.publishedAt) return false;
             const publishedAt = new Date(`${game.publishedAt}T00:00:00+09:00`).getTime();
             const eightWeeks = 56 * 24 * 60 * 60 * 1000;
@@ -2371,9 +2396,9 @@
             return isRecentlyPublished(game) ? '<span class="new-badge">NEW</span>' : "";
         }
 
-        function quickRankMarkup(rank) {
-            return rank
-                ? `<span class="quick-rank rank-${rank}" aria-label="${rank}ばん にんき">${rank}ばん</span>`
+        function quickOnlineMarkup(game) {
+            return game.onlineLabel
+                ? `<span class="quick-online mode-${game.onlineOrder}">${game.onlineLabel}</span>`
                 : "";
         }
 
@@ -2381,13 +2406,13 @@
             const mobileOnly = mobileQuickQuery.matches;
             const quickGames = mobileOnly
                 ? games
-                    .filter((game) => game.popularRank)
-                    .sort((first, second) => first.popularRank - second.popularRank)
+                    .filter((game) => game.onlineOrder)
+                    .sort((first, second) => first.onlineOrder - second.onlineOrder)
                 : games;
 
-            quickPickerTitle.textContent = mobileOnly ? "にんきの 3つ" : "ひとめで えらぶ";
+            quickPickerTitle.textContent = mobileOnly ? "オンラインたいおう" : "ひとめで えらぶ";
             quickPickerNote.textContent = mobileOnly
-                ? "1ばん・2ばん・3ばんから えらぼう！"
+                ? "いっしょに あそべる 3つ"
                 : "きになる えを タッチ！";
 
             quickGameGrid.innerHTML = quickGames.map((game, index) => `
@@ -2398,7 +2423,7 @@
                         data-open-game="${game.slug}"
                         aria-label="${game.title}の せつめいを みる"
                     >
-                        ${quickRankMarkup(game.popularRank)}
+                        ${quickOnlineMarkup(game)}
                         <img
                             src="${game.titleImage}"
                             alt=""
@@ -2432,8 +2457,8 @@
                             <img src="${game.titleImage}" alt="" width="960" height="600" loading="eager" decoding="async">
                         </span>
                         <span class="new-game-label">
-                            <strong>${game.title}</strong>
-                            <small>${game.featureNote ?? game.skills.join("・")}</small>
+                            <strong>${gameTitleMarkup(game)}</strong>
+                            <small>${game.newDescription ?? game.featureNote ?? game.skills.join("・")}</small>
                         </span>
                     </a>
                 </article>
@@ -2449,7 +2474,7 @@
                         data-open-game="${game.slug}"
                         aria-label="${game.title}の せつめいを みる"
                     >
-                        ${popularBadgeMarkup(game.popularRank)}
+                        ${onlineBadgeMarkup(game)}
                         ${newBadgeMarkup(game)}
                         ${deviceBadgeMarkup(game.deviceNote)}
                         ${featureBadgeMarkup(game.featureNote)}
@@ -2467,7 +2492,7 @@
                             <span class="open-hint">くわしく</span>
                         </span>
                         <span class="card-body">
-                            <span class="game-title">${game.title}</span>
+                            <span class="game-title">${gameTitleMarkup(game)}</span>
                             <span class="skill-list" aria-label="つかう ちから">
                                 ${skillMarkup(game.skills)}
                             </span>
@@ -2539,10 +2564,20 @@
 
             dialog.dataset.slug = game.slug;
             dialogTitle.textContent = "";
-            (game.dialogTitleLines ?? [game.title]).forEach((line, index) => {
-                if (index > 0) dialogTitle.append(document.createElement("br"));
-                dialogTitle.append(line);
-            });
+            if (game.dialogTitleParts) {
+                game.dialogTitleParts.forEach((part, index) => {
+                    if (index > 0) dialogTitle.append(document.createElement("wbr"));
+                    const titlePart = document.createElement("span");
+                    titlePart.className = "title-part";
+                    titlePart.textContent = part;
+                    dialogTitle.append(titlePart);
+                });
+            } else {
+                (game.dialogTitleLines ?? [game.title]).forEach((line, index) => {
+                    if (index > 0) dialogTitle.append(document.createElement("br"));
+                    dialogTitle.append(line);
+                });
+            }
             dialogDescription.textContent = game.description;
             dialogSkills.innerHTML = skillMarkup(game.skills);
             dialogPlay.href = game.href;
