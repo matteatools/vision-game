@@ -1064,6 +1064,15 @@
         @media (orientation: portrait) and (max-height: 650px) {
             .title-actions { top: 62%; }
         }
+        #online-button { grid-column:1 / -1; flex-direction:row; }
+        #harvest-room { margin:auto; padding:24px; border:2px solid #795637; border-radius:18px; background:#fff9e9; color:#46351c; max-width:min(94vw,520px); max-height:90vh; overflow:auto; }
+        #harvest-room::backdrop { background:#163221aa; }
+        #harvest-entry { display:grid; gap:14px; border:0; padding:12px 0; }
+        #harvest-room button,#harvest-room input,#harvest-room select { font:inherit; padding:10px; border-radius:8px; }
+        #harvest-room button { background:#266c37; color:white; border:0; cursor:pointer; }
+        #harvest-room [hidden] { display:none; }
+        #harvest-number { font-size:1.7rem; }
+        #opponent-score { margin:0 0 5px; text-align:center; font-weight:bold; color:#3a512f; }
     </style>
 </head>
 <body>
@@ -1088,6 +1097,7 @@
                 <span class="choice-icon" aria-hidden="true">📖</span>
                 <span class="choice-copy"><strong>れんしゅう</strong></span>
             </button>
+            <button class="main-choice practice-button" id="online-button" type="button"><span class="choice-icon" aria-hidden="true">🥕</span><span class="choice-copy"><strong>オンラインでたいせん</strong><small>2人で 早い者勝ち！</small></span></button>
             <div class="title-links">
                 <a class="title-link" href="classic.html">クラシックモード</a>
                 <a class="title-link" href="../../index.html">ゲームパークへ もどる</a>
@@ -1141,6 +1151,18 @@
         </div>
     </section>
 
+    <dialog id="harvest-room" aria-labelledby="harvest-heading">
+        <h2 id="harvest-heading">オンラインでたいせん</h2>
+        <p>30びょうで、たくさんとった人のかち！<br>やさいうさぎは さわると −1こ（0こまで）。</p>
+        <fieldset id="harvest-entry">
+            <label>はたけの大きさ <select id="harvest-size"><option value="4">ちいさな はたけ（4こ）</option><option value="9" selected>ふつうの はたけ（9こ）</option><option value="16">おおきな はたけ（16こ）</option></select></label>
+            <button id="harvest-create" type="button">部屋をつくる</button>
+            <form id="harvest-join"><label>部屋番号 <input id="harvest-code" inputmode="numeric" maxlength="4" pattern="[0-9０-９]{4}" size="5" placeholder="0000" required></label><button type="submit">部屋に入る</button></form>
+        </fieldset>
+        <strong id="harvest-number"></strong>
+        <p id="harvest-note" role="status" aria-live="polite"></p>
+        <button id="harvest-back" type="button">もどる</button>
+    </dialog>
     <section class="screen game-screen" id="screen-game" aria-label="ピョコッとしゅうかくのゲーム画面" hidden>
         <header class="hud">
             <button class="exit-button" id="exit-button" type="button" aria-label="タイトルへ戻る">×</button>
@@ -1155,6 +1177,7 @@
         </header>
 
         <main class="play-field">
+            <p id="opponent-score" hidden></p>
             <div class="round-message" id="round-message" aria-live="polite">おやさいを タッチ！</div>
             <div class="hole-grid cols-2" id="hole-grid" aria-label="はたけの穴"></div>
             <div class="feedback" id="feedback" aria-hidden="true">しゅうかく！</div>
@@ -1524,6 +1547,7 @@
             }
 
             function handleHole(index) {
+                if (state.runMode === "online") { if (state.playing && !state.locked) online.hit(index, onlineEvent); return; }
                 if (!state.playing || state.locked || index !== state.activeIndex) return;
                 const hole = holes()[index];
                 if (!hole) return;
@@ -1557,6 +1581,7 @@
             }
 
             function resetRun(mode, fieldSize = 4) {
+                document.getElementById("opponent-score").hidden=mode!=="online";
                 clearTimers();
                 state.runMode = mode;
                 state.playing = false;
@@ -1720,6 +1745,8 @@
             }
 
             function returnToTitle() {
+                if (state.runMode === "online") { online.leave(); return; }
+                document.getElementById("opponent-score").hidden=true;
                 clearTimers();
                 state.playing = false;
                 state.locked = true;
@@ -1744,7 +1771,7 @@
                 spawnFriend(120);
             });
             elements.again.addEventListener("click", () => {
-                if (state.runMode === "practice") {
+                if (state.runMode === "online") { online.leave().then(() => online.open()); } else if (state.runMode === "practice") {
                     showFieldSelect();
                 } else {
                     startChallenge(state.fieldSize);
@@ -1757,7 +1784,58 @@
                 if (event.key === "Escape" && state.screen === "field") returnToTitle();
             });
 
+            let online, onlineEvent = null;
+            const loadOnline = async () => online ||= await import('./online.js');
+            document.getElementById('online-button').onclick = async () => {
+                const dialog=document.getElementById('harvest-room');
+                if(!dialog.open)dialog.showModal();
+                document.getElementById('harvest-note').textContent='接続を準備しています…';
+                try { await loadOnline(); if(dialog.open) online.open(); }
+                catch { document.getElementById('harvest-note').textContent='接続を準備できません。もう一度試してね。'; }
+            };
+            document.getElementById('harvest-back').onclick=()=>document.getElementById('harvest-room').close();
+            window.harvestBoard = {
+                begin(size) {
+                    resetRun('online',size); onlineEvent=null;
+                    elements.scoreLabel.textContent='あなた'; elements.scoreUnit.textContent='こ';
+                    elements.timeLabel.textContent='のこり'; elements.timeUnit.textContent='びょう';
+                    elements.guideCard.hidden=true;
+                },
+                frame({scores,seat,left,event,locked,countdown,message}) {
+                    elements.score.textContent=String(scores[seat]);
+                    document.getElementById('opponent-score').textContent='あいて '+scores[1-seat]+'こ';
+                    elements.time.textContent=String(left);
+                    elements.message.textContent=message;
+                    elements.guide.hidden=!countdown; elements.countdown.hidden=!countdown;
+                    elements.countdown.textContent=String(countdown);
+                    state.playing=!countdown && left>0; state.locked=locked;
+                    if(onlineEvent!==(event?.id ?? null)){
+                        hideActive(); onlineEvent=event?.id ?? null;
+                        if(event){
+                            state.activeIndex=event.hole;state.currentType=event.type;
+                            const hole=holes()[event.hole],character=CHARACTERS[event.type];
+                            hole.querySelector('.friend').src=character.src;
+                            hole.setAttribute('aria-label',character.vegetable?character.name+'を しゅうかく':'やさいうさぎは タッチしない');
+                            hole.classList.add('active');
+                            hole.classList.toggle('rabbit-active',!character.vegetable);
+                        }
+                    }
+                },
+                feedback(message,bad) {showFeedback(message,bad?'bad':'');playTone(bad?'miss':'tap');},
+                message(message) { if(state.runMode==='online')elements.message.textContent=message; },
+                result(scores,seat,winner,forfeit) {
+                    clearTimers();hideActive();state.playing=false;state.locked=true;elements.guide.hidden=true;
+                    elements.resultHeading.textContent=winner===null?'ひきわけ！':winner===seat?'あなたの かち！':'あいての かち！';
+                    elements.resultScore.textContent=String(scores[seat]); elements.resultUnit.textContent='こ';
+                    elements.resultBest.textContent='あなた '+scores[seat]+'こ ／ あいて '+scores[1-seat]+'こ'+(forfeit?'（途中で退出）':'');
+                    elements.again.textContent='もういちど対戦';showScreen('result');playTone('finish');
+                },
+                home() {state.runMode='challenge';onlineEvent=null;elements.scoreLabel.textContent='しゅうかく';returnToTitle();}
+            };
             showScreen("title");
+            if(sessionStorage.getItem('pyoko-harvest:online')) {
+                loadOnline().then(mod=>mod.resume()).catch(()=>{document.getElementById('online-button').focus();});
+            }
         })();
     </script>
 </body>
