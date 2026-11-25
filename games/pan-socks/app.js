@@ -132,6 +132,7 @@
       el.setAttribute('aria-label', c.colorName + 'の ' + c.patternName + 'の くつした');
       el.innerHTML = sockSVG(c.color, c.pattern); board.appendChild(el); nodes.push(el);
     }
+    wrap.classList.toggle('has-character', game.mode.incidents.some(type => type !== 'hole'));
     arrange(); resize(); say(defaultMessage()); render(); lastFrame = performance.now(); raf = requestAnimationFrame(frame);
     Sound.startMusic();
     $('pause-button').focus({ preventScroll: true });
@@ -279,6 +280,9 @@
     return true;
   }
   // The clipped board cannot receive input in darkness; its parent still moves the light.
+  document.querySelectorAll('img').forEach(img => { img.draggable = false; });
+  wrap.addEventListener('selectstart', e => e.preventDefault());
+  wrap.addEventListener('dragstart', e => e.preventDefault());
   wrap.addEventListener('pointerdown', e => {
     moveLight(e);
     if (game?.active && game.hasEffect('fairy') && !e.target.closest('.sock') && !drag) wrap.setPointerCapture(e.pointerId);
@@ -300,14 +304,42 @@
     drag.dx = e.clientX - drag.x; drag.dy = e.clientY - drag.y; if (Math.hypot(drag.dx, drag.dy) > 7) drag.moved = true;
     if (drag.moved) position(game.cards[drag.id], nodes[drag.id], drag.dx, drag.dy);
   });
+  function dropTarget(id) {
+    const dragged = nodes[id], shape = dragged.querySelector('.sock-hit');
+    const matrix = shape.getScreenCTM(), hits = new Map();
+    let clothPoints = 0;
+    dragged.classList.add('drop-probe');
+    try {
+      // Sample actual cloth, so transparent corners never form a pair.
+      for (let y = 6; y < 74; y += 6) {
+        for (let x = 4; x < 54; x += 6) {
+          const local = new DOMPoint(x, y);
+          if (!shape.isPointInFill(local)) continue;
+          clothPoints++;
+          const point = local.matrixTransform(matrix);
+          const target = document.elementFromPoint(point.x, point.y)?.closest('.sock');
+          if (!target || target.disabled || target === dragged) continue;
+          const targetId = Number(target.dataset.card);
+          hits.set(targetId, (hits.get(targetId) || 0) + 1);
+        }
+      }
+    } finally { dragged.classList.remove('drop-probe'); }
+    const best = [...hits].sort((a, b) => b[1] - a[1])[0];
+    return best && best[1] >= Math.max(3, clothPoints * .15) ? best[0] : null;
+  }
   board.addEventListener('pointerup', e => {
     if (!drag || drag.pointerId !== e.pointerId) return;
     const d = drag, b = board.getBoundingClientRect(), c = game.cards[d.id];
     const maySelect = d.moved || allowSelect();
     if (d.moved) { c.x += (e.clientX - d.x) / b.width; c.y += (e.clientY - d.y) / b.height; clamp(c); }
+    let targetId = null;
+    if (d.moved) {
+      position(c, nodes[d.id]);
+      if (e.clientX >= b.left && e.clientX <= b.right && e.clientY >= b.top && e.clientY <= b.bottom) targetId = dropTarget(d.id);
+    }
     // Release the pointer before the shared core handles the tap or move.
     drag = null; nodes[d.id].classList.remove('dragging'); if (nodes[d.id].hasPointerCapture(e.pointerId)) nodes[d.id].releasePointerCapture(e.pointerId);
-    if (maySelect) game.endDrag(d.id, c.x, c.y, d.moved); else game.dragging = null;
+    if (maySelect) game.endDrag(d.id, c.x, c.y, d.moved, targetId); else game.dragging = null;
     events();
   });
   board.addEventListener('pointercancel', () => { clearDrag(); renderCards(); });

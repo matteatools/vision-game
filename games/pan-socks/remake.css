@@ -59,3 +59,11 @@
 #intro-art>*{display:block;width:min(24vw,115px);height:96px;object-fit:contain}
 @media(max-height:650px){#intro-art>*{height:66px}}
 @media(max-height:560px) and (orientation:landscape){.intro-content{display:block}#intro-art{margin:2px auto}#intro-art>*{height:48px;width:68px}}
+
+/* Artwork must not start the browser's native image selection or drag. */
+img,.board-wrap{-webkit-user-select:none;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}
+.sock.drop-probe,.sock.drop-probe *{pointer-events:none!important}
+/* Reserve a strip for stationary visitors before arranging the socks. */
+.board-wrap.has-character .board{top:128px}
+@media(max-width:760px){.board-wrap.has-character .board{top:98px}}
+@media(max-height:560px) and (orientation:landscape){.board-wrap.has-character .board{top:72px}.incident-visitor:not([data-kind=hole]){width:48px;height:48px;top:8px}}

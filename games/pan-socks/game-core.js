@@ -97,10 +97,19 @@
       return true;
     }
     beginDrag(id) { if (!this.active || this.pending || !this.cards[id] || this.cards[id].matched || this.dragging !== null) return false; this.pin(this.cards[id]); this.dragging = id; this.cards[id].z = ++this.maxZ; return true; }
-    endDrag(id, x, y, moved) {
+    endDrag(id, x, y, moved, targetId = null) {
       if (this.dragging !== id) return; this.cards[id].pinnedAt = this.time; this.dragging = null;
       if (!this.active) return;
-      if (moved) { Object.assign(this.cards[id], { x, y }); this.dragged = true; this.emit('drag'); this.checkEnd(); }
+      if (moved) {
+        Object.assign(this.cards[id], { x, y }); this.dragged = true; this.emit('drag');
+        const target = this.cards[targetId];
+        if (target && target.id !== id && !target.matched && target.key === this.cards[id].key) {
+          this.selected = [];
+          this.select(id);
+          this.select(target.id);
+        }
+        this.checkEnd();
+      }
       else this.select(id);
     }
     pause() { if (!this.active) return; this.previousState = this.state; this.state = 'paused'; this.dragging = null; this.emit('pause'); }
