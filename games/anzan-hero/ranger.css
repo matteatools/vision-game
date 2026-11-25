@@ -82,7 +82,7 @@ body[data-screen="title"]{overflow:hidden}body[data-screen="title"]>header{displ
 /* Ranger palette and a compact, picture-led setup. */
 :root{color:#203451;background:#eef6fc;font-family:'Yu Gothic','Hiragino Maru Gothic ProN','Meiryo',sans-serif}
 body{background:radial-gradient(ellipse at 20% 0%,#fff3d9 0,transparent 48%),#eef6fc}
-button{transition:background-color .15s,box-shadow .15s,transform .15s}button:active:not(:disabled){transform:translateY(2px)}
+button{transition:background-color .15s,box-shadow .15s,transform .15s}button:active:not(:disabled):not(.vision-choice){transform:translateY(2px)}
 button:focus-visible{outline:3px solid #e7a51d;outline-offset:3px}
 body[data-screen="home"]>header{display:none}body[data-screen="home"] main{max-width:1080px;padding-top:14px}
 .primary{background:#e94b48;box-shadow:0 4px 0 #ac343a;color:white}.primary:hover{background:#db3f43}
