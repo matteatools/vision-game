@@ -52,7 +52,7 @@ window.GAME_DATA = [
       "みつける",
       "すばやく"
     ],
-    "group": "find",
+    "group": "follow",
     "activities": [
       "飛び出すものを見つける",
       "野菜とうさぎを見分けて操作する"
@@ -520,7 +520,7 @@ window.GAME_DATA = [
       "つなぐ",
       "かんがえる"
     ],
-    "group": "compare",
+    "group": "think",
     "activities": [
       "パイプの向きと接続を見比べる",
       "すべての家へ届く道をつなぐ"
@@ -976,7 +976,7 @@ window.GAME_DATA = [
       "みつける",
       "すばやく"
     ],
-    "group": "compare",
+    "group": "find",
     "activities": [
       "色と模様を見比べて同じ靴下を二枚選ぶ",
       "重なった靴下を動かしながら組み合わせを見つける"

@@ -1,4 +1,10 @@
 export const LIMIT=6, MAX_ROUNDS=15, ANSWER_MS=10000, ATTACK_MS=2000;
+// Room progress is shared, survives reconnects, and never reads solo unlocks.
+export function roomStage(battles,count=20){
+ const won=new Set(Object.values(battles||{}).filter(b=>b?.end?.result==='win'&&Number.isInteger(b.enemy)&&b.enemy>=0&&b.enemy<count).map(b=>b.enemy));
+ let stage=0;while(stage<count&&won.has(stage))stage++;
+ return stage;
+}
 export function maximumHP(n){return 8*Math.floor(12*n*1.2)+Math.floor(24*n*1.2)+Math.floor(36*n*1.2);}
 export function power(combo){return combo===10?36:combo===5?24:12;}
 export function reply(previous,prior,question,value,at,start,id){

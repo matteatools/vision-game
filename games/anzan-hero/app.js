@@ -86,12 +86,29 @@ function layoutVision(width,height,values,rng=Math.random,wide=width>=800&&width
  let size=wide?Math.min(96,Math.max(56,height*.14)):Math.max(56,Math.min(72,width*.17)),columns,rows,needed;
  const grid=s=>{const cols=Math.max(1,Math.floor((areaW+6)/(s+6)));const rs=Math.ceil(count/cols);return {cols,rs,height:top+bottom+rs*(s+6)+8};};
  while(size>44&&grid(size).height>height)size=Math.max(44,size-2);
- ({cols:columns,rs:rows,height:needed}=grid(size));const fieldHeight=Math.max(height,needed),usableH=fieldHeight-top-bottom;
- const cellW=areaW/columns,cellH=usableH/rows,cells=[];
- const jitter=Math.max(0,Math.min(5,(Math.min(cellW,cellH)-size-4)/2));
- for(let row=0;row<rows;row++)for(let col=0;col<columns;col++)cells.push({x:x0+(col+.5)*cellW+(rng()-.5)*2*jitter,y:top+(row+.5)*cellH+(rng()-.5)*2*jitter});
+ ({cols:columns,rs:rows,height:needed}=grid(size));const fieldHeight=Math.max(height,needed);
+ // Sample continuous positions, keeping the whole touch target clear of its neighbours.
+ const gap=10,pad=4,result=(h,points)=>({height:h,points:points.map((p,i)=>({...p,size,value:values[i]}))});
+ let scatteredHeight=fieldHeight;
+ for(let pass=0;pass<6;pass++){
+  const points=[],spanX=areaW-size-2*pad,spanY=scatteredHeight-top-bottom-size-2*pad;
+  for(let attempt=0;attempt<1200&&points.length<count;attempt++){
+   const p={x:x0+pad+size/2+rng()*spanX,y:top+pad+size/2+rng()*spanY};
+   if(points.every(q=>Math.abs(p.x-q.x)>=size+gap||Math.abs(p.y-q.y)>=size+gap))points.push(p);
+  }
+  if(points.length===count)return result(scatteredHeight,points);
+  // A very short screen may scroll instead of losing or overlapping an answer.
+  scatteredHeight+=size+gap;
+ }
+ // Bounded fallback: roomy cells with independent offsets, never a fixed set of columns.
+ const cols=Math.max(1,Math.floor(areaW/(size+gap+20))),rs=Math.ceil(count/cols);
+ const cw=areaW/cols,ch=Math.max(size+gap+40,(scatteredHeight-top-bottom)/rs),cells=[];
+ for(let row=0;row<rs;row++)for(let col=0;col<cols;col++)cells.push({
+  x:x0+col*cw+(size+gap)/2+rng()*(cw-size-gap),
+  y:top+row*ch+(size+gap)/2+rng()*(ch-size-gap)
+ });
  for(let i=cells.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[cells[i],cells[j]]=[cells[j],cells[i]];}
- return {height:fieldHeight,points:cells.slice(0,count).map((p,i)=>({...p,size,value:values[i]}))};
+ return result(top+bottom+rs*ch,cells.slice(0,count));
 }
 function renderVision(){
  if(!state||state.mode!=='vision')return;
@@ -100,9 +117,10 @@ function renderVision(){
  const viewportHeight=window.innerHeight||rect.height+54,compact=rect.width>viewportHeight&&viewportHeight<=420,wide=compact||(rect.width>=800&&rect.width/viewportHeight>=1.2);
  const baseHeight=Math.max(1,viewportHeight-(compact?35:wide?54:38));
  const panelHeight=$('play').querySelector('.panel').getBoundingClientRect().height;
+ const portraitTop=Math.max(118,Math.ceil($('play').querySelector('.player-hud').getBoundingClientRect().bottom-rect.top)+10);
  const layout=window.GameBattleUI?.isLandscape()
   ?window.GameBattleUI.visionLayout(state.visionValues)
-  :layoutVision(rect.width,baseHeight,state.visionValues,Math.random,wide,compact?{top:118,bottom:16}:wide?{}:{top:118,bottom:panelHeight+12});
+  :layoutVision(rect.width,baseHeight,state.visionValues,Math.random,wide,compact?{top:118,bottom:16}:wide?{}:{top:portraitTop,bottom:panelHeight+12});
  $('battleScene').style.setProperty('--vision-min-height',`${layout.height}px`);
  $('visionField').innerHTML=layout.points.map(p=>`<button class="vision-choice" data-key="${p.value}" aria-label="こたえ ${p.value}" style="left:${p.x}px;top:${p.y}px;width:${p.size}px;height:${p.size}px;font-size:${Math.max(20,Math.floor(p.size*.46))}px">${p.value}</button>`).join('');setKeys(state.locked);
 }

@@ -862,16 +862,6 @@
             white-space: nowrap;
         }
 
-        .quick-online.mode-2 {
-            color: #fff;
-            background: var(--coral);
-        }
-
-        .quick-online.mode-3 {
-            color: #fff;
-            background: var(--teal);
-        }
-
         .detail-picker-heading {
             margin-top: 54px;
             text-align: center;
@@ -1096,14 +1086,14 @@
             background: var(--coral);
         }
 
-        .online-badge.mode-2 {
+        [data-online-label="たいせん"] {
             color: #fff;
-            background: var(--coral);
+            background: #167349;
         }
 
-        .online-badge.mode-3 {
+        [data-online-label="きょうりょく"] {
             color: #fff;
-            background: var(--teal);
+            background: #2457a7;
         }
 
         .device-badge {
@@ -2279,7 +2269,7 @@
         </div>
     </dialog>
 
-    <script src="data/games.generated.js?v=20261124"></script>
+    <script src="data/games.generated.js?v=20261125"></script>
     <script>
         const games = (window.GAME_DATA ?? [])
             .filter((game) => game.published)
@@ -2366,9 +2356,9 @@
                 .join("<wbr>");
         }
 
-        function onlineBadgeMarkup(game) {
+        function onlineBadgeMarkup(game, badgeClass = "online-badge") {
             return game.onlineLabel
-                ? `<span class="online-badge mode-${game.onlineOrder}">${game.onlineLabel}</span>`
+                ? `<span class="${badgeClass}" data-online-label="${game.onlineLabel}">${game.onlineLabel}</span>`
                 : "";
         }
 
@@ -2396,12 +2386,6 @@
             return isRecentlyPublished(game) ? '<span class="new-badge">NEW</span>' : "";
         }
 
-        function quickOnlineMarkup(game) {
-            return game.onlineLabel
-                ? `<span class="quick-online mode-${game.onlineOrder}">${game.onlineLabel}</span>`
-                : "";
-        }
-
         function renderQuickGames() {
             const mobileOnly = mobileQuickQuery.matches;
             const quickGames = mobileOnly
@@ -2423,7 +2407,7 @@
                         data-open-game="${game.slug}"
                         aria-label="${game.title}の せつめいを みる"
                     >
-                        ${quickOnlineMarkup(game)}
+                        ${onlineBadgeMarkup(game, "quick-online")}
                         <img
                             src="${game.titleImage}"
                             alt=""

@@ -1,5 +1,7 @@
 /* Landscape battlefield: one scene, side HUDs, a compact equation, then answers. */
 .battle-side,.battle-question-dock{display:none}
+/* Center answer labels explicitly instead of relying on native button text layout. */
+#play .key{display:flex;align-items:center;justify-content:center;line-height:1;padding:0;-webkit-appearance:none;appearance:none}
 #play .key.zero-key{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1px;line-height:1}
 #play .zero-key small{display:block;font-size:11px;line-height:1.1;white-space:nowrap}
 #play.landscape-battle{--battle-toolbar:44px;overflow:auto;background:#7ccbf3}

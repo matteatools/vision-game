@@ -135,7 +135,7 @@ body[data-screen="home"] main{max-width:1220px;padding:10px 24px 26px}
 }
 @media(max-width:799px) and (orientation:portrait){
  #play:not(.vision-mode) .panel{background:#f7f1df;border-top:2px solid #8198a6}
- #play.vision-mode .arena{background-image:linear-gradient(#eff7fad9,#eff7fad9),url('assets/command/city-arena.webp')}
+ #play.vision-mode .arena{background-image:url('assets/command/city-arena.webp')}
 }
 @media(max-height:420px) and (orientation:landscape){
  #play .panel,#play.vision-mode .panel{background:#fff8e9;border-right:2px solid #65879e}

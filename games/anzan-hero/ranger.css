@@ -139,13 +139,13 @@ body[data-screen="home"]>header{display:none}body[data-screen="home"] main{max-w
  #play.vision-mode .panel .toolbar{height:27px;margin-top:2px}
  #play.vision-mode .player-hud{top:66px;padding:4px 8px;font-size:10px;min-width:0;width:205px}
  #play.vision-mode .player-hud small{display:none}#play.vision-mode .hud-ranger{width:23px;height:32px}
- #play.vision-mode #sprite{opacity:.25;pointer-events:none}#play.vision-mode .vision-choice{background:#fffdf8f5;color:#244f78;border-color:#fff;box-shadow:0 0 0 2px #8db2c8,0 3px 5px #28486622}
+ #play.vision-mode #sprite{opacity:1;pointer-events:none}#play.vision-mode .vision-choice{background:#fffdf8f5;color:#244f78;border-color:#fff;box-shadow:0 0 0 2px #8db2c8,0 3px 5px #28486622}
 }
 @media(max-height:420px) and (orientation:landscape){
  #play:not(.vision-mode) .panel{background:#edf5fb}
  #play.vision-mode .panel{position:fixed;left:0;top:0;bottom:35px;width:52%;z-index:4;background:#edf5fb}
  #play.vision-mode .panel>.question{font-size:30px}
- #play.vision-mode #sprite{opacity:.18;pointer-events:none}
+ #play.vision-mode #sprite{opacity:1;pointer-events:none}
  #play.vision-mode .player-hud{top:61px;font-size:9px}
  #play.vision-mode .approach-hud{display:none}
  #play.vision-mode .enemy-name{max-width:none;align-self:center}
